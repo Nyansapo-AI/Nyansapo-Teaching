@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -54,107 +55,114 @@ fun GetStartedScreen(
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
-            .widthIn(max = 800.dp)
             .background(MaterialTheme.colorScheme.primary)
             .padding(20.dp)
     ) { paddingValues ->
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceBetween,
+        Box(
+            contentAlignment = Alignment.Center,
             modifier = Modifier
-                .background(MaterialTheme.colorScheme.primary)
                 .fillMaxSize()
                 .padding(paddingValues)
-
-        ) {
-            Image(
-                painter = painterResource(R.drawable.nyansapo_ai_icon_medium),
-                contentDescription = stringResource(R.string.app_icon_description),
-                modifier = Modifier
-//                    .size(100.dp)
-            )
-
+        ){
             Column(
-                verticalArrangement = Arrangement.spacedBy(28.dp)
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .background(MaterialTheme.colorScheme.primary)
+                    .fillMaxHeight()
+                    .widthIn(max = 500.dp)
             ) {
-
-                FlowRow(
-                    verticalArrangement = Arrangement.spacedBy(2.dp),
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                Image(
+                    painter = painterResource(R.drawable.nyansapo_ai_icon_medium),
+                    contentDescription = stringResource(R.string.app_icon_description),
                     modifier = Modifier
-                        .fillMaxWidth(0.9f)
+//                    .size(100.dp)
+                )
+
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(28.dp)
                 ) {
 
-                    Text(
-                        text = "Enhance The",
-                        textAlign = TextAlign.Left,
-                        style = MaterialTheme.typography.headlineMedium.copy(
-                            fontWeight = FontWeight.Bold
-                        )
-                    )
-                    Text(
-                        text = "Digital",
-                        textAlign = TextAlign.Left,
-                        style = MaterialTheme.typography.headlineMedium.copy(
-                            fontWeight = FontWeight.Bold
-                        )
-                    )
-                    Text(
-                        text = "Teaching",
-                        textAlign = TextAlign.Left,
-                        style = MaterialTheme.typography.headlineMedium.copy(
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.secondary
-                        )
-                    )
-                    Text(
-                        text = "Experience",
-                        textAlign = TextAlign.Left,
-                        style = MaterialTheme.typography.headlineMedium.copy(
-                            fontWeight = FontWeight.Bold
-                        )
-                    )
-
-
-                }
-
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                ) {
-                    TextButton(
-                        colors = ButtonColors(
-                            containerColor = MaterialTheme.colorScheme.secondary,
-                            contentColor = MaterialTheme.colorScheme.onSecondary,
-                            disabledContentColor = MaterialTheme.colorScheme.onPrimary,
-                            disabledContainerColor = MaterialTheme.colorScheme.primary
-                        ),
-                        onClick = {},
+                    FlowRow(
+                        verticalArrangement = Arrangement.spacedBy(2.dp),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
                         modifier = Modifier
-                            .align(Alignment.BottomEnd)
+                            .fillMaxWidth(0.9f)
                     ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+
+                        Text(
+                            text = "Enhance The",
+                            textAlign = TextAlign.Left,
+                            style = MaterialTheme.typography.headlineMedium.copy(
+                                fontWeight = FontWeight.Bold
+                            )
+                        )
+                        Text(
+                            text = "Digital",
+                            textAlign = TextAlign.Left,
+                            style = MaterialTheme.typography.headlineMedium.copy(
+                                fontWeight = FontWeight.Bold
+                            )
+                        )
+                        Text(
+                            text = "Teaching",
+                            textAlign = TextAlign.Left,
+                            style = MaterialTheme.typography.headlineMedium.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.secondary
+                            )
+                        )
+                        Text(
+                            text = "Experience",
+                            textAlign = TextAlign.Left,
+                            style = MaterialTheme.typography.headlineMedium.copy(
+                                fontWeight = FontWeight.Bold
+                            )
+                        )
+
+
+                    }
+
+
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    ) {
+                        TextButton(
+                            colors = ButtonColors(
+                                containerColor = MaterialTheme.colorScheme.secondary,
+                                contentColor = MaterialTheme.colorScheme.onSecondary,
+                                disabledContentColor = MaterialTheme.colorScheme.onPrimary,
+                                disabledContainerColor = MaterialTheme.colorScheme.primary
+                            ),
+                            onClick = {},
+                            modifier = Modifier
+                                .align(Alignment.BottomEnd)
                         ) {
-                            Icon(
-                                imageVector = Icons.Default.ArrowForward,
-                                contentDescription = stringResource(R.string.get_started_action)
-                            )
-
-                            Text(
-                                text = stringResource(R.string.get_started),
-                                style = MaterialTheme.typography.titleLarge.copy(
-                                    fontWeight = FontWeight.Bold
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.ArrowForward,
+                                    contentDescription = stringResource(R.string.get_started_action)
                                 )
-                            )
 
+                                Text(
+                                    text = stringResource(R.string.get_started),
+                                    style = MaterialTheme.typography.titleLarge.copy(
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                )
+
+                            }
                         }
                     }
                 }
-            }
 
+            }
         }
+
     }
 }
