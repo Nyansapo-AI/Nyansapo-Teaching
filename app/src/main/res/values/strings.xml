@@ -4,5 +4,7 @@
     <!--Get Started -->
     <string name="get_started">Get Started</string>
     <string name="get_started_desc">Enhance The Digital Teaching Experience</string>
+    <string name="app_icon_description">Popayan AI Icon</string>
+    <string name="get_started_action">Click to get started</string>
 
 </resources>

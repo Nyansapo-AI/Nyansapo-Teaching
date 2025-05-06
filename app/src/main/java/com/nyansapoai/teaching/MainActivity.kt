@@ -12,7 +12,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import com.nyansapoai.teaching.presentation.navigation.Navigation
 import com.nyansapoai.teaching.ui.theme.NyansapoTeachingTheme
+import org.koin.compose.KoinContext
+
+lateinit var navController: NavHostController
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -20,11 +27,13 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             NyansapoTeachingTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = stringResource(R.string.app_name),
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                navController = rememberNavController()
+
+
+                KoinContext {
+
+                    Navigation()
+
                 }
             }
         }
