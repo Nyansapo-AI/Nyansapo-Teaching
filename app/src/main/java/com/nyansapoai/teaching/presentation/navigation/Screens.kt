@@ -5,3 +5,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data object GetStartedPage
+
+@Serializable
+data object SignInPage

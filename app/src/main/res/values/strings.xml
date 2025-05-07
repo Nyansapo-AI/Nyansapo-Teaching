@@ -1,10 +1,18 @@
 <resources>
     <string name="app_name">Nyansapo Teaching</string>
 
+    <!--Common -->
+    <string name="continue_text">Continue</string>
+
+
     <!--Get Started -->
     <string name="get_started">Get Started</string>
     <string name="get_started_desc">Enhance The Digital Teaching Experience</string>
     <string name="app_icon_description">Popayan AI Icon</string>
     <string name="get_started_action">Click to get started</string>
+    
+    <!---Sign In-->
+    <string name="sign_in">Sign In to your account</string>
+    <string name="sign_in_desc">Enter your details to sign in to the app</string>
 
 </resources>

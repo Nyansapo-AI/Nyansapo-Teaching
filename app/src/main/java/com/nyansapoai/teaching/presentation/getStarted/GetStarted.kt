@@ -32,6 +32,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nyansapoai.teaching.R
+import com.nyansapoai.teaching.navController
+import com.nyansapoai.teaching.presentation.navigation.SignInPage
 import org.koin.androidx.compose.koinViewModel
 
 
@@ -77,7 +79,6 @@ fun GetStartedScreen(
                     painter = painterResource(R.drawable.nyansapo_ai_icon_medium),
                     contentDescription = stringResource(R.string.app_icon_description),
                     modifier = Modifier
-//                    .size(100.dp)
                 )
 
                 Column(
@@ -136,7 +137,9 @@ fun GetStartedScreen(
                                 disabledContentColor = MaterialTheme.colorScheme.onPrimary,
                                 disabledContainerColor = MaterialTheme.colorScheme.primary
                             ),
-                            onClick = {},
+                            onClick = {
+                                navController.navigate(SignInPage)
+                            },
                             modifier = Modifier
                                 .align(Alignment.BottomEnd)
                         ) {

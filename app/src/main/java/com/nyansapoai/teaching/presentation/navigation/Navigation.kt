@@ -13,6 +13,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.nyansapoai.teaching.navController
+import com.nyansapoai.teaching.presentation.authentication.signIn.SignInRoot
 import com.nyansapoai.teaching.presentation.getStarted.GetStartedRoot
 
 @Composable
@@ -32,6 +33,10 @@ fun Navigation(){
         ){
             composable<GetStartedPage> {
                 GetStartedRoot()
+            }
+
+            composable<SignInPage> {
+                SignInRoot()
             }
 
         }
