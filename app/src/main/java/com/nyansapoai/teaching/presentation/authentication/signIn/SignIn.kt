@@ -17,6 +17,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,17 +39,24 @@ import org.koin.androidx.compose.koinViewModel
 fun SignInRoot() {
 
     val viewModel = koinViewModel<SignInViewModel>()
-    val state by viewModel.state.collectAsStateWithLifecycle()
+
+    val name by viewModel.name.collectAsState()
+    val phoneNumber by viewModel.phoneNumber.collectAsState()
+    val canSubmit by viewModel.canSubmit.collectAsState()
 
     SignInScreen(
-        state = state,
+        name = name ,
+        phoneNumber = phoneNumber,
+        canSubmit = canSubmit,
         onAction = viewModel::onAction
     )
 }
 
 @Composable
 fun SignInScreen(
-    state: SignInState,
+    name: String,
+    phoneNumber: String,
+    canSubmit: Boolean,
     onAction: (SignInAction) -> Unit,
 ) {
     Scaffold(
@@ -120,13 +128,14 @@ fun SignInScreen(
 
 
                 Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier
                         .fillMaxWidth(0.9f)
                         .imePadding()
                 ) {
 
                     AppTextField(
-                        value = state.name,
+                        value = name,
                         placeholder = "Name",
                         imeAction = ImeAction.Next,
                         onValueChanged = { string ->
@@ -135,7 +144,7 @@ fun SignInScreen(
                     )
 
                     AppTextField(
-                        value = state.phoneNumber,
+                        value = phoneNumber,
                         placeholder = "Phone Number",
                         imeAction = ImeAction.Done,
                         keyboardType = KeyboardType.Number,
@@ -145,7 +154,7 @@ fun SignInScreen(
                     )
 
                     AppButton(
-                        enabled = state.submitEnabled,
+                        enabled = canSubmit,
                         onClick = {
                             onAction.invoke(SignInAction.OnSubmit(onSuccess = {
                                 navController.navigate(OTPPage)
@@ -162,17 +171,8 @@ fun SignInScreen(
                             )
                         )
                     }
-                }
 
 
-
-
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(6.dp),
@@ -203,6 +203,18 @@ fun SignInScreen(
                         }
 
                     }
+                }
+
+
+
+
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+
 
 
                     Row(
@@ -248,9 +260,6 @@ fun SignInScreen(
                             )
 
                         }
-
-
-
 
                     }
 

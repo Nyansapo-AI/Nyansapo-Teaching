@@ -1,4 +1,4 @@
-package com.nyansapoai.teaching.ui
+package com.nyansapoai.teaching.utils
 
 object Utils {
 
@@ -7,6 +7,12 @@ object Utils {
 
     fun isValidPhoneNumber(phone: String): Boolean {
         return phone.matches(phoneRegex)
+    }
+
+    fun secondsToTimerString(seconds: Int): String {
+        val minutes = seconds / 60
+        val remainingSeconds = seconds % 60
+        return String.format("%02d:%02d", minutes, remainingSeconds)
     }
 
 }

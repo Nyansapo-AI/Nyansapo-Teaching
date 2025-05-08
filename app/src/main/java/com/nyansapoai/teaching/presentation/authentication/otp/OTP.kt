@@ -4,7 +4,6 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -13,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -20,9 +20,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -30,23 +32,34 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nyansapoai.teaching.R
 import com.nyansapoai.teaching.presentation.common.components.CodeTextField
+import com.nyansapoai.teaching.utils.Utils
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun OTPRoot() {
 
     val viewModel = koinViewModel<OTPViewModel>()
-    val state by viewModel.state.collectAsStateWithLifecycle()
+    val otpCode by viewModel.otpCode.collectAsState()
+    val resendTimer by viewModel.timer.collectAsStateWithLifecycle()
+    val canSubmit by viewModel.canSubmit.collectAsState()
+    val canResendOTPRequest by viewModel.canResendOTPRequest.collectAsState()
+
 
     OTPScreen(
-        state = state,
-        onAction = viewModel::onAction
+        onAction = viewModel::onAction,
+        otpCode = otpCode,
+        resendTimer = resendTimer,
+        canResendOTPRequest = canResendOTPRequest,
+        canSubmit = canSubmit
     )
 }
 
 @Composable
 fun OTPScreen(
-    state: OTPState,
+    otpCode: String,
+    resendTimer: Int,
+    canResendOTPRequest: Boolean,
+    canSubmit: Boolean,
     onAction: (OTPAction) -> Unit,
 ) {
     Scaffold(
@@ -63,10 +76,12 @@ fun OTPScreen(
                 verticalArrangement = Arrangement.spacedBy(40.dp),
                 modifier = Modifier
                     .widthIn(max = 500.dp)
-//                    .fillMaxHeight()
+                    .imePadding()
             ) {
                 Column(
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    modifier = Modifier
+
                 ) {
                     Text(
                         text = stringResource(R.string.otp_title),
@@ -79,7 +94,7 @@ fun OTPScreen(
                     )
 
                     CodeTextField(
-                        value = state.otpCde,
+                        value = otpCode,
                         obscureText = false,
                         enabled = true,
                         length = 4 ,
@@ -91,7 +106,7 @@ fun OTPScreen(
                     )
 
                     Text(
-                        text = stringResource(R.string.remaining_time, "00:30s"),
+                        text = "Remaining time: ${Utils.secondsToTimerString(seconds = resendTimer)}",
                         textAlign = TextAlign.Center,
                         style = MaterialTheme.typography.titleSmall.copy(
                             fontWeight = FontWeight.Light
@@ -114,6 +129,13 @@ fun OTPScreen(
                             .fillMaxWidth()
                     )
                     TextButton(
+                        enabled = canResendOTPRequest,
+                        colors = ButtonDefaults.buttonColors(
+                            disabledContainerColor = Color.Transparent,
+                            disabledContentColor = MaterialTheme.colorScheme.onBackground.copy(
+                                alpha = 0.3f
+                            )
+                        ),
                         onClick = {}
                     ) {
                         Text(
@@ -137,6 +159,7 @@ fun OTPScreen(
                         .fillMaxWidth(0.9f)
                 ) {
                     Button(
+                        enabled = canSubmit,
                         shape = RoundedCornerShape(5.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.secondary,
