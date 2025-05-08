@@ -15,11 +15,6 @@
           <targets>
             <Target type="DEFAULT_BOOT">
               <handle>
-                <DeviceId pluginId="PhysicalDevice" identifier="serial=R9AM8053VZJ" />
-              </handle>
-            </Target>
-            <Target type="DEFAULT_BOOT">
-              <handle>
                 <DeviceId pluginId="LocalEmulator" identifier="path=/home/wallace/.android/avd/Pixel_3a.avd" />
               </handle>
             </Target>

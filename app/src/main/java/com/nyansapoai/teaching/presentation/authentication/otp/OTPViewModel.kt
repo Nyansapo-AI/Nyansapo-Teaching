@@ -1,4 +1,4 @@
-package com.nyansapoai.teaching.presentation.authentication.signIn
+package com.nyansapoai.teaching.presentation.authentication.otp
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -8,11 +8,11 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 
-class SignInViewModel : ViewModel() {
+class OTPViewModel : ViewModel() {
 
     private var hasLoadedInitialData = false
 
-    private val _state = MutableStateFlow(SignInState())
+    private val _state = MutableStateFlow(OTPState())
     val state = _state
         .onStart {
             if (!hasLoadedInitialData) {
@@ -23,27 +23,15 @@ class SignInViewModel : ViewModel() {
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000L),
-            initialValue = SignInState()
+            initialValue = OTPState()
         )
 
-    fun onAction(action: SignInAction) {
+    fun onAction(action: OTPAction) {
         when (action) {
-            is SignInAction.OnNameChange -> {
-                _state.update { it.copy(name = action.name) }
-            }
-            is SignInAction.OnPhoneNumberChange -> {
-                _state.update { it.copy(phoneNumber = action.phoneNumber) }
-            }
-
-            is SignInAction.OnSubmit -> {
-                onSubmitSignInForm()
-                action.onSuccess.invoke()
+            is OTPAction.OnOTPCOdeChange -> {
+                _state.update { it.copy(otpCde = action.code) }
             }
         }
-    }
-
-    private fun onSubmitSignInForm() {
-
     }
 
 }

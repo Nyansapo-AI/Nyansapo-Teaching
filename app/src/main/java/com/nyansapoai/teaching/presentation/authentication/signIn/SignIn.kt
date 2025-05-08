@@ -4,7 +4,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
@@ -13,18 +15,23 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nyansapoai.teaching.R
-import com.nyansapoai.teaching.presentation.common.AppButton
-import com.nyansapoai.teaching.presentation.common.AppTextField
+import com.nyansapoai.teaching.navController
+import com.nyansapoai.teaching.presentation.common.components.AppButton
+import com.nyansapoai.teaching.presentation.common.components.AppTextField
+import com.nyansapoai.teaching.presentation.navigation.OTPPage
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -39,7 +46,6 @@ fun SignInRoot() {
     )
 }
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun SignInScreen(
     state: SignInState,
@@ -56,9 +62,10 @@ fun SignInScreen(
         ){
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(32.dp),
+                verticalArrangement = Arrangement.SpaceEvenly,
                 modifier = Modifier
                     .widthIn(max = 500.dp)
+                    .fillMaxHeight()
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -121,6 +128,7 @@ fun SignInScreen(
                     AppTextField(
                         value = state.name,
                         placeholder = "Name",
+                        imeAction = ImeAction.Next,
                         onValueChanged = { string ->
                             onAction.invoke(SignInAction.OnNameChange(name = string))
                         }
@@ -129,6 +137,8 @@ fun SignInScreen(
                     AppTextField(
                         value = state.phoneNumber,
                         placeholder = "Phone Number",
+                        imeAction = ImeAction.Done,
+                        keyboardType = KeyboardType.Number,
                         onValueChanged = { string ->
                             onAction.invoke(SignInAction.OnPhoneNumberChange(phoneNumber = string))
                         }
@@ -138,7 +148,7 @@ fun SignInScreen(
                         enabled = state.submitEnabled,
                         onClick = {
                             onAction.invoke(SignInAction.OnSubmit(onSuccess = {
-
+                                navController.navigate(OTPPage)
                             }))
                         },
                         modifier = Modifier
@@ -152,6 +162,98 @@ fun SignInScreen(
                             )
                         )
                     }
+                }
+
+
+
+
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        modifier = Modifier
+                    ) {
+                        Text(
+                            text = stringResource(R.string.no_account),
+                            textAlign = TextAlign.Center,
+                            style = MaterialTheme.typography.titleSmall.copy(
+                                fontWeight = FontWeight.Bold
+                            ),
+                            modifier = Modifier
+                        )
+
+                        TextButton(
+                            onClick = {}
+                        ) {
+                            Text(
+                                text = stringResource(R.string.contact_us),
+                                textAlign = TextAlign.Center,
+                                style = MaterialTheme.typography.titleSmall.copy(
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.secondary
+                                ),
+                                modifier = Modifier
+                            )
+
+                        }
+
+                    }
+
+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        modifier = Modifier
+                    ) {
+                        TextButton(
+                            onClick = {}
+                        ) {
+                            Text(
+                                text = stringResource(R.string.term_services),
+                                textAlign = TextAlign.Center,
+                                style = MaterialTheme.typography.titleSmall.copy(
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.tertiary
+                                ),
+                                modifier = Modifier
+                            )
+
+                        }
+
+                        Text(
+                            text = stringResource(R.string.and),
+                            textAlign = TextAlign.Center,
+                            style = MaterialTheme.typography.titleSmall.copy(
+                                fontWeight = FontWeight.Bold
+                            ),
+                            modifier = Modifier
+                        )
+
+                        TextButton(
+                            onClick = {}
+                        ) {
+                            Text(
+                                text = stringResource(R.string.privacy_policy),
+                                textAlign = TextAlign.Center,
+                                style = MaterialTheme.typography.titleSmall.copy(
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.tertiary
+                                ),
+                                modifier = Modifier
+                            )
+
+                        }
+
+
+
+
+                    }
+
                 }
             }
         }

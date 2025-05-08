@@ -8,3 +8,6 @@ data object GetStartedPage
 
 @Serializable
 data object SignInPage
+
+@Serializable
+data object OTPPage

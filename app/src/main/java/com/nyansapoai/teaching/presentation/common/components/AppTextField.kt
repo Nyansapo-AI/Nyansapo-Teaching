@@ -1,4 +1,4 @@
-package com.nyansapoai.teaching.presentation.common
+package com.nyansapoai.teaching.presentation.common.components
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActionScope
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -39,6 +41,7 @@ fun AppTextField(
     enabled: Boolean = true,
     required: Boolean = false,
     imeAction: ImeAction = ImeAction.Next,
+    onImeActionDone: () -> Unit = {},
     trailingIcon: @Composable () -> Unit = {},
     leadingIcon: @Composable() (() -> Unit)? = null,
     textFieldModifier: Modifier = Modifier
@@ -91,7 +94,12 @@ fun AppTextField(
                 ),
             leadingIcon = leadingIcon,
             singleLine = singleLine,
-            keyboardOptions = KeyboardOptions(keyboardType = keyboardType, imeAction = imeAction),
+            keyboardOptions = KeyboardOptions(keyboardType = keyboardType, imeAction = imeAction, ),
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    onImeActionDone()
+                }
+            ),
             onValueChange = onValueChanged,
             shape = RoundedCornerShape(5.dp),
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),

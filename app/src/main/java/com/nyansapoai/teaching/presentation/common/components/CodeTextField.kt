@@ -1,4 +1,4 @@
-package com.nyansapoai.teaching.presentation.common
+package com.nyansapoai.teaching.presentation.common.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -32,8 +33,8 @@ fun CodeTextField(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     obscureText: Boolean = true,
-    boxSize: Dp = 36.dp,
-    shape: Shape = CircleShape,
+    boxSize: Dp = 80.dp,
+    shape: Shape = RoundedCornerShape(10.dp),
     keyboardOptions: KeyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
     keyboardActions: KeyboardActions = KeyboardActions(),
     onValueChange: (String) -> Unit,
@@ -52,31 +53,30 @@ fun CodeTextField(
         keyboardActions = keyboardActions,
         decorationBox = {
             Row(
-                Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(
                     8.dp,
                     alignment = Alignment.CenterHorizontally
                 ),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
+                modifier =Modifier
+                    .fillMaxWidth(),
+
             ) {
                 repeat(length) { index ->
                     val currentChar = value.getOrNull(index)
 
                     Box(
                         modifier =
-                            modifier
+                            Modifier
                                 .size(boxSize)
-                                .border(
-                                    width = 1.dp,
-                                    color = if (currentChar == null) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.primary,
-                                    shape = shape,
-                                ),
+                                .clip(shape)
+                                .background(MaterialTheme.colorScheme.tertiary),
                         contentAlignment = Alignment.Center
                     ) {
                         if (currentChar != null && obscureText) {
                             Box(
                                 modifier = Modifier.fillMaxSize().padding(8.dp).clip(shape).background(
-                                    MaterialTheme.colorScheme.primary)
+                                    MaterialTheme.colorScheme.tertiary)
                             )
                         } else if (currentChar != null) {
                             Text(
