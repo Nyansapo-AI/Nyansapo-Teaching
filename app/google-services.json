@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "510141847161",
+    "project_id": "nyansapo-ai-v2",
+    "storage_bucket": "nyansapo-ai-v2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:510141847161:android:2aa6f634dd960209c4e6a8",
+        "android_client_info": {
+          "package_name": "com.nyansapoai.teaching"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBRZFmDUmCd4ON4xEKD03JZK_s2Iwhc2Mo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

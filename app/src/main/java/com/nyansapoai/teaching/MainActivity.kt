@@ -14,16 +14,23 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.google.firebase.Firebase
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.analytics
 import com.nyansapoai.teaching.presentation.navigation.Navigation
 import com.nyansapoai.teaching.ui.theme.NyansapoTeachingTheme
 import org.koin.compose.KoinContext
 
 lateinit var navController: NavHostController
 
+private lateinit var analytics: FirebaseAnalytics
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        analytics = Firebase.analytics
+
         enableEdgeToEdge()
         setContent {
             NyansapoTeachingTheme {
