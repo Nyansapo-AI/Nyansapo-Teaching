@@ -1,8 +1,29 @@
 <resources>
     <string name="app_name">Nyansapo Teaching</string>
 
+    <!--Common -->
+    <string name="continue_text">Continue</string>
+    <string name="contact_us">Contact Us</string>
+    <string name="and">and</string>
+    <string name="term_services">Terms of Services</string>
+    <string name="privacy_policy">Privacy Policy</string>
+    <string name="cancel">Cancel</string>
+
     <!--Get Started -->
     <string name="get_started">Get Started</string>
     <string name="get_started_desc">Enhance The Digital Teaching Experience</string>
+    <string name="app_icon_description">Popayan AI Icon</string>
+    <string name="get_started_action">Click to get started</string>
+    
+    <!---Sign In-->
+    <string name="sign_in">Sign In to your account</string>
+    <string name="sign_in_desc">Enter your details to sign in to the app</string>
+    <string name="no_account">Do not have an Account?</string>
+    
+    <!--OTP-->
+    <string name="otp_title">Enter the Verification Code</string>
+    <string name="otp_not_received">Didn’t receive OTP code?</string>
+    <string name="remaining_time">Remaining time %1$s </string>
+    <string name="resend_otp">Resend Code</string>
 
 </resources>
