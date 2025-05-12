@@ -70,8 +70,8 @@ class OTPViewModel : ViewModel() {
                 delay(1000L)
                 _timer.value.let {
                     _timer.update { it - 1 }
-                    Log.d("timer", "Timer: $it")
-                } ?: break
+//                    Log.d("timer", "Timer: $it")
+                }
             }
         }
     }

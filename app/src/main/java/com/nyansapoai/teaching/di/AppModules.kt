@@ -1,5 +1,8 @@
 package com.nyansapoai.teaching.di
 
+import com.google.firebase.auth.FirebaseAuth
+import com.nyansapoai.teaching.data.remote.authentication.AuthenticationRepository
+import com.nyansapoai.teaching.data.remote.authentication.AuthenticationRepositoryImp
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 import com.nyansapoai.teaching.presentation.onboarding.OnboardingViewModel
@@ -13,5 +16,16 @@ val appModules = module {
     viewModelOf(::GetStartedViewModel)
     viewModelOf(::SignInViewModel)
     viewModelOf(::OTPViewModel)
+
+
+    single<FirebaseAuth> {
+        FirebaseAuth.getInstance()
+    }
+
+    single<AuthenticationRepository> {
+        AuthenticationRepositoryImp(
+            auth = get()
+        )
+    }
 
 }

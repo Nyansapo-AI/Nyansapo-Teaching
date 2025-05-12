@@ -1,5 +1,6 @@
 package com.nyansapoai.teaching.presentation.authentication.otp
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -20,6 +21,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -31,6 +33,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nyansapoai.teaching.R
+import com.nyansapoai.teaching.presentation.authentication.otp.components.OTPImplementation
 import com.nyansapoai.teaching.presentation.common.components.CodeTextField
 import com.nyansapoai.teaching.utils.Utils
 import org.koin.androidx.compose.koinViewModel
@@ -62,9 +65,19 @@ fun OTPScreen(
     canSubmit: Boolean,
     onAction: (OTPAction) -> Unit,
 ) {
+
+
+
     Scaffold(
         modifier = Modifier
     ) { innerPadding ->
+
+        AnimatedVisibility(
+            visible = canSubmit
+        ) {
+            OTPImplementation(phoneNumber = "+254795123407")
+        }
+
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
