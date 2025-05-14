@@ -1,6 +1,6 @@
 package com.nyansapoai.teaching.presentation.onboarding
 
 data class OnboardingState(
-    val paramOne: String = "default",
+    val currentStep: Int = 0,
     val paramTwo: List<String> = emptyList(),
 )

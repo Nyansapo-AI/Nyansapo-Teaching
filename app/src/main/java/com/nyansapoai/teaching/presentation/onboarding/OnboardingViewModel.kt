@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 
 class OnboardingViewModel : ViewModel() {
 
@@ -27,7 +28,10 @@ class OnboardingViewModel : ViewModel() {
 
     fun onAction(action: OnboardingAction) {
         when (action) {
-            else -> TODO("Handle actions")
+            is OnboardingAction.OnStepChange -> {
+
+                _state.update { it.copy(currentStep = action.step) }
+            }
         }
     }
 

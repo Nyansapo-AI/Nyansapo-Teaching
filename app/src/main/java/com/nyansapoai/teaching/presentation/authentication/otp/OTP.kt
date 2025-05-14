@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -21,7 +20,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -33,17 +31,20 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nyansapoai.teaching.R
-import com.nyansapoai.teaching.presentation.authentication.otp.components.OTPImplementation
+import com.nyansapoai.teaching.presentation.authentication.otp.components.PhoneAuth
 import com.nyansapoai.teaching.presentation.common.components.CodeTextField
 import com.nyansapoai.teaching.utils.Utils
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun OTPRoot() {
+fun OTPRoot(
+    phoneNumber: String
+) {
 
     val viewModel = koinViewModel<OTPViewModel>()
     val otpCode by viewModel.otpCode.collectAsState()
     val resendTimer by viewModel.timer.collectAsStateWithLifecycle()
+    val isOtpComplete by viewModel.isOTPComplete.collectAsState()
     val canSubmit by viewModel.canSubmit.collectAsState()
     val canResendOTPRequest by viewModel.canResendOTPRequest.collectAsState()
 
@@ -53,18 +54,24 @@ fun OTPRoot() {
         otpCode = otpCode,
         resendTimer = resendTimer,
         canResendOTPRequest = canResendOTPRequest,
-        canSubmit = canSubmit
+        isOTPComplete = isOtpComplete,
+        canSubmit = canSubmit,
+        phoneNumber = phoneNumber
     )
 }
 
 @Composable
 fun OTPScreen(
+    phoneNumber: String,
     otpCode: String,
     resendTimer: Int,
     canResendOTPRequest: Boolean,
-    canSubmit: Boolean,
+    isOTPComplete: Boolean,
+    canSubmit: Boolean = false,
     onAction: (OTPAction) -> Unit,
 ) {
+
+    val phoneAuth = PhoneAuth
 
 
 
@@ -72,11 +79,18 @@ fun OTPScreen(
         modifier = Modifier
     ) { innerPadding ->
 
+        /*
         AnimatedVisibility(
-            visible = canSubmit
+            visible = true
         ) {
-            OTPImplementation(phoneNumber = "+254795123407")
-        }
+//            OTPImplementation(phoneNumber = "+254795123407")
+
+            phoneAuth.StartPhoneNumberVerification(
+                phoneNumber = phoneNumber,
+                code = "343433",
+                canVerify = canSubmit,
+            )
+        }*/
 
         Box(
             contentAlignment = Alignment.Center,
@@ -110,7 +124,7 @@ fun OTPScreen(
                         value = otpCode,
                         obscureText = false,
                         enabled = true,
-                        length = 4 ,
+                        length = 6 ,
                         boxSize = 52.dp,
                         onValueChange = { string ->
                             onAction.invoke(OTPAction.OnOTPCOdeChange(code = string))
@@ -172,13 +186,25 @@ fun OTPScreen(
                         .fillMaxWidth(0.9f)
                 ) {
                     Button(
-                        enabled = canSubmit,
+                        enabled = isOTPComplete,
                         shape = RoundedCornerShape(5.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.secondary,
                             contentColor = MaterialTheme.colorScheme.background
                         ),
-                        onClick = {},
+                        onClick = {
+//                            onAction.invoke(OTPAction.OnCanSubmitChange(canSubmit = true))
+
+                            onAction.invoke(OTPAction.OnSubmit(
+                                onSuccess = {
+                                    phoneAuth.StartPhoneNumberVerification(
+                                        phoneNumber = phoneNumber,
+                                        code = otpCode,
+                                        canVerify = true
+                                    )
+                                }
+                            ))
+                        },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(54.dp)

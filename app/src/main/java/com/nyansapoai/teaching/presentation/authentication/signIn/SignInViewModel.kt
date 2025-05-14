@@ -62,8 +62,8 @@ class SignInViewModel : ViewModel() {
             }
 
             is SignInAction.OnSubmit -> {
-                onSubmitSignInForm()
-                action.onSuccess.invoke()
+//                onSubmitSignInForm()
+                action.onSuccess
             }
         }
     }

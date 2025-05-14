@@ -25,5 +25,12 @@
     <string name="otp_not_received">Didn’t receive OTP code?</string>
     <string name="remaining_time">Remaining time %1$s </string>
     <string name="resend_otp">Resend Code</string>
+    
+    <!--Onboarding -->
+    <string name="select_organization">What is your organization?</string>
+    <string name="select_organization_desc">Select your organization to get started</string>
+    <string name="select_project">What is your project?</string>
+    <string name="select_school">Select the school</string>
+    <string name="select_camp">What is your camp?</string>
 
 </resources>
