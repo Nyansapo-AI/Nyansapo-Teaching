@@ -17,30 +17,30 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.nyansapoai.teaching.R
-import com.nyansapoai.teaching.presentation.onboarding.OnboardingOrganizationState
+import com.nyansapoai.teaching.presentation.onboarding.OnboardingSchoolState
 
 @Composable
-fun SelectOrganization(
+fun SelectSchool(
     modifier: Modifier = Modifier,
-    organizationList: List<OnboardingOrganizationState> = emptyList(),
-    selectedOrganization: OnboardingOrganizationState?,
-    onSelectOrganization: (OnboardingOrganizationState) -> Unit = {}
+    schoolList: List<OnboardingSchoolState> = emptyList(),
+    selectedSchool: OnboardingSchoolState? = null,
+    onSelectSchool: (OnboardingSchoolState) -> Unit = {}
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(24.dp),
         modifier = modifier
             .padding(horizontal = 16.dp)
     ) {
-
-        if (organizationList.isEmpty()) {
+        if (schoolList.isEmpty()){
             Text(
-                text = stringResource(R.string.no_organization_linked),
+                text = stringResource(R.string.no_school_linked),
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f),
                 style = MaterialTheme.typography.titleSmall,
                 modifier = Modifier.fillMaxWidth()
             )
             return@Column
+
         }
 
         Row(
@@ -49,38 +49,33 @@ fun SelectOrganization(
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.organization1),
-                contentDescription = "organization",
+                contentDescription = "school",
                 tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f)
             )
 
             Text(
-                text = stringResource(R.string.select_organization),
+                text = stringResource(R.string.select_school),
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onBackground
             )
         }
 
-
-
         FlowRow(
             verticalArrangement = Arrangement.spacedBy(4.dp),
             horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            organizationList.forEach { organization ->
+            schoolList.forEach { school ->
+
                 OptionsItemUI(
-                    text = organization.name,
-                    isSelected = selectedOrganization == organization,
+                    text = school.name,
+                    isSelected = selectedSchool == school,
                     onClick = {
-                        onSelectOrganization(organization)
+                        onSelectSchool.invoke(school)
                     }
                 )
             }
         }
+
     }
+
 }
-/*
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-private fun PreviewSelectOrganization(){
-    SelectOrganization()
-}*/

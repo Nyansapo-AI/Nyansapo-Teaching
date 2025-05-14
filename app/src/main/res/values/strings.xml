@@ -34,5 +34,8 @@
     <string name="select_school">Select the school</string>
     <string name="select_camp">What is your camp?</string>
     <string name="no_organization_linked">You are not associated with any organization!</string>
+    <string name="no_project_linked">You are not associated with any project in the organization!</string>
+    <string name="no_school_linked">You are not associated with any school in the project!</string>
+    <string name="no_camp_linked">You are not associated with any camp in school!</string>
 
 </resources>

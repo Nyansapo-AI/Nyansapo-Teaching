@@ -36,8 +36,16 @@ class OnboardingViewModel : ViewModel() {
 
             is OnboardingAction.OnSelectOrganization -> {
                 _state.update { it.copy(selectedOrganization = action.organizationUI) }
-                Log.d("selected organization", "selected : ${_state.value.selectedOrganization}")
+            }
 
+            is OnboardingAction.OnSelectCamp -> {
+                _state.update { it.copy(selectedCamp = action.camp) }
+            }
+            is OnboardingAction.OnSelectProject -> {
+                _state.update { it.copy(selectedProject = action.project) }
+            }
+            is OnboardingAction.OnSelectSchool -> {
+                _state.update { it.copy(selectedSchool = action.school) }
             }
         }
     }

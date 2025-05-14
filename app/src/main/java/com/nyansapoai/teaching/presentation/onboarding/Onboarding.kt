@@ -16,18 +16,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nyansapoai.teaching.R
 import com.nyansapoai.teaching.presentation.common.components.AppButton
 import com.nyansapoai.teaching.presentation.common.components.StepContent
 import com.nyansapoai.teaching.presentation.common.components.StepsRow
+import com.nyansapoai.teaching.presentation.onboarding.components.SelectCamp
 import com.nyansapoai.teaching.presentation.onboarding.components.SelectOrganization
+import com.nyansapoai.teaching.presentation.onboarding.components.SelectProject
+import com.nyansapoai.teaching.presentation.onboarding.components.SelectSchool
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -47,125 +48,130 @@ fun OnboardingScreen(
     state: OnboardingState,
     onAction: (OnboardingAction) -> Unit = {},
 ) {
-
-
     val stepState = rememberLazyListState()
 
-
-    LaunchedEffect(state.currentStep){
+    LaunchedEffect(state.currentStep) {
         stepState.animateScrollToItem(index = state.currentStep)
     }
 
-    val onboardingSteps = remember {
-        listOf(
-            StepContent(
-                screen = {
-                    SelectOrganization(
-                        organizationList = listOf(
-                            OrganizationUI(
-                                name = "Nyansapo",
-                                id = "1"
-                            ),
-                            OrganizationUI(
-                                name = "Organization 1",
-                                id = "3"
-                            ),
-                            OrganizationUI(
-                                name = "Organization 2",
-                                id = "3"
-                            ),
-                            OrganizationUI(
-                                name = "Team Name",
-                                id = "3"
-                            )
-                        ),
-                        selectedOrganization = state.selectedOrganization,
-                        onSelectOrganization = { organization ->
-                            onAction.invoke(OnboardingAction.OnSelectOrganization(organizationUI = organization))
-                        }
-                    )
-                },
-                onSubmit = {},
-                title = "Organization"
-            ),
-            StepContent(
-                screen = {  },
-                onSubmit = {},
-                title = "Project"
-            ),
-            StepContent(
-                screen = {  },
-                onSubmit = {},
-                title = "School"
-            ),
-            StepContent(
-                screen = {  },
-                onSubmit = {},
-                title = "Camp"
-            )
+    val onboardingSteps =             listOf(
+        StepContent(
+            screen = {
+                SelectOrganization(
+                    organizationList = listOf(
+                        OnboardingOrganizationState(name = "Nyansapo", id = "1"),
+                        OnboardingOrganizationState(name = "Organization 1", id = "2"),
+                        OnboardingOrganizationState(name = "Organization 2", id = "3"),
+                        OnboardingOrganizationState(name = "Team Name", id = "4")
+                    ),
+                    selectedOrganization = state.selectedOrganization,
+                    onSelectOrganization = { organization ->
+                        onAction(OnboardingAction.OnSelectOrganization(organizationUI = organization))
+                    }
+                )
+            },
+            onSubmit = {},
+            title = "Organization"
+        ),
+        StepContent(
+            screen = {
+                SelectProject(
+                    projectList = listOf(
+                        OnboardingProjectState(name = "Project name 1", id = "1"),
+                        OnboardingProjectState(name = "Project Thing", id = "1"),
+                        OnboardingProjectState(name = "Name", id = "4"),
+                        OnboardingProjectState(name = "Name", id = "5"),
+                        OnboardingProjectState(name = "Name", id = "7"),
+                    ),
+                    selectedProject = state.selectedProject,
+                    onSelectProject = { project ->
+                        onAction.invoke(OnboardingAction.OnSelectProject(project = project))
+                    }
+                )
+            },
+            onSubmit = {},
+            title = "Project"
+        ),
+        StepContent(
+            screen = {
+                SelectSchool(
+                    schoolList = listOf(
+                        OnboardingSchoolState(name = "Nairobi School", id = "1"),
+                        OnboardingSchoolState(name = "Kitui Primary School", id = "31"),
+                        OnboardingSchoolState(name = "Junior School", id = "1"),
+                    ),
+                    selectedSchool = state.selectedSchool,
+                    onSelectSchool = {school ->
+                        onAction.invoke(OnboardingAction.OnSelectSchool(school = school))
+                    }
+                )
+            },
+            onSubmit = {},
+            title = "School"
+        ),
+        StepContent(
+            screen = {
+                SelectCamp(
+                    campList = listOf(
+                        OnboardingCampState(name = "Camp One", id = "1"),
+                        OnboardingCampState(name = "Camp Name 2", id = "1"),
+                        OnboardingCampState(name = "Camp Two", id = "1"),
+                        OnboardingCampState(name = "Camp Four", id = "1"),
+                        OnboardingCampState(name = "Camp G", id = "1"),
+                    ),
+                    selectedCamp = state.selectedCamp,
+                    onSelectCamp = {camp ->
+                        onAction.invoke(OnboardingAction.OnSelectCamp(camp = camp))
+                    }
+                )
+            },
+            onSubmit = {},
+            title = "Camp"
         )
-    }
+    )
 
     Scaffold(
-        topBar = {
-            /*
-            TopAppBar(
-
-            ) */
-        },
         modifier = Modifier
             .navigationBarsPadding()
             .statusBarsPadding()
     ) { innerPadding ->
-
         Box(
-            modifier = Modifier
-                .fillMaxSize()
+            modifier = Modifier.fillMaxSize()
         ) {
             Column(
                 verticalArrangement = Arrangement.spacedBy(30.dp),
-                modifier = Modifier
-                    .padding(innerPadding)
+                modifier = Modifier.padding(innerPadding)
             ) {
-
                 StepsRow(
                     state = stepState,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(start = 16.dp, end = 16.dp),
+                        .padding(horizontal = 16.dp),
                     numberOfSteps = onboardingSteps.size,
                     currentStep = state.currentStep,
                     stepDescriptionList = onboardingSteps,
                     onClick = { step ->
-                        onAction.invoke(OnboardingAction.OnStepChange(step = step))
+                        onAction(OnboardingAction.OnStepChange(step = step))
                     }
                 )
 
-                onboardingSteps[state.currentStep - 1 ].screen(Modifier)
-
+                onboardingSteps[state.currentStep - 1].screen(Modifier)
             }
 
-
             AppButton(
-                onClick = {},
+                onClick = { /* Handle next action */ },
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .fillMaxWidth(0.9f)
             ) {
                 Text(
                     text = stringResource(R.string.next),
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontWeight = FontWeight.Bold
-                    )
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
                 )
-
             }
-
         }
-
     }
 }
-
 
 /*
 @Preview(showBackground = true, showSystemUi = true)

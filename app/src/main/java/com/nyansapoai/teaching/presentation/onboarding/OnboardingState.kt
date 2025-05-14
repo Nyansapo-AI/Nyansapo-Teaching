@@ -2,14 +2,31 @@ package com.nyansapoai.teaching.presentation.onboarding
 
 data class OnboardingState(
     val currentStep: Int = 1,
-    val selectedOrganization: OrganizationUI? = null,
+    val selectedOrganization: OnboardingOrganizationState? = null,
+    val selectedProject: OnboardingProjectState? = null,
+    val selectedSchool: OnboardingSchoolState? = null,
+    val selectedCamp: OnboardingCampState? = null,
 
-    val paramTwo: List<String> = emptyList(),
+    )
+
+
+
+data class OnboardingOrganizationState(
+    val name: String,
+    val id: String,
 )
 
+data class OnboardingProjectState(
+    val name: String,
+    val id: String,
+)
 
+data class OnboardingSchoolState(
+    val name: String,
+    val id: String,
+)
 
-data class OrganizationUI(
+data class OnboardingCampState(
     val name: String,
     val id: String,
 )
