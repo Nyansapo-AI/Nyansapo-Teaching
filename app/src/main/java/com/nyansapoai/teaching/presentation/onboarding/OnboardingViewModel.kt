@@ -1,5 +1,6 @@
 package com.nyansapoai.teaching.presentation.onboarding
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -31,6 +32,12 @@ class OnboardingViewModel : ViewModel() {
             is OnboardingAction.OnStepChange -> {
 
                 _state.update { it.copy(currentStep = action.step) }
+            }
+
+            is OnboardingAction.OnSelectOrganization -> {
+                _state.update { it.copy(selectedOrganization = action.organizationUI) }
+                Log.d("selected organization", "selected : ${_state.value.selectedOrganization}")
+
             }
         }
     }

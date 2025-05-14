@@ -8,6 +8,7 @@
     <string name="term_services">Terms of Services</string>
     <string name="privacy_policy">Privacy Policy</string>
     <string name="cancel">Cancel</string>
+    <string name="next">Next</string>
 
     <!--Get Started -->
     <string name="get_started">Get Started</string>
@@ -32,5 +33,6 @@
     <string name="select_project">What is your project?</string>
     <string name="select_school">Select the school</string>
     <string name="select_camp">What is your camp?</string>
+    <string name="no_organization_linked">You are not associated with any organization!</string>
 
 </resources>
