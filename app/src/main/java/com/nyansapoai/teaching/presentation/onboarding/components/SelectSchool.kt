@@ -48,7 +48,7 @@ fun SelectSchool(
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Icon(
-                painter = painterResource(id = R.drawable.organization1),
+                painter = painterResource(id = R.drawable.school),
                 contentDescription = "school",
                 tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f)
             )
