@@ -185,129 +185,122 @@
   "student_id": "uid",          
   "competence_level": "number", 
   "literacy_results": {
-  "reading_results": [ 
-{ 
-
-"type": "string", // (letter/word/paragraph/story) 
-
-"content": "string", 
-
-"metadata" : {
-
-"audio_url": "string", 
-
-"passed" : "boolean", 
-
-"transcript": "string"
-
-}
-
-} 
+  "reading_results": [
+    { 
+    
+        "type": "string", // letter/word/paragraph/story
+        
+        "content": "string", 
+        
+        "metadata" : {
+        
+            "audio_url": "string", 
+            
+            "passed" : "boolean", 
+            
+            "transcript": "string"
+        
+        }
+    
+    } 
 
 ], 
 
 "multiple_choices_results" : [ 
 
-{ 
-
-"question": "string", 
-
-"student_answer": "string", 
-
-"options" : [ "string"] //size (3)
-
-}
-]
+    { 
+    
+    "question": "string", 
+    
+    "student_answer": "string", 
+    
+    "options" : [ "string"] //size 3
+    
+    }
+],
 
 "numeracy_results" : { 
 
-"count_and_match": [ 
+    "count_and_match": [ 
+    
+        { 
+        
+          "expected_number": "number", 
+          
+          "student_answer": "number", 
+          
+          "passed": "boolean" 
+        
+        } 
+    
+    ], 
 
-{ 
-
-"expected_number": "number", 
-
-"student_answer": "number", 
-
-"passed": "boolean" 
-
-} 
-
-], 
-
-"number_recognition" : [ 
-
-{ 
-
-"type": "string", //(number_recognition) 
-
-"content": "string", 
-
-"metadata" : { 
-
-"audio_url": "string", 
-
-"passed" : "boolean", 
-
-"transcript": "number"
-
-}
-}
-
-], 
+    "number_recognition" : [ 
+    
+        {
+            "type": "string", //number_recognition 
+            
+            "content": "string", 
+            
+            "metadata" : { 
+            
+                "audio_url": "string", 
+                
+                "passed" : "boolean", 
+                
+                "transcript": "number"
+            }
+        }
+    
+    ], 
 
  
 
-"number_operations" : [ 
+    "number_operations" : [ 
+    
+        { 
+        
+            "type": "string",  // (addtion/subtraction/multiplication/division) 
+            
+            "expected_answer": "number", 
+            
+            "student_answer": "number", 
+            
+            "operations_number1": "number", 
+            
+            "operations_number2" : "number", 
+            
+            "metadata" : { 
+            
+                "screenshot_url": "string", 
+                
+                "passed" : "boolean", 
+                
+                "transcript": "number"
+            
+            }
+        } 
+    ], 
 
-{ 
-
-"type": "string",  // (addtion/subtraction/multiplication/division) 
-
-"expected_answer": "number", 
-
-"student_answer": "number", 
-
-"operations_number1": "number", 
-
-"operations_number2" : "number", 
-
-"metadata" : { 
-
-"screenshot_url": "string", 
-
-"passed" : "boolean", 
-
-"transcript": "number"
+    "word_problem" : { 
+    
+        "question" : "string", 
+        
+        "expected_number": "number", 
+        
+        "metadata" : { 
+        
+            "screenshot_url": "string", 
+            
+            "passed": "boolean", 
+            
+            "transcript": "number"
+        
+        } 
+    
+    } 
 
 }
-} 
-], 
-
-"word_problem" : { 
-
-“question” : string, 
-
-“expected_number”: number, 
-
-  “metadata” : { 
-
-“screenshot_url”: “string”, 
-
-“passed” : boolean, 
-
-“transcript”: “number” 
-
-} 
-
-} 
-
-} 
-
- 
-
- 
-
 
 
 } 
