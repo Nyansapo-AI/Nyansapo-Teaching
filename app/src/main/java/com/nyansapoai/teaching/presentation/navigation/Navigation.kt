@@ -12,10 +12,12 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import com.nyansapoai.teaching.navController
 import com.nyansapoai.teaching.presentation.authentication.otp.OTPRoot
 import com.nyansapoai.teaching.presentation.authentication.signIn.SignInRoot
 import com.nyansapoai.teaching.presentation.getStarted.GetStartedRoot
+import com.nyansapoai.teaching.presentation.onboarding.OnboardingRoot
 
 @Composable
 fun Navigation(){
@@ -28,7 +30,7 @@ fun Navigation(){
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = GetStartedPage,
+            startDestination = OnboardingPage,
             modifier = Modifier
                 .padding(innerPadding)
         ){
@@ -40,8 +42,14 @@ fun Navigation(){
                 SignInRoot()
             }
 
-            composable<OTPPage> {
-                OTPRoot()
+            composable<OTPPage> { backEntry ->
+                val args = backEntry.toRoute<OTPPage>()
+                OTPRoot(phoneNumber = args.phoneNumber)
+            }
+
+
+            composable<OnboardingPage> {
+                OnboardingRoot()
             }
 
         }

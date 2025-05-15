@@ -8,6 +8,7 @@
     <string name="term_services">Terms of Services</string>
     <string name="privacy_policy">Privacy Policy</string>
     <string name="cancel">Cancel</string>
+    <string name="next">Next</string>
 
     <!--Get Started -->
     <string name="get_started">Get Started</string>
@@ -25,5 +26,16 @@
     <string name="otp_not_received">Didn’t receive OTP code?</string>
     <string name="remaining_time">Remaining time %1$s </string>
     <string name="resend_otp">Resend Code</string>
+    
+    <!--Onboarding -->
+    <string name="select_organization">What is your organization?</string>
+    <string name="select_organization_desc">Select your organization to get started</string>
+    <string name="select_project">What is your project?</string>
+    <string name="select_school">Select the school</string>
+    <string name="select_camp">What is your camp?</string>
+    <string name="no_organization_linked">You are not associated with any organization!</string>
+    <string name="no_project_linked">You are not associated with any project in the organization!</string>
+    <string name="no_school_linked">You are not associated with any school in the project!</string>
+    <string name="no_camp_linked">You are not associated with any camp in school!</string>
 
 </resources>

@@ -1,11 +1,13 @@
 package com.nyansapoai.teaching.presentation.onboarding
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 
 class OnboardingViewModel : ViewModel() {
 
@@ -27,7 +29,24 @@ class OnboardingViewModel : ViewModel() {
 
     fun onAction(action: OnboardingAction) {
         when (action) {
-            else -> TODO("Handle actions")
+            is OnboardingAction.OnStepChange -> {
+
+                _state.update { it.copy(currentStep = action.step) }
+            }
+
+            is OnboardingAction.OnSelectOrganization -> {
+                _state.update { it.copy(selectedOrganization = action.organizationUI) }
+            }
+
+            is OnboardingAction.OnSelectCamp -> {
+                _state.update { it.copy(selectedCamp = action.camp) }
+            }
+            is OnboardingAction.OnSelectProject -> {
+                _state.update { it.copy(selectedProject = action.project) }
+            }
+            is OnboardingAction.OnSelectSchool -> {
+                _state.update { it.copy(selectedSchool = action.school) }
+            }
         }
     }
 

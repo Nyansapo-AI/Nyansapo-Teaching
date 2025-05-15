@@ -1,5 +1,6 @@
 package com.nyansapoai.teaching.presentation.authentication.signIn
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nyansapoai.teaching.R
 import com.nyansapoai.teaching.navController
+import com.nyansapoai.teaching.presentation.authentication.otp.components.PhoneAuth
 import com.nyansapoai.teaching.presentation.common.components.AppButton
 import com.nyansapoai.teaching.presentation.common.components.AppTextField
 import com.nyansapoai.teaching.presentation.navigation.OTPPage
@@ -59,6 +61,9 @@ fun SignInScreen(
     canSubmit: Boolean,
     onAction: (SignInAction) -> Unit,
 ) {
+
+    val phoneAuth = PhoneAuth
+
     Scaffold(
         modifier = Modifier
     ) { innerPadding ->
@@ -147,7 +152,7 @@ fun SignInScreen(
                         value = phoneNumber,
                         placeholder = "Phone Number",
                         imeAction = ImeAction.Done,
-                        keyboardType = KeyboardType.Number,
+                        keyboardType = KeyboardType.Text,
                         onValueChanged = { string ->
                             onAction.invoke(SignInAction.OnPhoneNumberChange(phoneNumber = string))
                         }
@@ -157,7 +162,15 @@ fun SignInScreen(
                         enabled = canSubmit,
                         onClick = {
                             onAction.invoke(SignInAction.OnSubmit(onSuccess = {
-                                navController.navigate(OTPPage)
+
+                                Log.d("Sign In Button", "Button Clicked")
+                                phoneAuth.StartPhoneNumberVerification(
+                                    phoneNumber = phoneNumber,
+                                    code = "",
+                                    canVerify = false
+                                )
+
+                                navController.navigate(OTPPage(phoneNumber = phoneNumber))
                             }))
                         },
                         modifier = Modifier
