@@ -78,7 +78,24 @@
 
   "total_students": "number",         
 
-  "total_teachers": "number"           
+  "total_teachers": "number" ,
+
+  "learning_level_distribution": [
+    {
+      "type": "string", //(literacy/numeracy) 
+      "data" : [
+        {
+          "grade": "number",
+          "distribution" : [
+            {
+              "learning_level": "string",
+              "value" : "float"
+            }
+          ]
+        }
+      ]
+    }
+  ]
 
 } 
 ```

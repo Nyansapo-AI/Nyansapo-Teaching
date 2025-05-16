@@ -9,6 +9,7 @@ import com.nyansapoai.teaching.presentation.onboarding.OnboardingViewModel
 import com.nyansapoai.teaching.presentation.getStarted.GetStartedViewModel
 import com.nyansapoai.teaching.presentation.authentication.signIn.SignInViewModel
 import com.nyansapoai.teaching.presentation.authentication.otp.OTPViewModel
+import com.nyansapoai.teaching.presentation.home.HomeViewModel
 
 val appModules = module {
 
@@ -16,6 +17,7 @@ val appModules = module {
     viewModelOf(::GetStartedViewModel)
     viewModelOf(::SignInViewModel)
     viewModelOf(::OTPViewModel)
+    viewModelOf(::HomeViewModel)
 
 
     single<FirebaseAuth> {
