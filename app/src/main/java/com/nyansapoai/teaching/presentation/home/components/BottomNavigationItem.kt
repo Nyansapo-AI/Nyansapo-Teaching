@@ -9,7 +9,7 @@ import com.nyansapoai.teaching.presentation.camps.CampRoot
 data class BottomNavigationItem(
     val title: String,
     @DrawableRes val icon: Int,
-    val screen: @Composable (Dp) -> Unit,
+    val screen: @Composable () -> Unit,
 ) {
     companion object {
         val appBottomNavItems = listOf(

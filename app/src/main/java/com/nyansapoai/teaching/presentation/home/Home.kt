@@ -28,6 +28,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.nyansapoai.teaching.presentation.common.components.getDeviceWidth
 import com.nyansapoai.teaching.presentation.home.components.BottomNavigationItem
 import org.koin.androidx.compose.koinViewModel
 
@@ -48,13 +49,12 @@ fun HomeScreen(
     state: HomeState,
     onAction: (HomeAction) -> Unit,
 ) {
+
+
+    val deviceWidth = getDeviceWidth()
+
     Scaffold(
         bottomBar = {
-            /*
-            BottomAppBar(
-                containerColor = MaterialTheme.colorScheme.onPrimary
-            ) {
-            }*/
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -62,7 +62,6 @@ fun HomeScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(MaterialTheme.colorScheme.onPrimary)
-                    .padding(8.dp)
             ) {
                 BottomNavigationItem.appBottomNavItems.forEach { item ->
                     NavigationBarItem(
@@ -86,7 +85,7 @@ fun HomeScreen(
                                     },
                             )
                         },
-                        alwaysShowLabel = true,
+                        alwaysShowLabel = deviceWidth > 420,
                         icon = {
                             Icon(
                                 painter = painterResource(item.icon),
@@ -112,7 +111,7 @@ fun HomeScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
         ){
-
+            state.currentNavigationItem.screen()
         }
     }
 

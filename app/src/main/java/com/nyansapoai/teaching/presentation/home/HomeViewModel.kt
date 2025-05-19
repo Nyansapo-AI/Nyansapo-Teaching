@@ -7,6 +7,9 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 
 class HomeViewModel : ViewModel() {
 
@@ -16,7 +19,6 @@ class HomeViewModel : ViewModel() {
     val state = _state
         .onStart {
             if (!hasLoadedInitialData) {
-                /** Load initial data here **/
                 hasLoadedInitialData = true
             }
         }
@@ -33,5 +35,7 @@ class HomeViewModel : ViewModel() {
             }
         }
     }
+
+
 
 }
