@@ -11,18 +11,18 @@ data class CampState(
 
 data class Camp(
     val id: String = "",
-    val name: String = "",
+    val name: String = "Camp One",
     val learning_level_description: List<LearningLevelDescription> = listOf(
         LearningLevelDescription(
             type = "Numeracy",
             totalStudents = 20,
             data = listOf(
-                Level("Count and Match", 1),
-                Level("Addition", 2),
-                Level("Subtraction", 3),
-                Level("Multiplication", 4),
-                Level("Division", 5),
-                Level("Word Problem", 5),
+                Level("Count and Match", 1, Color.Blue),
+                Level("Addition", 2, Color.Cyan),
+                Level("Subtraction", 3, Color.Green),
+                Level("Multiplication", 4, Color.Yellow),
+                Level("Division", 5, Color.Magenta),
+                Level("Word Problem", 5, Color.Red),
             )
         ),
         LearningLevelDescription(

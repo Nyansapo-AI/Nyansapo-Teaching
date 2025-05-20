@@ -2,6 +2,7 @@ package com.nyansapoai.teaching.presentation.camps
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -69,18 +70,28 @@ fun CampScreen(
 
 
         item {
-            Column {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
                 Text(
                     text = state.camp.name,
-                    style = MaterialTheme.typography.titleLarge,
+                    style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
 
-                state.camp.learning_level_description.forEach {
-                    LearningLevelItem(
-                        levelDescription = it
-                    )
+
+                FlowRow(
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    state.camp.learning_level_description.forEach {
+                        LearningLevelItem(
+                            levelDescription = it
+                        )
+                    }
                 }
+
             }
         }
     }

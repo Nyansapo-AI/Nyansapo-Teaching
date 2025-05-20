@@ -35,6 +35,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.nyansapoai.teaching.presentation.camps.LearningLevelDescription
@@ -46,7 +47,6 @@ fun LearningLevelItem(
     levelDescription: LearningLevelDescription
 ) {
     var containerWidth by remember { mutableIntStateOf(0) }
-    val availableWidth = (containerWidth - 24).coerceAtLeast(0)
 
     ElevatedCard(
         colors = CardDefaults.outlinedCardColors(
@@ -60,6 +60,7 @@ fun LearningLevelItem(
                 containerWidth = size.width
             }
             .heightIn(min = 200.dp)
+            .widthIn(max = 420.dp)
     ) {
         Column(
             verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -71,38 +72,6 @@ fun LearningLevelItem(
             )
 
             Box(modifier = Modifier.fillMaxWidth()) {
-
-                /*
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    levelDescription.data.forEach { level ->
-                        val levelWidth = if (levelDescription.totalStudents > 0) {
-                            ((level.value.toFloat() * availableWidth) / levelDescription.totalStudents).dp
-                        } else {
-                            0.dp
-                        }
-
-                        Log.d("Level Width", "Level: ${level.name}, Width: $levelWidth")
-
-                        Box(
-                            contentAlignment = Alignment.Center,
-                            modifier = Modifier
-                                .width(levelWidth)
-                                .background(level.color)
-                                .height(20.dp)
-                        ){
-                            if (levelWidth > 30.dp) {
-                                Text(
-                                    text = level.value.toString(),
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = contentColorFor(level.color)
-                                )
-                            }
-                        }
-                    }
-                } */
 
                 Layout(
                     content = {
@@ -185,7 +154,9 @@ fun LearningLevelItem(
                             Text(
                                 text = level.name,
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onBackground
+                                color = MaterialTheme.colorScheme.onBackground,
+                                maxLines = 1,
+                                overflow = TextOverflow.MiddleEllipsis
                             )
 
                             Text(
