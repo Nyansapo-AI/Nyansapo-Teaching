@@ -4,6 +4,7 @@ import androidx.annotation.DrawableRes
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.Dp
 import com.nyansapoai.teaching.R
+import com.nyansapoai.teaching.presentation.assessments.AssessmentsRoot
 import com.nyansapoai.teaching.presentation.camps.CampRoot
 
 data class BottomNavigationItem(
@@ -22,25 +23,25 @@ data class BottomNavigationItem(
             BottomNavigationItem(
                 title = "Students",
                 icon = R.drawable.students,
-                screen = { CampRoot() },
+                screen = {  },
             ),
 
             BottomNavigationItem(
                 title = "Assessment",
                 icon = R.drawable.assessment,
-                screen = { CampRoot() },
+                screen = { AssessmentsRoot() },
             ),
 
             BottomNavigationItem(
                 title = "Attendance",
                 icon = R.drawable.attendance,
-                screen = { CampRoot() },
+                screen = {  },
             ),
 
             BottomNavigationItem(
                 title = "Sessions",
                 icon = R.drawable.sessions,
-                screen = { CampRoot() },
+                screen = {  },
             ),
         )
     }
