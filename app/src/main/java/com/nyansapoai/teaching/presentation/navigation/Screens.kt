@@ -14,3 +14,6 @@ data class OTPPage(val phoneNumber: String)
 
 @Serializable
 data object OnboardingPage
+
+@Serializable
+data object HomePage

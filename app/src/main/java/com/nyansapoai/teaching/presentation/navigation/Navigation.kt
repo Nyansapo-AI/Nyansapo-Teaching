@@ -17,6 +17,7 @@ import com.nyansapoai.teaching.navController
 import com.nyansapoai.teaching.presentation.authentication.otp.OTPRoot
 import com.nyansapoai.teaching.presentation.authentication.signIn.SignInRoot
 import com.nyansapoai.teaching.presentation.getStarted.GetStartedRoot
+import com.nyansapoai.teaching.presentation.home.HomeRoot
 import com.nyansapoai.teaching.presentation.onboarding.OnboardingRoot
 
 @Composable
@@ -30,7 +31,7 @@ fun Navigation(){
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = OnboardingPage,
+            startDestination = HomePage,
             modifier = Modifier
                 .padding(innerPadding)
         ){
@@ -50,6 +51,10 @@ fun Navigation(){
 
             composable<OnboardingPage> {
                 OnboardingRoot()
+            }
+
+            composable<HomePage> {
+                HomeRoot()
             }
 
         }
