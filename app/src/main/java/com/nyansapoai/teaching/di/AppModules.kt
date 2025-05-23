@@ -11,6 +11,9 @@ import com.nyansapoai.teaching.presentation.authentication.signIn.SignInViewMode
 import com.nyansapoai.teaching.presentation.authentication.otp.OTPViewModel
 import com.nyansapoai.teaching.presentation.home.HomeViewModel
 import com.nyansapoai.teaching.presentation.camps.CampViewModel
+import com.nyansapoai.teaching.presentation.assessments.AssessmentsViewModel
+import com.nyansapoai.teaching.presentation.assessments.createAssessment.CreateAssessmentsViewModel
+import org.koin.core.module.dsl.viewModel
 
 val appModules = module {
 
@@ -20,6 +23,9 @@ val appModules = module {
     viewModelOf(::OTPViewModel)
     viewModelOf(::HomeViewModel)
     viewModelOf(::CampViewModel)
+    viewModelOf(::AssessmentsViewModel)
+    viewModelOf(::CreateAssessmentsViewModel)
+
 
 
     single<FirebaseAuth> {

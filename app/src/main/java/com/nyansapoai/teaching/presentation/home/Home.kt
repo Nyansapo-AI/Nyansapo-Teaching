@@ -94,7 +94,7 @@ fun HomeScreen(
                                     if (item == state.currentNavigationItem) {
                                         MaterialTheme.colorScheme.secondary
                                     } else {
-                                        MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
+                                        MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
                                     },
                             )
                         },

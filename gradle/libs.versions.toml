@@ -17,11 +17,13 @@ composeBom = "2025.05.00"
     kotlinxSerializationJson = "1.8.0"
     googleGmsGoogleServices = "4.4.2"
     firebaseAnalytics = "22.4.0"
+navigationTesting = "2.9.0"
 
 
 
     [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-navigation-testing = { module = "androidx.navigation:navigation-testing", version.ref = "navigationTesting" }
 firebase-auth = { module = "com.google.firebase:firebase-auth" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }

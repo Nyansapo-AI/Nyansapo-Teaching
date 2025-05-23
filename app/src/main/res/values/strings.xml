@@ -42,4 +42,9 @@
     <string name="no_school_linked">You are not associated with any school in the project!</string>
     <string name="no_camp_linked">You are not associated with any camp in school!</string>
 
+
+    <!--Assessment -->
+    <string name="assessment">Assessment</string>
+    <string name="add_assessment">Add Assessment</string>
+
 </resources>

@@ -17,3 +17,6 @@ data object OnboardingPage
 
 @Serializable
 data object HomePage
+
+@Serializable
+data object CreateAssessmentsPage

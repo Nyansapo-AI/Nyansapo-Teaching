@@ -79,4 +79,6 @@ dependencies {
 
     //datetime
     implementation (libs.kotlinx.datetime)
+
+    androidTestImplementation (libs.androidx.navigation.testing)
 }
