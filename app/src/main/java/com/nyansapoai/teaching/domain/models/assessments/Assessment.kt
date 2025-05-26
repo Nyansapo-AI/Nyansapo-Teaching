@@ -6,7 +6,7 @@ data class Assessment(
     val created_at: String,
     val type: String,
     val start_level: String,
-    val assessmentNumber: Int,
-    val level_distribution: List<AssessmentLevelDistribution>,
-    val assigned_students: List<AssignedStudent>
+    val assessmentNumber: Int = 0,
+    val level_distribution: List<AssessmentLevelDistribution> = emptyList(),
+    val assigned_students: List<AssignedStudent> = emptyList()
 )

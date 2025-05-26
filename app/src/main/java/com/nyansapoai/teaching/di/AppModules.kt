@@ -1,6 +1,9 @@
 package com.nyansapoai.teaching.di
 
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.nyansapoai.teaching.data.firebase.assessment.AssessmentRepositoryFirebaseImp
+import com.nyansapoai.teaching.data.remote.assessment.AssessmentRepository
 import com.nyansapoai.teaching.data.remote.authentication.AuthenticationRepository
 import com.nyansapoai.teaching.data.remote.authentication.AuthenticationRepositoryImp
 import org.koin.core.module.dsl.viewModelOf
@@ -13,6 +16,7 @@ import com.nyansapoai.teaching.presentation.home.HomeViewModel
 import com.nyansapoai.teaching.presentation.camps.CampViewModel
 import com.nyansapoai.teaching.presentation.assessments.AssessmentsViewModel
 import com.nyansapoai.teaching.presentation.assessments.createAssessment.CreateAssessmentsViewModel
+import com.nyansapoai.teaching.presentation.common.snackbar.SnackBarHandler
 import org.koin.core.module.dsl.viewModel
 
 val appModules = module {
@@ -26,16 +30,28 @@ val appModules = module {
     viewModelOf(::AssessmentsViewModel)
     viewModelOf(::CreateAssessmentsViewModel)
 
-
-
     single<FirebaseAuth> {
         FirebaseAuth.getInstance()
+    }
+
+    single<FirebaseFirestore> {
+        FirebaseFirestore.getInstance()
     }
 
     single<AuthenticationRepository> {
         AuthenticationRepositoryImp(
             auth = get()
         )
+    }
+
+    single<AssessmentRepository> {
+        AssessmentRepositoryFirebaseImp(
+            firebaseDb = get()
+        )
+    }
+
+    single<SnackBarHandler> {
+        SnackBarHandler()
     }
 
 }
