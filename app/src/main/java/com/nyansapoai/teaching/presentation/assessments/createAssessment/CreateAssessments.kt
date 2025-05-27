@@ -22,6 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.nyansapoai.teaching.navController
 import com.nyansapoai.teaching.presentation.common.components.AppButton
 import com.nyansapoai.teaching.presentation.common.components.AppDropDownItem
 import com.nyansapoai.teaching.presentation.common.components.AppDropDownMenu
@@ -201,7 +202,11 @@ fun CreateAssessmentsScreen(
                AppButton(
                    enabled = state.canSubmit,
                    onClick = {
-                       onAction(CreateAssessmentsAction.SubmitAssessment)
+                       onAction(CreateAssessmentsAction.SubmitAssessment(
+                           onSuccess = {
+                               navController.popBackStack()
+                           }
+                       ))
                    },
                    modifier = Modifier
                        .fillMaxWidth()

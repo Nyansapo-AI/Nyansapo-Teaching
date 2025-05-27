@@ -1,5 +1,6 @@
 package com.nyansapoai.teaching.presentation.assessments
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -27,8 +28,10 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nyansapoai.teaching.R
 import com.nyansapoai.teaching.navController
+import com.nyansapoai.teaching.presentation.assessments.components.AssessmentItem
 import com.nyansapoai.teaching.presentation.common.components.AppButton
 import com.nyansapoai.teaching.presentation.navigation.CreateAssessmentsPage
+import com.nyansapoai.teaching.utils.ResultStatus
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -97,14 +100,50 @@ fun AssessmentsScreen(
 
         }
     ) { innerPadding ->
-        LazyColumn(
+
+        AnimatedContent(
+            targetState = state.assessmentListState.status,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
                 .padding(horizontal = 12.dp)
-        ) {
+        ) { status ->
+            when(status){
+                ResultStatus.INITIAL ,
+                ResultStatus.LOADING -> {
 
+                }
+                ResultStatus.SUCCESS -> {
+                    state.assessmentListState.data?.let { assessments ->
+                        if (assessments.isEmpty()){
+                            return@let
+                        }
+
+                        LazyColumn(
+                            verticalArrangement = Arrangement.spacedBy(12.dp),
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(vertical = 8.dp)
+                        ) {
+                            items(assessments.size) { index ->
+                                val assessment = assessments[index]
+                                AssessmentItem(
+                                    assessment = assessment,
+                                    onClick = {
+//                                        navController.navigate("${CreateAssessmentsPage}/${assessment.id}")
+                                    }
+                                )
+                            }
+                        }
+
+                    }
+
+
+                }
+                ResultStatus.ERROR -> {}
+            }
         }
+
 
     }
 
