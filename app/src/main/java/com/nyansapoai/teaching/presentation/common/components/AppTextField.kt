@@ -13,6 +13,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -42,6 +43,16 @@ fun AppTextField(
     required: Boolean = false,
     imeAction: ImeAction = ImeAction.Next,
     onImeActionDone: () -> Unit = {},
+    textFieldColors: TextFieldColors = TextFieldDefaults.colors(
+        cursorColor = MaterialTheme.colorScheme.secondary,
+        focusedContainerColor = MaterialTheme.colorScheme.tertiary,
+        unfocusedContainerColor = MaterialTheme.colorScheme.tertiary,
+        focusedIndicatorColor = Color.Transparent,
+        unfocusedIndicatorColor = Color.Transparent,
+        disabledIndicatorColor = Color.Transparent,
+        disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+        disabledTextColor = MaterialTheme.colorScheme.onBackground,
+    ) ,
     trailingIcon: @Composable () -> Unit = {},
     leadingIcon: @Composable() (() -> Unit)? = null,
     textFieldModifier: Modifier = Modifier
@@ -81,17 +92,7 @@ fun AppTextField(
                 )
             },
             maxLines = 1,
-            colors =
-                TextFieldDefaults.colors(
-                    cursorColor = MaterialTheme.colorScheme.secondary,
-                    focusedContainerColor = MaterialTheme.colorScheme.tertiary,
-                    unfocusedContainerColor = MaterialTheme.colorScheme.tertiary,
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent,
-                    disabledIndicatorColor = Color.Transparent,
-                    disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                    disabledTextColor = MaterialTheme.colorScheme.onBackground,
-                ),
+            colors =textFieldColors,
             leadingIcon = leadingIcon,
             singleLine = singleLine,
             keyboardOptions = KeyboardOptions(keyboardType = keyboardType, imeAction = imeAction, ),
