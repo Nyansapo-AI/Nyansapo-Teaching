@@ -35,9 +35,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.nyansapoai.teaching.navController
 import com.nyansapoai.teaching.presentation.camps.LearningLevelDescription
 import com.nyansapoai.teaching.presentation.camps.components.LearningLevelItem
 import com.nyansapoai.teaching.presentation.common.components.AppCircularLoading
+import com.nyansapoai.teaching.presentation.navigation.ConductAssessmentPage
 import com.nyansapoai.teaching.utils.ResultStatus
 import org.koin.androidx.compose.koinViewModel
 
@@ -180,7 +182,12 @@ fun IndividualAssessmentScreen(
                                         )
 
                                         TextButton(
-                                            onClick = {},
+                                            onClick = {
+                                                navController.navigate(ConductAssessmentPage(
+                                                    assessmentId = assessment.id,
+                                                    studentId = student.student_id
+                                                ))
+                                            },
                                             colors = ButtonDefaults.textButtonColors(
                                                 contentColor = MaterialTheme.colorScheme.onBackground,
                                             ),

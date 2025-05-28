@@ -17,6 +17,7 @@ import com.nyansapoai.teaching.presentation.camps.CampViewModel
 import com.nyansapoai.teaching.presentation.assessments.AssessmentsViewModel
 import com.nyansapoai.teaching.presentation.assessments.createAssessment.CreateAssessmentsViewModel
 import com.nyansapoai.teaching.presentation.assessments.IndividualAssessment.IndividualAssessmentViewModel
+import com.nyansapoai.teaching.presentation.assessments.conductAssessment.ConductAssessmentViewModel
 import com.nyansapoai.teaching.presentation.common.snackbar.SnackBarHandler
 import org.koin.core.module.dsl.viewModel
 
@@ -31,6 +32,7 @@ val appModules = module {
     viewModelOf(::AssessmentsViewModel)
     viewModelOf(::CreateAssessmentsViewModel)
     viewModelOf(::IndividualAssessmentViewModel)
+    viewModelOf(::ConductAssessmentViewModel)
 
 
     single<FirebaseAuth> {

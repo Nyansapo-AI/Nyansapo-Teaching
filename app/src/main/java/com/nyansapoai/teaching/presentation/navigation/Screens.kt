@@ -23,3 +23,9 @@ data object CreateAssessmentsPage
 
 @Serializable
 data class IndividualAssessmentPage(val assessmentId: String)
+
+@Serializable
+data class ConductAssessmentPage(
+    val assessmentId: String,
+    val studentId: String,
+)
