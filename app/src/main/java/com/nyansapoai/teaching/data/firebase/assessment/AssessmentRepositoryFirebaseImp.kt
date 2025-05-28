@@ -45,7 +45,8 @@ class AssessmentRepositoryFirebaseImp(
         )
 
         firebaseDb.collection(assessmentCollection)
-            .add(newAssessment)
+            .document(newAssessment.id)
+            .set(newAssessment)
             .addOnSuccessListener {
                 deferred.complete(Results.success(data = Unit))
             }
@@ -72,6 +73,35 @@ class AssessmentRepositoryFirebaseImp(
                     trySend(assessments)
                 } else {
                     trySend(emptyList())
+                }
+            }
+
+        awaitClose {
+            snapshotListener.remove()
+        }
+    }
+
+    override suspend fun getAssessmentById(assessmentId: String): Flow<Results<Assessment>> = callbackFlow {
+
+        val snapshotListener = firebaseDb.collection(assessmentCollection)
+            .document(assessmentId)
+            .addSnapshotListener { snapshot, e ->
+                if (e != null) {
+                    Log.w("getAssessmentById", "Listen failed.", e)
+                    trySend(Results.error(msg = e.message ?: "Something went wrong"))
+                    close(e)
+                    return@addSnapshotListener
+                }
+
+                if (snapshot != null && snapshot.exists()) {
+                    val assessment = snapshot.toObject<Assessment>()
+                    if (assessment != null) {
+                        trySend(Results.success(data = assessment))
+                    } else {
+                        trySend(Results.error(msg = "Assessment not found"))
+                    }
+                } else {
+                    trySend(Results.error(msg = "Unknown assessment ID"))
                 }
             }
 

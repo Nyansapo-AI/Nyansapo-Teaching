@@ -14,8 +14,6 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -25,10 +23,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.nyansapoai.teaching.R
 
 @Composable
 fun StepsRow(
@@ -118,7 +118,7 @@ private fun Step(
             Box(contentAlignment = Alignment.Center) {
                 if (isCompete)
                     Icon(
-                        imageVector = Icons.Default.Done, "done",
+                        painter = painterResource(R.drawable.check), "done",
                         modifier = modifier.padding(4.dp),
                         tint = MaterialTheme.colorScheme.onPrimary
                     )

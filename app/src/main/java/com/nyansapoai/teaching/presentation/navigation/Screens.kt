@@ -20,3 +20,6 @@ data object HomePage
 
 @Serializable
 data object CreateAssessmentsPage
+
+@Serializable
+data class IndividualAssessmentPage(val assessmentId: String)

@@ -15,4 +15,6 @@ interface AssessmentRepository {
     ): Results<Unit>
 
     suspend fun getAssessments(): Flow<List<Assessment>>
+
+    suspend fun getAssessmentById(assessmentId: String): Flow<Results<Assessment>>
 }

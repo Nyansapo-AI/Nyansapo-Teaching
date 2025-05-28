@@ -107,19 +107,32 @@ fun AssessmentItem(
             */
         },
         trailingContent = {
+            Text(
+                text = when(assessment.assigned_students.size) {
+                    0 -> "No students"
+                    1 -> "1 student"
+                    else -> "${assessment.assigned_students.size} students"
+                },
+            )
+
+            /*
             Column(
                 verticalArrangement = Arrangement.SpaceBetween,
                 horizontalAlignment = Alignment.End,
             ) {
-                Text(text = formatDate(isoDateString = assessment.created_at))
+                /* Text(text = formatDate(isoDateString = assessment.created_at))
+                */
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
+                    /*
                     Icon(
                         painter = painterResource(R.drawable.child),
                         contentDescription = "students icon",
                     )
+
+                     */
                     Text(
                         text = when(assessment.assigned_students.size) {
                             0 -> "No students"
@@ -130,6 +143,8 @@ fun AssessmentItem(
                 }
 
             }
+
+             */
         },
         colors = ListItemDefaults.colors(
             containerColor = MaterialTheme.colorScheme.tertiary

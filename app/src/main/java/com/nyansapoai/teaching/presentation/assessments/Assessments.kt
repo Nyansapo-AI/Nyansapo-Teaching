@@ -10,8 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -22,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -30,7 +30,9 @@ import com.nyansapoai.teaching.R
 import com.nyansapoai.teaching.navController
 import com.nyansapoai.teaching.presentation.assessments.components.AssessmentItem
 import com.nyansapoai.teaching.presentation.common.components.AppButton
+import com.nyansapoai.teaching.presentation.common.components.AppCircularLoading
 import com.nyansapoai.teaching.presentation.navigation.CreateAssessmentsPage
+import com.nyansapoai.teaching.presentation.navigation.IndividualAssessmentPage
 import com.nyansapoai.teaching.utils.ResultStatus
 import org.koin.androidx.compose.koinViewModel
 
@@ -84,7 +86,7 @@ fun AssessmentsScreen(
                             .fillMaxWidth()
                     ) {
                         Icon(
-                            imageVector = Icons.Default.Add,
+                            painter = painterResource(R.drawable.add),
                             contentDescription = "Click to add assessment",
                         )
 
@@ -111,26 +113,26 @@ fun AssessmentsScreen(
             when(status){
                 ResultStatus.INITIAL ,
                 ResultStatus.LOADING -> {
-
+                    AppCircularLoading()
                 }
                 ResultStatus.SUCCESS -> {
                     state.assessmentListState.data?.let { assessments ->
                         if (assessments.isEmpty()){
                             return@let
                         }
-
                         LazyColumn(
                             verticalArrangement = Arrangement.spacedBy(12.dp),
                             modifier = Modifier
                                 .fillMaxSize()
                                 .padding(vertical = 8.dp)
                         ) {
-                            items(assessments.size) { index ->
-                                val assessment = assessments[index]
+                            items(items =assessments, key = {it.id}, ) { assessment ->
                                 AssessmentItem(
                                     assessment = assessment,
                                     onClick = {
-//                                        navController.navigate("${CreateAssessmentsPage}/${assessment.id}")
+                                        navController.navigate(IndividualAssessmentPage(
+                                            assessmentId = assessment.id
+                                        ))
                                     }
                                 )
                             }

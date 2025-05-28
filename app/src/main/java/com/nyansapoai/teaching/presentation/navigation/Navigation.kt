@@ -20,6 +20,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.nyansapoai.teaching.navController
+import com.nyansapoai.teaching.presentation.assessments.IndividualAssessment.IndividualAssessmentRoot
 import com.nyansapoai.teaching.presentation.assessments.createAssessment.CreateAssessmentsRoot
 import com.nyansapoai.teaching.presentation.authentication.otp.OTPRoot
 import com.nyansapoai.teaching.presentation.authentication.signIn.SignInRoot
@@ -84,6 +85,11 @@ fun Navigation(){
 
             composable<CreateAssessmentsPage> {
                 CreateAssessmentsRoot()
+            }
+
+            composable<IndividualAssessmentPage> {
+                val args = it.toRoute<IndividualAssessmentPage>()
+                IndividualAssessmentRoot(assessmentId = args.assessmentId)
             }
 
         }
