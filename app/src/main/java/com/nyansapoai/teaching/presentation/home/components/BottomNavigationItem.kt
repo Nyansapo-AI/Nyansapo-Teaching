@@ -6,6 +6,7 @@ import androidx.compose.ui.unit.Dp
 import com.nyansapoai.teaching.R
 import com.nyansapoai.teaching.presentation.assessments.AssessmentsRoot
 import com.nyansapoai.teaching.presentation.camps.CampRoot
+import com.nyansapoai.teaching.presentation.common.components.AppTakeScreenShoot
 
 data class BottomNavigationItem(
     val title: String,
@@ -35,7 +36,7 @@ data class BottomNavigationItem(
             BottomNavigationItem(
                 title = "Attendance",
                 icon = R.drawable.attendance,
-                screen = {  },
+                screen = { AppTakeScreenShoot() },
             ),
 
             BottomNavigationItem(

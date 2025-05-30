@@ -84,4 +84,7 @@ dependencies {
     implementation (libs.kotlinx.datetime)
 
     androidTestImplementation (libs.androidx.navigation.testing)
+
+    //coil
+    implementation(libs.coil.compose)
 }

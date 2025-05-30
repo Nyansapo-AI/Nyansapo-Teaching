@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -77,6 +78,7 @@ fun HomeScreen(
                         label = {
                             Text(
                                 text = item.title,
+//                                autoSize = TextAutoSize.StepBased(),
                                 color =
                                     if (item == state.currentNavigationItem) {
                                         MaterialTheme.colorScheme.secondary

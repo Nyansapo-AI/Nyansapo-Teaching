@@ -8,15 +8,19 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -35,59 +39,38 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun AppTouchInput(modifier: Modifier = Modifier) {
+fun AppTouchInput(
+    modifier: Modifier = Modifier,
+    isEraserMode: Boolean = false,
+    brushColor: Color = Color.Black,
+                  ) {
 
-    val path = remember { Path() }
-    val touchPoints = remember { mutableListOf<Offset>() }
-
-    /*
-    Box(
-        modifier = Modifier
+    MultiTouchDrawingCanvas(
+        modifier = modifier
             .fillMaxSize()
-            .background(Color.White)
-            .pointerInput(Unit) {
-                detectDragGestures(
-                    onDragStart = { offset ->
-                        touchPoints.clear()
-                        path.moveTo(offset.x, offset.y)
-                        touchPoints.add(offset)
-                    },
-                    onDrag = { change, _ ->
-                        val offset = change.position
-                        path.lineTo(offset.x, offset.y)
-                        touchPoints.add(offset)
-                    }
-                )
-            }
-    ) {
-        Canvas(modifier = Modifier.fillMaxSize()) {
-            drawPath(
-                path = path,
-                color = Color.Black,
-                style = Stroke(width = 4f)
-            )
-        }
-    }
-
-     */
-
-
-    /* MultiTouchDrawingCanvas() */
-
-    PrecisionEraserCanvas()
+            .background(MaterialTheme.colorScheme.tertiary),
+        isEraserMode = isEraserMode,
+        eraserSize = 60f,
+        brushColor = brushColor
+    )
 }
 
 
 @Composable
-fun MultiTouchDrawingCanvas() {
+fun MultiTouchDrawingCanvas(
+    modifier: Modifier = Modifier,
+    isEraserMode: Boolean = false,
+    eraserSize: Float = 30f,
+    brushColor: Color = Color.Black,
+) {
     var paths by remember { mutableStateOf(listOf<PressurePath>()) }
     var activePaths by remember { mutableStateOf(mapOf<Int, PressurePath>()) }
 
     Canvas(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
-            .background(Color.White)
-            .pointerInput(Unit) {
+            .background(MaterialTheme.colorScheme.tertiary)
+            .pointerInput(isEraserMode) {
                 awaitEachGesture {
                     do {
                         val event = awaitPointerEvent()
@@ -99,20 +82,36 @@ fun MultiTouchDrawingCanvas() {
                                 PointerType.Touch -> {
                                     if (change.pressed) {
                                         if (pointerId !in activePaths) {
-                                            // Start new path
-                                            val pressure = change.pressure
-                                            val strokeWidth = (pressure * 20f).coerceIn(2f, 15f)
+                                            if (isEraserMode) {
+                                                // In eraser mode, remove points near touch
+                                                eraseAtPosition(change.position, eraserSize, paths) { newPaths ->
+                                                    paths = newPaths
+                                                }
 
-                                            activePaths = activePaths + (pointerId to PressurePath(
-                                                points = listOf(
-                                                    PressurePoint(
-                                                        offset = change.position,
-                                                        pressure = pressure
-                                                    )
-                                                ),
-                                                color = getRandomColor(),
-                                                baseStrokeWidth = strokeWidth
-                                            ))
+                                                // Add an eraser path for visual feedback
+                                                activePaths = activePaths + (pointerId to PressurePath(
+                                                    points = listOf(PressurePoint(change.position, 1f)),
+                                                    color = Color.LightGray.copy(alpha = 0.5f),
+                                                    baseStrokeWidth = eraserSize,
+                                                    isEraser = true
+                                                ))
+                                            } else {
+                                                // Start new drawing path
+                                                val pressure = change.pressure
+                                                val strokeWidth = (pressure * 20f).coerceIn(2f, 15f)
+
+                                                activePaths = activePaths + (pointerId to PressurePath(
+                                                    points = listOf(
+                                                        PressurePoint(
+                                                            offset = change.position,
+                                                            pressure = pressure
+                                                        )
+                                                    ),
+                                                    color = brushColor,
+                                                    baseStrokeWidth = strokeWidth,
+                                                    isEraser = false
+                                                ))
+                                            }
                                         } else {
                                             // Continue existing path
                                             val existingPath = activePaths[pointerId]
@@ -122,6 +121,13 @@ fun MultiTouchDrawingCanvas() {
                                                     pressure = change.pressure
                                                 )
 
+                                                if (isEraserMode) {
+                                                    // Continue erasing
+                                                    eraseAtPosition(change.position, eraserSize, paths) { newPaths ->
+                                                        paths = newPaths
+                                                    }
+                                                }
+
                                                 activePaths = activePaths + (pointerId to existingPath.copy(
                                                     points = existingPath.points + newPoint
                                                 ))
@@ -129,9 +135,12 @@ fun MultiTouchDrawingCanvas() {
                                         }
                                         change.consume()
                                     } else {
-                                        // Finger lifted - move to completed paths
+                                        // Finger lifted
                                         activePaths[pointerId]?.let { completedPath ->
-                                            paths = paths + completedPath
+                                            if (!completedPath.isEraser) {
+                                                // Only add to paths if not an eraser
+                                                paths = paths + completedPath
+                                            }
                                             activePaths = activePaths - pointerId
                                         }
                                     }
@@ -142,7 +151,6 @@ fun MultiTouchDrawingCanvas() {
                 }
             }
     ) {
-
         // Draw completed paths
         paths.forEach { pressurePath ->
             drawPressurePath(pressurePath)
@@ -150,10 +158,99 @@ fun MultiTouchDrawingCanvas() {
 
         // Draw active paths
         activePaths.values.forEach { pressurePath ->
-            drawPressurePath(pressurePath)
+            if (pressurePath.isEraser) {
+                // Draw eraser indicator
+                drawCircle(
+                    color = pressurePath.color,
+                    radius = pressurePath.baseStrokeWidth / 2,
+                    center = pressurePath.points.last().offset,
+                    style = Stroke(width = 2f)
+                )
+            } else {
+                drawPressurePath(pressurePath)
+            }
         }
     }
 }
+
+// Helper function to erase strokes that intersect with eraser
+private fun eraseAtPosition(
+    position: Offset,
+    eraserSize: Float,
+    paths: List<PressurePath>,
+    onPathsChanged: (List<PressurePath>) -> Unit
+) {
+    val eraserRadius = eraserSize / 2
+    val eraserRadiusSq = eraserRadius * eraserRadius
+
+    val newPaths = mutableListOf<PressurePath>()
+
+    paths.forEach { path ->
+        val points = path.points
+
+        // Skip this path if it's completely erased
+        if (points.all { point ->
+                val dx = position.x - point.offset.x
+                val dy = position.y - point.offset.y
+                dx * dx + dy * dy <= eraserRadiusSq
+            }) {
+            return@forEach
+        }
+
+        // Check if any point is within eraser radius
+        val hasPointsToErase = points.any { point ->
+            val dx = position.x - point.offset.x
+            val dy = position.y - point.offset.y
+            dx * dx + dy * dy <= eraserRadiusSq
+        }
+
+        if (!hasPointsToErase) {
+            // Keep the path unchanged
+            newPaths.add(path)
+        } else {
+            // Split path into segments that aren't erased
+            val segments = mutableListOf<List<PressurePoint>>()
+            var currentSegment = mutableListOf<PressurePoint>()
+
+            points.forEach { point ->
+                val dx = position.x - point.offset.x
+                val dy = position.y - point.offset.y
+                val distanceSq = dx * dx + dy * dy
+
+                if (distanceSq > eraserRadiusSq) {
+                    // Point is outside eraser radius
+                    currentSegment.add(point)
+                } else {
+                    // Point is within eraser radius
+                    if (currentSegment.isNotEmpty()) {
+                        segments.add(currentSegment.toList())
+                        currentSegment = mutableListOf()
+                    }
+                }
+            }
+
+            if (currentSegment.isNotEmpty()) {
+                segments.add(currentSegment)
+            }
+
+            // Add non-empty segments as new paths
+            segments.filter { it.size > 1 }.forEach { segment ->
+                newPaths.add(path.copy(points = segment))
+            }
+        }
+    }
+
+    onPathsChanged(newPaths)
+}
+
+// Updated PressurePath to include isEraser flag
+data class PressurePath(
+    val points: List<PressurePoint>,
+    val color: Color,
+    val baseStrokeWidth: Float,
+    val isEraser: Boolean = false
+)
+
 
 fun DrawScope.drawPressurePath(pressurePath: PressurePath) {
     if (pressurePath.points.size < 2) return
@@ -271,11 +368,14 @@ data class PressurePoint(
     val pressure: Float
 )
 
+/*
 data class PressurePath(
     val points: List<PressurePoint>,
     val color: Color,
     val baseStrokeWidth: Float
 )
+
+ */
 
 sealed class DrawnShape {
     data class Circle(
@@ -300,191 +400,7 @@ fun getRandomColor(): Color {
 }
 
 
-@Composable
-fun PrecisionEraserCanvas() {
-    var drawingLayers by remember { mutableStateOf(listOf<DrawingLayer>()) }
-    var currentLayer by remember { mutableStateOf<DrawingLayer?>(null) }
-    var isEraserMode by remember { mutableStateOf(false) }
-    var eraserSize by remember { mutableStateOf(20.dp) }
-    var showEraserPreview by remember { mutableStateOf(false) }
-    var eraserPreviewPosition by remember { mutableStateOf(Offset.Zero) }
 
-    Box {
-        Canvas(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.White)
-                .pointerInput(Unit) {
-                    detectDragGestures(
-                        onDragStart = { offset ->
-                            if (isEraserMode) {
-                                showEraserPreview = true
-                                eraserPreviewPosition = offset
-                                // Create eraser stroke
-                                currentLayer = DrawingLayer(
-                                    paths = listOf(
-                                        EraserPath(
-                                            path = Path().apply {
-                                                moveTo(offset.x, offset.y)
-                                                addOval(androidx.compose.ui.geometry.Rect(
-                                                    offset.x - eraserSize.toPx() / 2,
-                                                    offset.y - eraserSize.toPx() / 2,
-                                                    offset.x + eraserSize.toPx() / 2,
-                                                    offset.y + eraserSize.toPx() / 2
-                                                ))
-                                            },
-                                            size = eraserSize.toPx()
-                                        )
-                                    ),
-                                    isEraserLayer = true
-                                )
-                            } else {
-                                currentLayer = DrawingLayer(
-                                    paths = listOf(
-                                        DrawPath(
-                                            path = Path().apply { moveTo(offset.x, offset.y) },
-                                            color = Color.Black,
-                                            strokeWidth = 8.dp.toPx()
-                                        )
-                                    ),
-                                    isEraserLayer = false
-                                )
-                            }
-                        },
-                        onDragEnd = {
-                            showEraserPreview = false
-                            currentLayer?.let { layer ->
-                                drawingLayers = drawingLayers + layer
-                                currentLayer = null
-                            }
-                        },
-                        onDrag = { change, _ ->
-                            if (isEraserMode) {
-                                eraserPreviewPosition = change.position
-                                currentLayer?.let { layer ->
-                                    val newEraserPath = EraserPath(
-                                        path = Path().apply {
-                                            moveTo(change.position.x, change.position.y)
-                                            addOval(androidx.compose.ui.geometry.Rect(
-                                                change.position.x - eraserSize.toPx() / 2,
-                                                change.position.y - eraserSize.toPx() / 2,
-                                                change.position.x + eraserSize.toPx() / 2,
-                                                change.position.y + eraserSize.toPx() / 2
-                                            ))
-                                        },
-                                        size = eraserSize.toPx()
-                                    )
-                                    currentLayer = layer.copy(
-                                        paths = layer.paths + newEraserPath
-                                    )
-                                }
-                            } else {
-                                currentLayer?.let { layer ->
-                                    val drawPath = layer.paths.first() as DrawPath
-                                    drawPath.path.lineTo(change.position.x, change.position.y)
-                                }
-                            }
-                        }
-                    )
-                }
-        ) {
-            // Draw all layers with proper blending
-            drawIntoCanvas { canvas ->
-                with(canvas.nativeCanvas) {
-                    val checkPoint = saveLayer(null, null)
-
-                    // Draw all completed layers
-                    drawingLayers.forEach { layer ->
-                        layer.paths.forEach { pathData ->
-                            when (pathData) {
-                                is DrawPath -> {
-                                    drawPath(
-                                        path = pathData.path,
-                                        color = pathData.color,
-                                        style = Stroke(
-                                            width = pathData.strokeWidth,
-                                            cap = StrokeCap.Round,
-                                            join = StrokeJoin.Round
-                                        )
-                                    )
-                                }
-                                is EraserPath -> {
-                                    drawPath(
-                                        path = pathData.path,
-                                        color = Color.Transparent,
-                                        blendMode = BlendMode.Clear
-                                    )
-                                }
-                            }
-                        }
-                    }
-
-                    // Draw current layer
-                    currentLayer?.let { layer ->
-                        layer.paths.forEach { pathData ->
-                            when (pathData) {
-                                is DrawPath -> {
-                                    drawPath(
-                                        path = pathData.path,
-                                        color = pathData.color,
-                                        style = Stroke(
-                                            width = pathData.strokeWidth,
-                                            cap = StrokeCap.Round,
-                                            join = StrokeJoin.Round
-                                        )
-                                    )
-                                }
-                                is EraserPath -> {
-                                    drawPath(
-                                        path = pathData.path,
-                                        color = Color.Transparent,
-                                        blendMode = BlendMode.Clear
-                                    )
-                                }
-                            }
-                        }
-                    }
-
-                    restoreToCount(checkPoint)
-                }
-            }
-        }
-
-        // Eraser preview overlay
-        if (showEraserPreview && isEraserMode) {
-            Canvas(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                drawCircle(
-                    color = Color.Gray.copy(alpha = 0.5f),
-                    radius = eraserSize.toPx() / 2,
-                    center = eraserPreviewPosition,
-                    style = Stroke(width = 2.dp.toPx())
-                )
-            }
-        }
-    }
-}
-
-
-// Data classes for advanced eraser
-sealed class PathData
-
-data class DrawPath(
-    val path: Path,
-    val color: Color,
-    val strokeWidth: Float
-) : PathData()
-
-data class EraserPath(
-    val path: Path,
-    val size: Float
-) : PathData()
-
-data class DrawingLayer(
-    val paths: List<PathData>,
-    val isEraserLayer: Boolean
-)
 
 
 @Preview(showBackground = true, showSystemUi = true)

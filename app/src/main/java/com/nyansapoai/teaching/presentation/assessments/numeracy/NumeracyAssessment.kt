@@ -1,33 +1,28 @@
-package com.nyansapoai.teaching.presentation.assessments.conductAssessment
+package com.nyansapoai.teaching.presentation.assessments.numeracy
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.nyansapoai.teaching.presentation.assessments.numeracy.components.NumeracyAddition
-import com.nyansapoai.teaching.presentation.common.components.AppTouchInput
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun ConductAssessmentRoot(
-    assessmentId: String,
-    studentId: String
-) {
+fun NumeracyAssessmentRoot() {
 
-    val viewModel = koinViewModel<ConductAssessmentViewModel>()
+    val viewModel = koinViewModel<NumeracyAssessmentViewModel>()
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    ConductAssessmentScreen(
+    NumeracyAssessmentScreen(
         state = state,
         onAction = viewModel::onAction
     )
-
 }
 
 @Composable
-fun ConductAssessmentScreen(
-    state: ConductAssessmentState,
-    onAction: (ConductAssessmentAction) -> Unit,
+fun NumeracyAssessmentScreen(
+    state: NumeracyAssessmentState,
+    onAction: (NumeracyAssessmentAction) -> Unit,
 ) {
     NumeracyAddition(
         firstNumber = 34,
