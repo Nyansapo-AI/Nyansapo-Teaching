@@ -3,6 +3,7 @@ package com.nyansapoai.teaching.presentation.assessments.numeracy.components
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,14 +13,11 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ButtonGroup
-import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,45 +29,53 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nyansapoai.teaching.R
 import com.nyansapoai.teaching.presentation.common.components.AppButton
 import com.nyansapoai.teaching.presentation.common.components.AppTouchInput
+import com.nyansapoai.teaching.presentation.common.components.CapturableComposable
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun NumeracyAddition(
+fun NumeracyOperation(
     modifier: Modifier = Modifier,
     firstNumber: Int,
     secondNumber: Int,
-//    isEraserMode: Boolean = false,
+    operationType: OperationType = OperationType.DIVISION,
+    operationOrientation: Orientation = Orientation.Horizontal,
+    onCaptureAnswerContent: (ByteArray) -> Unit = {},
+    shouldCaptureAnswer: Boolean = false,
+    onCaptureWorkAreaContent: (ByteArray) -> Unit = {},
+    shouldCaptureWorkArea: Boolean = false,
+    onSubmit: () -> Unit = {  }
 ) {
 
     var isEraserMode by remember { mutableStateOf(false) }
 
-    LazyColumn(
-        verticalArrangement = Arrangement.spacedBy(20.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier
-    ) {
-        item {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+    ){
+        Column(
+            verticalArrangement = Arrangement.spacedBy(20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = modifier
+        ) {
             Text(
-                text = "Addition",
+                text = operationType.title,
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .fillMaxWidth()
             )
-        }
 
-        item {
             ButtonGroup(
                 overflowIndicator = { menuState ->
                     FilledIconButton(
@@ -87,12 +93,7 @@ fun NumeracyAddition(
                         )
                     }
                 },
-                Modifier,
-                /*
-                ButtonGroupDefaults.ExpandedRatio,
-                ButtonGroupDefaults.HorizontalArrangement,
-               `
-                 */
+                modifier =  Modifier,
                 content = {
                     clickableItem(
                         onClick = {
@@ -140,69 +141,133 @@ fun NumeracyAddition(
                     )
                 }
             )
-        }
 
-        item {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(4.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
 
-                VerticalOperationItem(
-                    operationSymbol = "+",
-                    firstNumber = firstNumber,
-                    secondNumber = secondNumber
-                )
+            when(operationOrientation){
+                Orientation.Vertical -> {
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
 
-                Box(
-                    modifier = Modifier
-//                        .fillParentMaxWidth()
-                        .widthIn(max = 200.dp, min = 100.dp)
-                        .heightIn(min = 100.dp, max = 150.dp)
-                        .background(MaterialTheme.colorScheme.tertiary)
-                        .border(
-                            width = 2.dp,
-                            color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f)
+                        VerticalOperationItem(
+                            operationSymbol = operationType.symbol,
+                            firstNumber = firstNumber,
+                            secondNumber = secondNumber
                         )
-                ) {
-                    AppTouchInput(
+
+                        Box(
+                            modifier = Modifier
+                                .widthIn(max = 200.dp, min = 100.dp)
+                                .heightIn(min = 100.dp, max = 150.dp)
+                                .background(MaterialTheme.colorScheme.tertiary)
+                                .border(
+                                    width = 2.dp,
+                                    color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f)
+                                )
+                        ) {
+                            CapturableComposable(
+                                onCapturedByteArray = onCaptureAnswerContent,
+                                shouldCapture = shouldCaptureAnswer,
+                                content = {
+                                    AppTouchInput(
+                                        modifier = Modifier
+                                            .background(MaterialTheme.colorScheme.tertiary),
+                                        isEraserMode = isEraserMode,
+                                    )
+                                }
+                            )
+                        }
+                    }
+                }
+                Orientation.Horizontal -> {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
                         modifier = Modifier
-                            .background(MaterialTheme.colorScheme.tertiary),
-                        isEraserMode = isEraserMode,
-                    )
+                            .fillMaxWidth()
+                            .padding(12.dp)
+                    ) {
+
+                        HorizontalOperationItem(
+                            operationSymbol = operationType.symbol,
+                            firstNumber = firstNumber,
+                            secondNumber = secondNumber
+                        )
+
+                        Box(
+                            modifier = Modifier
+                                .widthIn(max = 200.dp, min = 100.dp)
+                                .heightIn(min = 100.dp, max = 150.dp)
+                                .background(MaterialTheme.colorScheme.tertiary)
+                                .border(
+                                    width = 2.dp,
+                                    color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f)
+                                )
+                        ) {
+                            CapturableComposable(
+                                onCapturedByteArray = onCaptureAnswerContent,
+                                shouldCapture = shouldCaptureAnswer,
+                                content = {
+                                    AppTouchInput(
+                                        modifier = Modifier
+                                            .background(MaterialTheme.colorScheme.tertiary),
+                                        isEraserMode = isEraserMode,
+                                    )
+                                }
+                            )
+                        }
+
+                    }
                 }
             }
-        }
 
 
-        item {
+
             Box(
                 modifier = Modifier
                     .widthIn(max = 420.dp, min = 100.dp)
-                    .heightIn(min = 400.dp, max = 600.dp)
+                    .heightIn(min = 300.dp, max = 400.dp)
                     .padding(horizontal = 12.dp)
                     .border(
                         width = 2.dp,
                         color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f)
                     )
             ) {
-                AppTouchInput(
-                    isEraserMode = isEraserMode,
-                    brushColor = Color.Green
+
+                CapturableComposable(
+                    onCapturedByteArray = onCaptureWorkAreaContent,
+                    shouldCapture = shouldCaptureWorkArea,
+                    content = {
+                        AppTouchInput(
+                            isEraserMode = isEraserMode,
+                            brushColor = Color.Green
+                        )
+
+                    }
+                )
+
+            }
+
+            AppButton(
+                onClick = onSubmit,
+                modifier = Modifier
+                    .padding(12.dp)
+            ) {
+                Text(
+                    text = "Next",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold
                 )
             }
-        }
 
-        item {
-            AppButton(
-                onClick = {}
-            ) { }
-        }
 
+        }
 
 
 
     }
+
 }
 
 
@@ -240,14 +305,67 @@ fun VerticalOperationItem(
             )
         }
     }
+}
 
+
+@Composable
+fun HorizontalOperationItem(
+    operationSymbol: String,
+    firstNumber: Int,
+    secondNumber: Int,
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Text(
+            text = "$firstNumber",
+            style = MaterialTheme.typography.displayLarge,
+            letterSpacing = 12.sp,
+            fontWeight = FontWeight.Bold
+        )
+        Text(
+            text = operationSymbol,
+            style = MaterialTheme.typography.displayLarge,
+            fontWeight = FontWeight.Bold
+        )
+        Text(
+            text = "$secondNumber",
+            style = MaterialTheme.typography.displayLarge,
+            letterSpacing = 12.sp,
+            fontWeight = FontWeight.Bold
+        )
+    }
+}
+
+
+enum class OperationType(
+    val title: String,
+    val symbol: String
+){
+    ADDITION(
+        title = "Addition",
+        symbol = "+"
+    ),
+    SUBTRACTION(
+        title = "Subtraction",
+        symbol = "-"
+    ),
+    MULTIPLICATION(
+        title = "Multiplication",
+        symbol = "X"
+    ),
+    DIVISION(
+        title = "Division",
+        symbol = "÷"
+    )
 }
 
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun NumeracyAdditionPreview() {
-    NumeracyAddition(
+    NumeracyOperation(
         firstNumber = 5,
         secondNumber = 1234342,
         modifier = Modifier.fillMaxWidth()

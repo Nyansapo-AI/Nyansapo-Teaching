@@ -1,6 +1,16 @@
 package com.nyansapoai.teaching.utils
 
+import android.content.Context
+import android.graphics.Bitmap
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asAndroidBitmap
 import kotlinx.datetime.toLocalDateTime
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.FileOutputStream
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 object Utils {
 
@@ -57,5 +67,84 @@ object Utils {
             return "Invalid date"
         }
     }
+
+
+    // Method 1: Convert ImageBitmap to ByteArray (most common)
+    fun imageBitmapToByteArray(
+        imageBitmap: ImageBitmap,
+        format: Bitmap.CompressFormat = Bitmap.CompressFormat.PNG,
+        quality: Int = 100
+    ): ByteArray {
+        val androidBitmap = imageBitmap.asAndroidBitmap()
+        val outputStream = ByteArrayOutputStream()
+        androidBitmap.compress(format, quality, outputStream)
+        return outputStream.toByteArray()
+    }
+
+
+    fun saveImageBitmapToFile(imageBitmap: ImageBitmap, file: File, format: Bitmap.CompressFormat = Bitmap.CompressFormat.PNG, quality: Int = 100) {
+        val androidBitmap = imageBitmap.asAndroidBitmap()
+        FileOutputStream(file).use { out ->
+            androidBitmap.compress(format, quality, out)
+        }
+    }
+
+
+    /**
+     * Saves an ImageBitmap to a file in the app's storage directory
+     *
+     * @param context Application context
+     * @param filename Optional filename (generates timestamp-based name if null)
+     * @param format Image compression format
+     * @param quality Compression quality (0-100)
+     * @return The saved File or null if saving failed
+     */
+    fun ImageBitmap.saveToImageFile(
+        context: Context,
+        filename: String? = null,
+        format: Bitmap.CompressFormat = Bitmap.CompressFormat.PNG,
+        quality: Int = 90
+    ): File? {
+        // Convert ImageBitmap to ByteArray
+        val byteArray = this.toByteArray(format, quality)
+
+        // Create filename with timestamp if not provided
+        val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+        val extension = when (format) {
+            Bitmap.CompressFormat.JPEG -> ".jpg"
+            Bitmap.CompressFormat.PNG -> ".png"
+            Bitmap.CompressFormat.WEBP -> ".webp"
+            else -> ".png"
+        }
+        val actualFilename = filename ?: "IMG_$timeStamp$extension"
+
+        // Get the directory for the app's private pictures directory
+        val storageDir = context.getExternalFilesDir(null) ?: context.filesDir
+        val imageFile = File(storageDir, actualFilename)
+
+        return try {
+            FileOutputStream(imageFile).use { outputStream ->
+                outputStream.write(byteArray)
+            }
+            imageFile
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+    /**
+     * Converts an ImageBitmap to a ByteArray
+     */
+    fun ImageBitmap.toByteArray(
+        format: Bitmap.CompressFormat = Bitmap.CompressFormat.PNG,
+        quality: Int = 90
+    ): ByteArray {
+        val bitmap = this.asAndroidBitmap()
+        val outputStream = ByteArrayOutputStream()
+        bitmap.compress(format, quality, outputStream)
+        return outputStream.toByteArray()
+    }
+
 
 }

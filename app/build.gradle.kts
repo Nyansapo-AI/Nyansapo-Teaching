@@ -87,4 +87,13 @@ dependencies {
 
     //coil
     implementation(libs.coil.compose)
+
+    //ktor
+    implementation(libs.ktor.client.android)
+    api(libs.ktor.core)
+    implementation(libs.ktor.contentNegotiation)
+    implementation(libs.ktor.serialization)
+    implementation(libs.ktor.json)
+    implementation(libs.ktor.logging)
+    implementation(libs.ktor.client.okhttp)
 }

@@ -1,12 +1,11 @@
 package com.nyansapoai.teaching.presentation.common.components
 
-import android.graphics.Bitmap
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
@@ -21,58 +20,94 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithCache
-import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.layer.drawLayer
-import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.rememberGraphicsLayer
-import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.nyansapoai.teaching.R
+import com.nyansapoai.teaching.presentation.common.permissions.RequestAppPermissions
+import com.nyansapoai.teaching.utils.Utils
+import com.nyansapoai.teaching.utils.Utils.saveToImageFile
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @Composable
 fun CapturableComposable(
     modifier: Modifier = Modifier,
     onCaptured: (ImageBitmap) -> Unit = {},
+    onCapturedByteArray : (ByteArray) -> Unit = {},
     content: @Composable () -> Unit,
     shouldCapture: Boolean = false
 ) {
-    val density = LocalDensity.current
-//    var shouldCapture by remember { mutableStateOf(false) }
 
+    val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     val graphicsLayer = rememberGraphicsLayer()
 
-    Box(
-        modifier = modifier
-            .drawWithCache {
-                onDrawWithContent {
+    // Request permissions to write and read external storage
+    var permissionGranted by remember { mutableStateOf(false) }
 
-                    graphicsLayer.record {
-                        this@onDrawWithContent.drawContent()
-                    }
-                    drawLayer(graphicsLayer = graphicsLayer)
+    RequestAppPermissions(
+        permissionsArray = arrayOf(
+            android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            android.Manifest.permission.READ_EXTERNAL_STORAGE,
+        ),
+        onSuccess = {
+            permissionGranted = true
+        },
 
-                    if (shouldCapture) {
-                        coroutineScope.launch {
-                            val bitmap = graphicsLayer.toImageBitmap()
+        )
+
+    if (permissionGranted){
+        Box(
+            modifier = modifier
+                .drawWithCache {
+                    onDrawWithContent {
+
+                        graphicsLayer.record {
+                            this@onDrawWithContent.drawContent()
+                        }
+                        drawLayer(graphicsLayer = graphicsLayer)
+
+                        if (shouldCapture) {
+                            coroutineScope.launch(Dispatchers.IO) {
+                                val bitmap = graphicsLayer.toImageBitmap()
+
+                                onCaptured(bitmap)
+
+                                val file = bitmap.saveToImageFile(
+                                    context = context,
+                                    filename = null
+                                )
+
+                                file?.let { file ->
+                                    Log.d("CapturedImage", "Image saved to: ${file.absolutePath}")
+                                    onCapturedByteArray(file.readBytes())
+                                }
 
 
-                            onCaptured(bitmap)
+                                /*
+                                val byteArray = Utils.imageBitmapToByteArray(
+                                    imageBitmap = bitmap
+                                )
+
+                                onCapturedByteArray(byteArray) */
+                            }
                         }
                     }
                 }
-            }
-    ) {
-        content()
+        ) {
+            content()
+        }
+
     }
+
+
 }
 
 
