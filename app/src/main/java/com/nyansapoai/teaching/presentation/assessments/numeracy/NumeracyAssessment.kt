@@ -18,7 +18,9 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun NumeracyAssessmentRoot(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    assessmentId: String,
+    studentId: String,
 ) {
 
     val viewModel = koinViewModel<NumeracyAssessmentViewModel>()
@@ -37,17 +39,18 @@ fun NumeracyAssessmentRoot(
 
 @Composable
 fun NumeracyAssessmentScreen(
+    modifier: Modifier = Modifier,
     state: NumeracyAssessmentState,
     onAction: (NumeracyAssessmentAction) -> Unit,
     answerAssessmentState: Results<VisionRecognition>,
     workAreaState: Results<VisionRecognition> = Results.initial(),
-    modifier: Modifier = Modifier
 ) {
 
 
     LazyColumn(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+
 
         item {
             when(answerAssessmentState.status){
@@ -72,6 +75,7 @@ fun NumeracyAssessmentScreen(
             }
         }
 
+        /*
         item {
             when(workAreaState.status){
                 ResultStatus.INITIAL,
@@ -93,7 +97,7 @@ fun NumeracyAssessmentScreen(
                     }
                 }
             }
-        }
+        }*/
 
         item {
             NumeracyOperation(

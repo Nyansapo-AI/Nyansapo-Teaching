@@ -5,6 +5,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.Dp
 import com.nyansapoai.teaching.R
 import com.nyansapoai.teaching.presentation.assessments.AssessmentsRoot
+import com.nyansapoai.teaching.presentation.assessments.numeracy.components.NumeracyCountAndMatch
+import com.nyansapoai.teaching.presentation.assessments.numeracy.components.NumeracyWordProblem
 import com.nyansapoai.teaching.presentation.camps.CampRoot
 import com.nyansapoai.teaching.presentation.common.components.AppTakeScreenShoot
 
@@ -36,13 +38,13 @@ data class BottomNavigationItem(
             BottomNavigationItem(
                 title = "Attendance",
                 icon = R.drawable.attendance,
-                screen = { AppTakeScreenShoot() },
+                screen = { NumeracyCountAndMatch() },
             ),
 
             BottomNavigationItem(
                 title = "Sessions",
                 icon = R.drawable.sessions,
-                screen = {  },
+                screen = { NumeracyWordProblem() },
             ),
         )
     }

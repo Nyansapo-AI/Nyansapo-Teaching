@@ -3,6 +3,7 @@ package com.nyansapoai.teaching.presentation.assessments.numeracy
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nyansapoai.teaching.data.remote.ai.ArtificialIntelligenceRepository
+import com.nyansapoai.teaching.data.remote.assessment.AssessmentRepository
 import com.nyansapoai.teaching.domain.models.ai.VisionRecognition
 import com.nyansapoai.teaching.utils.Results
 import kotlinx.coroutines.Dispatchers
@@ -15,7 +16,8 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class NumeracyAssessmentViewModel(
-    private val artificialIntelligenceRepository: ArtificialIntelligenceRepository
+    private val artificialIntelligenceRepository: ArtificialIntelligenceRepository,
+    private val assessmentRepository: AssessmentRepository
 ) : ViewModel() {
 
     private var hasLoadedInitialData = false
@@ -33,6 +35,7 @@ class NumeracyAssessmentViewModel(
             started = SharingStarted.WhileSubscribed(5_000L),
             initialValue = NumeracyAssessmentState()
         )
+
 
     fun onAction(action: NumeracyAssessmentAction) {
         when (action) {
@@ -74,6 +77,49 @@ class NumeracyAssessmentViewModel(
             NumeracyAssessmentAction.OnSubmitAnswer -> {
                 submitAnswer()
             }
+
+            is NumeracyAssessmentAction.OnAddAdditionOperation -> {
+                _state.value = _state.value.copy(
+                    additionOperationResults = _state.value.additionOperationResults.apply { add(action.addition) }
+                )
+            }
+
+            is NumeracyAssessmentAction.OnAddCountMatch -> {
+                _state.value = _state.value.copy(
+                    countAndMatchResults = _state.value.countAndMatchResults.apply { add(action.countMatch) }
+                )
+            }
+            is NumeracyAssessmentAction.OnAddDivisionOperation -> {
+                _state.value = _state.value.copy(
+                    divisionOperationResults = _state.value.divisionOperationResults.apply { add(action.division) }
+                )
+            }
+            is NumeracyAssessmentAction.OnAddMultiplicationOperation -> {
+                _state.value = _state.value.copy(
+                    multiplicationOperationResults = _state.value.multiplicationOperationResults.apply { add(action.multiplication) }
+                )
+            }
+            is NumeracyAssessmentAction.OnAddNumberRecognition -> {
+                _state.value = _state.value.copy(
+                    numberRecognitionResults = _state.value.numberRecognitionResults.apply { add(action.numberRecognition) }
+                )
+            }
+            is NumeracyAssessmentAction.OnAddSubtractionOperation -> {
+                _state.value = _state.value.copy(
+                    subtractionOperationResults = _state.value.subtractionOperationResults.apply { add(action.subtraction) }
+                )
+            }
+            is NumeracyAssessmentAction.OnSubmitCountMatch -> {
+                submitCountAndMatch(
+                    assessmentId = action.assessmentId,
+                    studentId = action.studentId
+                )
+            }
+            is NumeracyAssessmentAction.OnSubmitNumberRecognition -> TODO()
+            is NumeracyAssessmentAction.OnSubmitNumeracyOperations -> {
+
+            }
+            is NumeracyAssessmentAction.OnSubmitWordProblem -> TODO()
         }
     }
 
@@ -112,8 +158,42 @@ class NumeracyAssessmentViewModel(
                     .catch {  _answerImageByteArrayState.value = Results.error(msg = it.message ?: "Error  recognizing the work area") }
                     .collect { workArea ->
                         _answerImageByteArrayState.value = workArea
+
                     }
             }
+        }
+    }
+
+    private fun submitCountAndMatch(assessmentId: String, studentId: String) {
+        val countMatchList = _state.value.countAndMatchResults
+        if (countMatchList.isEmpty()) {
+            println("No count and match results to submit.")
+            return
+        }
+
+        viewModelScope.launch(Dispatchers.IO) {
+            assessmentRepository.assessNumeracyCountAndMatch(
+                countAndMatchList = countMatchList,
+                studentID = studentId,
+                assessmentId = assessmentId
+            )
+        }
+    }
+
+    private fun submitNumeracyArithmeticOperations(
+        assessmentId: String,
+        studentId: String
+    ){
+        if (_state.value.additionOperationResults.isEmpty()){
+            return
+        }
+
+        viewModelScope.launch {
+            assessmentRepository.assessNumeracyArithmeticOperations(
+                assessmentId = assessmentId,
+                studentID = studentId,
+                arithmeticOperations = _state.value.additionOperationResults,
+            )
         }
     }
 

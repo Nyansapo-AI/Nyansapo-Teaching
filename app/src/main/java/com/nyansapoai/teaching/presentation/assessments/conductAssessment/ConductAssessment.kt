@@ -26,52 +26,24 @@ fun ConductAssessmentRoot(
 
     ConductAssessmentScreen(
         state = state,
-        onAction = viewModel::onAction
+        onAction = viewModel::onAction,
+        assessmentId = assessmentId,
+        studentId = studentId,
     )
 
 }
 
 @Composable
 fun ConductAssessmentScreen(
+    assessmentId: String,
+    studentId: String,
     state: ConductAssessmentState,
     onAction: (ConductAssessmentAction) -> Unit,
 ) {
-    Scaffold(
+    NumeracyAssessmentRoot(
+        assessmentId = assessmentId,
+        studentId = studentId,
+    )
 
-    ) { innerPadding ->
-
-
-        /*
-        var answerImage by remember { mutableStateOf<ImageBitmap?>(null) }
-        var workAreaImage by remember { mutableStateOf<ImageBitmap?>(null) }
-
-        var shouldCaptureAnswer by remember { mutableStateOf(false) }
-        var shouldCaptureWorkArea by remember { mutableStateOf(false) }
-
-        LazyColumn(
-            modifier = Modifier.padding(innerPadding),
-        ) {
-            item {
-                NumeracyOperation(
-                    firstNumber = 10,
-                    secondNumber = 5,
-                    shouldCaptureAnswer = shouldCaptureAnswer,
-                    shouldCaptureWorkArea = shouldCaptureWorkArea,
-                    onCaptureAnswerContent = { imageBitmap ->
-                        answerImage = imageBitmap
-                    },
-                    onCaptureWorkAreaContent = {
-                        workAreaImage = it
-                    },
-                )
-
-            }
-        } */
-
-        NumeracyAssessmentRoot(
-
-        )
-
-    }
 
 }

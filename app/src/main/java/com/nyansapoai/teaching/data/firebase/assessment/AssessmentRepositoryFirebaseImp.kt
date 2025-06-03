@@ -6,6 +6,9 @@ import com.google.firebase.firestore.toObject
 import com.nyansapoai.teaching.data.remote.assessment.AssessmentRepository
 import com.nyansapoai.teaching.domain.models.assessments.Assessment
 import com.nyansapoai.teaching.domain.models.assessments.AssignedStudent
+import com.nyansapoai.teaching.domain.models.assessments.numeracy.CountMatch
+import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyArithmeticOperation
+import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyWordProblem
 import com.nyansapoai.teaching.utils.Results
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
@@ -107,6 +110,129 @@ class AssessmentRepositoryFirebaseImp(
 
         awaitClose {
             snapshotListener.remove()
+        }
+    }
+
+    override suspend fun assessNumeracyCountAndMatch(
+        assessmentId: String,
+        studentID: String,
+        countAndMatchList: List<CountMatch>
+    ): Results<String> {
+        val deferred = CompletableDeferred<Results<String>>()
+
+        firebaseDb.collection(assessmentCollection)
+            .document(assessmentId)
+            .collection("assessments-results")
+            .document(assessmentId+"_$studentID")
+            .update(
+                mapOf(
+                    "assessmentId" to assessmentId,
+                    "student_id" to studentID,
+                    "numeracy_results.count_and_match" to countAndMatchList
+                )
+            )
+            .addOnSuccessListener {
+                deferred.complete(Results.success(data = "Assessment submitted successfully"))
+            }
+            .addOnFailureListener {
+                deferred.complete(Results.error(msg = "Failed to submit assessment: ${it.message}"))
+            }
+
+
+        return withContext(Dispatchers.IO) {
+            deferred.await()
+        }
+    }
+
+    override suspend fun assessNumeracyNumberRecognition(
+        assessmentId: String,
+        studentID: String,
+        numberRecognitionList: List<String>
+    ): Results<String> {
+        val deferred = CompletableDeferred<Results<String>>()
+
+        firebaseDb.collection(assessmentCollection)
+            .document(assessmentId)
+            .collection("assessments-results")
+            .document(assessmentId+"_$studentID")
+            .update(
+                mapOf(
+                    "assessmentId" to assessmentId,
+                    "student_id" to studentID,
+                    "numeracy_results.number_recognition" to numberRecognitionList
+                )
+            )
+            .addOnSuccessListener {
+                deferred.complete(Results.success(data = "Assessment submitted successfully"))
+            }
+            .addOnFailureListener {
+                deferred.complete(Results.error(msg = "Failed to submit assessment: ${it.message}"))
+            }
+
+        return withContext(Dispatchers.IO) {
+            deferred.await()
+        }
+    }
+
+    override suspend fun assessNumeracyArithmeticOperations(
+        assessmentId: String,
+        studentID: String,
+        arithmeticOperations: List<NumeracyArithmeticOperation>
+    ): Results<String> {
+        val deferred = CompletableDeferred<Results<String>>()
+
+        firebaseDb.collection(assessmentCollection)
+            .document(assessmentId)
+            .collection("assessments-results")
+            .document(assessmentId+"_$studentID")
+            .update(
+                mapOf(
+                    "assessmentId" to assessmentId,
+                    "student_id" to studentID,
+                    "numeracy_results.number_operations" to arithmeticOperations
+                )
+            )
+            .addOnSuccessListener {
+                deferred.complete(Results.success(data = "Assessment submitted successfully"))
+            }
+            .addOnFailureListener {
+                deferred.complete(Results.error(msg = "Failed to submit assessment: ${it.message}"))
+            }
+
+        return withContext(Dispatchers.IO) {
+            deferred.await()
+        }
+    }
+
+    override suspend fun assessNumeracyWordProblem(
+        assessmentId: String,
+        studentID: String,
+        wordProblem: NumeracyWordProblem
+    ) {
+
+        val deferred = CompletableDeferred<Results<String>>()
+
+        firebaseDb.collection(assessmentCollection)
+            .document(assessmentId)
+            .collection("assessments-results")
+            .document(assessmentId+"_$studentID")
+            .update(
+                mapOf(
+                    "assessmentId" to assessmentId,
+                    "student_id" to studentID,
+                    "numeracy_results.word_problem" to wordProblem
+                )
+            )
+            .addOnSuccessListener {
+                deferred.complete(Results.success(data = "Assessment submitted successfully"))
+            }
+            .addOnFailureListener {
+                deferred.complete(Results.error(msg = "Failed to submit assessment: ${it.message}"))
+            }
+
+
+        return withContext(Dispatchers.IO) {
+            deferred.await()
         }
     }
 

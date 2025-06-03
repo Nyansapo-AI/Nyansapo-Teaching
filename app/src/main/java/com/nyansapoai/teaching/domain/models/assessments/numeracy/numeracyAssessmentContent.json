@@ -1,0 +1,154 @@
+{
+  "numeracyAssessmentContentList": [
+    {
+      "countAndMatchNumbersList": [9, 2, 4, 6, 1, 3],
+      "numberRecognition_2List": [74, 66, 28, 39, 97, 45],
+      "additions": [
+        { "firstNumber": 17, "secondNumber": 24, "answer": 41 },
+        { "firstNumber": 34, "secondNumber": 21, "answer": 55 },
+        { "firstNumber": 12, "secondNumber": 31, "answer": 43 }
+      ],
+      "subtractions": [
+        { "firstNumber": 78, "secondNumber": 41, "answer": 37 },
+        { "firstNumber": 96, "secondNumber": 54, "answer": 42 },
+        { "firstNumber": 43, "secondNumber": 20, "answer": 23 }
+      ],
+      "multiplications": [
+        { "firstNumber": 2, "secondNumber": 2, "answer": 4 },
+        { "firstNumber": 5, "secondNumber": 3, "answer": 15 },
+        { "firstNumber": 3, "secondNumber": 4, "answer": 12 }
+      ],
+      "divisions": [
+        { "firstNumber": 20, "secondNumber": 5, "answer": 4 },
+        { "firstNumber": 12, "secondNumber": 2, "answer": 6 },
+        { "firstNumber": 6, "secondNumber": 3, "answer": 2 }
+      ],
+      "wordProblems": [
+        {
+          "problem": "John has 31 banana's,Peter takes 13 banana's from John.How many banana's does John have left?",
+          "answer": 18
+        }
+      ]
+    },
+    {
+      "countAndMatchNumbersList": [6, 3, 9, 2, 7, 5],
+      "numberRecognition_2List": [19, 67, 45, 24, 33, 51],
+      "additions": [
+        { "firstNumber": 21, "secondNumber": 36, "answer": 57 },
+        { "firstNumber": 15, "secondNumber": 34, "answer": 49 },
+        { "firstNumber": 84, "secondNumber": 12, "answer": 96 }
+      ],
+      "subtractions": [
+        { "firstNumber": 28, "secondNumber": 15, "answer": 13 },
+        { "firstNumber": 33, "secondNumber": 11, "answer": 22 },
+        { "firstNumber": 87, "secondNumber": 51, "answer": 36 }
+      ],
+      "multiplications": [
+        { "firstNumber": 5, "secondNumber": 2, "answer": 10 },
+        { "firstNumber": 2, "secondNumber": 3, "answer": 6 },
+        { "firstNumber": 3, "secondNumber": 4, "answer": 12 }
+      ],
+      "divisions": [
+        { "firstNumber": 4, "secondNumber": 2, "answer": 2 },
+        { "firstNumber": 16, "secondNumber": 4, "answer": 4 },
+        { "firstNumber": 10, "secondNumber": 5, "answer": 2 }
+      ],
+      "wordProblems": [
+        {
+          "problem": "Mary has 5 apples. She eats 2 apples. How many apples does Mary have left?",
+          "answer": 3
+        }
+      ]
+    },
+    {
+      "countAndMatchNumbersList": [8, 4, 1, 3, 6, 7],
+      "numberRecognition_2List": [23, 71, 48, 29, 37, 56],
+      "additions": [
+        { "firstNumber": 25, "secondNumber": 39, "answer": 64 },
+        { "firstNumber": 18, "secondNumber": 37, "answer": 55 },
+        { "firstNumber": 89, "secondNumber": 15, "answer": 104 }
+      ],
+      "subtractions": [
+        { "firstNumber": 32, "secondNumber": 17, "answer": 15 },
+        { "firstNumber": 38, "secondNumber": 14, "answer": 24 },
+        { "firstNumber": 92, "secondNumber": 56, "answer": 36 }
+      ],
+      "multiplications": [
+        { "firstNumber": 6, "secondNumber": 3, "answer": 18 },
+        { "firstNumber": 3, "secondNumber": 4, "answer": 12 },
+        { "firstNumber": 4, "secondNumber": 5, "answer": 20 }
+      ],
+      "divisions": [
+        { "firstNumber": 6, "secondNumber": 3, "answer": 2 },
+        { "firstNumber": 20, "secondNumber": 5, "answer": 4 },
+        { "firstNumber": 12, "secondNumber": 6, "answer": 2 }
+      ],
+      "wordProblems": [
+        {
+          "problem": "Sarah has 7 oranges. She gives 3 oranges to her friend. How many oranges does Sarah have left?",
+          "answer": 4
+        }
+      ]
+    },
+    {
+      "countAndMatchNumbersList": [2, 5, 1, 3, 6, 7],
+      "numberRecognition_2List": [24, 73, 49, 31, 38, 57],
+      "additions": [
+        { "firstNumber": 27, "secondNumber": 39, "answer": 66 },
+        { "firstNumber": 19, "secondNumber": 37, "answer": 56 },
+        { "firstNumber": 88, "secondNumber": 14, "answer": 102 }
+      ],
+      "subtractions": [
+        { "firstNumber": 33, "secondNumber": 17, "answer": 16 },
+        { "firstNumber": 39, "secondNumber": 15, "answer": 24 },
+        { "firstNumber": 91, "secondNumber": 52, "answer": 39 }
+      ],
+      "multiplications": [
+        { "firstNumber": 7, "secondNumber": 3, "answer": 21 },
+        { "firstNumber": 4, "secondNumber": 4, "answer": 16 },
+        { "firstNumber": 5, "secondNumber": 5, "answer": 25 }
+      ],
+      "divisions": [
+        { "firstNumber": 8, "secondNumber": 4, "answer": 2 },
+        { "firstNumber": 18, "secondNumber": 6, "answer": 3 },
+        { "firstNumber": 15, "secondNumber": 5, "answer": 3 }
+      ],
+      "wordProblems": [
+        {
+          "problem": "Tom has 8 books. He gives 3 books to his friend. How many books does Tom have left?",
+          "answer": 5
+        }
+      ]
+    },
+    {
+      "countAndMatchNumbersList": [3, 6, 2, 4, 7, 8],
+      "numberRecognition_2List": [25, 74, 50, 32, 39, 58],
+      "additions": [
+        { "firstNumber": 28, "secondNumber": 40, "answer": 68 },
+        { "firstNumber": 20, "secondNumber": 38, "answer": 58 },
+        { "firstNumber": 87, "secondNumber": 13, "answer": 100 }
+      ],
+      "subtractions": [
+        { "firstNumber": 34, "secondNumber": 18, "answer": 16 },
+        { "firstNumber": 40, "secondNumber": 16, "answer": 24 },
+        { "firstNumber": 90, "secondNumber": 51, "answer": 39 }
+      ],
+      "multiplications": [
+        { "firstNumber": 8, "secondNumber": 4, "answer": 32 },
+        { "firstNumber": 5, "secondNumber": 5, "answer": 25 },
+        { "firstNumber": 6, "secondNumber": 6, "answer": 36 }
+      ],
+      "divisions": [
+        { "firstNumber": 9, "secondNumber": 3, "answer": 3 },
+        { "firstNumber": 18, "secondNumber": 6, "answer": 3 },
+        { "firstNumber": 15, "secondNumber": 5, "answer": 3 }
+      ],
+      "wordProblems": [
+        {
+          "problem": "Sue has 9 apples. She eats 4 apples. How many apples does Sue have left?",
+          "answer": 5
+        }
+      ]
+    }
+  ]
+}
