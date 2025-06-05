@@ -6,6 +6,7 @@ import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyAssess
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyNumberRecognition
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyWordProblem
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.WordProblem
+import com.nyansapoai.teaching.presentation.assessments.numeracy.components.NumeracyAssessmentLevel
 import com.nyansapoai.teaching.utils.Results
 
 data class NumeracyAssessmentState(
@@ -23,6 +24,14 @@ data class NumeracyAssessmentState(
     val subtractionOperationResults: MutableList<NumeracyArithmeticOperation> = mutableListOf(),
     val multiplicationOperationResults: MutableList<NumeracyArithmeticOperation> = mutableListOf(),
     val divisionOperationResults: MutableList<NumeracyArithmeticOperation> = mutableListOf(),
-    val wordProblem: NumeracyWordProblem? = null
+    val wordProblem: NumeracyWordProblem? = null,
 
+    val countMatchIndex: Int = 0,
+    val additionIndex: Int = 0,
+    val subtractionIndex: Int = 0,
+    val multiplicationIndex: Int = 0,
+    val divisionIndex: Int = 0,
+    val numberRecognitionIndex: Int = 0,
+
+    val numeracyLevel: NumeracyAssessmentLevel = NumeracyAssessmentLevel.COUNT_MATCH
 )

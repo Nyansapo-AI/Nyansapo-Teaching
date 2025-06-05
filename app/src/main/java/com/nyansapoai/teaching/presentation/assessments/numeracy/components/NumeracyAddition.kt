@@ -158,7 +158,7 @@ fun NumeracyOperation(
 
                         Box(
                             modifier = Modifier
-                                .widthIn(max = 200.dp, min = 100.dp)
+                                .widthIn(max = 300.dp, min = 100.dp)
                                 .heightIn(min = 100.dp, max = 150.dp)
                                 .background(MaterialTheme.colorScheme.tertiary)
                                 .border(

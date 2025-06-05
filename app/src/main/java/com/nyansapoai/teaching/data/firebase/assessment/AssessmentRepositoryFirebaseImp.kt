@@ -124,7 +124,7 @@ class AssessmentRepositoryFirebaseImp(
             .document(assessmentId)
             .collection("assessments-results")
             .document(assessmentId+"_$studentID")
-            .update(
+            .set(
                 mapOf(
                     "assessmentId" to assessmentId,
                     "student_id" to studentID,
@@ -132,9 +132,11 @@ class AssessmentRepositoryFirebaseImp(
                 )
             )
             .addOnSuccessListener {
+                Log.d("AssessmentRepositoryFirebaseImp", "Assessment submitted count and match successfully")
                 deferred.complete(Results.success(data = "Assessment submitted successfully"))
             }
             .addOnFailureListener {
+                Log.d("AssessmentRepositoryFirebaseImp", "Failed to submit count and match assessment: ${it.message}")
                 deferred.complete(Results.error(msg = "Failed to submit assessment: ${it.message}"))
             }
 
@@ -155,11 +157,13 @@ class AssessmentRepositoryFirebaseImp(
             .document(assessmentId)
             .collection("assessments-results")
             .document(assessmentId+"_$studentID")
-            .update(
+            .set(
                 mapOf(
                     "assessmentId" to assessmentId,
                     "student_id" to studentID,
-                    "numeracy_results.number_recognition" to numberRecognitionList
+                    "numeracy_results" to mapOf(
+                        "number_recognition" to numberRecognitionList
+                    )
                 )
             )
             .addOnSuccessListener {
@@ -185,17 +189,21 @@ class AssessmentRepositoryFirebaseImp(
             .document(assessmentId)
             .collection("assessments-results")
             .document(assessmentId+"_$studentID")
-            .update(
+            .set(
                 mapOf(
                     "assessmentId" to assessmentId,
                     "student_id" to studentID,
-                    "numeracy_results.number_operations" to arithmeticOperations
+                    "numeracy_results" to mapOf(
+                        "number_operations" to arithmeticOperations
+                    )
                 )
             )
             .addOnSuccessListener {
+                Log.d("AssessmentRepositoryFirebaseImp", "Assessment submitted successfully")
                 deferred.complete(Results.success(data = "Assessment submitted successfully"))
             }
             .addOnFailureListener {
+                Log.d("AssessmentRepositoryFirebaseImp", "Failed to submit assessment: ${it.message}")
                 deferred.complete(Results.error(msg = "Failed to submit assessment: ${it.message}"))
             }
 
@@ -216,11 +224,13 @@ class AssessmentRepositoryFirebaseImp(
             .document(assessmentId)
             .collection("assessments-results")
             .document(assessmentId+"_$studentID")
-            .update(
+            .set(
                 mapOf(
                     "assessmentId" to assessmentId,
                     "student_id" to studentID,
-                    "numeracy_results.word_problem" to wordProblem
+                    "numeracy_results" to mapOf(
+                        "word_problem" to wordProblem
+                    )
                 )
             )
             .addOnSuccessListener {

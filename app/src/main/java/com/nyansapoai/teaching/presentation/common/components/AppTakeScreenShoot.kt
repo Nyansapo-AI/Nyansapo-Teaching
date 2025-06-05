@@ -166,7 +166,6 @@ fun AppTakeScreenShoot(
             },
             modifier = Modifier
 //                .padding(16.dp)
-
         ) {
             Text(text = "Capture Screen")
         }

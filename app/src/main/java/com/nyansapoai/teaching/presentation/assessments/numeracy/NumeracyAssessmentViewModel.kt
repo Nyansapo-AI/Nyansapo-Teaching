@@ -5,6 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.nyansapoai.teaching.data.remote.ai.ArtificialIntelligenceRepository
 import com.nyansapoai.teaching.data.remote.assessment.AssessmentRepository
 import com.nyansapoai.teaching.domain.models.ai.VisionRecognition
+import com.nyansapoai.teaching.domain.models.assessments.numeracy.CountMatch
+import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyArithmeticOperation
+import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyOperationMetadata
 import com.nyansapoai.teaching.utils.Results
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -112,14 +115,52 @@ class NumeracyAssessmentViewModel(
             is NumeracyAssessmentAction.OnSubmitCountMatch -> {
                 submitCountAndMatch(
                     assessmentId = action.assessmentId,
-                    studentId = action.studentId
+                    studentId = action.studentId,
+                    countMatchList = _state.value.countAndMatchResults
                 )
             }
             is NumeracyAssessmentAction.OnSubmitNumberRecognition -> TODO()
             is NumeracyAssessmentAction.OnSubmitNumeracyOperations -> {
 
             }
-            is NumeracyAssessmentAction.OnSubmitWordProblem -> TODO()
+            is NumeracyAssessmentAction.OnSubmitWordProblem -> {
+            }
+            is NumeracyAssessmentAction.OnAdditionIndexChange -> {
+                _state.value = _state.value.copy(
+                    additionIndex = action.index
+                )
+            }
+            is NumeracyAssessmentAction.OnCountMachIndexChange -> {
+                _state.value = _state.value.copy(
+                    countMatchIndex = action.index
+                )
+            }
+            is NumeracyAssessmentAction.OnDivisionIndexChange -> {
+                _state.value = _state.value.copy(
+                    divisionIndex = action.index
+                )
+            }
+            is NumeracyAssessmentAction.OnMultiplicationIndexChange -> {
+                _state.value = _state.value.copy(
+                    multiplicationIndex = action.index
+                )
+            }
+            is NumeracyAssessmentAction.OnNumberRecognitionIndexChange -> {
+                _state.value = _state.value.copy(
+                    numberRecognitionIndex = action.index
+                )
+            }
+            is NumeracyAssessmentAction.OnSubtractionIndexChange -> {
+                _state.value = _state.value.copy(
+                    subtractionIndex = action.index
+                )
+            }
+
+            is NumeracyAssessmentAction.OnNumeracyLevelChange -> {
+                _state.value = _state.value.copy(
+                    numeracyLevel = action.numeracyLevel
+                )
+            }
         }
     }
 
@@ -164,8 +205,11 @@ class NumeracyAssessmentViewModel(
         }
     }
 
-    private fun submitCountAndMatch(assessmentId: String, studentId: String) {
-        val countMatchList = _state.value.countAndMatchResults
+    private fun submitCountAndMatch(
+        assessmentId: String,
+        studentId: String,
+        countMatchList: List<CountMatch>
+    ) {
         if (countMatchList.isEmpty()) {
             println("No count and match results to submit.")
             return
@@ -182,9 +226,10 @@ class NumeracyAssessmentViewModel(
 
     private fun submitNumeracyArithmeticOperations(
         assessmentId: String,
-        studentId: String
+        studentId: String,
+        operationList: List<NumeracyArithmeticOperation>
     ){
-        if (_state.value.additionOperationResults.isEmpty()){
+        if (operationList.isEmpty()){
             return
         }
 
@@ -192,9 +237,47 @@ class NumeracyAssessmentViewModel(
             assessmentRepository.assessNumeracyArithmeticOperations(
                 assessmentId = assessmentId,
                 studentID = studentId,
-                arithmeticOperations = _state.value.additionOperationResults,
+                arithmeticOperations = operationList,
             )
         }
     }
 
+/*
+    init {
+        submitNumeracyArithmeticOperations(
+            assessmentId = " d0c525ba-b151-4f61-98dc-7920fe857e69 ",
+            studentId = "student_2",
+            operationList = listOf(
+                NumeracyArithmeticOperation(
+                    type = "Addition",
+                    student_answer = 3,
+                    expected_answer = 3,
+                    operationNumber1 = 2,
+                    operationNumber2 = 1,
+                    metadata = NumeracyOperationMetadata(
+                        workAreaMediaUrl = "https://example.com/work_area_1.jpg",
+                        answerMediaUrl = "https://example.com/answer_1.jpg",
+                        passed = true
+                    )
+                )
+            )
+        )
+
+
+        submitCountAndMatch(
+            assessmentId = "d0c525ba-b151-4f61-98dc-7920fe857e69",
+            studentId = "student_2",
+            countMatchList = listOf(
+                CountMatch(
+                    type = "Count and Match",
+                    student_count = 5,
+                    expected_number = 5,
+                    passed = true,
+                )
+            )
+        )
+    }
+
+
+ */
 }
