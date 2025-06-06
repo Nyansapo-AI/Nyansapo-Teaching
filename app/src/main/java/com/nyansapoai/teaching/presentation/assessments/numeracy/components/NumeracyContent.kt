@@ -16,7 +16,7 @@ fun NumeracyContent(
     modifier: Modifier = Modifier,
     assessmentContent: NumeracyAssessmentContent,
     countMatchIndex: Int,
-//    additionIndex: Int,
+    additionIndex: Int,
     subtractionIndex: Int,
     multiplicationIndex: Int,
     divisionIndex: Int,
@@ -28,13 +28,16 @@ fun NumeracyContent(
     onSubmitWordProblem: () -> Unit = {},
     onSubmitDivision: () -> Unit = {},
     onSubmitNumberRecognition: () -> Unit = {},
+    onCaptureAnswerContent: (ByteArray) -> Unit = {},
+    shouldCaptureAnswer: Boolean = false,
+    onCaptureWorkAreaContent: (ByteArray) -> Unit = {},
     assessmentLevel: NumeracyAssessmentLevel = NumeracyAssessmentLevel.ADDITION
 ) {
     AnimatedContent(
         targetState = assessmentLevel
     ) { level ->
 
-        var additionIndex by remember { mutableStateOf(0) }
+//        var additionIndex by remember { mutableStateOf(0) }
 
         when (level) {
             NumeracyAssessmentLevel.COUNT_MATCH -> {
@@ -54,15 +57,15 @@ fun NumeracyContent(
                         secondNumber = assessmentContent.additions[additionIndex].secondNumber,
                         operationType = assessmentContent.additions[additionIndex].operationType,
                         operationOrientation = Orientation.Vertical,
-                        onCaptureAnswerContent = {},
-                        shouldCaptureAnswer = false,
-                        onCaptureWorkAreaContent = {},
-                        shouldCaptureWorkArea = false,
-//                        onSubmit = onSubmitAddition
-                        onSubmit = {
-                            onSubmitAddition()
-                            additionIndex = (additionIndex + 1) % assessmentContent.additions.size
-                        }
+                        onCaptureAnswerContent = onCaptureAnswerContent,
+                        shouldCaptureAnswer = shouldCaptureAnswer,
+                        onCaptureWorkAreaContent = onCaptureWorkAreaContent,
+                        shouldCaptureWorkArea = shouldCaptureAnswer,
+                        onSubmit = onSubmitAddition
+//                        onSubmit = {
+//                            onSubmitAddition()
+//                            additionIndex = (additionIndex + 1) % assessmentContent.additions.size
+//                        }
                     )
                 }
             }

@@ -13,10 +13,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nyansapoai.teaching.domain.models.ai.VisionRecognition
+import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyOperations
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.numeracyAssessmentData
 import com.nyansapoai.teaching.presentation.assessments.numeracy.components.NumeracyAssessmentLevel
 import com.nyansapoai.teaching.presentation.assessments.numeracy.components.NumeracyContent
 import com.nyansapoai.teaching.presentation.assessments.numeracy.components.NumeracyOperation
+import com.nyansapoai.teaching.presentation.assessments.numeracy.components.OperationType
 import com.nyansapoai.teaching.presentation.common.components.AppCircularLoading
 import com.nyansapoai.teaching.utils.ResultStatus
 import com.nyansapoai.teaching.utils.Results
@@ -100,12 +102,47 @@ fun NumeracyAssessmentScreen(
                 NumeracyContent(
                     modifier = modifier,
                     assessmentContent = numeracyAssessmentData.numeracyAssessmentContentList[0],
-                    countMatchIndex = state.countAndMatchResults.size - 1,
-                    subtractionIndex = state.subtractionOperationResults.size - 1,
-                    multiplicationIndex = state.multiplicationOperationResults.size - 1,
-                    divisionIndex = state.divisionOperationResults.size - 1,
-                    numberRecognitionIndex = state.numberRecognitionResults.size - 1,
-                    assessmentLevel = NumeracyAssessmentLevel.ADDITION
+                    countMatchIndex = state.countMatchIndex,
+                    subtractionIndex = state.subtractionIndex,
+                    multiplicationIndex = state.multiplicationIndex,
+                    divisionIndex = state.divisionIndex,
+                    numberRecognitionIndex = state.numberRecognitionIndex,
+                    assessmentLevel = NumeracyAssessmentLevel.ADDITION,
+                    onSubmitAddition = {
+                        onAction(
+                            NumeracyAssessmentAction.OnAddArithmeticOperation(
+                            numeracyOperations = NumeracyOperations(
+                                firstNumber = state.numeracyAssessmentContent.data?.additions[state.additionIndex]?.firstNumber
+                                    ?: 0,
+                                secondNumber = state.numeracyAssessmentContent.data?.additions[state.additionIndex]?.secondNumber
+                                    ?: 0,
+                                answer = state.numeracyAssessmentContent.data?.additions[state.additionIndex]?.answer
+                                    ?: 0,
+                                operationType = state.numeracyAssessmentContent.data?.additions[state.additionIndex]?.operationType
+                                    ?: OperationType.ADDITION
+                            ),
+                            onSuccess = {
+                                onAction(NumeracyAssessmentAction.OnAdditionIndexChange(index = state.additionIndex + 1))
+//                                onAction(NumeracyAssessmentAction.OnAdditionIndexChange((state.additionIndex + 1) % numeracyAssessmentData.numeracyAssessmentContentList[0].additions.size))
+                            }
+                        )
+                        )
+                    },
+                    additionIndex = state.additionIndex,
+                    onSubmitCountMatch = {},
+                    onSubmitSubtraction = {},
+                    onSubmitMultiplication = {},
+                    onSubmitWordProblem = {},
+                    onSubmitDivision = {},
+                    onSubmitNumberRecognition = {},
+                    onCaptureAnswerContent = {image ->
+                        onAction(NumeracyAssessmentAction.OnCaptureAnswer(image))
+
+                    },
+                    shouldCaptureAnswer = state.shouldCaptureAnswer,
+                    onCaptureWorkAreaContent = { image ->
+                        onAction(NumeracyAssessmentAction.OnCaptureWorkArea(image))
+                    }
                 )
             }
 

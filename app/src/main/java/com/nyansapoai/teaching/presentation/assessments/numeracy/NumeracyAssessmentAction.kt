@@ -3,6 +3,7 @@ package com.nyansapoai.teaching.presentation.assessments.numeracy
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.CountMatch
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyArithmeticOperation
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyNumberRecognition
+import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyOperations
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyWordProblem
 import com.nyansapoai.teaching.presentation.assessments.numeracy.components.NumeracyAssessmentLevel
 
@@ -18,13 +19,7 @@ sealed interface NumeracyAssessmentAction {
 
     data class OnAddCountMatch(val countMatch: CountMatch, val onSuccess: () -> Unit) : NumeracyAssessmentAction
 
-    data class OnAddAdditionOperation(val addition: NumeracyArithmeticOperation, val onSuccess: () -> Unit) : NumeracyAssessmentAction
-
-    data class OnAddSubtractionOperation(val subtraction: NumeracyArithmeticOperation, val onSuccess: () -> Unit) : NumeracyAssessmentAction
-
-    data class OnAddMultiplicationOperation(val multiplication: NumeracyArithmeticOperation, val onSuccess: () -> Unit) : NumeracyAssessmentAction
-
-    data class OnAddDivisionOperation(val division: NumeracyArithmeticOperation, val onSuccess: () -> Unit) : NumeracyAssessmentAction
+    data class OnAddArithmeticOperation(val numeracyOperations: NumeracyOperations, val onSuccess: () -> Unit) : NumeracyAssessmentAction
 
     data class OnAddNumberRecognition(val numberRecognition: NumeracyNumberRecognition, val onSuccess: () -> Unit): NumeracyAssessmentAction
 

@@ -2,10 +2,11 @@ package com.nyansapoai.teaching.presentation.assessments.numeracy
 
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.CountMatch
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyArithmeticOperation
+import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyAssessmentContent
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyAssessmentData
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyNumberRecognition
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyWordProblem
-import com.nyansapoai.teaching.domain.models.assessments.numeracy.WordProblem
+import com.nyansapoai.teaching.domain.models.assessments.numeracy.numeracyAssessmentData
 import com.nyansapoai.teaching.presentation.assessments.numeracy.components.NumeracyAssessmentLevel
 import com.nyansapoai.teaching.utils.Results
 
@@ -14,16 +15,15 @@ data class NumeracyAssessmentState(
     val shouldCaptureWorkArea: Boolean = false,
     val answerImageByteArray: ByteArray? = null,
     val workAreaImageByteArray: ByteArray? = null,
+    val answerUri: String? = null,
+    val response: Int? = null,
     val answerString: String? = null,
     val answerInt: Int? = null,
-    val numeracyAssessmentContent: Results<NumeracyAssessmentData> = Results.initial(),
+    val numeracyAssessmentContent: Results<NumeracyAssessmentContent> = Results.success(data =numeracyAssessmentData.numeracyAssessmentContentList[0] ),
 
     val countAndMatchResults: MutableList<CountMatch> = mutableListOf(),
     val numberRecognitionResults: MutableList<NumeracyNumberRecognition> = mutableListOf(),
-    val additionOperationResults: MutableList<NumeracyArithmeticOperation> = mutableListOf(),
-    val subtractionOperationResults: MutableList<NumeracyArithmeticOperation> = mutableListOf(),
-    val multiplicationOperationResults: MutableList<NumeracyArithmeticOperation> = mutableListOf(),
-    val divisionOperationResults: MutableList<NumeracyArithmeticOperation> = mutableListOf(),
+    val arithmeticOperationResults: MutableList<NumeracyArithmeticOperation> = mutableListOf(),
     val wordProblem: NumeracyWordProblem? = null,
 
     val countMatchIndex: Int = 0,
