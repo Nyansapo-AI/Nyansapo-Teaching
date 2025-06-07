@@ -99,51 +99,68 @@ fun NumeracyAssessmentScreen(
             }*/
 
             item {
-                NumeracyContent(
-                    modifier = modifier,
-                    assessmentContent = numeracyAssessmentData.numeracyAssessmentContentList[0],
-                    countMatchIndex = state.countMatchIndex,
-                    subtractionIndex = state.subtractionIndex,
-                    multiplicationIndex = state.multiplicationIndex,
-                    divisionIndex = state.divisionIndex,
-                    numberRecognitionIndex = state.numberRecognitionIndex,
-                    assessmentLevel = NumeracyAssessmentLevel.ADDITION,
-                    onSubmitAddition = {
-                        onAction(
-                            NumeracyAssessmentAction.OnAddArithmeticOperation(
-                            numeracyOperations = NumeracyOperations(
-                                firstNumber = state.numeracyAssessmentContent.data?.additions[state.additionIndex]?.firstNumber
-                                    ?: 0,
-                                secondNumber = state.numeracyAssessmentContent.data?.additions[state.additionIndex]?.secondNumber
-                                    ?: 0,
-                                answer = state.numeracyAssessmentContent.data?.additions[state.additionIndex]?.answer
-                                    ?: 0,
-                                operationType = state.numeracyAssessmentContent.data?.additions[state.additionIndex]?.operationType
-                                    ?: OperationType.ADDITION
-                            ),
-                            onSuccess = {
-                                onAction(NumeracyAssessmentAction.OnAdditionIndexChange(index = state.additionIndex + 1))
-//                                onAction(NumeracyAssessmentAction.OnAdditionIndexChange((state.additionIndex + 1) % numeracyAssessmentData.numeracyAssessmentContentList[0].additions.size))
-                            }
-                        )
-                        )
-                    },
-                    additionIndex = state.additionIndex,
-                    onSubmitCountMatch = {},
-                    onSubmitSubtraction = {},
-                    onSubmitMultiplication = {},
-                    onSubmitWordProblem = {},
-                    onSubmitDivision = {},
-                    onSubmitNumberRecognition = {},
-                    onCaptureAnswerContent = {image ->
-                        onAction(NumeracyAssessmentAction.OnCaptureAnswer(image))
+                state.numeracyAssessmentContent.data?.let {
+                    NumeracyContent(
+                        modifier = modifier,
+                        assessmentContent = numeracyAssessmentData.numeracyAssessmentContentList[0],
+                        countMatchIndex = state.countMatchIndex,
+                        subtractionIndex = state.subtractionIndex,
+                        multiplicationIndex = state.multiplicationIndex,
+                        divisionIndex = state.divisionIndex,
+                        numberRecognitionIndex = state.numberRecognitionIndex,
+                        assessmentLevel = NumeracyAssessmentLevel.ADDITION,
+                        onSubmitAddition = {
+                            onAction(
+                                NumeracyAssessmentAction.OnAddArithmeticOperation(
+                                    numeracyOperations = NumeracyOperations(
+                                        firstNumber = state.numeracyAssessmentContent.data.additions[state.additionIndex].firstNumber,
+                                        secondNumber = state.numeracyAssessmentContent.data.additions[state.additionIndex].secondNumber,
+                                        answer = state.numeracyAssessmentContent.data.additions[state.additionIndex].answer,
+                                        operationType = state.numeracyAssessmentContent.data.additions[state.additionIndex].operationType
+                                    ),
+                                    onSuccess = {
+                                        /*
+                                        when {
+                                            state.additionIndex + 1 >= numeracyAssessmentData.numeracyAssessmentContentList[0].additions.size -> {
+                                                onAction(NumeracyAssessmentAction.OnSubmitNumeracyOperations(
+                                                    operationList = state.arithmeticOperationResults,
+                                                    assessmentId = assessmentId,
+                                                    studentId = studentId,
+                                                    onSuccess = {
+                                                        onAction(NumeracyAssessmentAction.OnNumeracyLevelChange(NumeracyAssessmentLevel.SUBTRACTION))
+                                                    }
+                                                ))
+                                            }
+                                            else -> {
+                                                onAction(NumeracyAssessmentAction.OnAdditionIndexChange(index = state.additionIndex + 1))
+                                            }
+                                        } */
+                                    }
+                                )
+                            )
+                        },
+                        additionIndex = state.additionIndex,
+                        onSubmitCountMatch = {},
+                        onSubmitSubtraction = {},
+                        onSubmitMultiplication = {},
+                        onSubmitWordProblem = {},
+                        onSubmitDivision = {},
+                        onSubmitNumberRecognition = {},
+                        responseError = state.responseError,
+                        answerResponse = state.response,
+                        onCaptureAnswerContent = {image ->
+                            onAction(NumeracyAssessmentAction.OnCaptureAnswer(image))
 
-                    },
-                    shouldCaptureAnswer = state.shouldCaptureAnswer,
-                    onCaptureWorkAreaContent = { image ->
-                        onAction(NumeracyAssessmentAction.OnCaptureWorkArea(image))
-                    }
-                )
+                        },
+                        shouldCaptureAnswer = state.shouldCaptureAnswer,
+                        onCaptureWorkAreaContent = { image ->
+                            onAction(NumeracyAssessmentAction.OnCaptureWorkArea(image))
+                        }
+                    )
+
+                }
+
+
             }
 
             /*

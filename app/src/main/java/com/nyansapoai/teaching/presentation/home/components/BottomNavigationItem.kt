@@ -8,7 +8,6 @@ import com.nyansapoai.teaching.presentation.assessments.AssessmentsRoot
 import com.nyansapoai.teaching.presentation.assessments.numeracy.components.NumeracyCountAndMatch
 import com.nyansapoai.teaching.presentation.assessments.numeracy.components.NumeracyWordProblem
 import com.nyansapoai.teaching.presentation.camps.CampRoot
-import com.nyansapoai.teaching.presentation.common.components.AppTakeScreenShoot
 
 data class BottomNavigationItem(
     val title: String,

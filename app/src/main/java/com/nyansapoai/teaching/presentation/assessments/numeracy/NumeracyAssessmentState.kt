@@ -17,6 +17,7 @@ data class NumeracyAssessmentState(
     val workAreaImageByteArray: ByteArray? = null,
     val answerUri: String? = null,
     val response: Int? = null,
+    val responseError: String? = null,
     val answerString: String? = null,
     val answerInt: Int? = null,
     val numeracyAssessmentContent: Results<NumeracyAssessmentContent> = Results.success(data =numeracyAssessmentData.numeracyAssessmentContentList[0] ),

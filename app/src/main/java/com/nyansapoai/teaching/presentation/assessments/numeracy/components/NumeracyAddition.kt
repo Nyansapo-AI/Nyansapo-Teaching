@@ -14,7 +14,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ButtonGroup
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
@@ -41,7 +44,7 @@ import com.nyansapoai.teaching.presentation.common.components.AppButton
 import com.nyansapoai.teaching.presentation.common.components.AppTouchInput
 import com.nyansapoai.teaching.presentation.common.components.CapturableComposable
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun NumeracyOperation(
     modifier: Modifier = Modifier,
@@ -58,10 +61,13 @@ fun NumeracyOperation(
 
     var isEraserMode by remember { mutableStateOf(false) }
 
+
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
     ){
+
         Column(
             verticalArrangement = Arrangement.spacedBy(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -263,9 +269,6 @@ fun NumeracyOperation(
 
 
         }
-
-
-
     }
 
 }
@@ -362,6 +365,7 @@ enum class OperationType(
 }
 
 
+/*
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun NumeracyAdditionPreview() {
@@ -371,3 +375,5 @@ private fun NumeracyAdditionPreview() {
         modifier = Modifier.fillMaxWidth()
     )
 }
+
+ */

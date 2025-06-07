@@ -11,6 +11,7 @@ import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyArithm
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyOperationMetadata
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyOperations
 import com.nyansapoai.teaching.presentation.assessments.components.checkAnswer
+import com.nyansapoai.teaching.utils.ResultStatus
 import com.nyansapoai.teaching.utils.Results
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -88,40 +89,12 @@ class NumeracyAssessmentViewModel(
             }
 
             is NumeracyAssessmentAction.OnAddArithmeticOperation -> {
-
                 _state.value = _state.value.copy(
                     shouldCaptureAnswer = true,
                     shouldCaptureWorkArea = true
                 )
 
                 viewModelScope.launch(Dispatchers.IO) {
-
-
-                    /*
-                    val operation = _state.value.answerImageByteArray?.let { image ->
-                        onAddOperation(
-                            numeracyOperations = action.numeracyOperations,
-                            answerImageByteArray = image
-                        )
-                    }
-
-                    operation?.let {
-                        _state.value = _state.value.copy(
-                            arithmeticOperationResults = _state.value.arithmeticOperationResults.apply { add(it) }
-                        )
-                        println("Added arithmetic operation:  ${_state.value.arithmeticOperationResults}")
-                        action.onSuccess()
-                        _state.value = _state.value.copy(
-                            answerImageByteArray = null,
-                            workAreaImageByteArray = null,
-                            shouldCaptureAnswer = false,
-                            shouldCaptureWorkArea = false
-                        )
-                    } ?: run {
-                        println("Failed to add arithmetic operation. Operation is null.")
-                    }
-
-                     */
 
                     Log.d("NumeracyAssessmentViewModel", "Processing arithmetic operation: ${action.numeracyOperations}")
                     if (_state.value.answerImageByteArray == null) {
@@ -131,16 +104,36 @@ class NumeracyAssessmentViewModel(
 
                     _state.value.answerImageByteArray?.let { imageByteArray ->
                         artificialIntelligenceRepository.recognizeImage(imageByteArray = imageByteArray)
-                            .catch { println("error recognizing image: ${it.message}") }
+                            .catch {
+                                println("error recognizing image: ${it.message}")
+
+                                _state.value = _state.value.copy(
+                                    shouldCaptureAnswer = false,
+                                    shouldCaptureWorkArea = false,
+                                    responseError = it.message ?: "Error recognizing the answer image, try again"
+                                )
+                            }
                             .collect { vision ->
                                 vision.data?.let { data ->
                                     _state.value = _state.value.copy(
                                         answerUri = data.url,
-                                        answerInt = data.response
+                                        answerInt = data.response,
+                                        response = data.response,
+                                        responseError = null,
+                                        shouldCaptureAnswer = false,
+                                        shouldCaptureWorkArea = false
                                     )
 
+
                                     println("Recognized answer: ${data.response} from image: ${data.url}")
-                                }?: println("Failed to recognize answer image. Data is null.")
+                                }?:
+                                    println("No data in vision recognition response.")
+                                    _state.value = _state.value.copy(
+                                        shouldCaptureAnswer = false,
+                                        shouldCaptureWorkArea = false,
+                                        responseError = "No data in vision recognition response, try again"
+                                    )
+
                             }
                     }
 
@@ -204,7 +197,12 @@ class NumeracyAssessmentViewModel(
             }
             is NumeracyAssessmentAction.OnSubmitNumberRecognition -> TODO()
             is NumeracyAssessmentAction.OnSubmitNumeracyOperations -> {
-
+                submitNumeracyArithmeticOperations(
+                    assessmentId = action.assessmentId,
+                    studentId = action.studentId,
+                    operationList = _state.value.arithmeticOperationResults,
+                    onSuccess = action.onSuccess
+                )
             }
             is NumeracyAssessmentAction.OnSubmitWordProblem -> {
             }
@@ -312,18 +310,32 @@ class NumeracyAssessmentViewModel(
     private fun submitNumeracyArithmeticOperations(
         assessmentId: String,
         studentId: String,
-        operationList: List<NumeracyArithmeticOperation>
+        operationList: List<NumeracyArithmeticOperation>,
+        onSuccess: () -> Unit = {}
     ){
         if (operationList.isEmpty()){
             return
         }
 
         viewModelScope.launch {
-            assessmentRepository.assessNumeracyArithmeticOperations(
+            val result = assessmentRepository.assessNumeracyArithmeticOperations(
                 assessmentId = assessmentId,
                 studentID = studentId,
                 arithmeticOperations = operationList,
             )
+
+            when(result.status){
+                ResultStatus.INITIAL ,
+                ResultStatus.LOADING -> {}
+                ResultStatus.SUCCESS -> {
+                    onSuccess.invoke()
+                }
+                ResultStatus.ERROR -> {
+                    println("can not add operation arithmetic")
+                }
+            }
+
+
         }
     }
 
@@ -375,43 +387,6 @@ class NumeracyAssessmentViewModel(
     }
     */
 
-
-    suspend fun onAddOperation(
-        numeracyOperations: NumeracyOperations,
-        answerImageByteArray: ByteArray,
-        workAreaImageByteArray: ByteArray? = null,
-    ): NumeracyArithmeticOperation? {
-
-        Log.d("NumeracyAssessmentViewModel", "Processing answer image of size: ${answerImageByteArray.size} bytes")
-        val answerVisionRecognition = try {
-            withContext(Dispatchers.IO) {
-                artificialIntelligenceRepository.recognizeImage(imageByteArray = answerImageByteArray)
-                    .catch { emit(Results.error("Error recognizing image")) }
-                    .first()
-            }.data
-        } catch (e: Exception) {
-            Log.e("NumeracyAssessmentViewModel", "Error processing image: ${e.message}")
-            null
-        }
-
-        if (answerVisionRecognition == null) {
-            println("Failed to recognize answer image.")
-            return null
-        }
-
-        return NumeracyArithmeticOperation(
-            type = numeracyOperations.operationType.name,
-            expected_answer = numeracyOperations.answer,
-            student_answer = answerVisionRecognition.response,
-            operationNumber1 = numeracyOperations.firstNumber,
-            operationNumber2 = numeracyOperations.secondNumber,
-            metadata = NumeracyOperationMetadata(
-                workAreaMediaUrl = null,
-                answerMediaUrl = answerVisionRecognition.url,
-                passed = checkAnswer(answer = answerVisionRecognition.response, correctAnswer = numeracyOperations.answer)
-            )
-        )
-    }
 /*
     init {
         submitNumeracyArithmeticOperations(

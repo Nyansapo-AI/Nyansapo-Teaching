@@ -2,6 +2,11 @@ package com.nyansapoai.teaching.presentation.assessments.numeracy.components
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.BasicAlertDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -9,8 +14,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyAssessmentContent
+import com.nyansapoai.teaching.presentation.assessments.components.InputResponseAlert
 import com.nyansapoai.teaching.presentation.common.components.AppSimulateNavigation
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NumeracyContent(
     modifier: Modifier = Modifier,
@@ -31,13 +38,21 @@ fun NumeracyContent(
     onCaptureAnswerContent: (ByteArray) -> Unit = {},
     shouldCaptureAnswer: Boolean = false,
     onCaptureWorkAreaContent: (ByteArray) -> Unit = {},
-    assessmentLevel: NumeracyAssessmentLevel = NumeracyAssessmentLevel.ADDITION
+    assessmentLevel: NumeracyAssessmentLevel = NumeracyAssessmentLevel.ADDITION,
+    answerResponse: Int? = null,
+    responseError: String? = null,
 ) {
     AnimatedContent(
         targetState = assessmentLevel
     ) { level ->
 
-//        var additionIndex by remember { mutableStateOf(0) }
+        if (answerResponse != null  || responseError != null) {
+            InputResponseAlert(
+                responseError = responseError,
+                response = answerResponse
+            )
+        }
+
 
         when (level) {
             NumeracyAssessmentLevel.COUNT_MATCH -> {
