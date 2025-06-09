@@ -15,11 +15,15 @@ data class NumeracyAssessmentState(
     val shouldCaptureWorkArea: Boolean = false,
     val answerImageByteArray: ByteArray? = null,
     val workAreaImageByteArray: ByteArray? = null,
+    val countMatchAnswer: Int? = null,
     val answerUri: String? = null,
     val response: Int? = null,
     val responseError: String? = null,
     val answerString: String? = null,
     val answerInt: Int? = null,
+    val showResponseAlert: Boolean = false,
+
+
     val numeracyAssessmentContent: Results<NumeracyAssessmentContent> = Results.success(data =numeracyAssessmentData.numeracyAssessmentContentList[0] ),
 
     val countAndMatchResults: MutableList<CountMatch> = mutableListOf(),

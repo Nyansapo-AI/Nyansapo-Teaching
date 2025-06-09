@@ -12,18 +12,24 @@ sealed interface NumeracyAssessmentAction {
     data class OnCaptureWorkArea(val imageByteArray: ByteArray) : NumeracyAssessmentAction
     data class OnShouldCaptureAnswerChange(val shouldCapture: Boolean) : NumeracyAssessmentAction
     data class OnShouldCaptureWorkAreaChange(val shouldCapture: Boolean) : NumeracyAssessmentAction
+
+    data class OnShowResponseAlertChange(val showResponseAlert: Boolean) : NumeracyAssessmentAction
+
     data object OnSubmitAnswer : NumeracyAssessmentAction
     data object OnClearAnswer : NumeracyAssessmentAction
     data object OnClearWorkArea : NumeracyAssessmentAction
 
+    data class OnCountMatchAnswerChange(val countMatchAnswer: Int) : NumeracyAssessmentAction
 
-    data class OnAddCountMatch(val countMatch: CountMatch, val onSuccess: () -> Unit) : NumeracyAssessmentAction
+    data class OnReadAnswerImage(val imageByteArray: ByteArray?) : NumeracyAssessmentAction
+
+    data class OnAddCountMatch(val countMatch: Int, val onSuccess: () -> Unit) : NumeracyAssessmentAction
 
     data class OnAddArithmeticOperation(val numeracyOperations: NumeracyOperations, val onSuccess: () -> Unit) : NumeracyAssessmentAction
 
     data class OnAddNumberRecognition(val numberRecognition: NumeracyNumberRecognition, val onSuccess: () -> Unit): NumeracyAssessmentAction
 
-    data class OnSubmitCountMatch(val countMatchList: List<CountMatch>, val assessmentId: String = "", val studentId: String = "", val onSuccess: () -> Unit): NumeracyAssessmentAction
+    data class OnSubmitCountMatch(val countMatch: List<CountMatch>, val assessmentId: String = "", val studentId: String = "", val onSuccess: () -> Unit): NumeracyAssessmentAction
 
     data class OnSubmitNumeracyOperations(val operationList: List<NumeracyArithmeticOperation>, val assessmentId: String = "", val studentId: String = "", val onSuccess: () -> Unit): NumeracyAssessmentAction
 

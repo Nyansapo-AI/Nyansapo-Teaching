@@ -36,31 +36,52 @@ fun NumeracyContent(
     onSubmitDivision: () -> Unit = {},
     onSubmitNumberRecognition: () -> Unit = {},
     onCaptureAnswerContent: (ByteArray) -> Unit = {},
+    onSelectCountMatch: (Int) -> Unit = {},
     shouldCaptureAnswer: Boolean = false,
     onCaptureWorkAreaContent: (ByteArray) -> Unit = {},
-    assessmentLevel: NumeracyAssessmentLevel = NumeracyAssessmentLevel.ADDITION,
+    assessmentLevel: NumeracyAssessmentLevel = NumeracyAssessmentLevel.COUNT_MATCH,
+    showResponseAlert: Boolean = false,
     answerResponse: Int? = null,
     responseError: String? = null,
+    onDismissResponseAlert: () -> Unit = {},
+    onReadAnswerImage: () -> Unit = {},
 ) {
     AnimatedContent(
         targetState = assessmentLevel
     ) { level ->
 
-        if (answerResponse != null  || responseError != null) {
-            InputResponseAlert(
-                responseError = responseError,
-                response = answerResponse
-            )
-        }
+        InputResponseAlert(
+            showAlert = showResponseAlert,
+            responseError = responseError,
+            response = answerResponse,
+            onDismiss = onDismissResponseAlert,
+            onConfirm = {
+                when(level){
+                    NumeracyAssessmentLevel.COUNT_MATCH -> onSubmitCountMatch()
+                    NumeracyAssessmentLevel.ADDITION -> onSubmitAddition()
+                    NumeracyAssessmentLevel.SUBTRACTION -> onSubmitSubtraction()
+                    NumeracyAssessmentLevel.MULTIPLICATION -> onSubmitMultiplication()
+                    NumeracyAssessmentLevel.DIVISION -> onSubmitDivision()
+                    NumeracyAssessmentLevel.NUMBER_RECOGNITION -> onSubmitNumberRecognition()
+                    NumeracyAssessmentLevel.WORD_PROBLEM -> onSubmitWordProblem()
+                }
+            }
+        )
 
 
         when (level) {
             NumeracyAssessmentLevel.COUNT_MATCH -> {
 
-                NumeracyCountAndMatch(
-                    count = assessmentContent.countAndMatchNumbersList[countMatchIndex],
-                    onSubmit = onSubmitCountMatch
-                )
+                AppSimulateNavigation(
+                    targetState = countMatchIndex
+                ){
+                    NumeracyCountAndMatch(
+                        count = assessmentContent.countAndMatchNumbersList[countMatchIndex],
+                        onSelectCount = onSelectCountMatch,
+                        onSubmit = onSubmitCountMatch
+                    )
+                }
+
             }
             NumeracyAssessmentLevel.ADDITION -> {
                 AppSimulateNavigation(
@@ -76,11 +97,7 @@ fun NumeracyContent(
                         shouldCaptureAnswer = shouldCaptureAnswer,
                         onCaptureWorkAreaContent = onCaptureWorkAreaContent,
                         shouldCaptureWorkArea = shouldCaptureAnswer,
-                        onSubmit = onSubmitAddition
-//                        onSubmit = {
-//                            onSubmitAddition()
-//                            additionIndex = (additionIndex + 1) % assessmentContent.additions.size
-//                        }
+                        onSubmit = onReadAnswerImage
                     )
                 }
             }
@@ -100,7 +117,7 @@ fun NumeracyContent(
                                 shouldCaptureAnswer = false,
                                 onCaptureWorkAreaContent = {},
                                 shouldCaptureWorkArea = false,
-                                onSubmit = onSubmitAddition
+                                onSubmit = onReadAnswerImage
                             )
                         }
                     }
@@ -123,7 +140,7 @@ fun NumeracyContent(
                                 shouldCaptureAnswer = false,
                                 onCaptureWorkAreaContent = {},
                                 shouldCaptureWorkArea = false,
-                                onSubmit = onSubmitMultiplication
+                                onSubmit = onReadAnswerImage
                             )
                         }
                     }
@@ -143,7 +160,7 @@ fun NumeracyContent(
                         shouldCaptureAnswer = false,
                         onCaptureWorkAreaContent = {},
                         shouldCaptureWorkArea = false,
-                        onSubmit = onSubmitDivision
+                        onSubmit = onReadAnswerImage
                     )
                 }
             }

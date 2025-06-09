@@ -9,7 +9,6 @@ import com.nyansapoai.teaching.domain.models.ai.VisionRecognition
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.CountMatch
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyArithmeticOperation
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyOperationMetadata
-import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyOperations
 import com.nyansapoai.teaching.presentation.assessments.components.checkAnswer
 import com.nyansapoai.teaching.utils.ResultStatus
 import com.nyansapoai.teaching.utils.Results
@@ -21,9 +20,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.flow.update
 
 class NumeracyAssessmentViewModel(
     private val artificialIntelligenceRepository: ArtificialIntelligenceRepository,
@@ -89,6 +86,108 @@ class NumeracyAssessmentViewModel(
             }
 
             is NumeracyAssessmentAction.OnAddArithmeticOperation -> {
+
+                viewModelScope.launch(Dispatchers.IO) {
+                    Log.d("NumeracyAssessmentViewModel", "Processing arithmetic operation: ${action.numeracyOperations}")
+
+                    val imageByteArray = _state.value.answerImageByteArray
+                    if (_state.value.answerImageByteArray == null || _state.value.response == null || _state.value.responseError != null || _state.value.answerUri == null) {
+                        println("No answer image captured.")
+                        _state.value = _state.value.copy(
+                            shouldCaptureAnswer = false,
+                            shouldCaptureWorkArea = false,
+                            showResponseAlert = true,
+                            responseError = "No answer image captured. Please try again."
+                        )
+                        return@launch
+                    }
+
+                    try {
+
+                        /*
+                        // Use collect instead of first and handle a single emission
+                        var visionResult: Results<VisionRecognition>? = null
+                        artificialIntelligenceRepository.recognizeImage(imageByteArray = imageByteArray)
+                            .collect { result ->
+                                // Just store the first result and process it after collection
+                                if (visionResult == null) {
+                                    visionResult = result
+                                }
+                            }
+
+                        // Now process the collected result
+                        val recognizedData = visionResult?.data
+
+                        if (recognizedData != null) {
+                            println("Recognized answer: ${recognizedData.response} from image: ${recognizedData.url}")
+
+                            // Update state with recognition results
+                            _state.value = _state.value.copy(
+                                answerUri = recognizedData.url,
+                                answerInt = recognizedData.response,
+                                response = recognizedData.response,
+                                showResponseAlert = true,
+                                responseError = null
+                            )
+
+
+                        } else {
+                            println("No data in vision recognition response.")
+                            _state.value = _state.value.copy(
+                                shouldCaptureAnswer = false,
+                                shouldCaptureWorkArea = false,
+                                showResponseAlert = true,
+                                responseError = "No data in vision recognition response, try again"
+                            )
+                        } */
+
+
+                        // Create and add the arithmetic operation
+                        val arithmeticOperation = NumeracyArithmeticOperation(
+                            type = action.numeracyOperations.operationType.name,
+                            expected_answer = action.numeracyOperations.answer,
+                            student_answer = _state.value.response,
+                            operationNumber1 = action.numeracyOperations.firstNumber,
+                            operationNumber2 = action.numeracyOperations.secondNumber,
+                            metadata = NumeracyOperationMetadata(
+                                workAreaMediaUrl = null,
+                                answerMediaUrl = _state.value.answerUri,
+                                passed = checkAnswer(
+                                    answer = _state.value.response,
+                                    correctAnswer = action.numeracyOperations.answer
+                                )
+                            )
+                        )
+
+                        // Update state with the new operation and reset capture state
+                        _state.value = _state.value.copy(
+                            arithmeticOperationResults = _state.value.arithmeticOperationResults.apply {
+                                add(arithmeticOperation)
+                            },
+                            answerImageByteArray = null,
+                            workAreaImageByteArray = null,
+                            shouldCaptureAnswer = false,
+                            shouldCaptureWorkArea = false,
+                            showResponseAlert = false,
+                            answerInt = null,
+                            answerUri = null
+                        )
+
+                        action.onSuccess()
+                        println("Added arithmetic operation: ${_state.value.arithmeticOperationResults}")
+                    } catch (e: Exception) {
+                        Log.e("NumeracyAssessmentViewModel", "Error processing image recognition: ${e.message}", e)
+                        _state.value = _state.value.copy(
+                            shouldCaptureAnswer = false,
+                            shouldCaptureWorkArea = false,
+                            showResponseAlert = true,
+                            responseError = "An error occurred: ${e.message ?: "Unknown error"}"
+                        )
+                    }
+                }
+            }
+            /*
+            is NumeracyAssessmentAction.OnAddArithmeticOperation -> {
                 _state.value = _state.value.copy(
                     shouldCaptureAnswer = true,
                     shouldCaptureWorkArea = true
@@ -110,27 +209,37 @@ class NumeracyAssessmentViewModel(
                                 _state.value = _state.value.copy(
                                     shouldCaptureAnswer = false,
                                     shouldCaptureWorkArea = false,
+                                    showResponseAlert = true,
+                                    response = null,
                                     responseError = it.message ?: "Error recognizing the answer image, try again"
                                 )
+
+                                println("state info: ${_state.value.showResponseAlert}, ${_state.value.responseError}, ${_state.value.answerUri}, ${_state.value.answerInt}")
                             }
                             .collect { vision ->
                                 vision.data?.let { data ->
+
+                                    println("state info: ${_state.value.showResponseAlert}, ${_state.value.responseError}, ${_state.value.answerUri}, ${_state.value.answerInt}")
+                                    println("Recognized answer: ${data.response} from image: ${data.url}")
+
                                     _state.value = _state.value.copy(
                                         answerUri = data.url,
                                         answerInt = data.response,
                                         response = data.response,
+                                        showResponseAlert = true,
                                         responseError = null,
                                         shouldCaptureAnswer = false,
                                         shouldCaptureWorkArea = false
                                     )
 
 
-                                    println("Recognized answer: ${data.response} from image: ${data.url}")
                                 }?:
                                     println("No data in vision recognition response.")
                                     _state.value = _state.value.copy(
                                         shouldCaptureAnswer = false,
                                         shouldCaptureWorkArea = false,
+                                        response = null,
+                                        showResponseAlert = true,
                                         responseError = "No data in vision recognition response, try again"
                                     )
 
@@ -166,6 +275,7 @@ class NumeracyAssessmentViewModel(
                             workAreaImageByteArray = null,
                             shouldCaptureAnswer = false,
                             shouldCaptureWorkArea = false,
+                            showResponseAlert = false,
                             answerInt = null,
                             answerUri = null
                         )
@@ -176,23 +286,49 @@ class NumeracyAssessmentViewModel(
 
                     }
 
-
-
-
                 }
 
             }
 
+             */
+
             is NumeracyAssessmentAction.OnAddCountMatch -> {
-                _state.value = _state.value.copy(
-                    countAndMatchResults = _state.value.countAndMatchResults.apply { add(action.countMatch) }
+
+                if (_state.value.countMatchAnswer == null) {
+                    _state.value = _state.value.copy(
+                        showResponseAlert = true,
+                        responseError = "Count match answer is required."
+                    )
+                    return
+                }
+
+                val countMatchItem = CountMatch(
+                    type = "Count and Match",
+                    expected_number = action.countMatch,
+                    student_count = _state.value.countMatchAnswer,
+                    passed = checkAnswer(
+                        answer = _state.value.countMatchAnswer,
+                        correctAnswer = action.countMatch
+                    )
                 )
+
+                _state.value = _state.value.copy(
+                    countAndMatchResults = _state.value.countAndMatchResults.apply { add(countMatchItem) },
+                    countMatchAnswer = null,
+                    showResponseAlert = false,
+                    responseError = null
+                )
+
+                action.onSuccess.invoke()
+
+                println("Added count match: ${_state.value.countAndMatchResults}")
             }
             is NumeracyAssessmentAction.OnSubmitCountMatch -> {
                 submitCountAndMatch(
                     assessmentId = action.assessmentId,
                     studentId = action.studentId,
-                    countMatchList = _state.value.countAndMatchResults
+                    countMatchList = _state.value.countAndMatchResults,
+                    onSuccess = action.onSuccess
                 )
             }
             is NumeracyAssessmentAction.OnSubmitNumberRecognition -> TODO()
@@ -215,6 +351,7 @@ class NumeracyAssessmentViewModel(
                 _state.value = _state.value.copy(
                     countMatchIndex = action.index
                 )
+                println("Count match index updated: ${_state.value.countMatchIndex}")
             }
             is NumeracyAssessmentAction.OnDivisionIndexChange -> {
                 _state.value = _state.value.copy(
@@ -244,6 +381,76 @@ class NumeracyAssessmentViewModel(
             }
 
             is NumeracyAssessmentAction.OnAddNumberRecognition -> TODO()
+            is NumeracyAssessmentAction.OnShowResponseAlertChange -> {
+                _state.update { it.copy(
+                    showResponseAlert = action.showResponseAlert
+                ) }
+            }
+
+            is NumeracyAssessmentAction.OnReadAnswerImage -> {
+                _state.value = _state.value.copy(
+                    shouldCaptureAnswer = true
+                )
+
+                if (_state.value.answerImageByteArray == null) {
+                    println("No answer image to read.")
+                    return
+                }
+
+                viewModelScope.launch(Dispatchers.IO) {
+                    try {
+                        artificialIntelligenceRepository.recognizeImage(imageByteArray = _state.value.answerImageByteArray!!)
+                            .catch { e ->
+                                _state.value = _state.value.copy(
+                                    showResponseAlert = true,
+                                    shouldCaptureAnswer = false,
+                                    shouldCaptureWorkArea = false,
+                                    response = null,
+                                    responseError = e.message ?: "Error recognizing the answer image",
+                                )
+                            }
+                            .collect { result ->
+
+                                result.data?.let {
+                                    _state.value = _state.value.copy(
+                                        answerUri = result.data.url,
+                                        answerInt = result.data.response,
+                                        response = result.data.response,
+                                        showResponseAlert = true,
+                                        responseError = null
+                                    )
+
+                                } ?: run {
+                                    _state.value = _state.value.copy(
+                                        showResponseAlert = true,
+                                        shouldCaptureAnswer = false,
+                                        shouldCaptureWorkArea = false,
+                                        response = null,
+                                        responseError = "No data in vision recognition response, try again"
+                                    )
+                                }
+                            }
+                    } catch (e: Exception) {
+                        _state.value = _state.value.copy(
+                            showResponseAlert = true,
+                            shouldCaptureAnswer = false,
+                            shouldCaptureWorkArea = false,
+                            response = null,
+                            responseError = e.message ?: "Error processing the answer image"
+                        )
+                    }
+
+                }
+
+            }
+
+            is NumeracyAssessmentAction.OnCountMatchAnswerChange -> {
+                _state.value = _state.value.copy(
+                    countMatchAnswer = action.countMatchAnswer
+                )
+
+                println("Count match answer updated: ${_state.value.countMatchAnswer}")
+            }
         }
     }
 
@@ -291,7 +498,8 @@ class NumeracyAssessmentViewModel(
     private fun submitCountAndMatch(
         assessmentId: String,
         studentId: String,
-        countMatchList: List<CountMatch>
+        countMatchList: List<CountMatch>,
+        onSuccess: () -> Unit
     ) {
         if (countMatchList.isEmpty()) {
             println("No count and match results to submit.")
@@ -299,11 +507,24 @@ class NumeracyAssessmentViewModel(
         }
 
         viewModelScope.launch(Dispatchers.IO) {
-            assessmentRepository.assessNumeracyCountAndMatch(
+            val result = assessmentRepository.assessNumeracyCountAndMatch(
                 countAndMatchList = countMatchList,
                 studentID = studentId,
                 assessmentId = assessmentId
             )
+
+            when(result.status){
+                ResultStatus.INITIAL ,
+                ResultStatus.LOADING -> {}
+                ResultStatus.SUCCESS -> {
+                    onSuccess.invoke()
+                }
+                ResultStatus.ERROR -> {
+                    println("can not add count and match")
+                }
+            }
+
+
         }
     }
 

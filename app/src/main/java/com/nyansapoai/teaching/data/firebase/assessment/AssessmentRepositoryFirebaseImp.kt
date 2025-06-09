@@ -128,7 +128,9 @@ class AssessmentRepositoryFirebaseImp(
                 mapOf(
                     "assessmentId" to assessmentId,
                     "student_id" to studentID,
-                    "numeracy_results.count_and_match" to countAndMatchList
+                    "numeracy_results" to mapOf(
+                        "count_and_match" to countAndMatchList
+                    )
                 )
             )
             .addOnSuccessListener {

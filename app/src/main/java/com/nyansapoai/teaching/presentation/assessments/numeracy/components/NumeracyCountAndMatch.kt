@@ -39,11 +39,11 @@ fun NumeracyCountAndMatch(
     val options by remember { mutableStateOf(generateOptionsWithCorrectAnswer(correctNumber = count)) } // Randomly select 4 unique numbers from 1 to 10
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.SpaceEvenly
+        verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
         Text(
             text = "Count and Match",
@@ -121,7 +121,8 @@ fun NumeracyCountAndMatch(
 @Composable
 fun OptionButton(
     number: Int,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    isSelected: Boolean = false
 ) {
     Button(
         onClick = onClick,
@@ -131,7 +132,7 @@ fun OptionButton(
         Text(
             text = number.toString(),
             style = MaterialTheme.typography.headlineSmall,
-            color = Color(0xFFFFC107),
+            color = if (isSelected) MaterialTheme.colorScheme.secondary.copy(alpha = 0.7f) else Color(0xFFFFC107),
             fontWeight = FontWeight.Bold
         )
     }

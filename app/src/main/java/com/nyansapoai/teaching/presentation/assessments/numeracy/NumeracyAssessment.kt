@@ -1,27 +1,19 @@
 package com.nyansapoai.teaching.presentation.assessments.numeracy
 
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.nyansapoai.teaching.domain.models.ai.VisionRecognition
+import com.nyansapoai.teaching.domain.models.assessments.numeracy.CountMatch
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyOperations
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.numeracyAssessmentData
 import com.nyansapoai.teaching.presentation.assessments.numeracy.components.NumeracyAssessmentLevel
 import com.nyansapoai.teaching.presentation.assessments.numeracy.components.NumeracyContent
-import com.nyansapoai.teaching.presentation.assessments.numeracy.components.NumeracyOperation
-import com.nyansapoai.teaching.presentation.assessments.numeracy.components.OperationType
-import com.nyansapoai.teaching.presentation.common.components.AppCircularLoading
-import com.nyansapoai.teaching.utils.ResultStatus
-import com.nyansapoai.teaching.utils.Results
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -32,15 +24,13 @@ fun NumeracyAssessmentRoot(
 ) {
 
     val viewModel = koinViewModel<NumeracyAssessmentViewModel>()
-    val state by viewModel.state.collectAsState()
+    val state by viewModel.state.collectAsStateWithLifecycle()
     val answerAssessmentState by viewModel.answerImageByteArrayState.collectAsState()
     val workAreaState by viewModel.workAreaImageByteArrayState.collectAsState()
 
     NumeracyAssessmentScreen(
         state = state,
         onAction = viewModel::onAction,
-        answerAssessmentState = answerAssessmentState ,
-        workAreaState = workAreaState,
         studentId = studentId,
         assessmentId = assessmentId,
         modifier = modifier
@@ -52,8 +42,6 @@ fun NumeracyAssessmentScreen(
     modifier: Modifier = Modifier,
     state: NumeracyAssessmentState,
     onAction: (NumeracyAssessmentAction) -> Unit,
-    answerAssessmentState: Results<VisionRecognition>,
-    workAreaState: Results<VisionRecognition> = Results.initial(),
     studentId: String,
     assessmentId: String
 ) {
@@ -108,8 +96,19 @@ fun NumeracyAssessmentScreen(
                         multiplicationIndex = state.multiplicationIndex,
                         divisionIndex = state.divisionIndex,
                         numberRecognitionIndex = state.numberRecognitionIndex,
-                        assessmentLevel = NumeracyAssessmentLevel.ADDITION,
+                        assessmentLevel = state.numeracyLevel,
+                        onReadAnswerImage = {
+                            onAction(
+                                NumeracyAssessmentAction.OnReadAnswerImage(imageByteArray = state.answerImageByteArray)
+                            )
+                        },
+                        onSelectCountMatch = { answer ->
+                            onAction(
+                                NumeracyAssessmentAction.OnCountMatchAnswerChange(countMatchAnswer = answer )
+                            )
+                        },
                         onSubmitAddition = {
+
                             onAction(
                                 NumeracyAssessmentAction.OnAddArithmeticOperation(
                                     numeracyOperations = NumeracyOperations(
@@ -119,9 +118,8 @@ fun NumeracyAssessmentScreen(
                                         operationType = state.numeracyAssessmentContent.data.additions[state.additionIndex].operationType
                                     ),
                                     onSuccess = {
-                                        /*
                                         when {
-                                            state.additionIndex + 1 >= numeracyAssessmentData.numeracyAssessmentContentList[0].additions.size -> {
+                                            state.additionIndex + 1 >= state.numeracyAssessmentContent.data.additions.size -> {
                                                 onAction(NumeracyAssessmentAction.OnSubmitNumeracyOperations(
                                                     operationList = state.arithmeticOperationResults,
                                                     assessmentId = assessmentId,
@@ -134,13 +132,38 @@ fun NumeracyAssessmentScreen(
                                             else -> {
                                                 onAction(NumeracyAssessmentAction.OnAdditionIndexChange(index = state.additionIndex + 1))
                                             }
-                                        } */
+                                        }
                                     }
                                 )
                             )
                         },
                         additionIndex = state.additionIndex,
-                        onSubmitCountMatch = {},
+                        onSubmitCountMatch = {
+                            onAction(
+                                NumeracyAssessmentAction.OnAddCountMatch(
+                                    countMatch = state.numeracyAssessmentContent.data.countAndMatchNumbersList[state.countMatchIndex],
+                                    onSuccess = {
+                                        onAction(
+                                            NumeracyAssessmentAction.OnSubmitCountMatch(
+                                                countMatch = state.countAndMatchResults,
+                                                assessmentId = assessmentId,
+                                                studentId = studentId,
+                                                onSuccess = {
+                                                    when {
+                                                        state.countMatchIndex + 1 >= state.numeracyAssessmentContent.data.countAndMatchNumbersList.size -> {
+                                                            onAction(NumeracyAssessmentAction.OnNumeracyLevelChange(NumeracyAssessmentLevel.ADDITION))
+                                                        }
+                                                        else -> {
+                                                            onAction(NumeracyAssessmentAction.OnCountMachIndexChange(index = state.countMatchIndex + 1))
+                                                        }
+                                                    }
+                                                }
+                                            )
+                                        )
+                                    }
+                                )
+                            )
+                        },
                         onSubmitSubtraction = {},
                         onSubmitMultiplication = {},
                         onSubmitWordProblem = {},
@@ -155,6 +178,10 @@ fun NumeracyAssessmentScreen(
                         shouldCaptureAnswer = state.shouldCaptureAnswer,
                         onCaptureWorkAreaContent = { image ->
                             onAction(NumeracyAssessmentAction.OnCaptureWorkArea(image))
+                        },
+                        showResponseAlert = state.showResponseAlert,
+                        onDismissResponseAlert = {
+                            onAction(NumeracyAssessmentAction.OnShowResponseAlertChange(false))
                         }
                     )
 

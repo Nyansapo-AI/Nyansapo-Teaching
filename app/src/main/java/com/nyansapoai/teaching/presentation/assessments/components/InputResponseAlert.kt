@@ -1,6 +1,6 @@
 package com.nyansapoai.teaching.presentation.assessments.components
 
-import android.R
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -27,99 +27,106 @@ import androidx.compose.ui.window.DialogProperties
 @Composable
 fun InputResponseAlert(
     modifier: Modifier = Modifier,
-    response: Int? = null,
-    responseError: String? = null,
+    showAlert: Boolean ,
+    response: Int?,
+    responseError: String?,
     onConfirm: () -> Unit = {},
     onDismiss: () -> Unit = {},
 ) {
-    BasicAlertDialog(
-        onDismissRequest = {},
-        properties = DialogProperties(
-            dismissOnBackPress = true,
-            dismissOnClickOutside = true,
-            usePlatformDefaultWidth = true
-        )
-    ) {
-        AlertDialog(
-            onDismissRequest = {},
-            containerColor = MaterialTheme.colorScheme.tertiary,
-            title = {
 
-                response?.let {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp)
-                    ) {
+
+    AnimatedVisibility(
+        visible = showAlert
+    ){
+        BasicAlertDialog(
+            onDismissRequest = {},
+        ) {
+            AlertDialog(
+                onDismissRequest = {},
+                  title = {
+
+                    if (responseError != null){
                         Text(
-                            text = "Your Answer",
-                            color = MaterialTheme.colorScheme.onTertiary
-                        )
-                        Text(
-                            text = "$response",
-                            style = MaterialTheme.typography.headlineLarge,
-                            fontWeight = FontWeight.Bold,
+//                            text = "We can't read your answer, Please try again.",
+                            text = responseError,
                             color = MaterialTheme.colorScheme.secondary,
-                            fontSize = 120.sp,
-                            maxLines = 1,
+                            textAlign = TextAlign.Center,
+                            maxLines = 3,
                             overflow = TextOverflow.Ellipsis
                         )
                     }
-                }
 
-
-                responseError?.let {
-                    Text(
-                        text = "We can't read your answer, Please try again.",
-                        color = MaterialTheme.colorScheme.secondary,
-                        textAlign = TextAlign.Center
-                    )
-                }
-
-            },
-            text = {
-                Text(
-                    text = response?.let { "Press confirm to submit your answer or dismiss to cancel."  } ?: "",
-                    color = MaterialTheme.colorScheme.onTertiary,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                )
-            },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        if (responseError == null) {
-                            onDismiss()
-                        } else {
-                            onConfirm()
+                    response?.let {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                        ) {
+                            Text(
+                                text = "Your Answer",
+                                color = MaterialTheme.colorScheme.onBackground
+                            )
+                            Text(
+                                text = "$response",
+                                style = MaterialTheme.typography.headlineLarge,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onBackground,
+                                fontSize = 120.sp,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
                         }
-                    },
-                    colors = ButtonDefaults.textButtonColors(
-                        contentColor = MaterialTheme.colorScheme.onSecondary,
-                        containerColor = MaterialTheme.colorScheme.secondary
-                    )
-                ) {
-                    Text(text = responseError?.let { "Try Again" } ?: "Confirm")
-                }
-            },
-            dismissButton = {
-                TextButton(
-                    onClick = onDismiss,
-                    colors = ButtonDefaults.textButtonColors(
-                        contentColor = MaterialTheme.colorScheme.onSecondary,
-                    )
+                    }
 
-                ) {
+
+
+
+
+                },
+                text = {
                     Text(
-                        text = response?.let { "Dismiss" } ?: ""
+                        text = response?.let { "Press confirm to submit your answer or dismiss to cancel."  } ?: "",
+                        color = MaterialTheme.colorScheme.onBackground,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .fillMaxWidth()
                     )
-                }
-            },
-            modifier = modifier
-        )
+                },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            if (responseError != null) {
+                                onDismiss()
+                            } else {
+                                onConfirm()
+                            }
+                        },
+                        colors = ButtonDefaults.textButtonColors(
+                            contentColor = MaterialTheme.colorScheme.onSecondary,
+                            containerColor = MaterialTheme.colorScheme.secondary
+                        )
+                    ) {
+                        Text(text = responseError?.let { "Try Again" } ?: "Confirm")
+                    }
+                },
+                dismissButton = {
+                    TextButton(
+                        onClick = onDismiss,
+                        colors = ButtonDefaults.textButtonColors(
+                            contentColor = MaterialTheme.colorScheme.onBackground,
+                        )
+
+                    ) {
+                        Text(
+                            text = "Dismiss"
+                        )
+                    }
+                },
+                modifier = modifier
+            )
+        }
+
     }
 }
 
@@ -128,5 +135,5 @@ fun InputResponseAlert(
 @Preview
 @Composable
 private fun InputResponseAlertPreview() {
-    InputResponseAlert()
+//    InputResponseAlert()
 }
