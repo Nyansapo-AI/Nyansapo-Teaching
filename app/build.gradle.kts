@@ -61,6 +61,8 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
+    implementation (libs.material3)
+
 
     // Koin for Android
     implementation(libs.koin.android)
@@ -76,7 +78,22 @@ dependencies {
     //firebase
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)
+    implementation(libs.firebase.firestore)
 
     //datetime
     implementation (libs.kotlinx.datetime)
+
+    androidTestImplementation (libs.androidx.navigation.testing)
+
+    //coil
+    implementation(libs.coil.compose)
+
+    //ktor
+    implementation(libs.ktor.client.android)
+    api(libs.ktor.core)
+    implementation(libs.ktor.contentNegotiation)
+    implementation(libs.ktor.serialization)
+    implementation(libs.ktor.json)
+    implementation(libs.ktor.logging)
+    implementation(libs.ktor.client.okhttp)
 }

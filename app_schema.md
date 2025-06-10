@@ -136,58 +136,43 @@
 
   "name": "string",                            
 
-  "created_at": "timestamp",                     
+  "created_at": "timestamp",           
+  
+  "assessmentNumber": "number",
 
   "type": "string", 
 
   "start_level": ["string"], 
 
-    "alert": { 
-      "day_before_assessment": "number", 
-    } , 
-
-    "literacy_assessment_progress_profile": { 
-    
-            "letter": "number",
-            
-            "word": "number ",
-            
-            "paragraph" : "number",
-            
-            "story": "number", 
-            
-            "above": "number" 
-    
-    }, 
-
-    "numeracy_assessment_progress_profile": { 
-    
-            "count and match": "number", 
-            
-            "number recognition": "number", 
-            
-            "addition": "number", 
-            
-            "subtraction": "number", 
-            
-            "multiplication": "number", 
-            
-            "division": "number", 
-            
-            "word_problem": "number" 
-    
-    }, 
-    "assigned_students": [                      
+  "alert": { 
+    "day_before_assessment": "number", 
+  }, 
+  
+  "level_distribution": [
+    {
+      "type": "string", //(literacy/numeracy) 
+      "data" : [
+        {
+          "learning_level": "string",
+          "value" : "float"
+        }
+      ]
+    }
+  ],
+  
+  "assigned_students": [                      
     
         { 
     
           "student_id": "string", 
+
+          "student_name": "string",
     
           "competence": "number?" 
     
         } 
     
-    ]
+  ]
 
  
 
