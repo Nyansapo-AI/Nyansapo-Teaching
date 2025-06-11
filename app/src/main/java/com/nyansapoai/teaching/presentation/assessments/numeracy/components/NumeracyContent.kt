@@ -2,16 +2,8 @@ package com.nyansapoai.teaching.presentation.assessments.numeracy.components
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyAssessmentContent
 import com.nyansapoai.teaching.presentation.assessments.components.InputResponseAlert
@@ -37,6 +29,7 @@ fun NumeracyContent(
     onSubmitNumberRecognition: () -> Unit = {},
     onCaptureAnswerContent: (ByteArray) -> Unit = {},
     onSelectCountMatch: (Int) -> Unit = {},
+    selectedCount: Int? = null,
     shouldCaptureAnswer: Boolean = false,
     onCaptureWorkAreaContent: (ByteArray) -> Unit = {},
     assessmentLevel: NumeracyAssessmentLevel = NumeracyAssessmentLevel.COUNT_MATCH,
@@ -78,6 +71,7 @@ fun NumeracyContent(
                     NumeracyCountAndMatch(
                         count = assessmentContent.countAndMatchNumbersList[countMatchIndex],
                         onSelectCount = onSelectCountMatch,
+                        selectedCount = selectedCount ,
                         onSubmit = onSubmitCountMatch
                     )
                 }
@@ -87,7 +81,7 @@ fun NumeracyContent(
                 AppSimulateNavigation(
                     targetState = additionIndex
                 ){
-                    NumeracyOperation(
+                    NumeracyOperationUI(
                         modifier = modifier,
                         firstNumber = assessmentContent.additions[additionIndex].firstNumber,
                         secondNumber = assessmentContent.additions[additionIndex].secondNumber,
@@ -107,7 +101,7 @@ fun NumeracyContent(
                 ) { index ->
                     when(index){
                         else -> {
-                            NumeracyOperation(
+                            NumeracyOperationUI(
                                 modifier = modifier,
                                 firstNumber = assessmentContent.subtractions[subtractionIndex].firstNumber,
                                 secondNumber = assessmentContent.subtractions[subtractionIndex].secondNumber,
@@ -130,7 +124,7 @@ fun NumeracyContent(
                 ) { index ->
                     when(index){
                         else -> {
-                            NumeracyOperation(
+                            NumeracyOperationUI(
                                 modifier = modifier,
                                 firstNumber = assessmentContent.multiplications[multiplicationIndex].firstNumber,
                                 secondNumber = assessmentContent.multiplications[multiplicationIndex].secondNumber,
@@ -150,7 +144,7 @@ fun NumeracyContent(
                 AppSimulateNavigation(
                     targetState = divisionIndex
                 ){
-                    NumeracyOperation(
+                    NumeracyOperationUI(
                         modifier = modifier,
                         firstNumber = assessmentContent.divisions[divisionIndex].firstNumber,
                         secondNumber = assessmentContent.divisions[divisionIndex].secondNumber,

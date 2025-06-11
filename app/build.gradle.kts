@@ -96,4 +96,10 @@ dependencies {
     implementation(libs.ktor.json)
     implementation(libs.ktor.logging)
     implementation(libs.ktor.client.okhttp)
+
+    //lottie
+    implementation (libs.lottie.compose)
+    
+    //microsoft cognitive services speech
+    implementation(libs.client.sdk)
 }

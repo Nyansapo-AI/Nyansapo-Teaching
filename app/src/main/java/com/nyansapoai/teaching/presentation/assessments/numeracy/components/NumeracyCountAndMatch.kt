@@ -33,7 +33,8 @@ fun NumeracyCountAndMatch(
     modifier: Modifier = Modifier,
     count: Int = 10,
     onSelectCount: (Int) -> Unit = { /* Handle count selection */ },
-    onSubmit: () -> Unit = { /* Handle submission */ }
+    onSubmit: () -> Unit = { /* Handle submission */ },
+    selectedCount: Int? = null, // Optional selected count for highlighting
 ) {
 //        val options = listOf(2, 6, 4, 5)
     val options by remember { mutableStateOf(generateOptionsWithCorrectAnswer(correctNumber = count)) } // Randomly select 4 unique numbers from 1 to 10
@@ -86,21 +87,25 @@ fun NumeracyCountAndMatch(
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 OptionButton(
                     number = options[0],
-                    onClick = { onSelectCount(options[0]) }
+                    onClick = { onSelectCount(options[0]) },
+                    isSelected = selectedCount == options[0]
                     )
                 OptionButton(
                     number = options[1],
-                    onClick = { onSelectCount(options[1]) }
+                    onClick = { onSelectCount(options[1]) },
+                    isSelected = selectedCount == options[1]
                 )
             }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 OptionButton(
                     number = options[2],
-                    onClick = { onSelectCount(options[2]) }
+                    onClick = { onSelectCount(options[2]) },
+                    isSelected = selectedCount == options[2]
                 )
                 OptionButton(
                     number = options[3],
-                    onClick = { onSelectCount(options[3]) }
+                    onClick = { onSelectCount(options[3]) },
+                    isSelected = selectedCount == options[3]
                 )
             }
         }
@@ -109,7 +114,12 @@ fun NumeracyCountAndMatch(
             onClick = onSubmit,
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFC107))
         ) {
-            Text("Next", color = Color.Black, fontWeight = FontWeight.Bold)
+            Text(
+                "Submit",
+                color = MaterialTheme.colorScheme.onSecondary,
+                fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.titleMedium
+            )
         }
 
     }
@@ -122,17 +132,20 @@ fun NumeracyCountAndMatch(
 fun OptionButton(
     number: Int,
     onClick: () -> Unit,
-    isSelected: Boolean = false
+    isSelected: Boolean = false,
+
 ) {
     Button(
         onClick = onClick,
-        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF102C57)),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = if (isSelected) MaterialTheme.colorScheme.secondary.copy(alpha = 0.3f) else Color(0xFF102C57),
+        ),
         modifier = Modifier.size(100.dp)
     ) {
         Text(
             text = number.toString(),
             style = MaterialTheme.typography.headlineSmall,
-            color = if (isSelected) MaterialTheme.colorScheme.secondary.copy(alpha = 0.7f) else Color(0xFFFFC107),
+            color = Color(0xFFFFC107),
             fontWeight = FontWeight.Bold
         )
     }
