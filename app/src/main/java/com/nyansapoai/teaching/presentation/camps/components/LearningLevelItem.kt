@@ -93,6 +93,7 @@ fun LearningLevelItem(
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) { measurables, constraints ->
+
                     val totalStudents = levelDescription.totalStudents.coerceAtLeast(0)
                     val totalWidth = constraints.maxWidth
 

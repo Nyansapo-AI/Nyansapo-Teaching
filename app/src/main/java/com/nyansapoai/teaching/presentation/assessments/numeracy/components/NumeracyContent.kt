@@ -107,10 +107,10 @@ fun NumeracyContent(
                                 secondNumber = assessmentContent.subtractions[subtractionIndex].secondNumber,
                                 operationType = assessmentContent.subtractions[subtractionIndex].operationType,
                                 operationOrientation = Orientation.Vertical,
-                                onCaptureAnswerContent = {},
-                                shouldCaptureAnswer = false,
-                                onCaptureWorkAreaContent = {},
-                                shouldCaptureWorkArea = false,
+                                onCaptureAnswerContent = onCaptureAnswerContent,
+                                shouldCaptureAnswer = shouldCaptureAnswer,
+                                onCaptureWorkAreaContent = onCaptureWorkAreaContent,
+                                shouldCaptureWorkArea = shouldCaptureAnswer,
                                 onSubmit = onReadAnswerImage
                             )
                         }
@@ -130,10 +130,10 @@ fun NumeracyContent(
                                 secondNumber = assessmentContent.multiplications[multiplicationIndex].secondNumber,
                                 operationType = assessmentContent.multiplications[multiplicationIndex].operationType,
                                 operationOrientation = Orientation.Vertical,
-                                onCaptureAnswerContent = {},
-                                shouldCaptureAnswer = false,
-                                onCaptureWorkAreaContent = {},
-                                shouldCaptureWorkArea = false,
+                                onCaptureAnswerContent = onCaptureAnswerContent,
+                                shouldCaptureAnswer = shouldCaptureAnswer,
+                                onCaptureWorkAreaContent = onCaptureWorkAreaContent,
+                                shouldCaptureWorkArea = shouldCaptureAnswer,
                                 onSubmit = onReadAnswerImage
                             )
                         }
@@ -150,10 +150,10 @@ fun NumeracyContent(
                         secondNumber = assessmentContent.divisions[divisionIndex].secondNumber,
                         operationType = assessmentContent.divisions[divisionIndex].operationType,
                         operationOrientation = Orientation.Horizontal,
-                        onCaptureAnswerContent = {},
-                        shouldCaptureAnswer = false,
-                        onCaptureWorkAreaContent = {},
-                        shouldCaptureWorkArea = false,
+                        onCaptureAnswerContent = onCaptureAnswerContent,
+                        shouldCaptureAnswer = shouldCaptureAnswer,
+                        onCaptureWorkAreaContent = onCaptureWorkAreaContent,
+                        shouldCaptureWorkArea = shouldCaptureAnswer,
                         onSubmit = onReadAnswerImage
                     )
                 }
@@ -173,6 +173,7 @@ fun NumeracyContent(
                     shouldCaptureAnswer = false,
                     onCaptureWorkAreaContent = {},
                     shouldCaptureWorkArea = false,
+                    onSubmit = onSubmitCountMatch
                 )
             }
         }

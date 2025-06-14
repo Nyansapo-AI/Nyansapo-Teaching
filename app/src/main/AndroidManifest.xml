@@ -22,6 +22,8 @@
     <!-- For Android 13+ to read media files -->
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
 
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
     <uses-permission android:name="android.permission.CAMERA" />
 
     <application

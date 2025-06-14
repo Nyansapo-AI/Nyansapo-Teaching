@@ -36,7 +36,6 @@ fun NumeracyCountAndMatch(
     onSubmit: () -> Unit = { /* Handle submission */ },
     selectedCount: Int? = null, // Optional selected count for highlighting
 ) {
-//        val options = listOf(2, 6, 4, 5)
     val options by remember { mutableStateOf(generateOptionsWithCorrectAnswer(correctNumber = count)) } // Randomly select 4 unique numbers from 1 to 10
 
     Column(
@@ -82,7 +81,6 @@ fun NumeracyCountAndMatch(
             modifier = Modifier.padding(vertical = 16.dp)
         )
 
-        // Grid-like answer options
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 OptionButton(

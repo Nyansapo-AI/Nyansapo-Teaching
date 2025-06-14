@@ -83,39 +83,6 @@ fun NumeracyAssessmentScreen(
                         modifier = Modifier
                             .padding(innerPadding)
                     ) {
-                        /*
-                        item {
-                            AnimatedContent(
-                                targetState = state.numeracyAssessmentContent.status
-                            ) { status ->
-                                when(status){
-                                    ResultStatus.INITIAL ,
-                                    ResultStatus.LOADING -> {
-                                        AppCircularLoading()
-                                    }
-                                    ResultStatus.SUCCESS -> {
-                                        NumeracyOperation(
-                                            firstNumber = 34,
-                                            secondNumber = 20,
-                                            shouldCaptureAnswer = state.shouldCaptureAnswer,
-                                            shouldCaptureWorkArea = state.shouldCaptureWorkArea,
-                                            onCaptureAnswerContent = { imageByteArray ->
-                                                onAction(NumeracyAssessmentAction.OnCaptureAnswer(imageByteArray))
-                                            },
-                                            onCaptureWorkAreaContent = { imageByteArray ->
-                                                onAction(NumeracyAssessmentAction.OnCaptureWorkArea(imageByteArray))
-                                            },
-                                            onSubmit = {
-                                                onAction(NumeracyAssessmentAction.OnSubmitAnswer)
-                                            },
-                                            modifier = modifier
-                                        )
-
-                                    }
-                                    ResultStatus.ERROR -> TODO()
-                                }
-                            }
-                        }*/
 
                         item {
                             state.numeracyAssessmentContent.data?.let {
@@ -196,10 +163,96 @@ fun NumeracyAssessmentScreen(
                                             )
                                         )
                                     },
-                                    onSubmitSubtraction = {},
-                                    onSubmitMultiplication = {},
+                                    onSubmitSubtraction = {
+                                        onAction(
+                                            NumeracyAssessmentAction.OnAddArithmeticOperation(
+                                                numeracyOperations = NumeracyOperations(
+                                                    firstNumber = state.numeracyAssessmentContent.data.subtractions[state.subtractionIndex].firstNumber,
+                                                    secondNumber = state.numeracyAssessmentContent.data.subtractions[state.subtractionIndex].secondNumber,
+                                                    answer = state.numeracyAssessmentContent.data.subtractions[state.subtractionIndex].answer,
+                                                    operationType = state.numeracyAssessmentContent.data.subtractions[state.subtractionIndex].operationType
+                                                ),
+                                                onSuccess = {
+                                                    when {
+                                                        state.subtractionIndex + 1 >= state.numeracyAssessmentContent.data.subtractions.size -> {
+                                                            onAction(NumeracyAssessmentAction.OnSubmitNumeracyOperations(
+                                                                operationList = state.arithmeticOperationResults,
+                                                                assessmentId = assessmentId,
+                                                                studentId = studentId,
+                                                                onSuccess = {
+                                                                    onAction(NumeracyAssessmentAction.OnNumeracyLevelChange(NumeracyAssessmentLevel.MULTIPLICATION))
+                                                                }
+                                                            ))
+                                                        }
+                                                        else -> {
+                                                            onAction(NumeracyAssessmentAction.OnSubtractionIndexChange(index = state.subtractionIndex + 1))
+                                                        }
+                                                    }
+                                                }
+                                            )
+                                        )
+
+                                    },
+                                    onSubmitMultiplication = {
+                                        onAction(
+                                            NumeracyAssessmentAction.OnAddArithmeticOperation(
+                                                numeracyOperations = NumeracyOperations(
+                                                    firstNumber = state.numeracyAssessmentContent.data.multiplications[state.multiplicationIndex].firstNumber,
+                                                    secondNumber = state.numeracyAssessmentContent.data.multiplications[state.multiplicationIndex].secondNumber,
+                                                    answer = state.numeracyAssessmentContent.data.multiplications[state.multiplicationIndex].answer,
+                                                    operationType = state.numeracyAssessmentContent.data.multiplications[state.multiplicationIndex].operationType
+                                                ),
+                                                onSuccess = {
+                                                    when {
+                                                        state.multiplicationIndex + 1 >= state.numeracyAssessmentContent.data.multiplications.size -> {
+                                                            onAction(NumeracyAssessmentAction.OnSubmitNumeracyOperations(
+                                                                operationList = state.arithmeticOperationResults,
+                                                                assessmentId = assessmentId,
+                                                                studentId = studentId,
+                                                                onSuccess = {
+                                                                    onAction(NumeracyAssessmentAction.OnNumeracyLevelChange(NumeracyAssessmentLevel.DIVISION))
+                                                                }
+                                                            ))
+                                                        }
+                                                        else -> {
+                                                            onAction(NumeracyAssessmentAction.OnMultiplicationIndexChange(index = state.multiplicationIndex + 1))
+                                                        }
+                                                    }
+                                                }
+                                            )
+                                        )
+
+                                    },
                                     onSubmitWordProblem = {},
-                                    onSubmitDivision = {},
+                                    onSubmitDivision = {
+                                        onAction(
+                                            NumeracyAssessmentAction.OnAddArithmeticOperation(
+                                                numeracyOperations = NumeracyOperations(
+                                                    firstNumber = state.numeracyAssessmentContent.data.divisions[state.divisionIndex].firstNumber,
+                                                    secondNumber = state.numeracyAssessmentContent.data.divisions[state.divisionIndex].secondNumber,
+                                                    answer = state.numeracyAssessmentContent.data.divisions[state.divisionIndex].answer,
+                                                    operationType = state.numeracyAssessmentContent.data.divisions[state.divisionIndex].operationType
+                                                ),
+                                                onSuccess = {
+                                                    when {
+                                                        state.divisionIndex + 1 >= state.numeracyAssessmentContent.data.divisions.size -> {
+                                                            onAction(NumeracyAssessmentAction.OnSubmitNumeracyOperations(
+                                                                operationList = state.arithmeticOperationResults,
+                                                                assessmentId = assessmentId,
+                                                                studentId = studentId,
+                                                                onSuccess = {
+                                                                    onAction(NumeracyAssessmentAction.OnNumeracyLevelChange(NumeracyAssessmentLevel.WORD_PROBLEM))
+                                                                }
+                                                            ))
+                                                        }
+                                                        else -> {
+                                                            onAction(NumeracyAssessmentAction.OnDivisionIndexChange(index = state.divisionIndex + 1))
+                                                        }
+                                                    }
+                                                }
+                                            )
+                                        )
+                                    },
                                     onSubmitNumberRecognition = {},
                                     responseError = state.responseError,
                                     answerResponse = state.response,
@@ -218,7 +271,6 @@ fun NumeracyAssessmentScreen(
                                 )
 
                             }
-
 
                         }
 

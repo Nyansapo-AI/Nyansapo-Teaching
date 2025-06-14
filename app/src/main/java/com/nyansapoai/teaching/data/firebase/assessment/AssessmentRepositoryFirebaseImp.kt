@@ -218,7 +218,7 @@ class AssessmentRepositoryFirebaseImp(
         assessmentId: String,
         studentID: String,
         wordProblem: NumeracyWordProblem
-    ) {
+    ): Results<String> {
 
         val deferred = CompletableDeferred<Results<String>>()
 

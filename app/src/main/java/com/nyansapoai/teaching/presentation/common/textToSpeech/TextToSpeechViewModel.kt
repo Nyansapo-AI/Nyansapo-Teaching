@@ -20,8 +20,10 @@ import kotlinx.coroutines.withContext
 class TextToSpeechViewModel : ViewModel() {
 
     // Replace with your Azure Speech Service key and region
-    private val speechKey = "YOUR_SPEECH_KEY"
-    private val speechRegion = "YOUR_REGION" // e.g., "eastus"
+//    private val speechKey = "00dd53c13cdf46369c8dbbeac8b9a5e9"
+    private val key1 = "00dd53c13cdf46369c8dbbeac8b9a5e9"
+    private val key2 = "b46bc3b4fe454606bb2e3ca731a335b4"
+    private val speechRegion = "eastus"
 
     private val _uiState = MutableStateFlow(TextToSpeechState())
     val uiState: StateFlow<TextToSpeechState> = _uiState.asStateFlow()
@@ -34,12 +36,17 @@ class TextToSpeechViewModel : ViewModel() {
 
     private fun initializeSpeechSynthesizer() {
         try {
-            val speechConfig = SpeechConfig.fromSubscription(speechKey, speechRegion)
+
+            val speechConfig = SpeechConfig.fromSubscription(key2, speechRegion)
             speechConfig.speechSynthesisVoiceName = "en-US-JennyNeural"
             speechConfig.setSpeechSynthesisOutputFormat(SpeechSynthesisOutputFormat.Audio16Khz32KBitRateMonoMp3)
 
+
             speechSynthesizer = SpeechSynthesizer(speechConfig)
         } catch (e: Exception) {
+
+            println("Error initializing speech synthesizer: ${e.message}")
+
             _uiState.value = _uiState.value.copy(
                 error = "Failed to initialize speech synthesizer: ${e.message}"
             )
@@ -54,7 +61,7 @@ class TextToSpeechViewModel : ViewModel() {
         _uiState.value = _uiState.value.copy(selectedVoice = voice)
         speechSynthesizer?.close()
 
-        val speechConfig = SpeechConfig.fromSubscription(speechKey, speechRegion)
+        val speechConfig = SpeechConfig.fromSubscription(key2, speechRegion)
         speechConfig.speechSynthesisVoiceName = voice
         speechConfig.setSpeechSynthesisOutputFormat(SpeechSynthesisOutputFormat.Audio16Khz32KBitRateMonoMp3)
 
@@ -78,12 +85,15 @@ class TextToSpeechViewModel : ViewModel() {
                     when (result?.reason) {
                         ResultReason.SynthesizingAudioCompleted -> {
                             // Success - audio was synthesized
+                            println("Speech synthesis completed successfully")
                         }
                         ResultReason.Canceled -> {
+                            println("Speech synthesis canceled")
                             val cancellation = SpeechSynthesisCancellationDetails.fromResult(result)
                             throw Exception("Speech synthesis canceled: ${cancellation.reason}")
                         }
                         else -> {
+                            println("Speech synthesis failed with reason: ${result?.reason}")
                             throw Exception("Speech synthesis failed")
                         }
                     }
