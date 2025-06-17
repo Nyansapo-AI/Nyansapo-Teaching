@@ -14,6 +14,7 @@ import com.nyansapoai.teaching.presentation.assessments.components.checkAnswer
 import com.nyansapoai.teaching.utils.ResultStatus
 import com.nyansapoai.teaching.utils.Results
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
@@ -161,6 +162,7 @@ class NumeracyAssessmentViewModel(
                     return
                 }
 
+
                 val countMatchItem = CountMatch(
                     type = "Count and Match",
                     expected_number = action.countMatch,
@@ -173,14 +175,15 @@ class NumeracyAssessmentViewModel(
 
                 _state.value = _state.value.copy(
                     countAndMatchResults = _state.value.countAndMatchResults.apply { add(countMatchItem) },
-                    countMatchAnswer = null,
+                    isLoading = true,
                     showResponseAlert = false,
                     responseError = null
                 )
 
                 action.onSuccess.invoke()
 
-                println("Added count match: ${_state.value.countAndMatchResults}")
+                _state.update { it.copy(isLoading = false,countMatchAnswer = null,  ) }
+
             }
             is NumeracyAssessmentAction.OnSubmitCountMatch -> {
                 submitCountAndMatch(

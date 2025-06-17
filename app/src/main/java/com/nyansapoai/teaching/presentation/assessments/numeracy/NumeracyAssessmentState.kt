@@ -16,6 +16,7 @@ data class NumeracyAssessmentState(
     val answerImageByteArray: ByteArray? = null,
     val workAreaImageByteArray: ByteArray? = null,
     val countMatchAnswer: Int? = null,
+    val isLoading: Boolean = false,
     val answerUri: String? = null,
     val response: Int? = null,
     val responseError: String? = null,
@@ -37,5 +38,5 @@ data class NumeracyAssessmentState(
     val divisionIndex: Int = 0,
     val numberRecognitionIndex: Int = 0,
 
-    val numeracyLevel: NumeracyAssessmentLevel = NumeracyAssessmentLevel.WORD_PROBLEM
+    val numeracyLevel: NumeracyAssessmentLevel = NumeracyAssessmentLevel.COUNT_MATCH
 )

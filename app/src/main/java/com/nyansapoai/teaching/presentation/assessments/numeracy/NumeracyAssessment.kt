@@ -88,6 +88,7 @@ fun NumeracyAssessmentScreen(
                             state.numeracyAssessmentContent.data?.let {
                                 NumeracyContent(
                                     modifier = modifier,
+                                    isLoading = state.isLoading,
                                     assessmentContent = numeracyAssessmentData.numeracyAssessmentContentList[0],
                                     countMatchIndex = state.countMatchIndex,
                                     subtractionIndex = state.subtractionIndex,

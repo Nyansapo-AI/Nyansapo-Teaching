@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -59,19 +60,7 @@ fun NumeracyCountAndMatch(
             maxItemsInEachRow = 5
         ) {
             repeat(count) { index ->
-                IconButton(
-                    onClick = {
-                    },
-                    modifier = Modifier
-                        .padding(4.dp)
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.football), // You must add this drawable
-                        contentDescription = "Football",
-                        modifier = Modifier.size(60.dp),
-                        tint = MaterialTheme.colorScheme.onBackground
-                    )
-                }
+                CountItem()
             }
         }
 
@@ -148,6 +137,29 @@ fun OptionButton(
         )
     }
 }
+
+@Composable
+fun CountItem(){
+    var isClicked by remember { mutableStateOf(false) }
+
+    IconButton(
+        onClick = {
+            isClicked = !isClicked
+        },
+        modifier = Modifier
+            .padding(4.dp)
+    ) {
+        Icon(
+            painter = painterResource(id = R.drawable.football), // You must add this drawable
+            contentDescription = "Football",
+            modifier = Modifier
+                .size(60.dp),
+            tint = if (!isClicked) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.secondary.copy(alpha = 0.7f)
+        )
+    }
+
+}
+
 
 
 /**
