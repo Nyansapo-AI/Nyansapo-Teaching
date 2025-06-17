@@ -10,6 +10,7 @@ import com.nyansapoai.teaching.presentation.assessments.numeracy.components.Nume
 import com.nyansapoai.teaching.presentation.camps.CampRoot
 import com.nyansapoai.teaching.presentation.common.textToSpeech.TextToSpeechRoot
 import com.nyansapoai.teaching.presentation.common.audio.AppAudio
+import com.nyansapoai.teaching.presentation.assessments.literacy.LiteracyScreen
 
 data class BottomNavigationItem(
     val title: String,
@@ -45,7 +46,7 @@ data class BottomNavigationItem(
             BottomNavigationItem(
                 title = "Sessions",
                 icon = R.drawable.sessions,
-                screen = { AppAudio() },
+                screen = { LiteracyScreen() },
             ),
         )
     }

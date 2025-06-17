@@ -19,6 +19,7 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.analytics
 import com.nyansapoai.teaching.presentation.navigation.Navigation
 import com.nyansapoai.teaching.ui.theme.NyansapoTeachingTheme
+import com.nyansapoai.teaching.utils.Utils
 import org.koin.compose.KoinContext
 
 lateinit var navController: NavHostController
@@ -35,30 +36,23 @@ class MainActivity : ComponentActivity() {
         setContent {
             NyansapoTeachingTheme {
                 navController = rememberNavController()
-
-
                 KoinContext {
-
                     Navigation()
-
                 }
             }
         }
     }
-}
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
+    override fun onDestroy() {
+        super.onDestroy()
 
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun GreetingPreview() {
-    NyansapoTeachingTheme {
-        Greeting("Android")
+        // Clean up resources
+        Utils.clearAppPrivatePicturesDir(context = this.applicationContext)
     }
+
+    override fun onStop() {
+        super.onStop()
+        Utils.clearAppPrivatePicturesDir(context = this.applicationContext)
+    }
+
 }

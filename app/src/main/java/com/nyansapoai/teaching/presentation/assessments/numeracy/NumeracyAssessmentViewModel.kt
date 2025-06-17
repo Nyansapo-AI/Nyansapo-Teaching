@@ -440,6 +440,10 @@ class NumeracyAssessmentViewModel(
         }
     }
 
+    private fun readHardwrittenAnswer(){
+
+    }
+
 
     private fun submitNumeracyWordProblem(
         assessmentId: String,

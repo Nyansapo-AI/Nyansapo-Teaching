@@ -184,7 +184,7 @@ fun NumeracyContent(
                                 shouldCaptureAnswer = false,
                                 onCaptureWorkAreaContent = {},
                                 shouldCaptureWorkArea = false,
-                                onSubmit = onSubmitCountMatch
+                                onSubmit = onReadAnswerImage
                             )
                         }
                     }

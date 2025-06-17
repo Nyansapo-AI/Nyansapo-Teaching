@@ -18,9 +18,11 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.CountMatch
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyOperations
+import com.nyansapoai.teaching.domain.models.assessments.numeracy.WordProblem
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.numeracyAssessmentData
 import com.nyansapoai.teaching.presentation.assessments.numeracy.components.NumeracyAssessmentLevel
 import com.nyansapoai.teaching.presentation.assessments.numeracy.components.NumeracyContent
+import com.nyansapoai.teaching.presentation.assessments.numeracy.components.NumeracyWordProblem
 import com.nyansapoai.teaching.presentation.common.animations.LottieLoading
 import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
@@ -224,7 +226,21 @@ fun NumeracyAssessmentScreen(
                                         )
 
                                     },
-                                    onSubmitWordProblem = {},
+                                    onSubmitWordProblem = {
+                                        /*
+                                        onAction(
+                                            NumeracyAssessmentAction.OnSubmitWordProblem(
+                                                wordProblem = NumeracyWordProblem(
+
+                                                ),
+                                                assessmentId = assessmentId,
+                                                studentId = studentId,
+                                                onSuccess = {
+                                                    onAction(NumeracyAssessmentAction.OnNumeracyLevelChange(NumeracyAssessmentLevel.NUMBER_RECOGNITION))
+                                                }
+                                            )
+                                        )*/
+                                    },
                                     onSubmitDivision = {
                                         onAction(
                                             NumeracyAssessmentAction.OnAddArithmeticOperation(
