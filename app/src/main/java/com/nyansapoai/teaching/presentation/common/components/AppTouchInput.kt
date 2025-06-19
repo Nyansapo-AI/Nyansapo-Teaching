@@ -98,7 +98,7 @@ fun MultiTouchDrawingCanvas(
                                             } else {
                                                 // Start new drawing path
                                                 val pressure = change.pressure
-                                                val strokeWidth = (pressure * 20f).coerceIn(2f, 15f)
+                                                val strokeWidth = (pressure * 20f).coerceIn(10f, 15f)
 
                                                 activePaths = activePaths + (pointerId to PressurePath(
                                                     points = listOf(

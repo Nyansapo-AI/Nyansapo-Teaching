@@ -1,0 +1,44 @@
+package com.nyansapoai.teaching.data.firebase.media
+
+import com.google.firebase.storage.FirebaseStorage
+import com.nyansapoai.teaching.data.remote.media.MediaRepository
+import com.nyansapoai.teaching.utils.Results
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+
+class FirebaseMediaRepositoryImpl(
+    private val firebaseStorage: FirebaseStorage
+): MediaRepository {
+
+    val mediaStorageRef = firebaseStorage.reference.child("media")
+
+
+    override suspend fun saveImage(imageByteArray: ByteArray): Results<String> {
+
+        val deferred = CompletableDeferred<Results<String>>()
+
+        mediaStorageRef.putBytes(imageByteArray)
+            .addOnFailureListener {
+                deferred.complete(Results.error(msg = it.message ?: "Error uploading image"))
+            }
+            .addOnSuccessListener { taskSnapshot ->
+
+                taskSnapshot.storage.downloadUrl
+                    .addOnSuccessListener { uri ->
+                        uri?.let {
+                            deferred.complete(Results.success(data = uri.toString()))
+                        } ?: run {
+                            deferred.complete(Results.error(msg = "Failed to get download URL"))
+                        }
+                    }
+                    .addOnFailureListener {
+                        deferred.complete(Results.error(msg = it.message ?: "Error getting download URL"))
+                    }
+            }
+
+        return withContext(Dispatchers.IO) {
+            deferred.await()
+        }
+    }
+}

@@ -147,4 +147,21 @@ object Utils {
     }
 
 
+    /*
+        * Clears the app's private pictures directory by deleting all files
+     */
+    fun clearAppPrivatePicturesDir(context: Context): Boolean {
+        val picturesDir = context.getExternalFilesDir(null) ?: context.filesDir
+        return try {
+            picturesDir.listFiles()?.forEach { file ->
+                if (file.isFile) file.delete()
+            }
+            true
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
+    }
+
+
 }

@@ -44,6 +44,7 @@ fun CreateAssessmentsRoot() {
         state = state,
         onAction = viewModel::onAction
     )
+
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -103,15 +104,6 @@ fun CreateAssessmentsScreen(
                 }
 
                 item {
-                    /*
-                    AppTextField(
-                        value = state.type,
-                        onValueChanged = { onAction(CreateAssessmentsAction.SetType(it)) },
-                        label = "Assessment Type",
-                        placeholder = "Enter assessment type",
-                    )
-
-                     */
 
                     AppDropDownMenu(
                         expanded = state.isTypeDropDownExpanded,
@@ -129,30 +121,8 @@ fun CreateAssessmentsScreen(
                             )
                         }
                     }
-
                 }
 
-                /*
-                item {
-                    AppDropDownMenu(
-                        expanded = state.isStartLevelDropDownExpanded,
-                        label = "Start Level",
-                        placeholder = "Select starting level",
-                        value = state.startLevel,
-                        onClick = { onAction(CreateAssessmentsAction.ToggleStartLevelDropDown(isExpanded = !state.isStartLevelDropDownExpanded)) },
-                        error = null
-                    ) {
-                        state.selectedStartingLevel.forEach {
-                            AppDropDownItem(
-                                item = it,
-                                isSelected = it == state.startLevel,
-                                onClick = { onAction(CreateAssessmentsAction.SetStartLevel(it)) }
-                            )
-                        }
-                    }
-                }
-
-                 */
 
                 item {
                     AppDropDownMenu(
@@ -177,6 +147,7 @@ fun CreateAssessmentsScreen(
                                 }
                             )
                         }
+
                     }
 
                 }

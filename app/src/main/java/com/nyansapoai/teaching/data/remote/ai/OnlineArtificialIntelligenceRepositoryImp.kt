@@ -1,8 +1,8 @@
 package com.nyansapoai.teaching.data.remote.ai
 
-import android.net.http.HttpException
 import com.nyansapoai.teaching.data.network.ApiHelper
 import com.nyansapoai.teaching.data.network.Http
+import com.nyansapoai.teaching.domain.dto.ai.GetTextFromImageRequestDTO
 import com.nyansapoai.teaching.domain.models.ai.VisionRecognition
 import com.nyansapoai.teaching.utils.Results
 import io.ktor.client.call.body
@@ -17,8 +17,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import okhttp3.Dispatcher
-import okhttp3.internal.format
 
 class OnlineArtificialIntelligenceRepositoryImp(
     val apiHelper: ApiHelper,
@@ -66,5 +64,9 @@ class OnlineArtificialIntelligenceRepositoryImp(
                 emit(Results.error(e.message ?: "Unknown Error reading the input"))
             }
         }.flowOn(Dispatchers.IO)
+    }
+
+    override suspend fun textExtractionFromImage(request: GetTextFromImageRequestDTO): Flow<Results<VisionRecognition>> {
+        TODO("Not yet implemented")
     }
 }

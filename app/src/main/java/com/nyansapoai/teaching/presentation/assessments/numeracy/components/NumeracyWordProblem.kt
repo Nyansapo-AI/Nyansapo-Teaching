@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ButtonGroup
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledIconButton
@@ -34,6 +35,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.nyansapoai.teaching.R
+import com.nyansapoai.teaching.presentation.common.components.AppButton
 import com.nyansapoai.teaching.presentation.common.components.AppTouchInput
 import com.nyansapoai.teaching.presentation.common.components.CapturableComposable
 
@@ -47,6 +49,7 @@ fun NumeracyWordProblem(
     shouldCaptureWorkArea: Boolean = false,
     shouldCaptureAnswer: Boolean = false,
     onCaptureAnswerContent: (ByteArray) -> Unit = {},
+    onSubmit: () -> Unit
     ) {
 
     var isEraserMode by remember { mutableStateOf(false) }
@@ -59,7 +62,7 @@ fun NumeracyWordProblem(
             verticalArrangement = Arrangement.spacedBy(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = modifier
-        ) {
+     ) {
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleLarge,
@@ -225,24 +228,25 @@ fun NumeracyWordProblem(
                                 isEraserMode = isEraserMode,
                                 brushColor = Color.Green
                             )
-                        }
+                        },
                     )
                 }
+            }
+
+            AppButton(
+                onClick = onSubmit,
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFC107)),                modifier = Modifier
+                    .padding(16.dp)
+            ) {
+                Text(
+                    "Submit",
+                    color = MaterialTheme.colorScheme.onSecondary,
+                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.titleMedium
+                )
             }
 
         }
 
     }
-}
-
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-private fun NumeracyWordProblemPreview() {
-    NumeracyWordProblem(
-        wordProblem = "A farmer has 12 apples. He gives 3 apples to his friend. How many apples does he have left?",
-        onCaptureWorkAreaContent = {},
-        shouldCaptureWorkArea = false,
-        onCaptureAnswerContent = {}
-    )
 }

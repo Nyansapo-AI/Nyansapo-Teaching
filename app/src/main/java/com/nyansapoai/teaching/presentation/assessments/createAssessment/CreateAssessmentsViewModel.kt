@@ -22,6 +22,7 @@ class CreateAssessmentsViewModel(
     private var hasLoadedInitialData = false
 
     private val _state = MutableStateFlow(CreateAssessmentsState())
+
     val state = _state
         .onStart {
             if (!hasLoadedInitialData) {

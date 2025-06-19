@@ -5,7 +5,6 @@ import com.nyansapoai.teaching.domain.models.assessments.AssignedStudent
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.CountMatch
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyArithmeticOperation
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyWordProblem
-import com.nyansapoai.teaching.domain.models.assessments.numeracy.WordProblem
 import com.nyansapoai.teaching.utils.Results
 import kotlinx.coroutines.flow.Flow
 
@@ -46,5 +45,5 @@ interface AssessmentRepository {
         assessmentId: String,
         studentID: String,
         wordProblem: NumeracyWordProblem
-    )
+    ): Results<String>
 }

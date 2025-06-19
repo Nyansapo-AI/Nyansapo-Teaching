@@ -74,7 +74,6 @@ fun OTPScreen(
     val phoneAuth = PhoneAuth
 
 
-
     Scaffold(
         modifier = Modifier
     ) { innerPadding ->

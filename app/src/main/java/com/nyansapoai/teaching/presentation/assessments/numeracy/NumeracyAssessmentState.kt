@@ -16,13 +16,13 @@ data class NumeracyAssessmentState(
     val answerImageByteArray: ByteArray? = null,
     val workAreaImageByteArray: ByteArray? = null,
     val countMatchAnswer: Int? = null,
+    val isLoading: Boolean = false,
     val answerUri: String? = null,
     val response: Int? = null,
     val responseError: String? = null,
     val answerString: String? = null,
     val answerInt: Int? = null,
     val showResponseAlert: Boolean = false,
-
 
     val numeracyAssessmentContent: Results<NumeracyAssessmentContent> = Results.success(data =numeracyAssessmentData.numeracyAssessmentContentList[0] ),
 
@@ -38,5 +38,5 @@ data class NumeracyAssessmentState(
     val divisionIndex: Int = 0,
     val numberRecognitionIndex: Int = 0,
 
-    val numeracyLevel: NumeracyAssessmentLevel = NumeracyAssessmentLevel.COUNT_MATCH
+    val numeracyLevel: NumeracyAssessmentLevel = NumeracyAssessmentLevel.ADDITION
 )
