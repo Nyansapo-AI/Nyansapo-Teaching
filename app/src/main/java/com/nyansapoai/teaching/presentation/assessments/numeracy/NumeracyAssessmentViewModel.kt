@@ -5,6 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nyansapoai.teaching.data.remote.ai.ArtificialIntelligenceRepository
 import com.nyansapoai.teaching.data.remote.assessment.AssessmentRepository
+import com.nyansapoai.teaching.data.remote.media.MediaRepository
+import com.nyansapoai.teaching.domain.dto.ai.GetTextFromImageRequestDTO
 import com.nyansapoai.teaching.domain.models.ai.VisionRecognition
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.CountMatch
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyArithmeticOperation
@@ -14,7 +16,6 @@ import com.nyansapoai.teaching.presentation.assessments.components.checkAnswer
 import com.nyansapoai.teaching.utils.ResultStatus
 import com.nyansapoai.teaching.utils.Results
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
@@ -26,10 +27,12 @@ import kotlinx.coroutines.flow.update
 
 class NumeracyAssessmentViewModel(
     private val artificialIntelligenceRepository: ArtificialIntelligenceRepository,
-    private val assessmentRepository: AssessmentRepository
+    private val assessmentRepository: AssessmentRepository,
+    private val mediaRepository: MediaRepository
 ) : ViewModel() {
 
     private var hasLoadedInitialData = false
+
 
     private val _state = MutableStateFlow(NumeracyAssessmentState())
     val state = _state
@@ -278,48 +281,77 @@ class NumeracyAssessmentViewModel(
                 }
 
                 viewModelScope.launch(Dispatchers.IO) {
-                    try {
-                        artificialIntelligenceRepository.recognizeImage(imageByteArray = _state.value.answerImageByteArray!!)
-                            .catch { e ->
+                    val response = mediaRepository.saveImage(imageByteArray = _state.value.answerImageByteArray!!)
+
+                    when(response.status){
+                        ResultStatus.INITIAL ,
+                        ResultStatus.LOADING -> {
+                            println("Firebase storage is loading...")
+                        }
+                        ResultStatus.SUCCESS -> {
+                            println("Firebase storage success: ${response.data}")
+
+                            if (response.data == null){
+                                /*
                                 _state.value = _state.value.copy(
                                     showResponseAlert = true,
                                     shouldCaptureAnswer = false,
                                     shouldCaptureWorkArea = false,
                                     response = null,
-                                    responseError = e.message ?: "Error recognizing the answer image",
+                                    responseError = "No data in vision recognition response, try again"
+                                )*/
+                                return@launch
+                            }
+
+                            try {
+                                artificialIntelligenceRepository.textExtractionFromImage(request = GetTextFromImageRequestDTO(url = response.data ))
+                                    .catch { e ->
+                                        _state.value = _state.value.copy(
+                                            showResponseAlert = true,
+                                            shouldCaptureAnswer = false,
+                                            shouldCaptureWorkArea = false,
+                                            response = null,
+                                            responseError = e.message ?: "Error recognizing the answer image",
+                                        )
+                                    }
+                                    .collect { result ->
+
+                                        println("Vision recognition result: $result")
+
+                                        result.data?.let {
+                                            _state.value = _state.value.copy(
+                                                answerUri = result.data.url,
+                                                answerInt = result.data.response,
+                                                response = result.data.response,
+                                                showResponseAlert = true,
+                                                responseError = null
+                                            )
+
+                                        } ?: run {
+                                            _state.value = _state.value.copy(
+                                                showResponseAlert = true,
+                                                shouldCaptureAnswer = false,
+                                                shouldCaptureWorkArea = false,
+                                                response = null,
+                                                responseError = "No data in vision recognition response, try again"
+                                            )
+                                        }
+                                    }
+                            } catch (e: Exception) {
+                                _state.value = _state.value.copy(
+                                    showResponseAlert = true,
+                                    shouldCaptureAnswer = false,
+                                    shouldCaptureWorkArea = false,
+                                    response = null,
+                                    responseError = e.message ?: "Error processing the answer image"
                                 )
                             }
-                            .collect { result ->
 
-                                result.data?.let {
-                                    _state.value = _state.value.copy(
-                                        answerUri = result.data.url,
-                                        answerInt = result.data.response,
-                                        response = result.data.response,
-                                        showResponseAlert = true,
-                                        responseError = null
-                                    )
-
-                                } ?: run {
-                                    _state.value = _state.value.copy(
-                                        showResponseAlert = true,
-                                        shouldCaptureAnswer = false,
-                                        shouldCaptureWorkArea = false,
-                                        response = null,
-                                        responseError = "No data in vision recognition response, try again"
-                                    )
-                                }
-                            }
-                    } catch (e: Exception) {
-                        _state.value = _state.value.copy(
-                            showResponseAlert = true,
-                            shouldCaptureAnswer = false,
-                            shouldCaptureWorkArea = false,
-                            response = null,
-                            responseError = e.message ?: "Error processing the answer image"
-                        )
+                        }
+                        ResultStatus.ERROR -> {
+                            println("Firebase storage error: ${response.message}")
+                        }
                     }
-
                 }
 
             }

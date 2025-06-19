@@ -19,10 +19,8 @@ import kotlinx.coroutines.withContext
 
 class TextToSpeechViewModel : ViewModel() {
 
-    // Replace with your Azure Speech Service key and region
-//    private val speechKey = "00dd53c13cdf46369c8dbbeac8b9a5e9"
-    private val key1 = "00dd53c13cdf46369c8dbbeac8b9a5e9"
-    private val key2 = "b46bc3b4fe454606bb2e3ca731a335b4"
+    private val key1 = ""
+    private val key2 = ""
     private val speechRegion = "eastus"
 
     private val _uiState = MutableStateFlow(TextToSpeechState())

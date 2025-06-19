@@ -62,6 +62,7 @@ fun Navigation(){
             modifier = Modifier
                 .padding(innerPadding)
         ){
+
             composable<GetStartedPage> {
                 GetStartedRoot()
             }

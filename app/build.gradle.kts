@@ -1,3 +1,6 @@
+import java.util.Properties
+import kotlin.apply
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -5,6 +8,16 @@ plugins {
 
     kotlin("plugin.serialization") version "2.1.10"
     alias(libs.plugins.google.gms.google.services)
+}
+
+
+val localPropertiesFile = rootProject.file("local.properties")
+val localProperties = Properties().apply {
+    if (localPropertiesFile.exists()) {
+        localPropertiesFile.inputStream().use { stream ->
+            load(stream)
+        }
+    }
 }
 
 android {
@@ -29,6 +42,21 @@ android {
                 "proguard-rules.pro"
             )
         }
+
+
+        getByName("debug") {
+            buildConfigField(
+                "String",
+                "AZURE_BASE_URL",
+                localProperties.getProperty("AZURE_BASE_URL")
+            )
+
+            buildConfigField(
+                "String",
+                "AZURE_SUBSCRIPTION_KEY",
+                localProperties.getProperty("AZURE_SUBSCRIPTION_KEY")
+            )
+        }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -39,6 +67,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -79,6 +108,7 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
+    implementation(libs.firebase.storage)
 
     //datetime
     implementation (libs.kotlinx.datetime)
