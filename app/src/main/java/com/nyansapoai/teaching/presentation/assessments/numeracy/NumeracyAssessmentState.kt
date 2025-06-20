@@ -38,5 +38,5 @@ data class NumeracyAssessmentState(
     val divisionIndex: Int = 0,
     val numberRecognitionIndex: Int = 0,
 
-    val numeracyLevel: NumeracyAssessmentLevel = NumeracyAssessmentLevel.ADDITION
+    val numeracyLevel: NumeracyAssessmentLevel = NumeracyAssessmentLevel.COUNT_MATCH
 )

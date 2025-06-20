@@ -26,6 +26,10 @@ import com.nyansapoai.teaching.presentation.assessments.createAssessment.CreateA
 import com.nyansapoai.teaching.presentation.assessments.IndividualAssessment.IndividualAssessmentViewModel
 import com.nyansapoai.teaching.presentation.assessments.conductAssessment.ConductAssessmentViewModel
 import com.nyansapoai.teaching.presentation.assessments.numeracy.NumeracyAssessmentViewModel
+import com.nyansapoai.teaching.presentation.common.audio.play.AndroidAudioPlayer
+import com.nyansapoai.teaching.presentation.common.audio.play.AudioPlayer
+import com.nyansapoai.teaching.presentation.common.audio.record.AndroidAudioRecorder
+import com.nyansapoai.teaching.presentation.common.audio.record.AudioRecorder
 import com.nyansapoai.teaching.presentation.common.textToSpeech.TextToSpeechViewModel
 import com.nyansapoai.teaching.presentation.common.snackbar.SnackBarHandler
 import org.koin.core.module.dsl.viewModel
@@ -93,6 +97,18 @@ val appModules = module {
     factory<MediaRepository> {
         FirebaseMediaRepositoryImpl(
             firebaseStorage = get()
+        )
+    }
+
+    factory<AudioRecorder> {
+        AndroidAudioRecorder(
+            context = get()
+        )
+    }
+
+    factory<AudioPlayer> {
+        AndroidAudioPlayer(
+            context = get()
         )
     }
 
