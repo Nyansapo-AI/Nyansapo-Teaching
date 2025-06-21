@@ -45,13 +45,14 @@ import java.io.File
 
 private var audioFile: File? = null
 
-
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun LiteracyLetterRecognitionUI(
     modifier: Modifier = Modifier,
 
 ) {
+
+
 
     val context = LocalContext.current
 
@@ -98,6 +99,8 @@ fun LiteracyLetterRecognitionUI(
                         contentColor = MaterialTheme.colorScheme.onTertiary
                     ),
                     onClick = {
+                        showAppIntro = true
+
                         audioFile?.let {
                             audioPlayer.playFile(it)
                         }?: run {
@@ -173,52 +176,6 @@ fun LiteracyLetterRecognitionUI(
                     showAppIntro = false
                 }
             ) {
-
-                /*
-            FloatingActionButton(
-                onClick = {},
-                modifier = Modifier.introShowCaseTarget(
-                    index = 0,
-                    style = ShowcaseStyle.Default.copy(
-                        backgroundColor = Color(0xFF1C0A00), // specify color of background
-                        backgroundAlpha = 0.98f, // specify transparency of background
-                        targetCircleColor = Color.White // specify color of target circle
-                    ),
-                    // specify the content to show to introduce app feature
-                    content = {
-                        Column {
-                            Text(
-                                text = "Check emails",
-                                color = Color.White,
-                                fontSize = 24.sp,
-                                fontWeight = FontWeight.Bold
-                            )
-                            Text(
-                                text = "Click here to check/send emails",
-                                color = Color.White,
-                                fontSize = 16.sp
-                            )
-                            Spacer(modifier = Modifier.height(10.dp))
-                            Icon(
-                                painterResource(id = R.drawable.arrow_back),
-                                contentDescription = null,
-                                modifier = Modifier
-                                    .size(80.dp)
-                                    .align(Alignment.End),
-                                tint = Color.White
-                            )
-                        }
-                    }
-                ),
-                backgroundColor = MaterialTheme.colorScheme.background,
-                contentColor = Color.White,
-                elevation = FloatingActionButtonDefaults.elevation(6.dp)
-            ) {
-                Icon(
-                    Icons.Filled.Email,
-                    contentDescription = "Email"
-                )
-            }*/
 
                 IconButton(
                     onClick = {},

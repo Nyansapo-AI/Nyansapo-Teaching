@@ -190,20 +190,3 @@ val numeracyAssessmentData = NumeracyAssessmentData(
         )
     )
 )
-
-// Additional utility functions
-fun NumeracyAssessmentData.getAssessment(index: Int): NumeracyAssessmentContent? {
-    return numeracyAssessmentContentList.getOrNull(index)
-}
-
-fun NumeracyAssessmentContent.getTotalQuestions(): Int {
-    return additions.size + subtractions.size + multiplications.size + divisions.size + wordProblems.size
-}
-
-fun NumeracyOperations.isCorrect(userAnswer: Int): Boolean {
-    return answer == userAnswer
-}
-
-fun WordProblem.isCorrect(userAnswer: Int): Boolean {
-    return answer == userAnswer
-}
