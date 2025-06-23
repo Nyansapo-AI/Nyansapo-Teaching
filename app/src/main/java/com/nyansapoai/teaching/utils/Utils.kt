@@ -143,11 +143,12 @@ object Utils {
         val bitmap = this.asAndroidBitmap()
         val outputStream = ByteArrayOutputStream()
         bitmap.compress(format, quality, outputStream)
+        println("ImageBitmap converted to ByteArray with format: ${outputStream.toByteArray()}")
         return outputStream.toByteArray()
     }
 
 
-    /*
+    /**
         * Clears the app's private pictures directory by deleting all files
      */
     fun clearAppPrivatePicturesDir(context: Context): Boolean {

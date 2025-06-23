@@ -42,7 +42,7 @@ fun AppShowInstructions(
 
     IntroShowcase(
         showIntroShowCase = showInstructions,
-        dismissOnClickOutside = false,
+        dismissOnClickOutside = true,
         onShowCaseCompleted = {
 //            onChangeShow(false)
         },

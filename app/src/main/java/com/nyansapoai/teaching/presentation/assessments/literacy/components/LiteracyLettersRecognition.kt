@@ -12,19 +12,19 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,15 +33,14 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nyansapoai.teaching.R
 import com.nyansapoai.teaching.presentation.common.audio.play.AudioPlayer
-import com.nyansapoai.teaching.presentation.common.audio.record.AudioRecorder
+import com.nyansapoai.teaching.presentation.common.audio.record.AppAudioRecorder
+import com.nyansapoai.teaching.presentation.common.components.AppButton
 import com.nyansapoai.teaching.presentation.common.components.AppShowInstructions
-import kotlinx.coroutines.delay
 import org.koin.compose.koinInject
 import java.io.File
 
@@ -58,11 +57,15 @@ fun LiteracyLettersRecognitionUI(
 
     val context = LocalContext.current
 
+    var audioByteArray by remember {
+        mutableStateOf<ByteArray?>(null)
+    }
 
-    val audioRecorder = koinInject<AudioRecorder>()
+
+    val appAudioRecorder = koinInject<AppAudioRecorder>()
     val audioPlayer = koinInject<AudioPlayer>()
 
-    var currentIndex by remember { mutableStateOf(2) }
+    var currentIndex by remember { mutableStateOf(0) }
 
     var showInstructions by remember {
         mutableStateOf(true)
@@ -72,9 +75,6 @@ fun LiteracyLettersRecognitionUI(
         mutableStateOf<Boolean?>(null)
     }
 
-    var isRecording by remember {
-        mutableStateOf(false)
-    }
 
 
     Column(
@@ -82,6 +82,7 @@ fun LiteracyLettersRecognitionUI(
         verticalArrangement = Arrangement.spacedBy(40.dp),
         modifier = modifier
             .fillMaxSize()
+            .widthIn(max = 700.dp)
             .padding(16.dp),
     ) {
 
@@ -120,13 +121,12 @@ fun LiteracyLettersRecognitionUI(
                 onClick = {
                     showInstructions = !showInstructions
 
-                    /*
                     audioFile?.let {
                         audioPlayer.playFile(it)
                     }?: run {
                         println("Audio file not available")
                         // Handle case where audio file is not available
-                    } */
+                    }
                 }
             ) {
                 Row(
@@ -181,38 +181,74 @@ fun LiteracyLettersRecognitionUI(
                 AppShowInstructions(
                     showInstructions = showInstructions,
                     size = 120.dp,
+                    instructionsTitle = "Read the letter",
+                    instructionsDescription = "Hold the button below to record your voice saying the letter.",
                     content = {
-                        Icon(
-                            painter = painterResource(R.drawable.mic),
-                            contentDescription = "Hold to speak",
-                            modifier = Modifier
-                                .size(80.dp)
-                                .align(Alignment.CenterHorizontally)
-                                .pointerInput(Unit) {
-                                    detectTapGestures(
-                                        onPress = {
-                                            showLetter = true
+                        IconButton(
+                            onClick = {}
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.mic),
+                                contentDescription = "Hold to speak",
+                                modifier = Modifier
+                                    .size(80.dp)
+                                    .align(Alignment.CenterHorizontally)
+                                    .pointerInput(Unit) {
+                                        detectTapGestures(
+                                            onTap = {
+                                                showLetter = false
+                                            },
+                                            onPress = {
+                                                showLetter = true
 
-                                            File(
-                                                context.cacheDir,
-                                                "audio_recording.m4a"
-                                            ).also { file ->
-                                                audioRecorder.start(outputFile = file)
-                                                audioFile = file
+                                                File(
+                                                    context.cacheDir,
+                                                    "audio_recording.wav"
+                                                ).also { file ->
+                                                    appAudioRecorder.start(outputFile = file)
+                                                    audioFile = file
+
+
+                                                }
+
+                                                tryAwaitRelease()
+                                                showLetter = false
+                                                appAudioRecorder.stop()
+
+                                                audioFile?.let {
+                                                    println("Audio file recorded: ${audioFile!!.absolutePath}")
+                                                    println("Audio file recorded byteArray: ${appAudioRecorder.getOutputFileByteArray(outputFile = audioFile!!)}")
+
+                                                    when {
+                                                        audioFile != null -> {
+                                                            audioByteArray = appAudioRecorder.getOutputFileByteArray(outputFile = audioFile!!)
+                                                        }
+                                                    }
+                                                }
+
                                             }
-
-                                            tryAwaitRelease()
-                                            showLetter = false
-                                            audioRecorder.stop()
-                                        }
-                                    )
-                                }
-                        )
-
+                                        )
+                                    }
+                            )
+                        }
                     }
                 )
 
             }
+        }
+
+
+        AppButton(
+            enabled = audioByteArray != null,
+            onClick = {},
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            Text(
+                text = "Submit",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
         }
     }
 

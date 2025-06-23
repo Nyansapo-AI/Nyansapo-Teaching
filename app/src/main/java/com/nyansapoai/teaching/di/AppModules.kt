@@ -28,11 +28,10 @@ import com.nyansapoai.teaching.presentation.assessments.conductAssessment.Conduc
 import com.nyansapoai.teaching.presentation.assessments.numeracy.NumeracyAssessmentViewModel
 import com.nyansapoai.teaching.presentation.common.audio.play.AndroidAudioPlayer
 import com.nyansapoai.teaching.presentation.common.audio.play.AudioPlayer
-import com.nyansapoai.teaching.presentation.common.audio.record.AndroidAudioRecorder
-import com.nyansapoai.teaching.presentation.common.audio.record.AudioRecorder
+import com.nyansapoai.teaching.presentation.common.audio.record.AndroidAppAudioRecorder
+import com.nyansapoai.teaching.presentation.common.audio.record.AppAudioRecorder
 import com.nyansapoai.teaching.presentation.common.textToSpeech.TextToSpeechViewModel
 import com.nyansapoai.teaching.presentation.common.snackbar.SnackBarHandler
-import org.koin.core.module.dsl.viewModel
 
 val appModules = module {
 
@@ -100,8 +99,8 @@ val appModules = module {
         )
     }
 
-    factory<AudioRecorder> {
-        AndroidAudioRecorder(
+    factory<AppAudioRecorder> {
+        AndroidAppAudioRecorder(
             context = get()
         )
     }

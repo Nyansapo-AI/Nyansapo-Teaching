@@ -1,7 +1,6 @@
 package com.nyansapoai.teaching.presentation.assessments.literacy.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -38,7 +37,7 @@ import com.canopas.lib.showcase.IntroShowcase
 import com.canopas.lib.showcase.component.ShowcaseStyle
 import com.nyansapoai.teaching.R
 import com.nyansapoai.teaching.presentation.common.audio.play.AudioPlayer
-import com.nyansapoai.teaching.presentation.common.audio.record.AudioRecorder
+import com.nyansapoai.teaching.presentation.common.audio.record.AppAudioRecorder
 import org.koin.compose.koinInject
 import java.io.File
 
@@ -56,7 +55,7 @@ fun LiteracyLetterRecognitionUI(
 
     val context = LocalContext.current
 
-    val audioRecorder = koinInject<AudioRecorder>()
+    val appAudioRecorder = koinInject<AppAudioRecorder>()
     val audioPlayer = koinInject<AudioPlayer>()
 
     var showAppIntro by remember {
@@ -220,13 +219,13 @@ fun LiteracyLetterRecognitionUI(
                                         showLetter = true
 
                                         File(context.cacheDir, "audio_recording.m4a").also { file ->
-                                            audioRecorder.start(outputFile = file)
+                                            appAudioRecorder.start(outputFile = file)
                                             audioFile = file
                                         }
 
                                         tryAwaitRelease()
                                         showLetter = false
-                                        audioRecorder.stop()
+                                        appAudioRecorder.stop()
                                     }
                                 )
                             }
