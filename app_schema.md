@@ -32,9 +32,6 @@
       "data" : [
         {
           "grade": "number",
-          "age":"number",
-          "total_maleStudents":"number",
-          "total_femaleStudents":"number",
           "distribution" : [
             {
               "learning_level": "string",
