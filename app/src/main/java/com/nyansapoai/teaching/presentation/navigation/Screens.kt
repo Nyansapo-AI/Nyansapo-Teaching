@@ -27,5 +27,6 @@ data class IndividualAssessmentPage(val assessmentId: String)
 @Serializable
 data class ConductAssessmentPage(
     val assessmentId: String,
+    val assessmentType: String,
     val studentId: String,
 )

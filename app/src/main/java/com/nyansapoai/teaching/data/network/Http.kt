@@ -17,8 +17,11 @@ import com.nyansapoai.teaching.BuildConfig
 
 class Http() {
 
-    val azureBaseUrl = BuildConfig.AZURE_BASE_URL
-    val azureSubscriptionKey = BuildConfig.AZURE_SUBSCRIPTION_KEY
+    val azureVisionBaseUrl = BuildConfig.AZURE_BASE_URL
+    val azureVisionSubscriptionKey = BuildConfig.AZURE_SUBSCRIPTION_KEY
+
+    val azureSpeechBaseUrl = BuildConfig.AZURE_SPEECH_BASE_URL
+    val azureSpeechSubscriptionKey = BuildConfig.AZURE_SPEECH_SUBSCRIPTION_KEY
 
     val client by lazy {
         HttpClient(httpClient()) {
@@ -55,7 +58,7 @@ class Http() {
     }
 
 
-    val azureClient by lazy {
+    val azureVisionClient by lazy {
         HttpClient(httpClient()) {
             install(Logging) {
                 logger =
@@ -84,8 +87,44 @@ class Http() {
             }
 
             defaultRequest {
-                url(azureBaseUrl)
-                header("Ocp-Apim-Subscription-Key", azureSubscriptionKey)
+                url(azureVisionBaseUrl)
+                header("Ocp-Apim-Subscription-Key", azureVisionSubscriptionKey)
+            }
+
+        }
+    }
+
+    val azureSpeechClient by lazy {
+        HttpClient(httpClient()) {
+            install(Logging) {
+                logger =
+                    object : Logger {
+                        override fun log(message: String) {
+                            println(message)
+                        }
+                    }
+                level = LogLevel.ALL
+            }
+
+            install(HttpTimeout) {
+                requestTimeoutMillis = 60000
+                socketTimeoutMillis = 60000
+                connectTimeoutMillis = 60000
+            }
+
+            install(ContentNegotiation) {
+                json(
+                    Json {
+                        prettyPrint = true
+                        isLenient = true
+                        ignoreUnknownKeys = true
+                    },
+                )
+            }
+
+            defaultRequest {
+                url(azureSpeechBaseUrl)
+                header("Ocp-Apim-Subscription-Key", azureSpeechSubscriptionKey)
             }
 
         }

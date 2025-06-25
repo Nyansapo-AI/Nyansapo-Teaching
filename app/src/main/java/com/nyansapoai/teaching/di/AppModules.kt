@@ -25,6 +25,7 @@ import com.nyansapoai.teaching.presentation.assessments.AssessmentsViewModel
 import com.nyansapoai.teaching.presentation.assessments.createAssessment.CreateAssessmentsViewModel
 import com.nyansapoai.teaching.presentation.assessments.IndividualAssessment.IndividualAssessmentViewModel
 import com.nyansapoai.teaching.presentation.assessments.conductAssessment.ConductAssessmentViewModel
+import com.nyansapoai.teaching.presentation.assessments.literacy.LiteracyViewModel
 import com.nyansapoai.teaching.presentation.assessments.numeracy.NumeracyAssessmentViewModel
 import com.nyansapoai.teaching.presentation.common.audio.play.AndroidAudioPlayer
 import com.nyansapoai.teaching.presentation.common.audio.play.AudioPlayer
@@ -47,6 +48,7 @@ val appModules = module {
     viewModelOf(::ConductAssessmentViewModel)
     viewModelOf(::NumeracyAssessmentViewModel)
     viewModelOf(::TextToSpeechViewModel)
+    viewModelOf(::LiteracyViewModel)
 
 
     single<FirebaseAuth> {

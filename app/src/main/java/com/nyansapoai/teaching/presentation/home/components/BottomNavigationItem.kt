@@ -41,13 +41,13 @@ data class BottomNavigationItem(
             BottomNavigationItem(
                 title = "Attendance",
                 icon = R.drawable.attendance,
-                screen = { LiteracyLettersRecognitionUI() },
+                screen = {  },
             ),
 
             BottomNavigationItem(
                 title = "Sessions",
                 icon = R.drawable.sessions,
-                screen = { LiteracyScreen() },
+                screen = {  },
             ),
         )
     }

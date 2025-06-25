@@ -13,6 +13,8 @@ class FirebaseMediaRepositoryImpl(
 
     val mediaStorageRef = firebaseStorage.reference.child("media")
 
+    val audioStorageRef = firebaseStorage.reference.child("audio")
+
 
     override suspend fun saveImage(imageByteArray: ByteArray): Results<String> {
 
@@ -21,6 +23,34 @@ class FirebaseMediaRepositoryImpl(
         mediaStorageRef.putBytes(imageByteArray)
             .addOnFailureListener {
                 deferred.complete(Results.error(msg = it.message ?: "Error uploading image"))
+            }
+            .addOnSuccessListener { taskSnapshot ->
+
+                taskSnapshot.storage.downloadUrl
+                    .addOnSuccessListener { uri ->
+                        uri?.let {
+                            deferred.complete(Results.success(data = uri.toString()))
+                        } ?: run {
+                            deferred.complete(Results.error(msg = "Failed to get download URL"))
+                        }
+                    }
+                    .addOnFailureListener {
+                        deferred.complete(Results.error(msg = it.message ?: "Error getting download URL"))
+                    }
+            }
+
+        return withContext(Dispatchers.IO) {
+            deferred.await()
+        }
+    }
+
+    override suspend fun saveAudio(audioByteArray: ByteArray): Results<String> {
+
+        val deferred = CompletableDeferred<Results<String>>()
+
+        audioStorageRef.putBytes(audioByteArray)
+            .addOnFailureListener {
+                deferred.complete(Results.error(msg = it.message ?: "Error uploading audio"))
             }
             .addOnSuccessListener { taskSnapshot ->
 

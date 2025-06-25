@@ -6,6 +6,7 @@ import com.google.firebase.firestore.toObject
 import com.nyansapoai.teaching.data.remote.assessment.AssessmentRepository
 import com.nyansapoai.teaching.domain.models.assessments.Assessment
 import com.nyansapoai.teaching.domain.models.assessments.AssignedStudent
+import com.nyansapoai.teaching.domain.models.assessments.literacy.ReadingAssessmentResult
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.CountMatch
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyArithmeticOperation
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyWordProblem
@@ -242,6 +243,39 @@ class AssessmentRepositoryFirebaseImp(
                 deferred.complete(Results.error(msg = "Failed to submit assessment: ${it.message}"))
             }
 
+
+        return withContext(Dispatchers.IO) {
+            deferred.await()
+        }
+    }
+
+    override suspend fun assessReadingAssessment(
+        assessmentId: String,
+        studentID: String,
+        readingAssessmentResults: List<ReadingAssessmentResult>
+    ): Results<String> {
+
+        val deferred = CompletableDeferred<Results<String>>()
+
+        firebaseDb.collection(assessmentCollection)
+            .document(assessmentId)
+            .collection("assessments-results")
+            .document(assessmentId+"_$studentID")
+            .set(
+                mapOf(
+                    "assessmentId" to assessmentId,
+                    "student_id" to studentID,
+                    "literacy_results" to mapOf(
+                        "reading_results" to readingAssessmentResults
+                    )
+                )
+            )
+            .addOnSuccessListener {
+                deferred.complete(Results.success(data = "Assessment submitted successfully"))
+            }
+            .addOnFailureListener {
+                deferred.complete(Results.error(msg = "Failed to submit assessment: ${it.message}"))
+            }
 
         return withContext(Dispatchers.IO) {
             deferred.await()

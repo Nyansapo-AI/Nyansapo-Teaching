@@ -36,8 +36,6 @@ fun NumeracyAssessmentRoot(
 
     val viewModel = koinViewModel<NumeracyAssessmentViewModel>()
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val answerAssessmentState by viewModel.answerImageByteArrayState.collectAsState()
-    val workAreaState by viewModel.workAreaImageByteArrayState.collectAsState()
 
     NumeracyAssessmentScreen(
         state = state,

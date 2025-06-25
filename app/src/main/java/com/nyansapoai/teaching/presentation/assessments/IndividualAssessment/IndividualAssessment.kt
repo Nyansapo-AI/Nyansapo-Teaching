@@ -183,9 +183,11 @@ fun IndividualAssessmentScreen(
 
                                         TextButton(
                                             onClick = {
+
                                                 navController.navigate(ConductAssessmentPage(
                                                     assessmentId = assessment.id,
-                                                    studentId = student.student_id
+                                                    studentId = student.student_id,
+                                                    assessmentType = assessment.type
                                                 ))
                                             },
                                             colors = ButtonDefaults.textButtonColors(

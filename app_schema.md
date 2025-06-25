@@ -190,7 +190,7 @@
   "reading_results": [
     { 
     
-        "type": "string", // letter/word/paragraph/story
+        "type": "string", // letter/word/paragraph/
         
         "content": "string", 
         

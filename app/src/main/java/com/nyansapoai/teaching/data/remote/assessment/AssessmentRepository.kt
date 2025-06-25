@@ -2,6 +2,7 @@ package com.nyansapoai.teaching.data.remote.assessment
 
 import com.nyansapoai.teaching.domain.models.assessments.Assessment
 import com.nyansapoai.teaching.domain.models.assessments.AssignedStudent
+import com.nyansapoai.teaching.domain.models.assessments.literacy.ReadingAssessmentResult
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.CountMatch
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyArithmeticOperation
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyWordProblem
@@ -45,5 +46,12 @@ interface AssessmentRepository {
         assessmentId: String,
         studentID: String,
         wordProblem: NumeracyWordProblem
+    ): Results<String>
+
+
+    suspend fun assessReadingAssessment(
+        assessmentId: String,
+        studentID: String,
+        readingAssessmentResults: List<ReadingAssessmentResult>
     ): Results<String>
 }

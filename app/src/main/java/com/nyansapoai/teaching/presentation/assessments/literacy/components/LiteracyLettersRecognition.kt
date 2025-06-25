@@ -1,5 +1,8 @@
 package com.nyansapoai.teaching.presentation.assessments.literacy.components
 
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -22,8 +25,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -33,7 +37,8 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nyansapoai.teaching.R
@@ -41,38 +46,85 @@ import com.nyansapoai.teaching.presentation.common.audio.play.AudioPlayer
 import com.nyansapoai.teaching.presentation.common.audio.record.AppAudioRecorder
 import com.nyansapoai.teaching.presentation.common.components.AppButton
 import com.nyansapoai.teaching.presentation.common.components.AppShowInstructions
+import kotlinx.coroutines.delay
 import org.koin.compose.koinInject
 import java.io.File
 
 
 private var audioFile: File? = null
 
-@Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun LiteracyLettersRecognitionUI(
     modifier: Modifier = Modifier,
-    letters: List<String> =  listOf("i", "j", "k", "m", "x", "r", "b", "c", "d"),
-    onClick: () -> Unit = {}
+    letters: List<String>,
+    currentIndex: Int,
+    showInstructions: Boolean,
+    onShowInstructionsChange: (Boolean) -> Unit,
+    title: String,
+    fontSize: TextUnit = 60.sp,
+    showContent: Boolean,
+    onShowContentChange: (Boolean) -> Unit,
+    audioByteArray: ByteArray?,
+    onAudioByteArrayChange: (ByteArray) -> Unit,
+    response: String?,
+    onClick: () -> Unit,
 ) {
 
+
     val context = LocalContext.current
-
-    var audioByteArray by remember {
-        mutableStateOf<ByteArray?>(null)
-    }
-
 
     val appAudioRecorder = koinInject<AppAudioRecorder>()
     val audioPlayer = koinInject<AudioPlayer>()
 
-    var currentIndex by remember { mutableStateOf(0) }
 
-    var showInstructions by remember {
-        mutableStateOf(true)
+
+    var progress by remember {
+        mutableFloatStateOf(0f)
     }
 
-    var showLetter by remember {
-        mutableStateOf<Boolean?>(null)
+    val animatedProgress by animateFloatAsState(
+        targetValue = progress,
+        animationSpec = tween(
+            durationMillis = 500,
+            easing = FastOutSlowInEasing
+        ),
+        label = "progressAnimation"
+    )
+
+    LaunchedEffect(currentIndex) {
+        if (currentIndex < letters.size) {
+            progress = (currentIndex + 1).toFloat() / letters.size.toFloat()
+        } else {
+            progress = 1f
+        }
+    }
+
+    LaunchedEffect(showContent) {
+        if (showContent){
+            File(
+                context.cacheDir,
+                "audio_recording.wav"
+            ).also { file ->
+                appAudioRecorder.start(outputFile = file)
+                audioFile = file
+            }
+
+        }else if (audioFile != null){
+            delay(1000)
+            appAudioRecorder.stop()
+            audioFile?.let {
+
+                when {
+                    audioFile != null -> {
+                        onAudioByteArrayChange(appAudioRecorder.getOutputFileByteArray(outputFile = audioFile!!))
+                    }
+                }
+            }
+        }
+    }
+
+    if (letters.isEmpty()){
+        return
     }
 
 
@@ -93,7 +145,7 @@ fun LiteracyLettersRecognitionUI(
 
         ) {
             Text(
-                text = "Letter Recognition",
+                text = title,
                 style = MaterialTheme.typography.headlineSmall,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold
@@ -106,11 +158,11 @@ fun LiteracyLettersRecognitionUI(
             )
 
             LinearProgressIndicator(
+                progress = { animatedProgress },
                 color = MaterialTheme.colorScheme.secondary,
-                progress = (currentIndex + 1f / letters.size).toFloat(),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(12.dp)
+                    .height(12.dp),
             )
 
             TextButton(
@@ -119,7 +171,7 @@ fun LiteracyLettersRecognitionUI(
                     contentColor = MaterialTheme.colorScheme.onTertiary
                 ),
                 onClick = {
-                    showInstructions = !showInstructions
+                    onShowInstructionsChange(!showInstructions)
 
                     audioFile?.let {
                         audioPlayer.playFile(it)
@@ -164,17 +216,21 @@ fun LiteracyLettersRecognitionUI(
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier
-                        .heightIn(min = 200.dp, max = 300.dp)
+                        .heightIn(min = 200.dp, max = 600.dp)
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(5))
                         .background(MaterialTheme.colorScheme.tertiary)
                 ) {
                     Text(
-                        text = if (showLetter == true) letters[currentIndex] else "",
+                        text = if (showContent == true) letters[currentIndex] else "",
                         style = MaterialTheme.typography.headlineLarge,
-                        color = MaterialTheme.colorScheme.onTertiary,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        textAlign = TextAlign.Center,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 160.sp,
+                        fontSize = fontSize,
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .align(Alignment.Center)
                     )
                 }
 
@@ -196,36 +252,12 @@ fun LiteracyLettersRecognitionUI(
                                     .pointerInput(Unit) {
                                         detectTapGestures(
                                             onTap = {
-                                                showLetter = false
+                                                onShowContentChange(false)
                                             },
                                             onPress = {
-                                                showLetter = true
-
-                                                File(
-                                                    context.cacheDir,
-                                                    "audio_recording.wav"
-                                                ).also { file ->
-                                                    appAudioRecorder.start(outputFile = file)
-                                                    audioFile = file
-
-
-                                                }
-
+                                                onShowContentChange(true)
                                                 tryAwaitRelease()
-                                                showLetter = false
-                                                appAudioRecorder.stop()
-
-                                                audioFile?.let {
-                                                    println("Audio file recorded: ${audioFile!!.absolutePath}")
-                                                    println("Audio file recorded byteArray: ${appAudioRecorder.getOutputFileByteArray(outputFile = audioFile!!)}")
-
-                                                    when {
-                                                        audioFile != null -> {
-                                                            audioByteArray = appAudioRecorder.getOutputFileByteArray(outputFile = audioFile!!)
-                                                        }
-                                                    }
-                                                }
-
+                                                onShowContentChange(false)
                                             }
                                         )
                                     }
@@ -240,7 +272,7 @@ fun LiteracyLettersRecognitionUI(
 
         AppButton(
             enabled = audioByteArray != null,
-            onClick = {},
+            onClick = onClick,
             modifier = Modifier
                 .fillMaxWidth()
         ) {
