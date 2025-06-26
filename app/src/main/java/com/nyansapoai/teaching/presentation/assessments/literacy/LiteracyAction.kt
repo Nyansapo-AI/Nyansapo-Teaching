@@ -14,7 +14,6 @@ sealed interface LiteracyAction {
     data class OnSubmitResponse(
         val assessmentId: String,
         val studentId: String,
-        val response: String,
     ) : LiteracyAction
 
 }

@@ -16,7 +16,7 @@ data class QuestionData(
 
 @Serializable
 data class LiteracyAssessmentData(
-    val letters: List<String?>,
+    val letters: List<String>,
     val words: List<String>,
     val paragraphs: List<String>,
     val storys: List<String>,
@@ -117,7 +117,7 @@ val literacyAssessmentContent = listOf(
 
     // Grade 5
     LiteracyAssessmentData(
-        letters = listOf("r", "b", "c", "j", "m", "i", "k", null, "x", "u"),
+        letters = listOf("r", "b", "c", "j", "m", "i", "k","x", "u"),
         words = listOf("bag", "mango", "dad", "crops", "bush", "room", "pot", "hen", "fish", "hand"),
         paragraphs = listOf(
             "Our flag has four colors. We learn about them in school. They tell us about our country. We love our flag very much.",

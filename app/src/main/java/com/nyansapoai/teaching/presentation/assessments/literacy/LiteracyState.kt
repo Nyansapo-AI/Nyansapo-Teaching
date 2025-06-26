@@ -11,12 +11,21 @@ data class LiteracyState(
     val title: String = "",
     val showContent: Boolean = false,
     val audioByteArray: ByteArray? = null,
+    val isLoading: Boolean = false,
+    val message: String? = null,
 
     val response: String? = null,
     val error: String? = null,
     val audioUrl: String? = null,
 
     val currentAssessmentLevel: LiteracyAssessmentLevel = LiteracyAssessmentLevel.LETTER_RECOGNITION,
+    val currentAssessmentLevelIndex: Int = 0,
     val assessmentContent: LiteracyAssessmentData? = literacyAssessmentContent[0],
     val readingAssessmentResults: MutableList<ReadingAssessmentResult> = mutableListOf(),
+    val assessmentFlow: List<LiteracyAssessmentLevel> = listOf(
+        LiteracyAssessmentLevel.LETTER_RECOGNITION,
+        LiteracyAssessmentLevel.WORD,
+        LiteracyAssessmentLevel.PARAGRAPH,
+        LiteracyAssessmentLevel.STORY
+    ),
 )

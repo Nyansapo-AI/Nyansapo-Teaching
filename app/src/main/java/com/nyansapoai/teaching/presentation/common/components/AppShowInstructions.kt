@@ -44,7 +44,7 @@ fun AppShowInstructions(
         showIntroShowCase = showInstructions,
         dismissOnClickOutside = true,
         onShowCaseCompleted = {
-//            onChangeShow(false)
+            onChangeShow(false)
         },
     ) {
         Box(

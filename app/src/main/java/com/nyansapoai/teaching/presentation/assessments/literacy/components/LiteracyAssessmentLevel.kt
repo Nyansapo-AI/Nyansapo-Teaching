@@ -5,7 +5,6 @@ enum class LiteracyAssessmentLevel(
 ) {
     LETTER_RECOGNITION("Letter Recognition"),
     WORD("Word"),
-    SENTENCE("Sentence"),
     PARAGRAPH("Paragraph"),
     STORY("Story"),
 }

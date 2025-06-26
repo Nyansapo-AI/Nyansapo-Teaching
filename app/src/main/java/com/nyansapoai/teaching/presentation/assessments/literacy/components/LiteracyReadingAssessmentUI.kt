@@ -1,5 +1,7 @@
 package com.nyansapoai.teaching.presentation.assessments.literacy.components
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -54,7 +56,7 @@ import java.io.File
 private var audioFile: File? = null
 
 @Composable
-fun LiteracyLettersRecognitionUI(
+fun LiteracyReadingAssessmentUI(
     modifier: Modifier = Modifier,
     letters: List<String>,
     currentIndex: Int,
@@ -67,7 +69,7 @@ fun LiteracyLettersRecognitionUI(
     audioByteArray: ByteArray?,
     onAudioByteArrayChange: (ByteArray) -> Unit,
     response: String?,
-    onClick: () -> Unit,
+    onSubmit: () -> Unit,
 ) {
 
 
@@ -110,13 +112,14 @@ fun LiteracyLettersRecognitionUI(
             }
 
         }else if (audioFile != null){
-            delay(1000)
+            delay(2000)
             appAudioRecorder.stop()
             audioFile?.let {
 
                 when {
                     audioFile != null -> {
                         onAudioByteArrayChange(appAudioRecorder.getOutputFileByteArray(outputFile = audioFile!!))
+                        onSubmit.invoke()
                     }
                 }
             }
@@ -175,7 +178,7 @@ fun LiteracyLettersRecognitionUI(
 
                     audioFile?.let {
                         audioPlayer.playFile(it)
-                    }?: run {
+                    } ?: run {
                         println("Audio file not available")
                         // Handle case where audio file is not available
                     }
@@ -202,7 +205,7 @@ fun LiteracyLettersRecognitionUI(
         }
 
         Box(
-            contentAlignment = Alignment.Center,
+            contentAlignment = Alignment.TopCenter,
             modifier = Modifier
                 .weight(1f)
         ) {
@@ -213,10 +216,60 @@ fun LiteracyLettersRecognitionUI(
 //                    .fillMaxSize()
             ) {
 
+                val boxColor by animateColorAsState(
+                    if (showContent) MaterialTheme.colorScheme.onTertiary else MaterialTheme.colorScheme.tertiary,
+                    label = "boxColorAnimation"
+                )
+
+
+
+                AppShowInstructions(
+                    showInstructions = showInstructions,
+                    size = 420.dp,
+                    instructionsTitle = "Read the letter",
+                    instructionsDescription = "Hold the box to record your voice saying the letter.",
+                    content = {
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier
+                                .heightIn(min = 200.dp, max = 640.dp)
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(5))
+                                .background(boxColor)
+                                .pointerInput(Unit) {
+                                    detectTapGestures(
+                                        onTap = {
+                                            onShowContentChange(false)
+                                        },
+                                        onPress = {
+                                            onShowContentChange(true)
+                                            tryAwaitRelease()
+                                            onShowContentChange(false)
+                                        }
+                                    )
+                                }
+                        ) {
+                            Text(
+                                text = if (showContent == true) letters[currentIndex] else "",
+                                style = MaterialTheme.typography.headlineLarge,
+                                color = MaterialTheme.colorScheme.secondary,
+                                textAlign = TextAlign.Center,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = fontSize,
+                                modifier = Modifier
+                                    .padding(16.dp)
+                                    .align(Alignment.Center)
+                            )
+                        }
+
+                    }
+                )
+
+                /*
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier
-                        .heightIn(min = 200.dp, max = 600.dp)
+                        .heightIn(min = 200.dp, max = 640.dp)
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(5))
                         .background(MaterialTheme.colorScheme.tertiary)
@@ -264,15 +317,16 @@ fun LiteracyLettersRecognitionUI(
                             )
                         }
                     }
-                )
+                ) */
 
             }
         }
 
 
+        /*
         AppButton(
             enabled = audioByteArray != null,
-            onClick = onClick,
+            onClick = onSubmit,
             modifier = Modifier
                 .fillMaxWidth()
         ) {
@@ -281,7 +335,7 @@ fun LiteracyLettersRecognitionUI(
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
-        }
+        }*/
     }
 
 }
