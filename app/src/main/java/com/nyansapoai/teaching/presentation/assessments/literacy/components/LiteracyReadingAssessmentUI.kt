@@ -66,6 +66,7 @@ fun LiteracyReadingAssessmentUI(
     fontSize: TextUnit = 60.sp,
     showContent: Boolean,
     onShowContentChange: (Boolean) -> Unit,
+    isLoading: Boolean,
     audioByteArray: ByteArray?,
     onAudioByteArrayChange: (ByteArray) -> Unit,
     response: String?,
@@ -112,14 +113,15 @@ fun LiteracyReadingAssessmentUI(
             }
 
         }else if (audioFile != null){
-            delay(2000)
+            delay(1000)
             appAudioRecorder.stop()
             audioFile?.let {
 
                 when {
-                    audioFile != null -> {
+                    audioFile != null && !isLoading -> {
                         onAudioByteArrayChange(appAudioRecorder.getOutputFileByteArray(outputFile = audioFile!!))
                         onSubmit.invoke()
+                        audioFile = null
                     }
                 }
             }
@@ -213,11 +215,10 @@ fun LiteracyReadingAssessmentUI(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(20.dp),
                 modifier = Modifier
-//                    .fillMaxSize()
             ) {
 
                 val boxColor by animateColorAsState(
-                    if (showContent) MaterialTheme.colorScheme.onTertiary else MaterialTheme.colorScheme.tertiary,
+                    if (!showContent) MaterialTheme.colorScheme.onTertiary else MaterialTheme.colorScheme.tertiary,
                     label = "boxColorAnimation"
                 )
 
@@ -250,7 +251,7 @@ fun LiteracyReadingAssessmentUI(
                                 }
                         ) {
                             Text(
-                                text = if (showContent == true) letters[currentIndex] else "",
+                                text = if (showContent) letters[currentIndex] else "",
                                 style = MaterialTheme.typography.headlineLarge,
                                 color = MaterialTheme.colorScheme.secondary,
                                 textAlign = TextAlign.Center,
@@ -264,60 +265,6 @@ fun LiteracyReadingAssessmentUI(
 
                     }
                 )
-
-                /*
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier
-                        .heightIn(min = 200.dp, max = 640.dp)
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(5))
-                        .background(MaterialTheme.colorScheme.tertiary)
-                ) {
-                    Text(
-                        text = if (showContent == true) letters[currentIndex] else "",
-                        style = MaterialTheme.typography.headlineLarge,
-                        color = MaterialTheme.colorScheme.onBackground,
-                        textAlign = TextAlign.Center,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = fontSize,
-                        modifier = Modifier
-                            .padding(16.dp)
-                            .align(Alignment.Center)
-                    )
-                }
-
-                AppShowInstructions(
-                    showInstructions = showInstructions,
-                    size = 120.dp,
-                    instructionsTitle = "Read the letter",
-                    instructionsDescription = "Hold the button below to record your voice saying the letter.",
-                    content = {
-                        IconButton(
-                            onClick = {}
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.mic),
-                                contentDescription = "Hold to speak",
-                                modifier = Modifier
-                                    .size(80.dp)
-                                    .align(Alignment.CenterHorizontally)
-                                    .pointerInput(Unit) {
-                                        detectTapGestures(
-                                            onTap = {
-                                                onShowContentChange(false)
-                                            },
-                                            onPress = {
-                                                onShowContentChange(true)
-                                                tryAwaitRelease()
-                                                onShowContentChange(false)
-                                            }
-                                        )
-                                    }
-                            )
-                        }
-                    }
-                ) */
 
             }
         }

@@ -1,7 +1,9 @@
 package com.nyansapoai.teaching.data.firebase.assessment
 
 import android.util.Log
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.toObject
 import com.nyansapoai.teaching.data.remote.assessment.AssessmentRepository
 import com.nyansapoai.teaching.domain.models.assessments.Assessment
@@ -268,7 +270,8 @@ class AssessmentRepositoryFirebaseImp(
                     "literacy_results" to mapOf(
                         "reading_results" to readingAssessmentResults
                     )
-                )
+                ),
+                SetOptions.merge()
             )
             .addOnSuccessListener {
                 deferred.complete(Results.success(data = "Assessment submitted successfully"))
