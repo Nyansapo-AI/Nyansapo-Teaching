@@ -1,10 +1,6 @@
 package com.nyansapoai.teaching.presentation.assessments.literacy.components
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -13,16 +9,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -46,7 +38,7 @@ import androidx.compose.ui.unit.sp
 import com.nyansapoai.teaching.R
 import com.nyansapoai.teaching.presentation.common.audio.play.AudioPlayer
 import com.nyansapoai.teaching.presentation.common.audio.record.AppAudioRecorder
-import com.nyansapoai.teaching.presentation.common.components.AppButton
+import com.nyansapoai.teaching.presentation.common.components.AppLinearProgressIndicator
 import com.nyansapoai.teaching.presentation.common.components.AppShowInstructions
 import kotlinx.coroutines.delay
 import org.koin.compose.koinInject
@@ -58,7 +50,7 @@ private var audioFile: File? = null
 @Composable
 fun LiteracyReadingAssessmentUI(
     modifier: Modifier = Modifier,
-    letters: List<String>,
+    readingList: List<String>,
     currentIndex: Int,
     showInstructions: Boolean,
     onShowInstructionsChange: (Boolean) -> Unit,
@@ -85,18 +77,9 @@ fun LiteracyReadingAssessmentUI(
         mutableFloatStateOf(0f)
     }
 
-    val animatedProgress by animateFloatAsState(
-        targetValue = progress,
-        animationSpec = tween(
-            durationMillis = 500,
-            easing = FastOutSlowInEasing
-        ),
-        label = "progressAnimation"
-    )
-
     LaunchedEffect(currentIndex) {
-        if (currentIndex < letters.size) {
-            progress = (currentIndex + 1).toFloat() / letters.size.toFloat()
+        if (currentIndex < readingList.size) {
+            progress = (currentIndex + 1).toFloat() / readingList.size.toFloat()
         } else {
             progress = 1f
         }
@@ -128,7 +111,7 @@ fun LiteracyReadingAssessmentUI(
         }
     }
 
-    if (letters.isEmpty()){
+    if (readingList.isEmpty()){
         return
     }
 
@@ -139,7 +122,7 @@ fun LiteracyReadingAssessmentUI(
         verticalArrangement = Arrangement.spacedBy(40.dp),
         modifier = modifier
             .fillMaxSize()
-            .widthIn(max = 700.dp)
+            .widthIn(max = 600.dp)
             .padding(16.dp),
     ) {
 
@@ -147,7 +130,6 @@ fun LiteracyReadingAssessmentUI(
             verticalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier
                 .fillMaxWidth()
-
         ) {
             Text(
                 text = title,
@@ -158,16 +140,12 @@ fun LiteracyReadingAssessmentUI(
 
 
             Text(
-                text = "Question ${currentIndex + 1}/${letters.size}",
+                text = "Question ${currentIndex + 1}/${readingList.size}",
                 style = MaterialTheme.typography.titleMedium,
             )
 
-            LinearProgressIndicator(
-                progress = { animatedProgress },
-                color = MaterialTheme.colorScheme.secondary,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(12.dp),
+            AppLinearProgressIndicator(
+                progress = progress
             )
 
             TextButton(
@@ -251,7 +229,7 @@ fun LiteracyReadingAssessmentUI(
                                 }
                         ) {
                             Text(
-                                text = if (showContent) letters[currentIndex] else "",
+                                text = if (showContent) readingList[currentIndex] else "",
                                 style = MaterialTheme.typography.headlineLarge,
                                 color = MaterialTheme.colorScheme.secondary,
                                 textAlign = TextAlign.Center,
