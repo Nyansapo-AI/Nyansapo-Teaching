@@ -4,8 +4,7 @@ import androidx.annotation.DrawableRes
 import androidx.compose.runtime.Composable
 import com.nyansapoai.teaching.R
 import com.nyansapoai.teaching.presentation.assessments.AssessmentsRoot
-import com.nyansapoai.teaching.presentation.assessments.literacy.components.MultichoiceQuestionItemUI
-import com.nyansapoai.teaching.presentation.assessments.literacy.components.MultichoiceQuestionsUI
+import com.nyansapoai.teaching.presentation.assessments.components.HasCompletedAssessment
 import com.nyansapoai.teaching.presentation.camps.CampRoot
 
 data class BottomNavigationItem(
@@ -36,7 +35,7 @@ data class BottomNavigationItem(
             BottomNavigationItem(
                 title = "Attendance",
                 icon = R.drawable.attendance,
-                screen = { MultichoiceQuestionItemUI() },
+                screen = { HasCompletedAssessment() },
             ),
 
             BottomNavigationItem(

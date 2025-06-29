@@ -24,7 +24,7 @@ fun AppShowInstructions(
     showInstructions: Boolean = true,
     onChangeShow: (Boolean) -> Unit = {  },
     index: Int = 0,
-    instructionAudio: Int = R.raw.child_error,
+    instructionAudio: Int = R.raw.reading_assessment_default_instructions,
     size: Dp = Dp.Unspecified,
     instructionsTitle: String = "Instructions",
     instructionsDescription: String = "Follow the instructions carefully to complete the task.",
@@ -42,7 +42,7 @@ fun AppShowInstructions(
 
     IntroShowcase(
         showIntroShowCase = showInstructions,
-        dismissOnClickOutside = true,
+        dismissOnClickOutside = false,
         onShowCaseCompleted = {
             onChangeShow(false)
         },

@@ -8,6 +8,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
@@ -17,8 +18,12 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import com.nyansapoai.teaching.R
 
 @Composable
-fun LottieLoading(modifier: Modifier = Modifier) {
-    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.story_loading))
+fun AppLottieAnimations(
+    modifier: Modifier = Modifier,
+    resId: Int = R.raw.story_loading,
+    size: Dp = 400.dp
+) {
+    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(resId))
     val progress by animateLottieCompositionAsState(composition)
 
     Box(
@@ -30,7 +35,7 @@ fun LottieLoading(modifier: Modifier = Modifier) {
             composition = composition,
 //        progress = { progress },
             iterations = LottieConstants.IterateForever,
-//            modifier = Modifier.size(200.dp)
+            modifier = Modifier.size(size)
         )
 
     }
@@ -41,5 +46,5 @@ fun LottieLoading(modifier: Modifier = Modifier) {
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun LottieLoadingPreview() {
-    LottieLoading()
+    AppLottieAnimations()
 }

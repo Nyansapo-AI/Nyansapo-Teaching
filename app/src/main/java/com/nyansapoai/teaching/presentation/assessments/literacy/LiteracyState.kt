@@ -22,8 +22,8 @@ data class LiteracyState(
     val selectedChoice: String? = null,
     val options: List<String> = emptyList(),
 
-    val currentAssessmentLevel: LiteracyAssessmentLevel = LiteracyAssessmentLevel.MULTIPLE_CHOICE,
-    val currentAssessmentLevelIndex: Int = 4,
+    val currentAssessmentLevel: LiteracyAssessmentLevel = LiteracyAssessmentLevel.LETTER_RECOGNITION,
+    val currentAssessmentLevelIndex: Int = 0,
     val assessmentContent: LiteracyAssessmentData? = literacyAssessmentContent[0],
     val readingAssessmentResults: MutableList<ReadingAssessmentResult> = mutableListOf(),
     val assessmentFlow: List<LiteracyAssessmentLevel> = listOf(
@@ -34,5 +34,7 @@ data class LiteracyState(
         LiteracyAssessmentLevel.MULTIPLE_CHOICE
     ),
 
-    val multipleChoiceQuestionsResult: MutableList<MultipleChoicesResult> = mutableListOf()
+    val multipleChoiceQuestionsResult: MutableList<MultipleChoicesResult> = mutableListOf(),
+
+    val hasCompletedAssessment: Boolean = false
 )
