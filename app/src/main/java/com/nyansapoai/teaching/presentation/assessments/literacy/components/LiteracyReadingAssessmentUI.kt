@@ -59,6 +59,7 @@ fun LiteracyReadingAssessmentUI(
     showContent: Boolean,
     onShowContentChange: (Boolean) -> Unit,
     isLoading: Boolean,
+    showQuestionNumber: Boolean = true,
     audioByteArray: ByteArray?,
     onAudioByteArrayChange: (ByteArray) -> Unit,
     response: String?,
@@ -139,10 +140,12 @@ fun LiteracyReadingAssessmentUI(
             )
 
 
-            Text(
-                text = "Question ${currentIndex + 1}/${readingList.size}",
-                style = MaterialTheme.typography.titleMedium,
-            )
+            if (showQuestionNumber){
+                Text(
+                    text = "Question ${currentIndex + 1}/${readingList.size}",
+                    style = MaterialTheme.typography.titleMedium,
+                )
+            }
 
             AppLinearProgressIndicator(
                 progress = progress

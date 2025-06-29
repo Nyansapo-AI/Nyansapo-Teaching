@@ -7,4 +7,6 @@ enum class LiteracyAssessmentLevel(
     WORD("Word"),
     PARAGRAPH("Paragraph"),
     STORY("Story"),
+
+    MULTIPLE_CHOICE("Story"),
 }

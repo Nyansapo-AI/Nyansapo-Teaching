@@ -6,12 +6,14 @@ import androidx.lifecycle.viewModelScope
 import com.nyansapoai.teaching.data.remote.ai.ArtificialIntelligenceRepository
 import com.nyansapoai.teaching.data.remote.assessment.AssessmentRepository
 import com.nyansapoai.teaching.data.remote.media.MediaRepository
+import com.nyansapoai.teaching.domain.models.assessments.literacy.MultipleChoicesResult
 import com.nyansapoai.teaching.domain.models.assessments.literacy.ReadingAssessmentMetadata
 import com.nyansapoai.teaching.domain.models.assessments.literacy.ReadingAssessmentResult
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.LiteracyAssessmentLevel
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.compareResponseStrings
 import com.nyansapoai.teaching.utils.ResultStatus
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.catch
@@ -84,6 +86,28 @@ class LiteracyViewModel(
                 _state.update {
                     it.copy(
                         showInstructions = action.showInstructions
+                    )
+                }
+            }
+
+            is LiteracyAction.OnSubmitMultipleChoiceResponse -> {
+                onSubmitStoryAssessment(
+                    studentId = action.studentId,
+                    assessmentId = action.assessmentId
+                )
+            }
+            is LiteracyAction.SetSelectedChoice -> {
+                _state.update {
+                    it.copy(
+                        selectedChoice = action.selectedChoice
+                    )
+                }
+            }
+
+            is LiteracyAction.SetMultipleQuestionOptions -> {
+                _state.update {
+                    it.copy(
+                        options = action.options
                     )
                 }
             }
@@ -178,7 +202,11 @@ class LiteracyViewModel(
             // Check if audio exists
             if (_state.value.audioByteArray == null) {
                 _state.update { it.copy(error = "Please record your response before submitting.") }
+                delay(1000)
+                _state.update { it.copy(error = null) }
+
                 return@launch
+
             }
 
             // Set loading state
@@ -198,6 +226,9 @@ class LiteracyViewModel(
                                     audioByteArray = null
                                 )
                             }
+
+                            delay(1000)
+                            _state.update { it.copy(error = null) }
                         }
                         .collect { response ->
                             response.data?.let { data ->
@@ -215,6 +246,10 @@ class LiteracyViewModel(
                                             isLoading = false
                                         )
                                     }
+
+                                    delay(1000)
+                                    _state.update { it.copy(error = null) }
+
                                     return@collect
                                 }
                             }
@@ -229,10 +264,14 @@ class LiteracyViewModel(
                         }
                     } ?: run {
                         _state.update { it.copy(
-                            error = "No answer recorded.",
+                            error = "No answer recorded. Please Try Again",
                             isLoading = false,
                             audioByteArray = null
                         ) }
+
+                        delay(1000)
+                        _state.update { it.copy(error = null) }
+
                         return@launch
                     }
 
@@ -265,6 +304,9 @@ class LiteracyViewModel(
                     error = "Error processing assessment: ${e.message}",
                     isLoading = false
                 ) }
+
+                delay(1000)
+                _state.update { it.copy(error = null) }
             }
 
         }
@@ -339,6 +381,53 @@ class LiteracyViewModel(
     }
 
 
+    private fun submitMultipleChoiceQuestions(
+        assessmentId: String,
+        studentId: String,
+        multipleChoiceQuestionsResult: List<MultipleChoicesResult>,
+        onSuccess: () -> Unit
+    ) {
+        viewModelScope.launch(Dispatchers.IO) {
+            _state.update { it.copy(isLoading = true) }
+
+            val response = assessmentRepository.assessMultipleChoiceQuestions(
+                assessmentId = assessmentId,
+                studentID = studentId,
+                multipleChoiceQuestions = multipleChoiceQuestionsResult
+            )
+
+            when(response.status){
+                ResultStatus.INITIAL ,
+                ResultStatus.LOADING -> {}
+                ResultStatus.SUCCESS -> {
+                    _state.update {
+                        it.copy(
+                            message = "Assessment submitted successfully.",
+                            isLoading = false,
+                            showInstructions = false,
+                            showContent = false,
+                            currentIndex = 0,
+                            audioByteArray = null,
+                            response = null,
+                            audioUrl = null,
+                            multipleChoiceQuestionsResult = mutableListOf()
+                        )
+                    }
+
+                    onSuccess.invoke()
+                }
+                ResultStatus.ERROR -> {
+                    _state.update {
+                        it.copy(
+                            error = response.message ?: "Can not submit assessment result",
+                            isLoading = false
+                        )
+                    }
+                }
+            }
+        }
+    }
+
 
 
     fun onSubmitReadingAssessment(
@@ -350,7 +439,8 @@ class LiteracyViewModel(
             LiteracyAssessmentLevel.LETTER_RECOGNITION -> _state.value.assessmentContent?.letters ?: emptyList()
             LiteracyAssessmentLevel.WORD -> _state.value.assessmentContent?.words ?: emptyList()
             LiteracyAssessmentLevel.PARAGRAPH -> _state.value.assessmentContent?.paragraphs
-            LiteracyAssessmentLevel.STORY -> _state.value.assessmentContent?.storys
+            LiteracyAssessmentLevel.STORY -> _state.value.assessmentContent?.storys[0]?.split(".")
+            LiteracyAssessmentLevel.MULTIPLE_CHOICE -> emptyList()
         }
 
         currentAssessmentContentList?.let {
@@ -416,7 +506,139 @@ class LiteracyViewModel(
                 )
             }
         }
+    }
 
+    fun addMultipleChoiceResponse(
+        correctOptions: List<String>,
+        question: String,
+        onSuccess: () -> Unit
+    ) {
+        viewModelScope.launch {
+            if (_state.value.selectedChoice == null){
+                _state.update {
+                    it.copy(
+                        error = "Please select an answer before submitting."
+                    )
+                }
+                return@launch
+            }
+
+
+            if (_state.value.options.isEmpty()){
+                _state.update {
+                    it.copy(error = "No options available for this question." )
+                }
+                return@launch
+            }
+
+
+
+            _state.update { it.copy(isLoading = true) }
+
+            try {
+                _state.update {
+                    val new = MultipleChoicesResult(
+                        question = question,
+                        options = _state.value.options,
+                        student_answer = _state.value.selectedChoice,
+                        passed = _state.value.selectedChoice in correctOptions
+                    )
+
+                    it.copy(
+                        multipleChoiceQuestionsResult = _state.value.multipleChoiceQuestionsResult.apply { add(element = new) },
+                        isLoading = false,
+                        error = null
+                    )
+
+                }
+
+                onSuccess.invoke()
+
+            }catch (e: Exception){
+                _state.update {
+                    it.copy(
+                        error = "Error processing multiple choice response: ${e.message}",
+                        isLoading = false
+                    )
+                }
+
+                delay(1000)
+                _state.update { it.copy(error = null) }
+            }
+        }
+    }
+
+
+    fun onSubmitStoryAssessment(
+        assessmentId: String,
+        studentId: String,
+    ) {
+
+        val contentList = when(_state.value.currentAssessmentLevel){
+            LiteracyAssessmentLevel.MULTIPLE_CHOICE -> _state.value.assessmentContent?.questionsData ?: emptyList()
+            else -> emptyList()
+        }
+
+        when{
+            contentList.isEmpty() -> {
+                _state.update {
+                    it.copy(error = "Something went wrong. Try again")
+                    return
+                }
+            }
+
+            _state.value.currentIndex == contentList.size - 1 -> {
+                addMultipleChoiceResponse(
+                    correctOptions = contentList[_state.value.currentIndex].multipleChoices.correctChoices,
+                    question = contentList[_state.value.currentIndex].question,
+                    onSuccess ={
+
+                        submitMultipleChoiceQuestions(
+                            assessmentId = assessmentId,
+                            studentId = studentId,
+                            multipleChoiceQuestionsResult = _state.value.multipleChoiceQuestionsResult,
+                            onSuccess = {
+                                _state.update {
+                                    val nextIndex = if (_state.value.currentAssessmentLevelIndex < _state.value.assessmentFlow.size - 1)
+                                        _state.value.currentAssessmentLevelIndex + 1
+                                    else 0
+
+                                    val nextLevel = if (nextIndex < _state.value.assessmentFlow.size)
+                                        _state.value.assessmentFlow[nextIndex]
+                                    else
+                                        _state.value.assessmentFlow[0]
+
+                                    it.copy(
+                                        currentAssessmentLevelIndex = nextIndex,
+                                        currentAssessmentLevel = nextLevel,
+                                        currentIndex = 0,
+                                        multipleChoiceQuestionsResult = mutableListOf()
+                                    )
+                                }
+                            }
+                        )
+                    }
+                )
+
+
+            }
+
+            else -> {
+                addMultipleChoiceResponse(
+                    correctOptions = contentList[_state.value.currentIndex].multipleChoices.correctChoices,
+                    question = contentList[_state.value.currentIndex].question,
+                    onSuccess ={
+                        _state.update {
+                            it.copy(
+                                currentIndex = it.currentIndex + 1,
+                                options = emptyList(),
+                                selectedChoice = null
+                            )
+                        }
+                    }
+                )
+            }
+        }
 
     }
 

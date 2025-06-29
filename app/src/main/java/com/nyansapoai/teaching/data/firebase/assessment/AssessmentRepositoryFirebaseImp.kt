@@ -8,6 +8,7 @@ import com.google.firebase.firestore.toObject
 import com.nyansapoai.teaching.data.remote.assessment.AssessmentRepository
 import com.nyansapoai.teaching.domain.models.assessments.Assessment
 import com.nyansapoai.teaching.domain.models.assessments.AssignedStudent
+import com.nyansapoai.teaching.domain.models.assessments.literacy.MultipleChoicesResult
 import com.nyansapoai.teaching.domain.models.assessments.literacy.ReadingAssessmentResult
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.CountMatch
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyArithmeticOperation
@@ -269,6 +270,39 @@ class AssessmentRepositoryFirebaseImp(
                     "student_id" to studentID,
                     "literacy_results" to mapOf(
                         "reading_results" to readingAssessmentResults
+                    )
+                ),
+                SetOptions.merge()
+            )
+            .addOnSuccessListener {
+                deferred.complete(Results.success(data = "Assessment submitted successfully"))
+            }
+            .addOnFailureListener {
+                deferred.complete(Results.error(msg = "Failed to submit assessment: ${it.message}"))
+            }
+
+        return withContext(Dispatchers.IO) {
+            deferred.await()
+        }
+    }
+
+    override suspend fun assessMultipleChoiceQuestions(
+        assessmentId: String,
+        studentID: String,
+        multipleChoiceQuestions: List<MultipleChoicesResult>
+    ): Results<String> {
+        val deferred = CompletableDeferred<Results<String>>()
+
+        firebaseDb.collection(assessmentCollection)
+            .document(assessmentId)
+            .collection("assessments-results")
+            .document(assessmentId+"_$studentID")
+            .set(
+                mapOf(
+                    "assessmentId" to assessmentId,
+                    "student_id" to studentID,
+                    "literacy_results" to mapOf(
+                        "multiple_choice_questions" to multipleChoiceQuestions
                     )
                 ),
                 SetOptions.merge()

@@ -26,8 +26,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.nyansapoai.teaching.presentation.assessments.literacy.LiteracyAction.*
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.LiteracyAssessmentLevel
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.LiteracyReadingAssessmentUI
+import com.nyansapoai.teaching.presentation.assessments.literacy.components.MultichoiceQuestionsUI
+import com.nyansapoai.teaching.presentation.assessments.literacy.components.ReadingStoryEvaluationUI
 import com.nyansapoai.teaching.presentation.common.components.AppSimulateNavigation
 import org.koin.androidx.compose.koinViewModel
 
@@ -93,23 +96,23 @@ fun LiteracyScreen(
                             currentIndex = state.currentIndex,
                             showInstructions = state.showInstructions,
                             onShowInstructionsChange = {
-                                onAction(LiteracyAction.SetShowInstructions(it))
+                                onAction(SetShowInstructions(it))
                             },
                             title = "Letter",
                             fontSize = 120.sp,
                             showContent = state.showContent,
                             onShowContentChange = {
-                                onAction(LiteracyAction.SetShowContent(it))
+                                onAction(SetShowContent(it))
                             },
                             audioByteArray = state.audioByteArray,
                             onAudioByteArrayChange = {
-                                onAction(LiteracyAction.SetAudioByteArray(it))
+                                onAction(SetAudioByteArray(it))
                             },
                             response = state.response,
                             isLoading = state.isLoading,
                             onSubmit = {
                                 onAction(
-                                    LiteracyAction.OnSubmitResponse(
+                                    OnSubmitResponse(
                                         assessmentId = assessmentId,
                                         studentId = studentId
                                     )
@@ -126,23 +129,23 @@ fun LiteracyScreen(
                             currentIndex = state.currentIndex,
                             showInstructions = state.showInstructions,
                             onShowInstructionsChange = {
-                                onAction(LiteracyAction.SetShowInstructions(it))
+                                onAction(SetShowInstructions(it))
                             },
                             title = "Words",
                             fontSize = 80.sp,
                             showContent = state.showContent,
                             onShowContentChange = {
-                                onAction(LiteracyAction.SetShowContent(it))
+                                onAction(SetShowContent(it))
                             },
                             audioByteArray = state.audioByteArray,
                             onAudioByteArrayChange = {
-                                onAction(LiteracyAction.SetAudioByteArray(it))
+                                onAction(SetAudioByteArray(it))
                             },
                             response = state.response,
                             isLoading = state.isLoading,
                             onSubmit = {
                                 onAction(
-                                    LiteracyAction.OnSubmitResponse(
+                                    OnSubmitResponse(
                                         assessmentId = assessmentId,
                                         studentId = studentId
                                     )
@@ -159,23 +162,23 @@ fun LiteracyScreen(
                             currentIndex = state.currentIndex,
                             showInstructions = state.showInstructions,
                             onShowInstructionsChange = {
-                                onAction(LiteracyAction.SetShowInstructions(it))
+                                onAction(SetShowInstructions(it))
                             },
                             title = "Paragraphs",
                             fontSize = 40.sp,
                             showContent = state.showContent,
                             onShowContentChange = {
-                                onAction(LiteracyAction.SetShowContent(it))
+                                onAction(SetShowContent(it))
                             },
                             audioByteArray = state.audioByteArray,
                             onAudioByteArrayChange = {
-                                onAction(LiteracyAction.SetAudioByteArray(it))
+                                onAction(SetAudioByteArray(it))
                             },
                             response = state.response,
                             isLoading = state.isLoading,
                             onSubmit = {
                                 onAction(
-                                    LiteracyAction.OnSubmitResponse(
+                                    OnSubmitResponse(
                                         assessmentId = assessmentId,
                                         studentId = studentId
                                     )
@@ -187,6 +190,58 @@ fun LiteracyScreen(
 
                     LiteracyAssessmentLevel.STORY -> {
 
+                        LiteracyReadingAssessmentUI(
+                            modifier = Modifier,
+                            readingList = state.assessmentContent?.storys[0]?.split(".") ?: emptyList(),
+                            currentIndex = state.currentIndex,
+                            showInstructions = state.showInstructions,
+                            onShowInstructionsChange = {
+                                onAction(SetShowInstructions(it))
+                            },
+                            title = "Reading Story",
+                            fontSize = 40.sp,
+                            showQuestionNumber = true,
+                            showContent = state.showContent,
+                            onShowContentChange = {
+                                onAction(SetShowContent(it))
+                            },
+                            audioByteArray = state.audioByteArray,
+                            onAudioByteArrayChange = {
+                                onAction(SetAudioByteArray(it))
+                            },
+                            response = state.response,
+                            isLoading = state.isLoading,
+                            onSubmit = {
+                                onAction(
+                                    OnSubmitResponse(
+                                        assessmentId = assessmentId,
+                                        studentId = studentId
+                                    )
+                                )
+                            }
+                        )
+
+                    }
+
+                    LiteracyAssessmentLevel.MULTIPLE_CHOICE -> {
+                        MultichoiceQuestionsUI(
+                            currentIndex = state.currentIndex,
+                            story = state.assessmentContent?.storys[0] ?: "",
+                            questionsList = state.assessmentContent?.questionsData ?: emptyList(),
+                            selectedChoice = state.selectedChoice,
+                            onSelectedChoiceChange = {
+                                onAction(LiteracyAction.SetSelectedChoice(it))
+                            },
+                            onSubmitMultipleChoices = {
+                                onAction(LiteracyAction.OnSubmitMultipleChoiceResponse(
+                                    assessmentId = assessmentId,
+                                    studentId = studentId
+                                ))
+                            },
+                            onSetOptionsList = { options ->
+                                onAction(LiteracyAction.SetMultipleQuestionOptions(options))
+                            }
+                        )
                     }
                 }
             }

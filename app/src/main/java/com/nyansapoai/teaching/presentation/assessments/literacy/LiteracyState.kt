@@ -1,6 +1,7 @@
 package com.nyansapoai.teaching.presentation.assessments.literacy
 
 import com.nyansapoai.teaching.domain.models.assessments.literacy.LiteracyAssessmentData
+import com.nyansapoai.teaching.domain.models.assessments.literacy.MultipleChoicesResult
 import com.nyansapoai.teaching.domain.models.assessments.literacy.ReadingAssessmentResult
 import com.nyansapoai.teaching.domain.models.assessments.literacy.literacyAssessmentContent
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.LiteracyAssessmentLevel
@@ -18,14 +19,20 @@ data class LiteracyState(
     val error: String? = null,
     val audioUrl: String? = null,
 
-    val currentAssessmentLevel: LiteracyAssessmentLevel = LiteracyAssessmentLevel.LETTER_RECOGNITION,
-    val currentAssessmentLevelIndex: Int = 0,
+    val selectedChoice: String? = null,
+    val options: List<String> = emptyList(),
+
+    val currentAssessmentLevel: LiteracyAssessmentLevel = LiteracyAssessmentLevel.MULTIPLE_CHOICE,
+    val currentAssessmentLevelIndex: Int = 4,
     val assessmentContent: LiteracyAssessmentData? = literacyAssessmentContent[0],
     val readingAssessmentResults: MutableList<ReadingAssessmentResult> = mutableListOf(),
     val assessmentFlow: List<LiteracyAssessmentLevel> = listOf(
         LiteracyAssessmentLevel.LETTER_RECOGNITION,
         LiteracyAssessmentLevel.WORD,
         LiteracyAssessmentLevel.PARAGRAPH,
-        LiteracyAssessmentLevel.STORY
+        LiteracyAssessmentLevel.STORY,
+        LiteracyAssessmentLevel.MULTIPLE_CHOICE
     ),
+
+    val multipleChoiceQuestionsResult: MutableList<MultipleChoicesResult> = mutableListOf()
 )

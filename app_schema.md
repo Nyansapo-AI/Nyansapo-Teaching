@@ -190,7 +190,7 @@
   "reading_results": [
     { 
     
-        "type": "string", // letter/word/paragraph/
+        "type": "string", // letter/word/paragraph/story
         
         "content": "string", 
         
@@ -215,6 +215,8 @@
     "question": "string", 
     
     "student_answer": "string", 
+
+    "passed" : "boolean",
     
     "options" : [ "string"] //size 3
     

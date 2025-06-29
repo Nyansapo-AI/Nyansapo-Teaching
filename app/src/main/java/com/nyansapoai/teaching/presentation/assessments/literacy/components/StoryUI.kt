@@ -1,5 +1,6 @@
 package com.nyansapoai.teaching.presentation.assessments.literacy.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -31,6 +32,7 @@ fun StoryUI(
     Column(
         modifier = modifier
             .fillMaxSize()
+            .background(MaterialTheme.colorScheme.tertiary)
     ){
         Row(
             modifier = Modifier
@@ -60,6 +62,7 @@ fun StoryUI(
             modifier = Modifier
                 .padding(16.dp)
                 .clip(MaterialTheme.shapes.large)
+                .background(MaterialTheme.colorScheme.background)
                 .border(
                     width = 2.dp,
                     color = MaterialTheme.colorScheme.outline,

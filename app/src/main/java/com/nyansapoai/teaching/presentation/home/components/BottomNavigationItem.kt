@@ -42,7 +42,7 @@ data class BottomNavigationItem(
             BottomNavigationItem(
                 title = "Sessions",
                 icon = R.drawable.sessions,
-                screen = { MultichoiceQuestionsUI() },
+                screen = {  },
             ),
         )
     }
