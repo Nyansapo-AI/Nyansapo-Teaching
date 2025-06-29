@@ -31,7 +31,8 @@ data class LiteracyState(
         LiteracyAssessmentLevel.WORD,
         LiteracyAssessmentLevel.PARAGRAPH,
         LiteracyAssessmentLevel.STORY,
-        LiteracyAssessmentLevel.MULTIPLE_CHOICE
+        LiteracyAssessmentLevel.MULTIPLE_CHOICE,
+        LiteracyAssessmentLevel.COMPLETED
     ),
 
     val multipleChoiceQuestionsResult: MutableList<MultipleChoicesResult> = mutableListOf(),

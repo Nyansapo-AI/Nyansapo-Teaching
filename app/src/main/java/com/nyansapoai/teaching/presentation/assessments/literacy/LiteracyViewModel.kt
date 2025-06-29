@@ -202,7 +202,7 @@ class LiteracyViewModel(
             // Check if audio exists
             if (_state.value.audioByteArray == null) {
                 _state.update { it.copy(error = "Please record your response before submitting.") }
-                delay(1000)
+                delay(4000)
                 _state.update { it.copy(error = null) }
 
                 return@launch
@@ -227,7 +227,7 @@ class LiteracyViewModel(
                                 )
                             }
 
-                            delay(1000)
+                            delay(4000)
                             _state.update { it.copy(error = null) }
                         }
                         .collect { response ->
@@ -247,7 +247,7 @@ class LiteracyViewModel(
                                         )
                                     }
 
-                                    delay(1000)
+                                    delay(4000)
                                     _state.update { it.copy(error = null) }
 
                                     return@collect
@@ -269,7 +269,7 @@ class LiteracyViewModel(
                             audioByteArray = null
                         ) }
 
-                        delay(1000)
+                        delay(4000)
                         _state.update { it.copy(error = null) }
 
                         return@launch
@@ -305,7 +305,7 @@ class LiteracyViewModel(
                     isLoading = false
                 ) }
 
-                delay(1000)
+                delay(4000)
                 _state.update { it.copy(error = null) }
             }
 
@@ -441,6 +441,7 @@ class LiteracyViewModel(
             LiteracyAssessmentLevel.PARAGRAPH -> _state.value.assessmentContent?.paragraphs
             LiteracyAssessmentLevel.STORY -> _state.value.assessmentContent?.storys[0]?.split(".")
             LiteracyAssessmentLevel.MULTIPLE_CHOICE -> emptyList()
+            LiteracyAssessmentLevel.COMPLETED -> emptyList()
         }
 
         currentAssessmentContentList?.let {
@@ -562,7 +563,7 @@ class LiteracyViewModel(
                     )
                 }
 
-                delay(1000)
+                delay(4000)
                 _state.update { it.copy(error = null) }
             }
         }

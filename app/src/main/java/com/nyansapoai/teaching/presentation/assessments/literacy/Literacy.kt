@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LinearProgressIndicator
@@ -26,6 +27,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.nyansapoai.teaching.presentation.assessments.components.HasCompletedAssessment
 import com.nyansapoai.teaching.presentation.assessments.literacy.LiteracyAction.*
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.LiteracyAssessmentLevel
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.LiteracyReadingAssessmentUI
@@ -80,10 +82,18 @@ fun LiteracyScreen(
         }*/
     ) { innerPadding ->
         Box(
+            contentAlignment = Alignment.Center,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
+
+            /*
+            LazyColumn {
+                item {
+                }
+            }*/
+
             AppSimulateNavigation(
                 modifier = Modifier,
                 targetState = state.currentAssessmentLevel
@@ -230,21 +240,29 @@ fun LiteracyScreen(
                             questionsList = state.assessmentContent?.questionsData ?: emptyList(),
                             selectedChoice = state.selectedChoice,
                             onSelectedChoiceChange = {
-                                onAction(LiteracyAction.SetSelectedChoice(it))
+                                onAction(SetSelectedChoice(it))
                             },
                             onSubmitMultipleChoices = {
-                                onAction(LiteracyAction.OnSubmitMultipleChoiceResponse(
-                                    assessmentId = assessmentId,
-                                    studentId = studentId
-                                ))
+                                onAction(
+                                    OnSubmitMultipleChoiceResponse(
+                                        assessmentId = assessmentId,
+                                        studentId = studentId
+                                    )
+                                )
                             },
                             onSetOptionsList = { options ->
-                                onAction(LiteracyAction.SetMultipleQuestionOptions(options))
+                                onAction(SetMultipleQuestionOptions(options))
                             }
                         )
                     }
+
+                    LiteracyAssessmentLevel.COMPLETED -> {
+                        HasCompletedAssessment()
+                    }
                 }
             }
+
+
 
 
             AnimatedVisibility(

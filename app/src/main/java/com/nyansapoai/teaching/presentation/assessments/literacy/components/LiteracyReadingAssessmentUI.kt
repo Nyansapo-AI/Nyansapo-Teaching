@@ -123,8 +123,8 @@ fun LiteracyReadingAssessmentUI(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(40.dp),
         modifier = modifier
-            .fillMaxSize()
-            .widthIn(max = 600.dp)
+//            .fillMaxSize()
+            .widthIn(max = 700.dp)
             .padding(16.dp),
     ) {
 

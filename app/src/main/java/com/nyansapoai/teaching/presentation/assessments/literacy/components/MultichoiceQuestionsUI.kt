@@ -76,7 +76,7 @@ fun MultichoiceQuestionsUI(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(60.dp),
                 modifier = modifier
-                    .fillMaxSize()
+//                    .fillMaxSize()
                     .widthIn(max = 600.dp)
                     .padding(16.dp),
             ) {
