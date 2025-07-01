@@ -17,7 +17,6 @@ import org.koin.androidx.compose.koinViewModel
 fun TextToSpeechRoot() {
 
     val viewModel = koinViewModel<TextToSpeechViewModel>()
-//    val state by viewModel.state.collectAsStateWithLifecycle()
     val state by viewModel.uiState.collectAsStateWithLifecycle()
 
     var isPermissionsAllowed by remember { mutableStateOf(false) }

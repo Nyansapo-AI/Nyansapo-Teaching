@@ -215,6 +215,8 @@
     "question": "string", 
     
     "student_answer": "string", 
+
+    "passed" : "boolean",
     
     "options" : [ "string"] //size 3
     

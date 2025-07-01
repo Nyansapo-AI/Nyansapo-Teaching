@@ -56,6 +56,18 @@ android {
                 "AZURE_SUBSCRIPTION_KEY",
                 localProperties.getProperty("AZURE_SUBSCRIPTION_KEY")
             )
+            buildConfigField(
+                "String",
+                "AZURE_SPEECH_BASE_URL",
+                localProperties.getProperty("AZURE_SPEECH_BASE_URL")
+            )
+            buildConfigField(
+                "String",
+                "AZURE_SPEECH_SUBSCRIPTION_KEY",
+                localProperties.getProperty("AZURE_SPEECH_SUBSCRIPTION_KEY")
+            )
+
+
         }
     }
     compileOptions {

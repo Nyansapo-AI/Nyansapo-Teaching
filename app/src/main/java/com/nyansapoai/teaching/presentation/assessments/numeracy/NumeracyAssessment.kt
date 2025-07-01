@@ -1,14 +1,12 @@
 package com.nyansapoai.teaching.presentation.assessments.numeracy
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -16,14 +14,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.nyansapoai.teaching.domain.models.assessments.numeracy.CountMatch
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyOperations
-import com.nyansapoai.teaching.domain.models.assessments.numeracy.WordProblem
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.numeracyAssessmentData
 import com.nyansapoai.teaching.presentation.assessments.numeracy.components.NumeracyAssessmentLevel
 import com.nyansapoai.teaching.presentation.assessments.numeracy.components.NumeracyContent
-import com.nyansapoai.teaching.presentation.assessments.numeracy.components.NumeracyWordProblem
-import com.nyansapoai.teaching.presentation.common.animations.LottieLoading
+import com.nyansapoai.teaching.presentation.common.animations.AppLottieAnimations
 import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
 
@@ -32,12 +27,11 @@ fun NumeracyAssessmentRoot(
     modifier: Modifier = Modifier,
     assessmentId: String,
     studentId: String,
+    assessmentNo: Int
 ) {
 
     val viewModel = koinViewModel<NumeracyAssessmentViewModel>()
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val answerAssessmentState by viewModel.answerImageByteArrayState.collectAsState()
-    val workAreaState by viewModel.workAreaImageByteArrayState.collectAsState()
 
     NumeracyAssessmentScreen(
         state = state,
@@ -72,7 +66,7 @@ fun NumeracyAssessmentScreen(
         ) { loading ->
             when(loading) {
                 true -> {
-                    LottieLoading(
+                    AppLottieAnimations(
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(innerPadding)

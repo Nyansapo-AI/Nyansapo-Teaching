@@ -2,15 +2,10 @@ package com.nyansapoai.teaching.presentation.home.components
 
 import androidx.annotation.DrawableRes
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.unit.Dp
 import com.nyansapoai.teaching.R
 import com.nyansapoai.teaching.presentation.assessments.AssessmentsRoot
-import com.nyansapoai.teaching.presentation.assessments.numeracy.components.NumeracyCountAndMatch
-import com.nyansapoai.teaching.presentation.assessments.numeracy.components.NumeracyWordProblem
+import com.nyansapoai.teaching.presentation.assessments.components.HasCompletedAssessment
 import com.nyansapoai.teaching.presentation.camps.CampRoot
-import com.nyansapoai.teaching.presentation.common.textToSpeech.TextToSpeechRoot
-import com.nyansapoai.teaching.presentation.common.audio.AppAudio
-import com.nyansapoai.teaching.presentation.assessments.literacy.LiteracyScreen
 
 data class BottomNavigationItem(
     val title: String,
@@ -40,13 +35,13 @@ data class BottomNavigationItem(
             BottomNavigationItem(
                 title = "Attendance",
                 icon = R.drawable.attendance,
-                screen = { NumeracyWordProblem(onSubmit = {}) },
+                screen = { HasCompletedAssessment() },
             ),
 
             BottomNavigationItem(
                 title = "Sessions",
                 icon = R.drawable.sessions,
-                screen = { LiteracyScreen() },
+                screen = {  },
             ),
         )
     }

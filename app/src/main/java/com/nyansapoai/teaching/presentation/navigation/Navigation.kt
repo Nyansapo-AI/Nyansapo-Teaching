@@ -96,7 +96,7 @@ fun Navigation(){
 
             composable<ConductAssessmentPage> {
                 val args = it.toRoute<ConductAssessmentPage>()
-                 ConductAssessmentRoot(assessmentId = args.assessmentId, studentId = args.studentId)
+                 ConductAssessmentRoot(assessmentId = args.assessmentId, studentId = args.studentId, assessmentType = args.assessmentType, assessmentNo = args.assessmentNo)
             }
 
         }

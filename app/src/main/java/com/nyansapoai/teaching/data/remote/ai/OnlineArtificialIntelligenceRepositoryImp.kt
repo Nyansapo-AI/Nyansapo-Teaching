@@ -3,6 +3,7 @@ package com.nyansapoai.teaching.data.remote.ai
 import com.nyansapoai.teaching.data.network.ApiHelper
 import com.nyansapoai.teaching.data.network.Http
 import com.nyansapoai.teaching.domain.dto.ai.GetTextFromImageRequestDTO
+import com.nyansapoai.teaching.domain.models.ai.SpeechRecognition
 import com.nyansapoai.teaching.domain.models.ai.VisionRecognition
 import com.nyansapoai.teaching.utils.Results
 import io.ktor.client.call.body
@@ -67,6 +68,10 @@ class OnlineArtificialIntelligenceRepositoryImp(
     }
 
     override suspend fun textExtractionFromImage(request: GetTextFromImageRequestDTO): Flow<Results<VisionRecognition>> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun getTextFromAudio(audioByteArray: ByteArray): Flow<Results<SpeechRecognition>> {
         TODO("Not yet implemented")
     }
 }
