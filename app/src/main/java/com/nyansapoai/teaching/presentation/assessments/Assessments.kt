@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nyansapoai.teaching.R
@@ -118,6 +119,15 @@ fun AssessmentsScreen(
                 ResultStatus.SUCCESS -> {
                     state.assessmentListState.data?.let { assessments ->
                         if (assessments.isEmpty()){
+
+                            Text(
+                                text = "No Assessments created yet",
+                                style = MaterialTheme.typography.bodyMedium,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(16.dp)
+                            )
                             return@let
                         }
                         LazyColumn(

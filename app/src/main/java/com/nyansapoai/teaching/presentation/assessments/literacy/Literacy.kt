@@ -20,6 +20,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,10 +42,15 @@ fun LiteracyRoot(
     modifier: Modifier = Modifier,
     assessmentId: String,
     studentId: String,
+    assessmentNo: Int
 ) {
 
     val viewModel = koinViewModel<LiteracyViewModel>()
     val state by viewModel.state.collectAsStateWithLifecycle()
+
+    LaunchedEffect(true) {
+        viewModel.fetchAssessmentContent(assessmentNo = assessmentNo)
+    }
 
     LiteracyScreen(
         state = state,
@@ -142,6 +148,7 @@ fun LiteracyScreen(
                                 onAction(SetShowInstructions(it))
                             },
                             title = "Words",
+                            instructionTitle = "Read the word",
                             fontSize = 80.sp,
                             showContent = state.showContent,
                             onShowContentChange = {
@@ -175,6 +182,7 @@ fun LiteracyScreen(
                                 onAction(SetShowInstructions(it))
                             },
                             title = "Paragraphs",
+                            instructionTitle = "Read the paragraph",
                             fontSize = 40.sp,
                             showContent = state.showContent,
                             onShowContentChange = {
@@ -209,6 +217,7 @@ fun LiteracyScreen(
                                 onAction(SetShowInstructions(it))
                             },
                             title = "Reading Story",
+                            instructionTitle = "Read the sentence",
                             fontSize = 40.sp,
                             showQuestionNumber = true,
                             showContent = state.showContent,

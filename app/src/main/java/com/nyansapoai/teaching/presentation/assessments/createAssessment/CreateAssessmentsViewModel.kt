@@ -39,9 +39,15 @@ class CreateAssessmentsViewModel(
     fun onAction(action: CreateAssessmentsAction) {
         when (action) {
             is CreateAssessmentsAction.AddAssignedStudent -> {
-                _state.value = _state.value.copy(
-                    assignedStudents = _state.value.assignedStudents + action.student
-                )
+
+                _state.update { currentState ->
+                    val isDuplicate = currentState.assignedStudents.any { it.student_id == action.student.student_id }
+                    if (!isDuplicate) {
+                        currentState.copy(assignedStudents = currentState.assignedStudents + action.student)
+                    } else {
+                        currentState
+                    }
+                }
             }
             is CreateAssessmentsAction.SetAssessmentNumber -> {
                 _state.update { it.copy(assessmentNumber = action.assessmentNumber) }
@@ -107,12 +113,29 @@ class CreateAssessmentsViewModel(
                 ResultStatus.INITIAL ,
                 ResultStatus.LOADING -> {}
                 ResultStatus.SUCCESS -> {
+
+                    _state.update {
+                        it.copy(
+                            name = "",
+                            type = "",
+                            startLevel = "",
+                            assessmentNumber = 1,
+                            assignedStudents = emptyList(),
+                            isAssessmentNumberDropDownExpanded = false,
+                            isStartLevelDropDownExpanded = false,
+                            isTypeDropDownExpanded = false,
+                            isStudentListDropDownExpanded = false
+                        )
+                    }
+
+
                     snackBarHandler.showSnackBarNotification(
                         snackBarItem = SnackBarItem(
                             message = "Assessment created successfully",
                             isError = false
                         )
                     )
+
                 }
                 ResultStatus.ERROR -> {
                     snackBarHandler.showSnackBarNotification(

@@ -29,4 +29,5 @@ data class ConductAssessmentPage(
     val assessmentId: String,
     val assessmentType: String,
     val studentId: String,
+    val assessmentNo: Int
 )

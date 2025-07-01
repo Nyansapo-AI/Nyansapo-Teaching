@@ -187,7 +187,8 @@ fun IndividualAssessmentScreen(
                                                 navController.navigate(ConductAssessmentPage(
                                                     assessmentId = assessment.id,
                                                     studentId = student.student_id,
-                                                    assessmentType = assessment.type
+                                                    assessmentType = assessment.type,
+                                                    assessmentNo = assessment.assessmentNumber
                                                 ))
                                             },
                                             colors = ButtonDefaults.textButtonColors(

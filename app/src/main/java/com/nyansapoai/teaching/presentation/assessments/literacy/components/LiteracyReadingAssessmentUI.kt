@@ -60,6 +60,8 @@ fun LiteracyReadingAssessmentUI(
     onShowContentChange: (Boolean) -> Unit,
     isLoading: Boolean,
     instructionAudio: Int = R.raw.reading_assessment_default_instructions,
+    instructionTitle: String = "Read the letter",
+    instructionDescription: String = "Hold the box to record your voice saying the letter.",
     showQuestionNumber: Boolean = true,
     audioByteArray: ByteArray?,
     onAudioByteArrayChange: (ByteArray) -> Unit,
@@ -209,8 +211,8 @@ fun LiteracyReadingAssessmentUI(
                 AppShowInstructions(
                     showInstructions = showInstructions,
                     size = 420.dp,
-                    instructionsTitle = "Read the letter",
-                    instructionsDescription = "Hold the box to record your voice saying the letter.",
+                    instructionsTitle = instructionTitle,
+                    instructionsDescription = instructionDescription,
                     instructionAudio = instructionAudio,
                     content = {
                         Box(

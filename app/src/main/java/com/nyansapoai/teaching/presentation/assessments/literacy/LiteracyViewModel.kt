@@ -9,6 +9,7 @@ import com.nyansapoai.teaching.data.remote.media.MediaRepository
 import com.nyansapoai.teaching.domain.models.assessments.literacy.MultipleChoicesResult
 import com.nyansapoai.teaching.domain.models.assessments.literacy.ReadingAssessmentMetadata
 import com.nyansapoai.teaching.domain.models.assessments.literacy.ReadingAssessmentResult
+import com.nyansapoai.teaching.domain.models.assessments.literacy.literacyAssessmentContent
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.LiteracyAssessmentLevel
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.compareResponseStrings
 import com.nyansapoai.teaching.utils.ResultStatus
@@ -45,6 +46,41 @@ class LiteracyViewModel(
             started = SharingStarted.WhileSubscribed(5_000L),
             initialValue = LiteracyState()
         )
+
+
+    fun fetchAssessmentContent(assessmentNo: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            _state.update { it.copy(isLoading = true) }
+
+            _state.update {
+                it.copy(assessmentContent = literacyAssessmentContent[assessmentNo], isLoading = false)
+            }
+
+            /*
+            val response = assessmentRepository.getLiteracyAssessmentContent()
+
+            when (response.status) {
+                ResultStatus.INITIAL,
+                ResultStatus.LOADING -> {}
+                ResultStatus.SUCCESS -> {
+                    response.data?.let { data ->
+                        _state.update {
+                            it.copy(
+                                assessmentContent = data,
+                                isLoading = false,
+                                error = null
+                            )
+                        }
+                    } ?: run {
+                        _state.update { it.copy(error = "No assessment content available.", isLoading = false) }
+                    }
+                }
+                ResultStatus.ERROR -> {
+                    _state.update { it.copy(error = response.message ?: "Error fetching assessment content", isLoading = false) }
+                }
+            }*/
+        }
+    }
 
     fun onAction(action: LiteracyAction) {
         when (action) {
@@ -114,7 +150,6 @@ class LiteracyViewModel(
         }
     }
 
-
     private fun recognizeAudio(audioByteArray: ByteArray) {
         viewModelScope.launch(Dispatchers.IO) {
             artificialIntelligenceRepository.getTextFromAudio(audioByteArray = audioByteArray)
@@ -159,7 +194,6 @@ class LiteracyViewModel(
                 }
         }
     }
-
 
     private fun saveAudio(audioByteArray: ByteArray){
         viewModelScope.launch(Dispatchers.IO) {
@@ -329,7 +363,6 @@ class LiteracyViewModel(
         }
     }
 
-
     fun submitReadingAssessment(
         assessmentId: String,
         studentId: String,
@@ -428,8 +461,6 @@ class LiteracyViewModel(
         }
     }
 
-
-
     fun onSubmitReadingAssessment(
         assessmentId: String,
         studentId: String,
@@ -439,7 +470,7 @@ class LiteracyViewModel(
             LiteracyAssessmentLevel.LETTER_RECOGNITION -> _state.value.assessmentContent?.letters ?: emptyList()
             LiteracyAssessmentLevel.WORD -> _state.value.assessmentContent?.words ?: emptyList()
             LiteracyAssessmentLevel.PARAGRAPH -> _state.value.assessmentContent?.paragraphs
-            LiteracyAssessmentLevel.STORY -> _state.value.assessmentContent?.storys[0]?.split(".")
+            LiteracyAssessmentLevel.STORY -> _state.value.assessmentContent?.storys[0]?.split(".") ?: emptyList()
             LiteracyAssessmentLevel.MULTIPLE_CHOICE -> emptyList()
             LiteracyAssessmentLevel.COMPLETED -> emptyList()
         }

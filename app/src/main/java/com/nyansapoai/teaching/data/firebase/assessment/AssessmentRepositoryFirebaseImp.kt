@@ -19,8 +19,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
+import kotlin.text.set
+import kotlin.toString
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -38,7 +41,6 @@ class AssessmentRepositoryFirebaseImp(
         assessmentNumber: Int,
         assignedStudents: List<AssignedStudent>
     ): Results<Unit> {
-
         val deferred = CompletableDeferred<Results<Unit>>()
 
         val newAssessment = Assessment(
@@ -51,14 +53,40 @@ class AssessmentRepositoryFirebaseImp(
             assigned_students = assignedStudents
         )
 
+        // Create the main assessment document
         firebaseDb.collection(assessmentCollection)
             .document(newAssessment.id)
             .set(newAssessment)
             .addOnSuccessListener {
-                deferred.complete(Results.success(data = Unit))
+                // Create assessment result documents for each assigned student
+                val batch = firebaseDb.batch()
+
+                assignedStudents.forEach { student ->
+                    val resultDocRef = firebaseDb.collection(assessmentCollection)
+                        .document(newAssessment.id)
+                        .collection("assessments-results")
+                        .document("${newAssessment.id}_${student.student_id}")
+
+                    batch.set(resultDocRef, mapOf(
+                        "assessmentId" to newAssessment.id,
+                        "student_id" to student.student_id,
+                        type to null
+                    ))
+                }
+
+                // Execute batch write for all student documents
+                batch.commit()
+                    .addOnSuccessListener {
+                        deferred.complete(Results.success(data = Unit))
+                    }
+                    .addOnFailureListener { e ->
+                        Log.d("create assessment", "Error creating student result documents: ${e.message}")
+                        deferred.complete(Results.error(msg = "Failed to create student result documents: ${e.message}"))
+                    }
             }
             .addOnFailureListener { e ->
                 Log.d("create assessment", "Error creating assessment: ${e.message}")
+                deferred.complete(Results.error(msg = "Failed to create assessment: ${e.message}"))
             }
 
         return withContext(Dispatchers.IO){
@@ -257,17 +285,14 @@ class AssessmentRepositoryFirebaseImp(
         studentID: String,
         readingAssessmentResults: List<ReadingAssessmentResult>
     ): Results<String> {
-
         val deferred = CompletableDeferred<Results<String>>()
 
         firebaseDb.collection(assessmentCollection)
             .document(assessmentId)
             .collection("assessments-results")
-            .document(assessmentId+"_$studentID")
+            .document(assessmentId + "_$studentID")
             .set(
                 mapOf(
-                    "assessmentId" to assessmentId,
-                    "student_id" to studentID,
                     "literacy_results" to mapOf(
                         "reading_results" to readingAssessmentResults
                     )
@@ -318,5 +343,81 @@ class AssessmentRepositoryFirebaseImp(
             deferred.await()
         }
     }
+
+
+
+    private fun checkIfAssessmentExists(assessmentId: String): Flow<Boolean> = callbackFlow {
+        val snapshotListener = firebaseDb.collection(assessmentCollection)
+            .document(assessmentId)
+            .addSnapshotListener { snapshot, e ->
+                if (e != null) {
+                    Log.w("checkIfAssessmentExists", "Listen failed.", e)
+                    trySend(false)
+                    close(e)
+                    return@addSnapshotListener
+                }
+
+                if (snapshot != null && snapshot.exists()) {
+                    trySend(true)
+                } else {
+                    trySend(false)
+                }
+            }
+
+        awaitClose {
+            snapshotListener.remove()
+        }
+    }
+
+    private suspend fun createAssessmentResultDocument(
+        assessmentId: String,
+        studentID: String,
+        onAction: () -> Unit
+    ): Results<String> {
+        val deferred = CompletableDeferred<Results<String>>()
+
+        val documentPath = "$assessmentCollection/$assessmentId/assessments-results/${assessmentId}_$studentID"
+
+
+        when(
+            checkIfAssessmentExists(assessmentId = "${assessmentId}_$studentID").single()
+        ){
+            true -> {
+                onAction.invoke()
+            }
+            false -> {
+                firebaseDb.collection(documentPath)
+                    .document()
+                    .set(
+                        mapOf(
+                            "assessmentId" to assessmentId,
+                            "student_id" to studentID,
+
+                        )
+                    )
+                    .addOnSuccessListener {
+//                        trySend("Assessment result document created successfully")
+
+                        deferred.complete(Results.success("Assessment result document created successfully"))
+
+                        onAction.invoke()
+                    }
+                    .addOnFailureListener { e ->
+                        Log.w("createAssessmentResultDocument", "Error creating document: ${e.message}")
+//                        trySend("Failed to create assessment result document: ${e.message}")
+
+                        deferred.complete(Results.error("Failed to created assessment"))
+                    }
+            }
+        }
+
+
+        return withContext(Dispatchers.IO) {
+            deferred.await()
+        }
+    }
+
+
+
 
 }

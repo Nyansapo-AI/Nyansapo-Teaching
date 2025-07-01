@@ -11,7 +11,8 @@ import org.koin.androidx.compose.koinViewModel
 fun ConductAssessmentRoot(
     assessmentId: String,
     assessmentType: String,
-    studentId: String
+    studentId: String,
+    assessmentNo: Int
 ) {
 
     val viewModel = koinViewModel<ConductAssessmentViewModel>()
@@ -22,7 +23,8 @@ fun ConductAssessmentRoot(
         onAction = viewModel::onAction,
         assessmentId = assessmentId,
         studentId = studentId,
-        assessmentType = assessmentType
+        assessmentType = assessmentType,
+        assessmentNo = assessmentNo
     )
 
 }
@@ -32,6 +34,7 @@ fun ConductAssessmentScreen(
     assessmentId: String,
     studentId: String,
     assessmentType: String,
+    assessmentNo: Int,
     state: ConductAssessmentState,
     onAction: (ConductAssessmentAction) -> Unit,
 ) {
@@ -40,12 +43,14 @@ fun ConductAssessmentScreen(
             LiteracyRoot(
                 assessmentId = assessmentId,
                 studentId = studentId,
+                assessmentNo = assessmentNo
             )
         }
         "Numeracy" -> {
             NumeracyAssessmentRoot(
                 assessmentId = assessmentId,
                 studentId = studentId,
+                assessmentNo = assessmentNo
             )
         }
         else -> {
