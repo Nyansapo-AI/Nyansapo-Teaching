@@ -55,30 +55,6 @@ class LiteracyViewModel(
             _state.update {
                 it.copy(assessmentContent = literacyAssessmentContent[assessmentNo], isLoading = false)
             }
-
-            /*
-            val response = assessmentRepository.getLiteracyAssessmentContent()
-
-            when (response.status) {
-                ResultStatus.INITIAL,
-                ResultStatus.LOADING -> {}
-                ResultStatus.SUCCESS -> {
-                    response.data?.let { data ->
-                        _state.update {
-                            it.copy(
-                                assessmentContent = data,
-                                isLoading = false,
-                                error = null
-                            )
-                        }
-                    } ?: run {
-                        _state.update { it.copy(error = "No assessment content available.", isLoading = false) }
-                    }
-                }
-                ResultStatus.ERROR -> {
-                    _state.update { it.copy(error = response.message ?: "Error fetching assessment content", isLoading = false) }
-                }
-            }*/
         }
     }
 

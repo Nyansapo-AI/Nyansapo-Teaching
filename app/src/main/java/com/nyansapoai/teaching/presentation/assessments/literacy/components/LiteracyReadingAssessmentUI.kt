@@ -1,5 +1,6 @@
 package com.nyansapoai.teaching.presentation.assessments.literacy.components
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -13,7 +14,11 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -22,6 +27,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -35,11 +41,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.DialogProperties
 import com.nyansapoai.teaching.R
+import com.nyansapoai.teaching.navController
 import com.nyansapoai.teaching.presentation.common.audio.play.AudioPlayer
 import com.nyansapoai.teaching.presentation.common.audio.record.AppAudioRecorder
+import com.nyansapoai.teaching.presentation.common.components.AppButton
 import com.nyansapoai.teaching.presentation.common.components.AppLinearProgressIndicator
 import com.nyansapoai.teaching.presentation.common.components.AppShowInstructions
+import com.nyansapoai.teaching.presentation.common.permissions.RequestAppPermissions
 import kotlinx.coroutines.delay
 import org.koin.compose.koinInject
 import java.io.File
@@ -47,6 +57,7 @@ import java.io.File
 
 private var audioFile: File? = null
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LiteracyReadingAssessmentUI(
     modifier: Modifier = Modifier,
@@ -68,6 +79,85 @@ fun LiteracyReadingAssessmentUI(
     response: String?,
     onSubmit: () -> Unit,
 ) {
+
+    var isButtonClicked by remember { mutableStateOf(false) }
+
+    var allPermissionsAllowed by remember { mutableStateOf(false) }
+
+
+    RequestAppPermissions(
+        permissionsArray = arrayOf(
+            android.Manifest.permission.RECORD_AUDIO,
+            android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            android.Manifest.permission.READ_EXTERNAL_STORAGE
+        ),
+        onSuccess = {
+            allPermissionsAllowed = true
+        },
+        onFailure = {
+//            allPermissionsAllowed = false
+            navController.popBackStack()
+            return@RequestAppPermissions
+        },
+        content = {action ->
+            BasicAlertDialog(
+                onDismissRequest = {
+                    isButtonClicked = false
+                },
+                properties = DialogProperties(),
+                content = {
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(20.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(MaterialTheme.colorScheme.background)
+                            .padding(16.dp)
+                    ) {
+                        Text(
+                            text = "Allow The Following Permissions Requests to Do the Assessment.",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Center,
+                        )
+
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                        ) {
+                            Text(
+                                text = "Record Audio",
+                                style = MaterialTheme.typography.bodyMedium,
+                            )
+                            Text(
+                                text = "Read and Write Storage",
+                                style = MaterialTheme.typography.bodyMedium,
+                            )
+                        }
+
+                        AppButton(
+                            onClick = {
+                                action.invoke()
+                                isButtonClicked = true
+                            }
+                        ) {
+                            Text(
+                                text = "Allow Permissions",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+
+                    }
+
+                })
+
+        }
+    )
+
+
+
 
 
     val context = LocalContext.current
@@ -120,154 +210,156 @@ fun LiteracyReadingAssessmentUI(
     }
 
 
-
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(40.dp),
-        modifier = modifier
-//            .fillMaxSize()
-            .widthIn(max = 700.dp)
-            .padding(16.dp),
+    AnimatedVisibility(
+        visible = allPermissionsAllowed
     ) {
-
         Column(
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            modifier = Modifier
-                .fillMaxWidth()
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(40.dp),
+            modifier = modifier
+                .widthIn(max = 700.dp)
+                .padding(16.dp),
         ) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.headlineSmall,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold
-            )
 
-
-            if (showQuestionNumber){
-                Text(
-                    text = "Question ${currentIndex + 1}/${readingList.size}",
-                    style = MaterialTheme.typography.titleMedium,
-                )
-            }
-
-            AppLinearProgressIndicator(
-                progress = progress
-            )
-
-            TextButton(
-                colors = ButtonDefaults.textButtonColors(
-                    containerColor = MaterialTheme.colorScheme.tertiary,
-                    contentColor = MaterialTheme.colorScheme.onTertiary
-                ),
-                onClick = {
-                    onShowInstructionsChange(!showInstructions)
-
-                    audioFile?.let {
-                        audioPlayer.playFile(it)
-                    } ?: run {
-                        println("Audio file not available")
-                        // Handle case where audio file is not available
-                    }
-                }
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    modifier = Modifier,
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.play),
-                        contentDescription = "click for instructions"
-                    )
-
-                    Text(
-                        text = "Instructions",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Medium
-                    )
-                }
-            }
-
-        }
-
-        Box(
-            contentAlignment = Alignment.TopCenter,
-            modifier = Modifier
-                .weight(1f)
-        ) {
             Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(20.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
                 modifier = Modifier
+                    .fillMaxWidth()
             ) {
-
-                val boxColor by animateColorAsState(
-                    if (!showContent) MaterialTheme.colorScheme.onTertiary else MaterialTheme.colorScheme.tertiary,
-                    label = "boxColorAnimation"
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold
                 )
 
 
+                if (showQuestionNumber){
+                    Text(
+                        text = "Question ${currentIndex + 1}/${readingList.size}",
+                        style = MaterialTheme.typography.titleMedium,
+                    )
+                }
 
-                AppShowInstructions(
-                    showInstructions = showInstructions,
-                    size = 420.dp,
-                    instructionsTitle = instructionTitle,
-                    instructionsDescription = instructionDescription,
-                    instructionAudio = instructionAudio,
-                    content = {
-                        Box(
-                            contentAlignment = Alignment.Center,
-                            modifier = Modifier
-                                .heightIn(min = 200.dp, max = 640.dp)
-                                .fillMaxWidth()
-                                .clip(RoundedCornerShape(5))
-                                .background(boxColor)
-                                .pointerInput(Unit) {
-                                    detectTapGestures(
-                                        onTap = {
-                                            onShowContentChange(false)
-                                        },
-                                        onPress = {
-                                            onShowContentChange(true)
-                                            tryAwaitRelease()
-                                            onShowContentChange(false)
-                                        }
-                                    )
-                                }
-                        ) {
-                            Text(
-                                text = if (showContent) readingList[currentIndex] else "",
-                                style = MaterialTheme.typography.headlineLarge,
-                                color = MaterialTheme.colorScheme.secondary,
-                                textAlign = TextAlign.Center,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = fontSize,
-                                modifier = Modifier
-                                    .padding(16.dp)
-                                    .align(Alignment.Center)
-                            )
+                AppLinearProgressIndicator(
+                    progress = progress
+                )
+
+                TextButton(
+                    colors = ButtonDefaults.textButtonColors(
+                        containerColor = MaterialTheme.colorScheme.tertiary,
+                        contentColor = MaterialTheme.colorScheme.onTertiary
+                    ),
+                    onClick = {
+                        onShowInstructionsChange(!showInstructions)
+
+                        audioFile?.let {
+                            audioPlayer.playFile(it)
+                        } ?: run {
+                            println("Audio file not available")
+                            // Handle case where audio file is not available
                         }
-
                     }
-                )
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        modifier = Modifier,
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.play),
+                            contentDescription = "click for instructions"
+                        )
+
+                        Text(
+                            text = "Instructions",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                }
 
             }
+
+            Box(
+                contentAlignment = Alignment.TopCenter,
+                modifier = Modifier
+                    .weight(1f)
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(20.dp),
+                    modifier = Modifier
+                ) {
+
+                    val boxColor by animateColorAsState(
+                        if (!showContent) MaterialTheme.colorScheme.onTertiary else MaterialTheme.colorScheme.tertiary,
+                        label = "boxColorAnimation"
+                    )
+
+                    AppShowInstructions(
+                        showInstructions = showInstructions,
+                        size = 420.dp,
+                        instructionsTitle = instructionTitle,
+                        instructionsDescription = instructionDescription,
+                        instructionAudio = instructionAudio,
+                        content = {
+                            Box(
+                                contentAlignment = Alignment.Center,
+                                modifier = Modifier
+                                    .heightIn(min = 200.dp, max = 640.dp)
+                                    .fillMaxWidth()
+                                    .clip(RoundedCornerShape(5))
+                                    .background(boxColor)
+                                    .pointerInput(Unit) {
+                                        detectTapGestures(
+                                            onTap = {
+                                                onShowContentChange(false)
+                                            },
+                                            onPress = {
+                                                onShowContentChange(true)
+                                                tryAwaitRelease()
+                                                onShowContentChange(false)
+                                            }
+                                        )
+                                    }
+                            ) {
+                                Text(
+                                    text = if (showContent) readingList[currentIndex] else "",
+                                    style = MaterialTheme.typography.headlineLarge,
+                                    color = MaterialTheme.colorScheme.secondary,
+                                    textAlign = TextAlign.Center,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = fontSize,
+                                    modifier = Modifier
+                                        .padding(16.dp)
+                                        .align(Alignment.Center)
+                                )
+                            }
+
+                        }
+                    )
+
+                }
+            }
+
+
+            /*
+            AppButton(
+                enabled = audioByteArray != null,
+                onClick = onSubmit,
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                Text(
+                    text = "Submit",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+            }*/
         }
 
-
-        /*
-        AppButton(
-            enabled = audioByteArray != null,
-            onClick = onSubmit,
-            modifier = Modifier
-                .fillMaxWidth()
-        ) {
-            Text(
-                text = "Submit",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
-            )
-        }*/
     }
+
 
 }

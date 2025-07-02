@@ -9,6 +9,7 @@ import com.nyansapoai.teaching.data.remote.assessment.AssessmentRepository
 import com.nyansapoai.teaching.domain.models.assessments.Assessment
 import com.nyansapoai.teaching.domain.models.assessments.AssignedStudent
 import com.nyansapoai.teaching.domain.models.assessments.literacy.MultipleChoicesResult
+import com.nyansapoai.teaching.domain.models.assessments.literacy.ReadingAssessmentMetadata
 import com.nyansapoai.teaching.domain.models.assessments.literacy.ReadingAssessmentResult
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.CountMatch
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyArithmeticOperation
@@ -280,6 +281,7 @@ class AssessmentRepositoryFirebaseImp(
         }
     }
 
+    /*
     override suspend fun assessReadingAssessment(
         assessmentId: String,
         studentID: String,
@@ -299,6 +301,62 @@ class AssessmentRepositoryFirebaseImp(
                 ),
                 SetOptions.merge()
             )
+            .addOnSuccessListener {
+                deferred.complete(Results.success(data = "Assessment submitted successfully"))
+            }
+            .addOnFailureListener {
+                deferred.complete(Results.error(msg = "Failed to submit assessment: ${it.message}"))
+            }
+
+        return withContext(Dispatchers.IO) {
+            deferred.await()
+        }
+    }*/
+
+    override suspend fun assessReadingAssessment(
+        assessmentId: String,
+        studentID: String,
+        readingAssessmentResults: List<ReadingAssessmentResult>
+    ): Results<String> {
+        val deferred = CompletableDeferred<Results<String>>()
+        val documentRef = firebaseDb.collection(assessmentCollection)
+            .document(assessmentId)
+            .collection("assessments-results")
+            .document("${assessmentId}_$studentID")
+
+        firebaseDb.runTransaction { transaction ->
+            val snapshot = transaction.get(documentRef)
+            val existingResults = mutableListOf<ReadingAssessmentResult>()
+
+            // Extract existing reading results if they exist
+            if (snapshot.exists()) {
+                val literacyResults = snapshot.get("literacy_results") as? Map<String, Any>
+                val readingResults = literacyResults?.get("reading_results") as? List<Map<String, Any>>
+
+                readingResults?.forEach { resultMap ->
+                    try {
+                        val result = convertMapToReadingAssessmentResult(resultMap)
+                        existingResults.add(result)
+                    } catch (e: Exception) {
+                        // Handle conversion error if needed
+                    }
+                }
+            }
+
+            // Add new results to existing ones
+            existingResults.addAll(readingAssessmentResults)
+
+            // Update the document with merged results
+            transaction.set(
+                documentRef,
+                mapOf(
+                    "literacy_results" to mapOf(
+                        "reading_results" to existingResults
+                    )
+                ),
+                SetOptions.merge()
+            )
+        }
             .addOnSuccessListener {
                 deferred.complete(Results.success(data = "Assessment submitted successfully"))
             }
@@ -415,6 +473,43 @@ class AssessmentRepositoryFirebaseImp(
         return withContext(Dispatchers.IO) {
             deferred.await()
         }
+    }
+
+    private fun convertMapToReadingAssessmentResult(map: Map<String, Any>): ReadingAssessmentResult {
+        val type = map["type"] as? String ?: ""
+        val content = map["content"] as? String ?: ""
+
+        // Handle metadata conversion
+        val metadata = (map["metadata"] as? Map<String, Any>)?.let { metadataMap ->
+            ReadingAssessmentMetadata(
+                audio_url = metadataMap["audio_url"] as? String ?: "",
+                passed = metadataMap["passed"] as? Boolean ?: false,
+                transcript = metadataMap["transcript"] as? String ?: ""
+            )
+        }
+
+        return ReadingAssessmentResult(
+            type = type,
+            content = content,
+            metadata = metadata
+        )
+    }
+
+    private fun convertReadingAssessmentResultToMap(result: ReadingAssessmentResult): Map<String, Any> {
+        val map = mutableMapOf<String, Any>(
+            "type" to result.type,
+            "content" to result.content
+        )
+
+        result.metadata?.let { metadata ->
+            map["metadata"] = mapOf(
+                "audio_url" to metadata.audio_url,
+                "passed" to metadata.passed,
+                "transcript" to metadata.transcript
+            )
+        }
+
+        return map
     }
 
 
