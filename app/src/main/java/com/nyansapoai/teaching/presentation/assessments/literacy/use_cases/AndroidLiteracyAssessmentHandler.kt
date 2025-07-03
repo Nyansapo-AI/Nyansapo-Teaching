@@ -26,7 +26,6 @@ class AndroidLiteracyAssessmentHandler(
     ): Results<ReadingAssessmentResult> {
         return withContext(Dispatchers.IO) {
             try {
-
                 /**
                  * Save the audio file to the media repository.
                  * This will return a URL for the saved audio file.
@@ -35,7 +34,6 @@ class AndroidLiteracyAssessmentHandler(
                 val audioUrl = audioUrlResult.data ?: return@withContext Results.error(
                     msg = "Failed to save audio file"
                 )
-
                 /**
                  * Transcribe the audio using the AI service.
                  */

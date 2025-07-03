@@ -26,6 +26,8 @@ navigationCompose = "2.9.0"
     googleGmsGoogleServices = "4.4.2"
     firebaseAnalytics = "22.4.0"
 navigationTesting = "2.9.0"
+roomRuntime = "2.7.2"
+workRuntimeKtx = "2.10.2"
 
 
 
@@ -36,6 +38,8 @@ androidx-media3-exoplayer-dash = { module = "androidx.media3:media3-exoplayer-da
 androidx-media3-ui = { module = "androidx.media3:media3-ui", version.ref = "media3Exoplayer" }
 androidx-media3-ui-compose = { module = "androidx.media3:media3-ui-compose", version.ref = "media3Exoplayer" }
 androidx-navigation-testing = { module = "androidx.navigation:navigation-testing", version.ref = "navigationTesting" }
+androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomRuntime" }
+androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntimeKtx" }
 client-sdk = { module = "com.microsoft.cognitiveservices.speech:client-sdk", version.ref = "clientSdk" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coilCompose" }
 firebase-auth = { module = "com.google.firebase:firebase-auth" }
