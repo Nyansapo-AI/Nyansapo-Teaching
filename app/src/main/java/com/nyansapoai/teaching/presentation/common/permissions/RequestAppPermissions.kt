@@ -59,21 +59,22 @@ fun RequestAppPermissions(
     }
 
 
-    LaunchedEffect(key1 = isButtonClicked) {
+    LaunchedEffect(key1 = true) {
         if (allPermissionsGranted) {
             onSuccess.invoke()
         } else if (!isRequestingPermissions) {
             isRequestingPermissions = true
-//            requestPermissionLauncher.launch(permissionsArray)
         }
     }
 
     AnimatedVisibility(
-        visible = isRequestingPermissions
+        visible = !allPermissionsGranted
     ) {
         Box(modifier = modifier) {
             content?.invoke(
-                { requestPermissionLauncher.launch(input = permissionsArray) }
+                {
+                    requestPermissionLauncher.launch(input = permissionsArray)
+                }
             )
         }
     }

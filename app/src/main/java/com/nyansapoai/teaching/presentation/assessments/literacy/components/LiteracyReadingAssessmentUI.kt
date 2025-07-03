@@ -1,5 +1,6 @@
 package com.nyansapoai.teaching.presentation.assessments.literacy.components
 
+import android.os.Build
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
@@ -86,11 +87,23 @@ fun LiteracyReadingAssessmentUI(
 
 
     RequestAppPermissions(
-        permissionsArray = arrayOf(
-            android.Manifest.permission.RECORD_AUDIO,
-            android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
-            android.Manifest.permission.READ_EXTERNAL_STORAGE
-        ),
+        permissionsArray = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+            /*
+            For Android versions below Q, we need to request both READ_EXTERNAL_STORAGE and WRITE_EXTERNAL_STORAGE
+             */
+            arrayOf(
+                android.Manifest.permission.RECORD_AUDIO,
+                android.Manifest.permission.READ_MEDIA_AUDIO,
+                android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+            )
+        } else {
+            /*
+            For Android Q and above, we only need to request RECORD_AUDIO
+             */
+            arrayOf(
+                android.Manifest.permission.RECORD_AUDIO,
+            )
+        },
         onSuccess = {
             allPermissionsAllowed = true
         },
