@@ -1,0 +1,36 @@
+CREATE TABLE PendingReadingResult (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    assessmentId TEXT NOT NULL,
+    studentId TEXT NOT NULL,
+    type TEXT NOT NULL,
+    content TEXT NOT NULL,
+    audioUrl TEXT NOT NULL,
+    transcript TEXT NOT NULL,
+    passed INTEGER NOT NULL,
+    timestamp INTEGER NOT NULL,
+    isPending INTEGER NOT NULL
+);
+
+getPendingResults:
+SELECT * FROM PendingReadingResult WHERE isPending = 1;
+
+getPendingResultsByAssessmentandStudent:
+SELECT * FROM PendingReadingResult
+WHERE isPending = 1 AND assessmentId = ? AND studentId = ?;
+
+insertPendingResult:
+INSERT INTO PendingReadingResult( assessmentId, studentId, type, content, audioUrl, transcript, passed, timestamp, isPending)
+VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+markResultsAsSubmitted:
+UPDATE PendingReadingResult
+SET isPending = 0
+WHERE assessmentId = ? AND studentId = ?;
+
+deleteSubmittedResults:
+DELETE FROM PendingReadingResult
+WHERE isPending = 0 AND assessmentId = ? AND studentId = ?;
+
+cleanOldSubmittedResults:
+DELETE FROM PendingReadingResult
+WHERE isPending = 0 AND timestamp < ?;

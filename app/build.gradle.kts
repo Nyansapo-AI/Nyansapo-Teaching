@@ -8,6 +8,8 @@ plugins {
 
     kotlin("plugin.serialization") version "2.1.10"
     alias(libs.plugins.google.gms.google.services)
+
+    id("app.cash.sqldelight") version "2.1.0"
 }
 
 
@@ -80,6 +82,15 @@ android {
     buildFeatures {
         compose = true
         buildConfig = true
+    }
+}
+
+
+sqldelight {
+    databases {
+        create("Database") {
+            packageName.set("com.nyansapoai.teaching")
+        }
     }
 }
 
@@ -159,4 +170,10 @@ dependencies {
     implementation(libs.androidx.work.runtime.ktx)
 
     implementation(libs.androidx.room.runtime)
+
+    //SQLDelight
+    implementation(libs.android.driver)
+    implementation(libs.sqlDelight.coroutine)
+
+
 }

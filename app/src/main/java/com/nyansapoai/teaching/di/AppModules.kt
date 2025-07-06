@@ -3,9 +3,11 @@ package com.nyansapoai.teaching.di
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
+import com.nyansapoai.teaching.Database
 import com.nyansapoai.teaching.data.azure.ai.AzureArtificialIntelligenceRepositoryImp
 import com.nyansapoai.teaching.data.firebase.assessment.AssessmentRepositoryFirebaseImp
 import com.nyansapoai.teaching.data.firebase.media.FirebaseMediaRepositoryImpl
+import com.nyansapoai.teaching.data.local.LocalDatabaseDriverFactory
 import com.nyansapoai.teaching.data.network.ApiHelper
 import com.nyansapoai.teaching.data.remote.ai.ArtificialIntelligenceRepository
 import com.nyansapoai.teaching.data.remote.ai.OnlineArtificialIntelligenceRepositoryImp
@@ -49,6 +51,7 @@ val appModules = module {
     viewModelOf(::NumeracyAssessmentViewModel)
     viewModelOf(::TextToSpeechViewModel)
     viewModelOf(::LiteracyViewModel)
+
 
 
     single<FirebaseAuth> {
@@ -111,6 +114,14 @@ val appModules = module {
         AndroidAudioPlayer(
             context = get()
         )
+    }
+
+    single<Database> {
+        Database(driver = get<LocalDatabaseDriverFactory>().create())
+    }
+
+    single<LocalDatabaseDriverFactory> {
+        LocalDatabaseDriverFactory(context = get())
     }
 
 }

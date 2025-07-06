@@ -223,155 +223,150 @@ fun LiteracyReadingAssessmentUI(
     }
 
 
-    AnimatedVisibility(
-        visible = allPermissionsAllowed
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(40.dp),
+        modifier = modifier
+            .widthIn(max = 700.dp)
+            .padding(16.dp),
     ) {
+
         Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(40.dp),
-            modifier = modifier
-                .widthIn(max = 700.dp)
-                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            modifier = Modifier
+                .fillMaxWidth()
         ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.headlineSmall,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold
+            )
 
-            Column(
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-            ) {
+
+            if (showQuestionNumber){
                 Text(
-                    text = title,
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold
-                )
-
-
-                if (showQuestionNumber){
-                    Text(
-                        text = "Question ${currentIndex + 1}/${readingList.size}",
-                        style = MaterialTheme.typography.titleMedium,
-                    )
-                }
-
-                AppLinearProgressIndicator(
-                    progress = progress
-                )
-
-                TextButton(
-                    colors = ButtonDefaults.textButtonColors(
-                        containerColor = MaterialTheme.colorScheme.tertiary,
-                        contentColor = MaterialTheme.colorScheme.onTertiary
-                    ),
-                    onClick = {
-                        onShowInstructionsChange(!showInstructions)
-
-                        audioFile?.let {
-                            audioPlayer.playFile(it)
-                        } ?: run {
-                            println("Audio file not available")
-                            // Handle case where audio file is not available
-                        }
-                    }
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
-                        modifier = Modifier,
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.play),
-                            contentDescription = "click for instructions"
-                        )
-
-                        Text(
-                            text = "Instructions",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Medium
-                        )
-                    }
-                }
-
-            }
-
-            Box(
-                contentAlignment = Alignment.TopCenter,
-                modifier = Modifier
-                    .weight(1f)
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(20.dp),
-                    modifier = Modifier
-                ) {
-
-                    val boxColor by animateColorAsState(
-                        if (!showContent) MaterialTheme.colorScheme.onTertiary else MaterialTheme.colorScheme.tertiary,
-                        label = "boxColorAnimation"
-                    )
-
-                    AppShowInstructions(
-                        showInstructions = showInstructions,
-                        size = 420.dp,
-                        instructionsTitle = instructionTitle,
-                        instructionsDescription = instructionDescription,
-                        instructionAudio = instructionAudio,
-                        content = {
-                            Box(
-                                contentAlignment = Alignment.Center,
-                                modifier = Modifier
-                                    .heightIn(min = 200.dp, max = 640.dp)
-                                    .fillMaxWidth()
-                                    .clip(RoundedCornerShape(5))
-                                    .background(boxColor)
-                                    .pointerInput(Unit) {
-                                        detectTapGestures(
-                                            onTap = {
-                                                onShowContentChange(false)
-                                            },
-                                            onPress = {
-                                                onShowContentChange(true)
-                                                tryAwaitRelease()
-                                                onShowContentChange(false)
-                                            }
-                                        )
-                                    }
-                            ) {
-                                Text(
-                                    text = if (showContent) readingList[currentIndex] else "",
-                                    style = MaterialTheme.typography.headlineLarge,
-                                    color = MaterialTheme.colorScheme.secondary,
-                                    textAlign = TextAlign.Center,
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = fontSize,
-                                    modifier = Modifier
-                                        .padding(16.dp)
-                                        .align(Alignment.Center)
-                                )
-                            }
-
-                        }
-                    )
-
-                }
-            }
-
-
-            /*
-            AppButton(
-                enabled = audioByteArray != null,
-                onClick = onSubmit,
-                modifier = Modifier
-                    .fillMaxWidth()
-            ) {
-                Text(
-                    text = "Submit",
+                    text = "Question ${currentIndex + 1}/${readingList.size}",
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
                 )
-            }*/
+            }
+
+            AppLinearProgressIndicator(
+                progress = progress
+            )
+
+            TextButton(
+                colors = ButtonDefaults.textButtonColors(
+                    containerColor = MaterialTheme.colorScheme.tertiary,
+                    contentColor = MaterialTheme.colorScheme.onTertiary
+                ),
+                onClick = {
+                    onShowInstructionsChange(!showInstructions)
+
+                    audioFile?.let {
+                        audioPlayer.playFile(it)
+                    } ?: run {
+                        println("Audio file not available")
+                        // Handle case where audio file is not available
+                    }
+                }
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    modifier = Modifier,
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.play),
+                        contentDescription = "click for instructions"
+                    )
+
+                    Text(
+                        text = "Instructions",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+            }
+
         }
 
+        Box(
+            contentAlignment = Alignment.TopCenter,
+            modifier = Modifier
+                .weight(1f)
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(20.dp),
+                modifier = Modifier
+            ) {
+
+                val boxColor by animateColorAsState(
+                    if (!showContent) MaterialTheme.colorScheme.onTertiary else MaterialTheme.colorScheme.tertiary,
+                    label = "boxColorAnimation"
+                )
+
+                AppShowInstructions(
+                    showInstructions = showInstructions && allPermissionsAllowed,
+                    size = 420.dp,
+                    instructionsTitle = instructionTitle,
+                    instructionsDescription = instructionDescription,
+                    instructionAudio = instructionAudio,
+                    content = {
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier
+                                .heightIn(min = 200.dp, max = 640.dp)
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(5))
+                                .background(boxColor)
+                                .pointerInput(Unit) {
+                                    detectTapGestures(
+                                        onTap = {
+                                            onShowContentChange(false)
+                                        },
+                                        onPress = {
+                                            onShowContentChange(true)
+                                            tryAwaitRelease()
+                                            onShowContentChange(false)
+                                        }
+                                    )
+                                }
+                        ) {
+                            Text(
+                                text = if (showContent) readingList[currentIndex] else "",
+                                style = MaterialTheme.typography.headlineLarge,
+                                color = MaterialTheme.colorScheme.secondary,
+                                textAlign = TextAlign.Center,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = fontSize,
+                                modifier = Modifier
+                                    .padding(16.dp)
+                                    .align(Alignment.Center)
+                            )
+                        }
+
+                    }
+                )
+
+            }
+        }
+
+
+        /*
+        AppButton(
+            enabled = audioByteArray != null,
+            onClick = onSubmit,
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            Text(
+                text = "Submit",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
+        }*/
     }
 
 
