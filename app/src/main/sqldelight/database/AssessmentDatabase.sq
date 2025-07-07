@@ -34,3 +34,35 @@ WHERE isPending = 0 AND assessmentId = ? AND studentId = ?;
 cleanOldSubmittedResults:
 DELETE FROM PendingReadingResult
 WHERE isPending = 0 AND timestamp < ?;
+
+CREATE TABLE PendingMultipleChoicesResultEntity(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    assessmentId TEXT NOT NULL,
+    studentId TEXT NOT NULL,
+    question TEXT NOT NULL,
+    options TEXT NOT NULL,
+    studentAnswer TEXT NOT NULL,
+    passed INTEGER NOT NULL,
+    timestamp INTEGER NOT NULL,
+    isPending INTEGER NOT NULL
+);
+
+insertPendingMultipleChoicesResult:
+INSERT INTO PendingMultipleChoicesResultEntity(assessmentId, studentId, question, options, studentAnswer, passed, timestamp, isPending)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+
+getPendingMultipleChoicesResults:
+SELECT * FROM PendingMultipleChoicesResultEntity WHERE isPending = 1;
+
+getPendingMultipleChoicesResultsByAssessmentandStudent:
+SELECT * FROM PendingMultipleChoicesResultEntity
+WHERE isPending = 1 AND assessmentId = ? AND studentId = ?;
+
+markMultipleChoicesResultsAsSubmitted:
+UPDATE PendingMultipleChoicesResultEntity
+SET isPending = 0
+WHERE assessmentId = ? AND studentId = ?;
+
+clearSubmittedMultipleChoicesResults:
+DELETE FROM PendingMultipleChoicesResultEntity
+WHERE isPending = 0 AND assessmentId = ? AND studentId = ?;
