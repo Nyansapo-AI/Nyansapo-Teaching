@@ -61,4 +61,6 @@ interface AssessmentRepository {
         studentID: String,
         multipleChoiceQuestions: List<MultipleChoicesResult>
     ): Results<String>
+
+    suspend fun markLiteracyAssessmentAsComplete(assessmentId: String, studentId: String): Results<String>
 }

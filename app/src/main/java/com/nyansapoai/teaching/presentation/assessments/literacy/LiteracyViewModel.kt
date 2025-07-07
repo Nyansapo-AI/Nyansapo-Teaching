@@ -1,8 +1,17 @@
 package com.nyansapoai.teaching.presentation.assessments.literacy
 
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.work.Constraints
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.ExistingWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.workDataOf
 import com.nyansapoai.teaching.data.remote.ai.ArtificialIntelligenceRepository
 import com.nyansapoai.teaching.data.remote.assessment.AssessmentRepository
 import com.nyansapoai.teaching.data.remote.media.MediaRepository
@@ -12,6 +21,8 @@ import com.nyansapoai.teaching.domain.models.assessments.literacy.ReadingAssessm
 import com.nyansapoai.teaching.domain.models.assessments.literacy.literacyAssessmentContent
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.LiteracyAssessmentLevel
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.compareResponseStrings
+import com.nyansapoai.teaching.presentation.assessments.literacy.workers.EvaluateReadingAssessmentWorker
+import com.nyansapoai.teaching.presentation.assessments.literacy.workers.SubmitReadingAssessmentWorker
 import com.nyansapoai.teaching.utils.ResultStatus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -22,13 +33,15 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
 import kotlin.collections.get
 import kotlin.text.compareTo
 
 class LiteracyViewModel(
     private val assessmentRepository: AssessmentRepository,
     private val artificialIntelligenceRepository: ArtificialIntelligenceRepository,
-    private val mediaRepository: MediaRepository
+    private val mediaRepository: MediaRepository,
+    private val appContext: Context
 ) : ViewModel() {
 
     private var hasLoadedInitialData = false
@@ -60,6 +73,15 @@ class LiteracyViewModel(
 
     fun onAction(action: LiteracyAction) {
         when (action) {
+            is LiteracyAction.SetIds -> {
+                _state.update {
+                    it.copy(
+                        assessmentId = action.assessmentId,
+                        studentId = action.studentId
+                    )
+                }
+            }
+
             is LiteracyAction.OnSubmitResponse -> {
                 onSubmitReadingAssessment(
                     assessmentId = action.assessmentId,
@@ -120,6 +142,14 @@ class LiteracyViewModel(
                 _state.update {
                     it.copy(
                         options = action.options
+                    )
+                }
+            }
+
+            is LiteracyAction.SetAudioFilePath -> {
+                _state.update {
+                    it.copy(
+                        audioFilePath = action.audioFilePath
                     )
                 }
             }
@@ -201,6 +231,8 @@ class LiteracyViewModel(
         }
     }
 
+
+    /*
     private fun addToReadingAssessmentResults(
         content: String,
         onSuccess: () -> Unit
@@ -322,7 +354,69 @@ class LiteracyViewModel(
         }
 
     }
+    */
 
+    private fun evaluateReadingAssessmentWithWorkManager(
+        assessmentId: String?,
+        studentId: String?,
+        audioByteArray: ByteArray?,
+        audioFilePath: String?,
+        content: String,
+        type: String,
+        onSuccess: () -> Unit
+    ){
+
+        if (assessmentId.isNullOrEmpty() || studentId.isNullOrEmpty() || audioFilePath.isNullOrEmpty()||audioByteArray == null){
+            _state.update {
+                it.copy(
+                    error = "Assessment can not be evaluated"
+                )
+            }
+            return
+        }
+
+        _state.update { it.copy(isLoading = true) }
+
+        val contentHash = content.hashCode().toString()
+
+        val workData = workDataOf(
+            "audioFilePath" to audioFilePath,
+            "content" to content,
+            "type" to type,
+            "assessment_id" to assessmentId,
+            "student_id" to studentId
+        )
+
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
+        val tag = "assessment_${assessmentId}_${studentId}"
+
+        val request = OneTimeWorkRequestBuilder<EvaluateReadingAssessmentWorker>()
+            .setInputData(workData)
+            .setConstraints(constraints = constraints)
+            .addTag(tag = tag)
+            .build()
+
+        val uniqueWorkName = "reading_assessment_${assessmentId}_${studentId}_${contentHash}_${System.currentTimeMillis()}"
+
+        WorkManager.getInstance(appContext)
+            .enqueueUniqueWork(
+                uniqueWorkName = uniqueWorkName,
+                ExistingWorkPolicy.REPLACE,
+                request = request
+            )
+
+        _state.update {
+            it.copy(
+                isLoading = false,
+                message = "Assessment content submitted for evaluation"
+            )
+        }
+
+        onSuccess.invoke()
+    }
 
     private fun resetAssessmentState() {
         _state.update {
@@ -347,8 +441,10 @@ class LiteracyViewModel(
     ){
 
         viewModelScope.launch(Dispatchers.IO) {
+
             _state.update { it.copy(isLoading = true) }
 
+            /*
             val response = assessmentRepository.assessReadingAssessment(
                 assessmentId = assessmentId,
                 studentID = studentId,
@@ -385,8 +481,58 @@ class LiteracyViewModel(
                     }
                 }
             }
+            */
+
+            scheduleReadingAssessmentResult(
+                assessmentId = assessmentId,
+                studentId = studentId,
+                onSuccess = onSuccess
+            )
         }
 
+    }
+
+    private fun scheduleReadingAssessmentResult(
+        assessmentId: String,
+        studentId: String,
+        onSuccess: () -> Unit
+    ){
+
+        _state.update { it.copy(isLoading = true) }
+
+        val workData = workDataOf(
+            "assessment_id" to assessmentId,
+            "student_id" to studentId
+        )
+
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
+        val tag = "assessment_${assessmentId}_${studentId}"
+
+        val request = PeriodicWorkRequestBuilder<SubmitReadingAssessmentWorker>( 5, TimeUnit.MINUTES)
+            .setInputData(workData)
+            .setConstraints(constraints = constraints)
+            .build()
+
+
+        WorkManager.getInstance(appContext)
+            .enqueueUniquePeriodicWork(
+                uniqueWorkName = "Periodic_submission_work",
+                ExistingPeriodicWorkPolicy.KEEP,
+                request = request
+            )
+
+        _state.update {
+            it.copy(
+                isLoading = false,
+                message = "Assessment content submitted for evaluation"
+            )
+        }
+
+
+        onSuccess.invoke()
     }
 
 
@@ -452,11 +598,113 @@ class LiteracyViewModel(
         }
 
         currentAssessmentContentList?.let {
+
+            evaluateReadingAssessmentWithWorkManager(
+                assessmentId = _state.value.assessmentId ?: return@let,
+                studentId = _state.value.studentId ?: return@let,
+                audioByteArray = _state.value.audioByteArray,
+                content = currentAssessmentContentList[_state.value.currentIndex],
+                type = _state.value.currentAssessmentLevel.label,
+                audioFilePath = _state.value.audioFilePath,
+                onSuccess = {
+                    when{
+                        _state.value.currentIndex == currentAssessmentContentList.size - 1 -> {
+                            Log.d("Literacy Assessment", "Next Step")
+
+                            submitReadingAssessment(
+                                assessmentId = assessmentId,
+                                studentId = studentId,
+                                readingAssessmentResults = _state.value.readingAssessmentResults,
+                                onSuccess = {
+                                    _state.update {
+                                        val nextIndex = if (_state.value.currentAssessmentLevelIndex < _state.value.assessmentFlow.size - 1)
+                                            _state.value.currentAssessmentLevelIndex + 1
+                                        else 0
+
+                                        val nextLevel = if (nextIndex < _state.value.assessmentFlow.size)
+                                            _state.value.assessmentFlow[nextIndex]
+                                        else
+                                            _state.value.assessmentFlow[0]
+
+                                        it.copy(
+                                            currentAssessmentLevelIndex = nextIndex,
+                                            currentAssessmentLevel = nextLevel,
+                                            currentIndex = 0
+                                        )
+                                    }
+                                }
+                            )
+                        }
+                        else -> {
+                            _state.update {
+                                it.copy(
+                                    currentIndex = it.currentIndex + 1,
+                                    showInstructions = true,
+                                    showContent = false,
+                                    audioByteArray = null,
+                                    audioFilePath = null,
+                                    message = null,
+                                    response = null,
+                                    audioUrl = null
+                                )
+                            }
+                        }
+                    }
+
+                }
+            )
+        } ?: run {
+            _state.update {
+                it.copy(
+                    error = "No assessment content available."
+                )
+            }
+
+        }
+
+
+        /*
             when{
 
                 _state.value.currentIndex == currentAssessmentContentList.size - 1 -> {
+
+                    /*
                     addToReadingAssessmentResults(
                         content = currentAssessmentContentList[_state.value.currentIndex],
+                        onSuccess = {
+                            submitReadingAssessment(
+                                assessmentId = assessmentId,
+                                studentId = studentId,
+                                readingAssessmentResults = _state.value.readingAssessmentResults,
+                                onSuccess = {
+                                    _state.update {
+                                        val nextIndex = if (_state.value.currentAssessmentLevelIndex < _state.value.assessmentFlow.size - 1)
+                                            _state.value.currentAssessmentLevelIndex + 1
+                                        else 0
+
+                                        val nextLevel = if (nextIndex < _state.value.assessmentFlow.size)
+                                            _state.value.assessmentFlow[nextIndex]
+                                        else
+                                            _state.value.assessmentFlow[0]
+
+                                        it.copy(
+                                            currentAssessmentLevelIndex = nextIndex,
+                                            currentAssessmentLevel = nextLevel,
+                                            currentIndex = 0
+                                        )
+                                    }
+                                }
+                            )
+                        }
+                    )*/
+
+                    evaluateReadingAssessmentWithWorkManager(
+                        assessmentId = _state.value.assessmentId ?: return@let,
+                        studentId = _state.value.studentId ?: return@let,
+                        audioByteArray = _state.value.audioByteArray,
+                        content = currentAssessmentContentList[_state.value.currentIndex],
+                        type = _state.value.currentAssessmentLevel.label,
+                        audioFilePath = _state.value.audioFilePath,
                         onSuccess = {
                             submitReadingAssessment(
                                 assessmentId = assessmentId,
@@ -488,6 +736,7 @@ class LiteracyViewModel(
 
                 else -> {
 
+                    /*
                     addToReadingAssessmentResults(
                         content = currentAssessmentContentList[_state.value.currentIndex],
                         onSuccess = {
@@ -502,18 +751,39 @@ class LiteracyViewModel(
                                 )
                             }
                         }
-                    )
+                    )*/
 
+                    evaluateReadingAssessmentWithWorkManager(
+                        assessmentId = _state.value.assessmentId ?: return@let,
+                        studentId = _state.value.studentId ?: return@let,
+                        audioByteArray = _state.value.audioByteArray,
+                        content = currentAssessmentContentList[_state.value.currentIndex],
+                        type = _state.value.currentAssessmentLevel.label,
+                        audioFilePath = _state.value.audioFilePath,
+                        onSuccess = {
+                            submitReadingAssessment(
+                                assessmentId = assessmentId,
+                                studentId = studentId,
+                                readingAssessmentResults = _state.value.readingAssessmentResults,
+                                onSuccess = {
+                                    _state.update {
+                                        it.copy(
+                                            currentIndex = it.currentIndex + 1,
+                                            showInstructions = true,
+                                            showContent = false,
+                                            audioByteArray = null,
+                                            audioFilePath = null,
+                                            response = null,
+                                            audioUrl = null
+                                        )
+                                    }
+                                }
+                            )
+                        }
+                    )
                 }
 
-            }
-        } ?: run {
-            _state.update {
-                it.copy(
-                    error = "No assessment content available."
-                )
-            }
-        }
+            } */
     }
 
     fun addMultipleChoiceResponse(

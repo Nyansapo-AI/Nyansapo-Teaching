@@ -4,8 +4,8 @@ import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import com.nyansapoai.teaching.Database
 import com.nyansapoai.teaching.data.local.LocalDataSource
-import com.nyansapoai.teaching.domain.mapper.toReadingAssessmentResult
-import com.nyansapoai.teaching.domain.models.assessments.literacy.ReadingAssessmentResult
+import com.nyansapoai.teaching.domain.mapper.toPendingReadingAssessmentResult
+import com.nyansapoai.teaching.domain.models.assessments.literacy.PendingReadingAssessmentResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
@@ -41,11 +41,11 @@ class SQLDelightDataSourceImp(
         )
     }
 
-    override suspend fun getPendingReadingResults(): Flow<List<ReadingAssessmentResult>> {
-        return assessmentQueries.getPendingResults()
+    override suspend fun getPendingReadingResults(assessmentId: String, studentId: String): Flow<List<PendingReadingAssessmentResult>> {
+        return assessmentQueries.getPendingResultsByAssessmentandStudent(assessmentId = assessmentId, studentId = studentId)
             .asFlow()
             .mapToList(Dispatchers.IO)
-            .map { pendingResults -> pendingResults.map { it.toReadingAssessmentResult() } }
+            .map { pendingResults -> pendingResults.map { it.toPendingReadingAssessmentResult() } }
             .flowOn(Dispatchers.IO)
 
     }

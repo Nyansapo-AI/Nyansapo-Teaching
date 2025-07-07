@@ -54,11 +54,13 @@ import com.nyansapoai.teaching.presentation.common.permissions.RequestAppPermiss
 import kotlinx.coroutines.delay
 import org.koin.compose.koinInject
 import java.io.File
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 
 private var audioFile: File? = null
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalTime::class)
 @Composable
 fun LiteracyReadingAssessmentUI(
     modifier: Modifier = Modifier,
@@ -77,6 +79,7 @@ fun LiteracyReadingAssessmentUI(
     showQuestionNumber: Boolean = true,
     audioByteArray: ByteArray?,
     onAudioByteArrayChange: (ByteArray) -> Unit,
+    onAudioPathChange: (String) -> Unit,
     response: String?,
     onSubmit: () -> Unit,
 ) {
@@ -110,9 +113,9 @@ fun LiteracyReadingAssessmentUI(
         onFailure = {
 //            allPermissionsAllowed = false
             navController.popBackStack()
-            return@RequestAppPermissions
+//            return@RequestAppPermissions
         },
-        content = {action ->
+        content = { action ->
             BasicAlertDialog(
                 onDismissRequest = {
                     isButtonClicked = false
@@ -196,12 +199,12 @@ fun LiteracyReadingAssessmentUI(
         if (showContent){
             File(
                 context.cacheDir,
-                "audio_recording.wav"
+                "audio_recording_${Clock.System.now().epochSeconds}.wav"
             ).also { file ->
                 appAudioRecorder.start(outputFile = file)
                 audioFile = file
-            }
 
+            }
         }else if (audioFile != null){
             delay(1000)
             appAudioRecorder.stop()
@@ -210,6 +213,7 @@ fun LiteracyReadingAssessmentUI(
                 when {
                     audioFile != null && !isLoading -> {
                         onAudioByteArrayChange(appAudioRecorder.getOutputFileByteArray(outputFile = audioFile!!))
+                        onAudioPathChange(it.absolutePath)
                         onSubmit.invoke()
                         audioFile = null
                     }

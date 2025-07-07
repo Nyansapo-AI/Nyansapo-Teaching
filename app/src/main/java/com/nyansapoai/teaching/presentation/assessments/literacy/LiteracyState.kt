@@ -12,8 +12,12 @@ data class LiteracyState(
     val title: String = "",
     val showContent: Boolean = false,
     val audioByteArray: ByteArray? = null,
+    val audioFilePath: String? = null,
     val isLoading: Boolean = false,
     val message: String? = null,
+
+    val studentId: String? = null,
+    val assessmentId: String? = null,
 
     val response: String? = null,
     val error: String? = null,

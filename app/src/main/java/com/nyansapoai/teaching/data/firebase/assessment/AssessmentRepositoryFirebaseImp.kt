@@ -281,37 +281,30 @@ class AssessmentRepositoryFirebaseImp(
         }
     }
 
-    /*
-    override suspend fun assessReadingAssessment(
+    override suspend fun markLiteracyAssessmentAsComplete(
         assessmentId: String,
-        studentID: String,
-        readingAssessmentResults: List<ReadingAssessmentResult>
+        studentId: String
     ): Results<String> {
         val deferred = CompletableDeferred<Results<String>>()
 
-        firebaseDb.collection(assessmentCollection)
+        val documentRef = firebaseDb.collection(assessmentCollection)
             .document(assessmentId)
             .collection("assessments-results")
-            .document(assessmentId + "_$studentID")
-            .set(
-                mapOf(
-                    "literacy_results" to mapOf(
-                        "reading_results" to readingAssessmentResults
-                    )
-                ),
-                SetOptions.merge()
-            )
-            .addOnSuccessListener {
-                deferred.complete(Results.success(data = "Assessment submitted successfully"))
+            .document("${assessmentId}_$studentId")
+            .update("completed_assessment", true)
+            .addOnCompleteListener {
+                deferred.complete(Results.success(data = "Assessment is completed successful"))
             }
             .addOnFailureListener {
-                deferred.complete(Results.error(msg = "Failed to submit assessment: ${it.message}"))
+                deferred.complete(Results.error(msg = "Assessment could not be completed"))
             }
+
 
         return withContext(Dispatchers.IO) {
             deferred.await()
         }
-    }*/
+
+    }
 
     override suspend fun assessReadingAssessment(
         assessmentId: String,
@@ -450,7 +443,7 @@ class AssessmentRepositoryFirebaseImp(
                         mapOf(
                             "assessmentId" to assessmentId,
                             "student_id" to studentID,
-
+                            "completed_assessment" to false
                         )
                     )
                     .addOnSuccessListener {

@@ -7,7 +7,9 @@ import com.nyansapoai.teaching.Database
 import com.nyansapoai.teaching.data.azure.ai.AzureArtificialIntelligenceRepositoryImp
 import com.nyansapoai.teaching.data.firebase.assessment.AssessmentRepositoryFirebaseImp
 import com.nyansapoai.teaching.data.firebase.media.FirebaseMediaRepositoryImpl
+import com.nyansapoai.teaching.data.local.LocalDataSource
 import com.nyansapoai.teaching.data.local.LocalDatabaseDriverFactory
+import com.nyansapoai.teaching.data.local.sqldelight.SQLDelightDataSourceImp
 import com.nyansapoai.teaching.data.network.ApiHelper
 import com.nyansapoai.teaching.data.remote.ai.ArtificialIntelligenceRepository
 import com.nyansapoai.teaching.data.remote.ai.OnlineArtificialIntelligenceRepositoryImp
@@ -122,6 +124,12 @@ val appModules = module {
 
     single<LocalDatabaseDriverFactory> {
         LocalDatabaseDriverFactory(context = get())
+    }
+
+    single<LocalDataSource> {
+        SQLDelightDataSourceImp(
+            database = get<Database>()
+        )
     }
 
 }
