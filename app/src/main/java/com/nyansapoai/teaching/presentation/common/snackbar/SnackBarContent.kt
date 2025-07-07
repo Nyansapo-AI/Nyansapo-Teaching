@@ -37,7 +37,7 @@ fun SnackBarContent(
 ) {
     Box(
         modifier = modifier
-            .fillMaxSize()
+//            .fillMaxSize()
             .testTag(description),
         contentAlignment = if (alignBottom) Alignment.BottomCenter else Alignment.TopCenter
     ) {
@@ -56,7 +56,7 @@ fun SnackBarContent(
                     ),
                     colors = CardDefaults.cardColors(
                         contentColor = MaterialTheme.colorScheme.onBackground,
-                        containerColor = MaterialTheme.colorScheme.background
+                        containerColor = MaterialTheme.colorScheme.tertiary
                     )
                 ) {
                     Row(

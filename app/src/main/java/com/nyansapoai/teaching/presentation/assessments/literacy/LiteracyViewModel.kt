@@ -21,6 +21,7 @@ import com.nyansapoai.teaching.domain.models.assessments.literacy.ReadingAssessm
 import com.nyansapoai.teaching.domain.models.assessments.literacy.literacyAssessmentContent
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.LiteracyAssessmentLevel
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.compareResponseStrings
+import com.nyansapoai.teaching.presentation.assessments.literacy.workers.EvaluateMultipleChoiceQuestionWorker
 import com.nyansapoai.teaching.presentation.assessments.literacy.workers.EvaluateReadingAssessmentWorker
 import com.nyansapoai.teaching.presentation.assessments.literacy.workers.SubmitReadingAssessmentWorker
 import com.nyansapoai.teaching.utils.ResultStatus
@@ -409,7 +410,6 @@ class LiteracyViewModel(
                 onSuccess = {
                     when{
                         _state.value.currentIndex == currentAssessmentContentList.size - 1 -> {
-                            Log.d("Literacy Assessment", "Next Step")
 
                             submitReadingAssessment(
                                 assessmentId = assessmentId,
@@ -429,7 +429,8 @@ class LiteracyViewModel(
                                         it.copy(
                                             currentAssessmentLevelIndex = nextIndex,
                                             currentAssessmentLevel = nextLevel,
-                                            currentIndex = 0
+                                            currentIndex = 0,
+                                            message = null
                                         )
                                     }
                                 }
@@ -463,6 +464,7 @@ class LiteracyViewModel(
         }
     }
 
+    /*
     fun addMultipleChoiceResponse(
         correctOptions: List<String>,
         question: String,
@@ -522,6 +524,73 @@ class LiteracyViewModel(
             }
         }
     }
+    */
+
+    private fun evaluateMultipleChoicesAssessmentWithWorkManager(
+        question: String,
+        studentId: String?,
+        assessmentId: String?,
+        correctOptions: List<String>,
+        onSuccess: () -> Unit
+    ){
+        viewModelScope.launch {
+            if (_state.value.selectedChoice == null){
+                _state.update {
+                    it.copy(
+                        error = "Please select an answer before submitting."
+                    )
+                }
+                return@launch
+            }
+
+            if (_state.value.options.isEmpty()){
+                _state.update {
+                    it.copy(error = "No options available for this question." )
+                }
+                return@launch
+            }
+
+
+            _state.update { it.copy(isLoading = true) }
+
+            val workData = workDataOf(
+                "studentId" to studentId,
+                "assessmentId" to assessmentId,
+                "question" to question,
+                "options" to _state.value.options.toList().toTypedArray(),
+                "studentAnswer" to _state.value.selectedChoice ,
+                "passed" to ( _state.value.selectedChoice in correctOptions )
+            )
+
+
+            val questionHash = question.hashCode().toString()
+            val tag = "assessment_${assessmentId}_${studentId}"
+
+            val request = OneTimeWorkRequestBuilder<EvaluateMultipleChoiceQuestionWorker>()
+                .setInputData(workData)
+                .addTag(tag)
+                .build()
+
+            val uniqueWorkName = "multiple_choices_${assessmentId}_${studentId}_${questionHash}_${System.currentTimeMillis()}"
+
+            WorkManager.getInstance(appContext)
+                .enqueueUniqueWork(
+                    uniqueWorkName = uniqueWorkName,
+                    ExistingWorkPolicy.REPLACE,
+                    request = request
+                )
+
+            _state.update {
+                it.copy(
+                    isLoading = false,
+                    message = "Assessment content submitted for evaluation"
+                )
+            }
+
+            onSuccess.invoke()
+        }
+    }
+
 
 
     fun onSubmitStoryAssessment(
@@ -534,15 +603,61 @@ class LiteracyViewModel(
             else -> emptyList()
         }
 
+        if (contentList.isEmpty()){
+            _state.update {
+                it.copy(error = "Something went wrong. Try again")
+            }
+            return
+        }
+
+        evaluateMultipleChoicesAssessmentWithWorkManager(
+            correctOptions = contentList[_state.value.currentIndex].multipleChoices.correctChoices,
+            studentId = _state.value.studentId,
+            assessmentId = _state.value.assessmentId,
+            question = contentList[_state.value.currentIndex].question,
+            onSuccess = {
+                when{
+                    _state.value.currentIndex == contentList.size - 1 -> {
+                        _state.update {
+                            val nextIndex = if (_state.value.currentAssessmentLevelIndex < _state.value.assessmentFlow.size - 1)
+                                _state.value.currentAssessmentLevelIndex + 1
+                            else 0
+
+                            val nextLevel = if (nextIndex < _state.value.assessmentFlow.size)
+                                _state.value.assessmentFlow[nextIndex]
+                            else
+                                _state.value.assessmentFlow[0]
+
+                            it.copy(
+                                currentAssessmentLevelIndex = nextIndex,
+                                currentAssessmentLevel = nextLevel,
+                                currentIndex = 0,
+                                multipleChoiceQuestionsResult = mutableListOf()
+                            )
+                        }
+                    }
+
+
+                    else -> {
+                        _state.update {
+                            it.copy(
+                                currentIndex = it.currentIndex + 1,
+                                options = emptyList(),
+                                selectedChoice = null
+                            )
+                        }
+                    }
+                }
+            }
+        )
+
+        /*
         when{
             contentList.isEmpty() -> {
-                _state.update {
-                    it.copy(error = "Something went wrong. Try again")
-                    return
-                }
             }
 
             _state.value.currentIndex == contentList.size - 1 -> {
+                /*
                 addMultipleChoiceResponse(
                     correctOptions = contentList[_state.value.currentIndex].multipleChoices.correctChoices,
                     question = contentList[_state.value.currentIndex].question,
@@ -573,7 +688,9 @@ class LiteracyViewModel(
                             }
                         )
                     }
-                )
+                )*/
+
+//                eva
 
 
             }
@@ -593,7 +710,7 @@ class LiteracyViewModel(
                     }
                 )
             }
-        }
+        } */
 
     }
 

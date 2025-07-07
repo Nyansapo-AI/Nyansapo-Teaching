@@ -26,6 +26,9 @@ class OTPViewModel : ViewModel() {
     private val _timer = MutableStateFlow(30)
     val timer = _timer.asStateFlow()
 
+    private val _message = MutableStateFlow("")
+    val message = _message.asStateFlow()
+
 
 
     val canResendOTPRequest = timer
@@ -58,6 +61,10 @@ class OTPViewModel : ViewModel() {
 
             is OTPAction.OnCanSubmitChange -> {
                 _canSubmit.value = action.canSubmit
+            }
+
+            is OTPAction.OnMessageChange -> {
+                _message.value = action.message
             }
 
             is OTPAction.OnSubmit -> {

@@ -21,7 +21,6 @@ object PhoneAuth {
         auth.firebaseAuthSettings.setAppVerificationDisabledForTesting(false)
     }
 
-
     @Composable
     fun StartPhoneNumberVerification(
         phoneNumber: String,
@@ -79,11 +78,6 @@ object PhoneAuth {
                     token: PhoneAuthProvider.ForceResendingToken
                 ) {
                     Log.d("PhoneAuth", "Code Sent: $verificationId")
-
-                    /*
-                    if (code.isNotBlank() && canVerify){
-
-                    }*/
 
                     verifyPhoneNumberWithCode(
                         verificationId = verificationId,

@@ -7,5 +7,7 @@ sealed interface OTPAction {
 
     data class OnCanSubmitChange(val canSubmit: Boolean): OTPAction
 
+    data class OnMessageChange(val message: String): OTPAction
+
     data class OnSubmit(val onSuccess: @Composable () -> Unit = {}): OTPAction
 }

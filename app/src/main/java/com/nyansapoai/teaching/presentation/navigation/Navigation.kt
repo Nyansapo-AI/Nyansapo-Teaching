@@ -3,6 +3,7 @@ package com.nyansapoai.teaching.presentation.navigation
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
@@ -25,6 +26,7 @@ import com.nyansapoai.teaching.presentation.assessments.conductAssessment.Conduc
 import com.nyansapoai.teaching.presentation.assessments.createAssessment.CreateAssessmentsRoot
 import com.nyansapoai.teaching.presentation.authentication.otp.OTPRoot
 import com.nyansapoai.teaching.presentation.authentication.signIn.SignInRoot
+import com.nyansapoai.teaching.presentation.common.snackbar.SnackBarContent
 import com.nyansapoai.teaching.presentation.common.snackbar.SnackBarHandler
 import com.nyansapoai.teaching.presentation.getStarted.GetStartedRoot
 import com.nyansapoai.teaching.presentation.home.HomeRoot
@@ -51,6 +53,12 @@ fun Navigation(){
 
     Scaffold(
         snackbarHost = {
+            SnackBarContent(
+                modifier = Modifier.statusBarsPadding(),
+                snackBarHostState = snackBarHostState,
+                snackBarItem = snackBarNotification.data,
+            )
+
         },
         modifier = Modifier
             .fillMaxSize()
@@ -58,7 +66,7 @@ fun Navigation(){
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = HomePage,
+            startDestination = GetStartedPage,
             modifier = Modifier
                 .padding(innerPadding)
         ){
