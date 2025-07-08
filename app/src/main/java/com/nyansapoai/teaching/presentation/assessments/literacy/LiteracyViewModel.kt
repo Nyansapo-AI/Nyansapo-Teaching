@@ -19,6 +19,8 @@ import com.nyansapoai.teaching.domain.models.assessments.literacy.literacyAssess
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.LiteracyAssessmentLevel
 import com.nyansapoai.teaching.presentation.assessments.literacy.workers.EvaluateMultipleChoiceQuestionWorker
 import com.nyansapoai.teaching.presentation.assessments.literacy.workers.EvaluateReadingAssessmentWorker
+import com.nyansapoai.teaching.presentation.assessments.literacy.workers.MarkLiteracyAssessmentWorker
+import com.nyansapoai.teaching.presentation.assessments.literacy.workers.SubmitMultipleChoiceResultsWorker
 import com.nyansapoai.teaching.presentation.assessments.literacy.workers.SubmitReadingAssessmentWorker
 import com.nyansapoai.teaching.utils.ResultStatus
 import kotlinx.coroutines.Dispatchers
@@ -146,6 +148,13 @@ class LiteracyViewModel(
                     )
                 }
             }
+
+            is LiteracyAction.OnSubmitLiteracyResults -> {
+                submitLiteracyAssessment(
+                    assessmentId = action.assessmentId,
+                    studentId = action.studentId
+                )
+            }
         }
     }
 
@@ -226,6 +235,7 @@ class LiteracyViewModel(
         }
     }
 
+    /*
     fun submitReadingAssessment(
         assessmentId: String,
         studentId: String,
@@ -243,8 +253,9 @@ class LiteracyViewModel(
             )
         }
 
-    }
+    }*/
 
+    /*
     private fun scheduleReadingAssessmentResult(
         assessmentId: String,
         studentId: String,
@@ -287,6 +298,7 @@ class LiteracyViewModel(
 
         onSuccess.invoke()
     }
+    */
 
 
     private fun submitMultipleChoiceQuestions(
@@ -363,29 +375,23 @@ class LiteracyViewModel(
                     when{
                         _state.value.currentIndex == currentAssessmentContentList.size - 1 -> {
 
-                            submitReadingAssessment(
-                                assessmentId = assessmentId,
-                                studentId = studentId,
-                                onSuccess = {
-                                    _state.update {
-                                        val nextIndex = if (_state.value.currentAssessmentLevelIndex < _state.value.assessmentFlow.size - 1)
-                                            _state.value.currentAssessmentLevelIndex + 1
-                                        else 0
+                            _state.update {
+                                val nextIndex = if (_state.value.currentAssessmentLevelIndex < _state.value.assessmentFlow.size - 1)
+                                    _state.value.currentAssessmentLevelIndex + 1
+                                else 0
 
-                                        val nextLevel = if (nextIndex < _state.value.assessmentFlow.size)
-                                            _state.value.assessmentFlow[nextIndex]
-                                        else
-                                            _state.value.assessmentFlow[0]
+                                val nextLevel = if (nextIndex < _state.value.assessmentFlow.size)
+                                    _state.value.assessmentFlow[nextIndex]
+                                else
+                                    _state.value.assessmentFlow[0]
 
-                                        it.copy(
-                                            currentAssessmentLevelIndex = nextIndex,
-                                            currentAssessmentLevel = nextLevel,
-                                            currentIndex = 0,
-                                            message = null
-                                        )
-                                    }
-                                }
-                            )
+                                it.copy(
+                                    currentAssessmentLevelIndex = nextIndex,
+                                    currentAssessmentLevel = nextLevel,
+                                    currentIndex = 0,
+                                    message = null
+                                )
+                            }
                         }
                         else -> {
                             _state.update {
@@ -539,6 +545,47 @@ class LiteracyViewModel(
                 }
             }
         )
+    }
+
+
+    private fun submitLiteracyAssessment(
+        assessmentId: String,
+        studentId: String,
+    ){
+
+        val workData = workDataOf(
+            "student_id" to studentId,
+            "assessment_id" to assessmentId
+        )
+
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
+        val submitReadingResultsRequest = OneTimeWorkRequestBuilder<SubmitReadingAssessmentWorker>()
+            .setInputData(workData)
+            .setConstraints(constraints = constraints)
+            .build()
+
+        val submitMultipleChoicesResultsRequest = OneTimeWorkRequestBuilder<SubmitMultipleChoiceResultsWorker>()
+            .setInputData(workData)
+            .setConstraints(constraints = constraints)
+            .build()
+
+        val markLiteracyAssessmentRequest = OneTimeWorkRequestBuilder<MarkLiteracyAssessmentWorker>()
+            .setInputData(workData)
+            .setConstraints(constraints = constraints)
+            .build()
+
+        WorkManager.getInstance(appContext)
+            .beginUniqueWork(
+                uniqueWorkName ="complete_assessment_${assessmentId}_${studentId}",
+                 existingWorkPolicy =  ExistingWorkPolicy.REPLACE,
+                request = submitReadingResultsRequest
+            )
+            .then(submitMultipleChoicesResultsRequest)
+            .then(markLiteracyAssessmentRequest)
+            .enqueue()
     }
 
 }

@@ -66,7 +66,8 @@
 ```json
 { 
   "name": "string",                           
-  "teachers": ["string"],                     
+  "teachers": ["string"],  
+  "students" : ["string"],                  
   "attendanceStats": {                  
     "present": "number", 
     "absent": "number", 

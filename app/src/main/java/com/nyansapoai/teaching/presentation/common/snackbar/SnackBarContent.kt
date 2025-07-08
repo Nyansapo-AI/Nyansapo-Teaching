@@ -37,7 +37,6 @@ fun SnackBarContent(
 ) {
     Box(
         modifier = modifier
-//            .fillMaxSize()
             .testTag(description),
         contentAlignment = if (alignBottom) Alignment.BottomCenter else Alignment.TopCenter
     ) {

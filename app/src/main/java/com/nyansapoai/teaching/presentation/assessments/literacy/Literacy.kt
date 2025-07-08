@@ -73,23 +73,12 @@ fun LiteracyScreen(
         onAction(LiteracyAction.SetIds(assessmentId = assessmentId, studentId = studentId))
     }
 
+    LaunchedEffect(state.currentAssessmentLevel == LiteracyAssessmentLevel.COMPLETED) {
+        onAction.invoke(LiteracyAction.OnSubmitLiteracyResults(assessmentId = assessmentId, studentId = studentId))
+    }
+
     Scaffold(
-        /*
-        topBar = {
-            MediumTopAppBar(
-                title = {},
-                actions = {
-                    IconButton(
-                        onClick = {}
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.close),
-                            contentDescription = "exit assessment"
-                        )
-                    }
-                }
-            )
-        }*/
+        
     ) { innerPadding ->
         Box(
             contentAlignment = Alignment.Center,

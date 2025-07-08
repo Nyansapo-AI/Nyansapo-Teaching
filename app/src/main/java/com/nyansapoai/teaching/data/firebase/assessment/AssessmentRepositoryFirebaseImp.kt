@@ -286,24 +286,70 @@ class AssessmentRepositoryFirebaseImp(
         studentId: String
     ): Results<String> {
         val deferred = CompletableDeferred<Results<String>>()
-
+        val documentId = "${assessmentId}_$studentId"
         val documentRef = firebaseDb.collection(assessmentCollection)
             .document(assessmentId)
             .collection("assessments-results")
-            .document("${assessmentId}_$studentId")
-            .update("completed_assessment", true)
-            .addOnCompleteListener {
-                deferred.complete(Results.success(data = "Assessment is completed successful"))
-            }
-            .addOnFailureListener {
-                deferred.complete(Results.error(msg = "Assessment could not be completed"))
+            .document(documentId)
+
+        Log.d("AssessmentRepo", "Attempting to mark assessment $assessmentId complete for student $studentId")
+
+        firebaseDb.runTransaction { transaction ->
+            val snapshot = transaction.get(documentRef)
+
+            if (!snapshot.exists()) {
+                Log.w("AssessmentRepo", "Document $documentId does not exist")
+                throw Exception("Assessment not found")
             }
 
+            val literacyResults = snapshot.get("literacy_results") as? Map<String, Any>
+            if (literacyResults == null) {
+                Log.w("AssessmentRepo", "No literacy_results found in document $documentId")
+                throw Exception("Literacy assessment data not found")
+            }
+
+            // Check both required components with detailed validation
+            val readingResults = literacyResults["reading_results"] as? List<*>
+            if (readingResults.isNullOrEmpty()) {
+                Log.w("AssessmentRepo", "Reading results missing or empty in $documentId")
+                throw Exception("Reading assessment section is incomplete")
+            }
+
+            val multipleChoiceQuestions = literacyResults["multiple_choice_questions"] as? List<*>
+            if (multipleChoiceQuestions.isNullOrEmpty()) {
+                Log.w("AssessmentRepo", "Multiple choice questions missing or empty in $documentId")
+                throw Exception("Multiple choice section is incomplete")
+            }
+
+            Log.d("AssessmentRepo", "Validation successful, marking assessment as complete")
+
+            // Update completed status and completion timestamp
+            transaction.update(
+                documentRef,
+                mapOf(
+                    "completed_assessment" to true,
+//                    "completed_at" to FieldValue.serverTimestamp()
+                )
+            )
+        }
+            .addOnSuccessListener {
+                Log.d("AssessmentRepo", "Successfully marked assessment $documentId as complete")
+                deferred.complete(Results.success(data = "Assessment has been marked as complete"))
+            }
+            .addOnFailureListener { e ->
+                Log.e("AssessmentRepo", "Failed to mark assessment complete: ${e.message}", e)
+                val errorMsg = when {
+                    e.message?.contains("Reading assessment") == true -> "Reading assessment section must be completed first"
+                    e.message?.contains("Multiple choice") == true -> "Multiple choice section must be completed first"
+                    e.message?.contains("not found") == true -> "Assessment not found"
+                    else -> "Unable to complete assessment: ${e.message}"
+                }
+                deferred.complete(Results.error(msg = errorMsg))
+            }
 
         return withContext(Dispatchers.IO) {
             deferred.await()
         }
-
     }
 
     override suspend fun assessReadingAssessment(
