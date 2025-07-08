@@ -1,4 +1,4 @@
-package com.nyansapoai.teaching.presentation.navigation
+package com.nyansapoai.teaching.navigation
 
 import kotlinx.serialization.Serializable
 

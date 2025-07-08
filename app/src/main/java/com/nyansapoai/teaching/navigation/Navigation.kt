@@ -1,4 +1,4 @@
-package com.nyansapoai.teaching.presentation.navigation
+package com.nyansapoai.teaching.navigation
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,12 +14,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import com.google.firebase.auth.FirebaseAuth
 import com.nyansapoai.teaching.navController
 import com.nyansapoai.teaching.presentation.assessments.IndividualAssessment.IndividualAssessmentRoot
 import com.nyansapoai.teaching.presentation.assessments.conductAssessment.ConductAssessmentRoot
@@ -51,6 +50,10 @@ fun Navigation(){
         }
     }
 
+    val firebaseAuth = koinInject<FirebaseAuth>()
+
+
+
     Scaffold(
         snackbarHost = {
             SnackBarContent(
@@ -66,7 +69,7 @@ fun Navigation(){
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = GetStartedPage,
+            startDestination = if (firebaseAuth.currentUser == null ) GetStartedPage else HomePage,
             modifier = Modifier
                 .padding(innerPadding)
         ){

@@ -1,7 +1,6 @@
 package com.nyansapoai.teaching.presentation.assessments.literacy
 
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.Constraints
@@ -16,27 +15,20 @@ import com.nyansapoai.teaching.data.remote.ai.ArtificialIntelligenceRepository
 import com.nyansapoai.teaching.data.remote.assessment.AssessmentRepository
 import com.nyansapoai.teaching.data.remote.media.MediaRepository
 import com.nyansapoai.teaching.domain.models.assessments.literacy.MultipleChoicesResult
-import com.nyansapoai.teaching.domain.models.assessments.literacy.ReadingAssessmentMetadata
-import com.nyansapoai.teaching.domain.models.assessments.literacy.ReadingAssessmentResult
 import com.nyansapoai.teaching.domain.models.assessments.literacy.literacyAssessmentContent
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.LiteracyAssessmentLevel
-import com.nyansapoai.teaching.presentation.assessments.literacy.components.compareResponseStrings
 import com.nyansapoai.teaching.presentation.assessments.literacy.workers.EvaluateMultipleChoiceQuestionWorker
 import com.nyansapoai.teaching.presentation.assessments.literacy.workers.EvaluateReadingAssessmentWorker
 import com.nyansapoai.teaching.presentation.assessments.literacy.workers.SubmitReadingAssessmentWorker
 import com.nyansapoai.teaching.utils.ResultStatus
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
-import kotlin.collections.get
-import kotlin.text.compareTo
 
 class LiteracyViewModel(
     private val assessmentRepository: AssessmentRepository,
@@ -237,52 +229,12 @@ class LiteracyViewModel(
     fun submitReadingAssessment(
         assessmentId: String,
         studentId: String,
-        readingAssessmentResults: List<ReadingAssessmentResult>,
         onSuccess: () -> Unit
     ){
 
         viewModelScope.launch(Dispatchers.IO) {
 
             _state.update { it.copy(isLoading = true) }
-
-            /*
-            val response = assessmentRepository.assessReadingAssessment(
-                assessmentId = assessmentId,
-                studentID = studentId,
-                readingAssessmentResults = readingAssessmentResults
-            )
-
-            when(response.status){
-                ResultStatus.INITIAL ,
-                ResultStatus.LOADING -> {}
-                ResultStatus.SUCCESS -> {
-                    _state.update {
-                        it.copy(
-                            message = "Assessment submitted successfully.",
-                            isLoading = false,
-                            showInstructions = false,
-                            showContent = false,
-                            currentIndex = 0,
-                            audioByteArray = null,
-                            response = null,
-                            audioUrl = null,
-                            readingAssessmentResults = mutableListOf()
-                        )
-                    }
-
-                    onSuccess.invoke()
-                }
-                ResultStatus.ERROR -> {
-
-                    _state.update {
-                        it.copy(
-                            error = response.message ?: "Can not submit assessment result",
-                            isLoading = false
-                        )
-                    }
-                }
-            }
-            */
 
             scheduleReadingAssessmentResult(
                 assessmentId = assessmentId,
@@ -414,7 +366,6 @@ class LiteracyViewModel(
                             submitReadingAssessment(
                                 assessmentId = assessmentId,
                                 studentId = studentId,
-                                readingAssessmentResults = _state.value.readingAssessmentResults,
                                 onSuccess = {
                                     _state.update {
                                         val nextIndex = if (_state.value.currentAssessmentLevelIndex < _state.value.assessmentFlow.size - 1)
@@ -463,68 +414,6 @@ class LiteracyViewModel(
 
         }
     }
-
-    /*
-    fun addMultipleChoiceResponse(
-        correctOptions: List<String>,
-        question: String,
-        onSuccess: () -> Unit
-    ) {
-        viewModelScope.launch {
-            if (_state.value.selectedChoice == null){
-                _state.update {
-                    it.copy(
-                        error = "Please select an answer before submitting."
-                    )
-                }
-                return@launch
-            }
-
-
-            if (_state.value.options.isEmpty()){
-                _state.update {
-                    it.copy(error = "No options available for this question." )
-                }
-                return@launch
-            }
-
-
-
-            _state.update { it.copy(isLoading = true) }
-
-            try {
-                _state.update {
-                    val new = MultipleChoicesResult(
-                        question = question,
-                        options = _state.value.options,
-                        student_answer = _state.value.selectedChoice,
-                        passed = _state.value.selectedChoice in correctOptions
-                    )
-
-                    it.copy(
-                        multipleChoiceQuestionsResult = _state.value.multipleChoiceQuestionsResult.apply { add(element = new) },
-                        isLoading = false,
-                        error = null
-                    )
-
-                }
-
-                onSuccess.invoke()
-
-            }catch (e: Exception){
-                _state.update {
-                    it.copy(
-                        error = "Error processing multiple choice response: ${e.message}",
-                        isLoading = false
-                    )
-                }
-
-                delay(4000)
-                _state.update { it.copy(error = null) }
-            }
-        }
-    }
-    */
 
     private fun evaluateMultipleChoicesAssessmentWithWorkManager(
         question: String,
@@ -650,68 +539,6 @@ class LiteracyViewModel(
                 }
             }
         )
-
-        /*
-        when{
-            contentList.isEmpty() -> {
-            }
-
-            _state.value.currentIndex == contentList.size - 1 -> {
-                /*
-                addMultipleChoiceResponse(
-                    correctOptions = contentList[_state.value.currentIndex].multipleChoices.correctChoices,
-                    question = contentList[_state.value.currentIndex].question,
-                    onSuccess ={
-
-                        submitMultipleChoiceQuestions(
-                            assessmentId = assessmentId,
-                            studentId = studentId,
-                            multipleChoiceQuestionsResult = _state.value.multipleChoiceQuestionsResult,
-                            onSuccess = {
-                                _state.update {
-                                    val nextIndex = if (_state.value.currentAssessmentLevelIndex < _state.value.assessmentFlow.size - 1)
-                                        _state.value.currentAssessmentLevelIndex + 1
-                                    else 0
-
-                                    val nextLevel = if (nextIndex < _state.value.assessmentFlow.size)
-                                        _state.value.assessmentFlow[nextIndex]
-                                    else
-                                        _state.value.assessmentFlow[0]
-
-                                    it.copy(
-                                        currentAssessmentLevelIndex = nextIndex,
-                                        currentAssessmentLevel = nextLevel,
-                                        currentIndex = 0,
-                                        multipleChoiceQuestionsResult = mutableListOf()
-                                    )
-                                }
-                            }
-                        )
-                    }
-                )*/
-
-//                eva
-
-
-            }
-
-            else -> {
-                addMultipleChoiceResponse(
-                    correctOptions = contentList[_state.value.currentIndex].multipleChoices.correctChoices,
-                    question = contentList[_state.value.currentIndex].question,
-                    onSuccess ={
-                        _state.update {
-                            it.copy(
-                                currentIndex = it.currentIndex + 1,
-                                options = emptyList(),
-                                selectedChoice = null
-                            )
-                        }
-                    }
-                )
-            }
-        } */
-
     }
 
 }

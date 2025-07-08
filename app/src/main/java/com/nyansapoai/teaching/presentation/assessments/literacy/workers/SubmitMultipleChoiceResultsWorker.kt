@@ -50,6 +50,7 @@ class SubmitMultipleChoiceResultsWorker(
                             studentId = studentId,
                             assessmentId = assessmentId
                         )
+
                     }
                     ResultStatus.ERROR -> {
                         hasFailure = true
@@ -60,7 +61,7 @@ class SubmitMultipleChoiceResultsWorker(
 
             if(hasFailure) Result.retry() else Result.success()
 
-        }catch (e: Exception){
+            }catch (e: Exception){
             e.printStackTrace()
             Result.failure()
         }
