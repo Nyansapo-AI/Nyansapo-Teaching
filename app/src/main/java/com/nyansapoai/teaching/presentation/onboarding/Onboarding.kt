@@ -54,7 +54,7 @@ fun OnboardingScreen(
         stepState.animateScrollToItem(index = state.currentStep)
     }
 
-    val onboardingSteps =             listOf(
+    val onboardingSteps = listOf(
         StepContent(
             screen = {
                 SelectOrganization(

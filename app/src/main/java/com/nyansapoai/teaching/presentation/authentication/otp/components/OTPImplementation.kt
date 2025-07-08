@@ -85,7 +85,6 @@ private fun startPhoneNumberVerification(
             }
 
             override fun onVerificationFailed(e: FirebaseException) {
-                Log.e("PhoneAuth", "Verification Failed: ${e.message}")
                 onVerificationFailed(e.message ?: "Unknown error")
             }
 
@@ -93,7 +92,6 @@ private fun startPhoneNumberVerification(
                 verificationId: String,
                 token: PhoneAuthProvider.ForceResendingToken
             ) {
-                Log.d("PhoneAuth", "Code Sent: $verificationId")
                 onCodeSent(verificationId)
             }
         })

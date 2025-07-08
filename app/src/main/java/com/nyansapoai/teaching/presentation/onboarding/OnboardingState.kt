@@ -6,10 +6,7 @@ data class OnboardingState(
     val selectedProject: OnboardingProjectState? = null,
     val selectedSchool: OnboardingSchoolState? = null,
     val selectedCamp: OnboardingCampState? = null,
-
     )
-
-
 
 data class OnboardingOrganizationState(
     val name: String,

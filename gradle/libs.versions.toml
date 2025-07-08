@@ -30,6 +30,7 @@ navigationTesting = "2.9.0"
 roomRuntime = "2.7.2"
 workRuntimeKtx = "2.10.2"
     sqlDelight = "2.1.0"
+    googleFirebaseAppdistribution = "5.1.1"
 
 
 
@@ -94,4 +95,5 @@ android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
     google-gms-google-services = { id = "com.google.gms.google-services", version.ref = "googleGmsGoogleServices" }
+    google-firebase-appdistribution = { id = "com.google.firebase.appdistribution", version.ref = "googleFirebaseAppdistribution" }
 
