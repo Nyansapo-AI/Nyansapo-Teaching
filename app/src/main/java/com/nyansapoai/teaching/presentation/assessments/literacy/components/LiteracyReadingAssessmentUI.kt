@@ -1,5 +1,7 @@
 package com.nyansapoai.teaching.presentation.assessments.literacy.components
 
+import android.os.Build
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -13,7 +15,11 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -22,6 +28,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -35,18 +42,25 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.DialogProperties
 import com.nyansapoai.teaching.R
+import com.nyansapoai.teaching.navController
 import com.nyansapoai.teaching.presentation.common.audio.play.AudioPlayer
 import com.nyansapoai.teaching.presentation.common.audio.record.AppAudioRecorder
+import com.nyansapoai.teaching.presentation.common.components.AppButton
 import com.nyansapoai.teaching.presentation.common.components.AppLinearProgressIndicator
 import com.nyansapoai.teaching.presentation.common.components.AppShowInstructions
+import com.nyansapoai.teaching.presentation.common.permissions.RequestAppPermissions
 import kotlinx.coroutines.delay
 import org.koin.compose.koinInject
 import java.io.File
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 
 private var audioFile: File? = null
 
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalTime::class)
 @Composable
 fun LiteracyReadingAssessmentUI(
     modifier: Modifier = Modifier,
@@ -65,9 +79,101 @@ fun LiteracyReadingAssessmentUI(
     showQuestionNumber: Boolean = true,
     audioByteArray: ByteArray?,
     onAudioByteArrayChange: (ByteArray) -> Unit,
+    onAudioPathChange: (String) -> Unit,
     response: String?,
     onSubmit: () -> Unit,
 ) {
+
+    var isButtonClicked by remember { mutableStateOf(false) }
+
+    var allPermissionsAllowed by remember { mutableStateOf(false) }
+
+
+    RequestAppPermissions(
+        permissionsArray = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+            /*
+            For Android versions below Q, we need to request both READ_EXTERNAL_STORAGE and WRITE_EXTERNAL_STORAGE
+             */
+            arrayOf(
+                android.Manifest.permission.RECORD_AUDIO,
+                android.Manifest.permission.READ_MEDIA_AUDIO,
+                android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+            )
+        } else {
+            /*
+            For Android Q and above, we only need to request RECORD_AUDIO
+             */
+            arrayOf(
+                android.Manifest.permission.RECORD_AUDIO,
+            )
+        },
+        onSuccess = {
+            allPermissionsAllowed = true
+        },
+        onFailure = {
+//            allPermissionsAllowed = false
+            navController.popBackStack()
+//            return@RequestAppPermissions
+        },
+        content = { action ->
+            BasicAlertDialog(
+                onDismissRequest = {
+                    isButtonClicked = false
+                },
+                properties = DialogProperties(),
+                content = {
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(20.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(MaterialTheme.colorScheme.background)
+                            .padding(16.dp)
+                    ) {
+                        Text(
+                            text = "Allow The Following Permissions Requests to Do the Assessment.",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Center,
+                        )
+
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                        ) {
+                            Text(
+                                text = "Record Audio",
+                                style = MaterialTheme.typography.bodyMedium,
+                            )
+                            Text(
+                                text = "Read and Write Storage",
+                                style = MaterialTheme.typography.bodyMedium,
+                            )
+                        }
+
+                        AppButton(
+                            onClick = {
+                                action.invoke()
+                                isButtonClicked = true
+                            }
+                        ) {
+                            Text(
+                                text = "Allow Permissions",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+
+                    }
+
+                })
+
+        }
+    )
+
+
+
 
 
     val context = LocalContext.current
@@ -93,12 +199,12 @@ fun LiteracyReadingAssessmentUI(
         if (showContent){
             File(
                 context.cacheDir,
-                "audio_recording.wav"
+                "audio_recording_${Clock.System.now().epochSeconds}.wav"
             ).also { file ->
                 appAudioRecorder.start(outputFile = file)
                 audioFile = file
-            }
 
+            }
         }else if (audioFile != null){
             delay(1000)
             appAudioRecorder.stop()
@@ -107,6 +213,7 @@ fun LiteracyReadingAssessmentUI(
                 when {
                     audioFile != null && !isLoading -> {
                         onAudioByteArrayChange(appAudioRecorder.getOutputFileByteArray(outputFile = audioFile!!))
+                        onAudioPathChange(it.absolutePath)
                         onSubmit.invoke()
                         audioFile = null
                     }
@@ -120,12 +227,10 @@ fun LiteracyReadingAssessmentUI(
     }
 
 
-
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(40.dp),
         modifier = modifier
-//            .fillMaxSize()
             .widthIn(max = 700.dp)
             .padding(16.dp),
     ) {
@@ -206,10 +311,8 @@ fun LiteracyReadingAssessmentUI(
                     label = "boxColorAnimation"
                 )
 
-
-
                 AppShowInstructions(
-                    showInstructions = showInstructions,
+                    showInstructions = showInstructions && allPermissionsAllowed,
                     size = 420.dp,
                     instructionsTitle = instructionTitle,
                     instructionsDescription = instructionDescription,
@@ -269,5 +372,6 @@ fun LiteracyReadingAssessmentUI(
             )
         }*/
     }
+
 
 }

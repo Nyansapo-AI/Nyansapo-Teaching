@@ -1,8 +1,17 @@
 package com.nyansapoai.teaching.presentation.assessments.literacy
 
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.work.Constraints
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.ExistingWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.workDataOf
 import com.nyansapoai.teaching.data.remote.ai.ArtificialIntelligenceRepository
 import com.nyansapoai.teaching.data.remote.assessment.AssessmentRepository
 import com.nyansapoai.teaching.data.remote.media.MediaRepository
@@ -12,6 +21,9 @@ import com.nyansapoai.teaching.domain.models.assessments.literacy.ReadingAssessm
 import com.nyansapoai.teaching.domain.models.assessments.literacy.literacyAssessmentContent
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.LiteracyAssessmentLevel
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.compareResponseStrings
+import com.nyansapoai.teaching.presentation.assessments.literacy.workers.EvaluateMultipleChoiceQuestionWorker
+import com.nyansapoai.teaching.presentation.assessments.literacy.workers.EvaluateReadingAssessmentWorker
+import com.nyansapoai.teaching.presentation.assessments.literacy.workers.SubmitReadingAssessmentWorker
 import com.nyansapoai.teaching.utils.ResultStatus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -22,13 +34,15 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
 import kotlin.collections.get
 import kotlin.text.compareTo
 
 class LiteracyViewModel(
     private val assessmentRepository: AssessmentRepository,
     private val artificialIntelligenceRepository: ArtificialIntelligenceRepository,
-    private val mediaRepository: MediaRepository
+    private val mediaRepository: MediaRepository,
+    private val appContext: Context
 ) : ViewModel() {
 
     private var hasLoadedInitialData = false
@@ -55,35 +69,20 @@ class LiteracyViewModel(
             _state.update {
                 it.copy(assessmentContent = literacyAssessmentContent[assessmentNo], isLoading = false)
             }
-
-            /*
-            val response = assessmentRepository.getLiteracyAssessmentContent()
-
-            when (response.status) {
-                ResultStatus.INITIAL,
-                ResultStatus.LOADING -> {}
-                ResultStatus.SUCCESS -> {
-                    response.data?.let { data ->
-                        _state.update {
-                            it.copy(
-                                assessmentContent = data,
-                                isLoading = false,
-                                error = null
-                            )
-                        }
-                    } ?: run {
-                        _state.update { it.copy(error = "No assessment content available.", isLoading = false) }
-                    }
-                }
-                ResultStatus.ERROR -> {
-                    _state.update { it.copy(error = response.message ?: "Error fetching assessment content", isLoading = false) }
-                }
-            }*/
         }
     }
 
     fun onAction(action: LiteracyAction) {
         when (action) {
+            is LiteracyAction.SetIds -> {
+                _state.update {
+                    it.copy(
+                        assessmentId = action.assessmentId,
+                        studentId = action.studentId
+                    )
+                }
+            }
+
             is LiteracyAction.OnSubmitResponse -> {
                 onSubmitReadingAssessment(
                     assessmentId = action.assessmentId,
@@ -147,206 +146,78 @@ class LiteracyViewModel(
                     )
                 }
             }
-        }
-    }
 
-    private fun recognizeAudio(audioByteArray: ByteArray) {
-        viewModelScope.launch(Dispatchers.IO) {
-            artificialIntelligenceRepository.getTextFromAudio(audioByteArray = audioByteArray)
-                .catch { error ->
-                    Log.e("Audio response", "audio response failed: ${error.message}")
-                    _state.update {
-                        it.copy(
-                            error = error.message ?: "Unknown Error. Try Again",
-                        )
-                    }
-                }
-                .collect { response ->
-                    Log.d("Audio response", "audio response successful: ${response.data}")
-
-                    response.data?.let { data ->
-                        _state.update {
-                            it.copy(
-                                error = "No response from AI"
-                            )
-                        }
-
-                        if (data.DisplayText.isEmpty()){
-                            return@collect
-                        }
-
-                        _state.update {
-                            it.copy(
-                                response = data.DisplayText,
-                                audioByteArray = audioByteArray
-                            )
-                        }
-
-                    } ?: run {
-                        _state.update {
-                            it.copy(
-                                error = "No response from AI"
-                            )
-                        }
-
-                    }
-
-                }
-        }
-    }
-
-    private fun saveAudio(audioByteArray: ByteArray){
-        viewModelScope.launch(Dispatchers.IO) {
-            val response = mediaRepository.saveAudio(audioByteArray = audioByteArray)
-
-            when(response.status){
-                ResultStatus.INITIAL ,
-                ResultStatus.LOADING -> {}
-                ResultStatus.SUCCESS -> {
-                    response.data?.let{ data ->
-                        if (data.isEmpty()){
-                            return@launch
-                        }
-
-                        _state.update {
-                            it.copy(audioUrl = data)
-                        }
-                    }
-
-                }
-                ResultStatus.ERROR -> {
-                    _state.update {
-                        it.copy(
-                            error = response.message ?: "Unknown Error"
-                        )
-                    }
+            is LiteracyAction.SetAudioFilePath -> {
+                _state.update {
+                    it.copy(
+                        audioFilePath = action.audioFilePath
+                    )
                 }
             }
         }
     }
 
-    private fun addToReadingAssessmentResults(
+    private fun evaluateReadingAssessmentWithWorkManager(
+        assessmentId: String?,
+        studentId: String?,
+        audioByteArray: ByteArray?,
+        audioFilePath: String?,
         content: String,
+        type: String,
         onSuccess: () -> Unit
-    ) {
+    ){
 
-        viewModelScope.launch {
-            val assessmentType: String = _state.value.currentAssessmentLevel.label
-
-            // Check if audio exists
-            if (_state.value.audioByteArray == null) {
-                _state.update { it.copy(error = "Please record your response before submitting.") }
-                delay(4000)
-                _state.update { it.copy(error = null) }
-
-                return@launch
-
+        if (assessmentId.isNullOrEmpty() || studentId.isNullOrEmpty() || audioFilePath.isNullOrEmpty()||audioByteArray == null){
+            _state.update {
+                it.copy(
+                    error = "Assessment can not be evaluated"
+                )
             }
-
-            // Set loading state
-            _state.update { it.copy(isLoading = true) }
-
-            try {
-                // Step 1: Recognize audio (wait for completion)
-                _state.value.audioByteArray?.let { audio ->
-                    // Call recognizeAudio but wait for it to complete
-                    artificialIntelligenceRepository.getTextFromAudio(audioByteArray = audio)
-                        .catch { error ->
-                            Log.e("Audio response", "audio response failed: ${error.message}")
-                            _state.update {
-                                it.copy(
-                                    error = error.message ?: "Unknown Error",
-                                    isLoading = false,
-                                    audioByteArray = null
-                                )
-                            }
-
-                            delay(4000)
-                            _state.update { it.copy(error = null) }
-                        }
-                        .collect { response ->
-                            response.data?.let { data ->
-                                if (data.DisplayText.isNotEmpty()) {
-                                    _state.update { it.copy(response = data.DisplayText) }
-                                } else {
-
-                                    /**
-                                     * resets the state if the response is empty, the student to retry
-                                     */
-                                    _state.update {
-                                        it.copy(
-                                            error = "Your answer was not received. Try Again",
-                                            audioByteArray = null,
-                                            isLoading = false
-                                        )
-                                    }
-
-                                    delay(4000)
-                                    _state.update { it.copy(error = null) }
-
-                                    return@collect
-                                }
-                            }
-                        }
-
-                    _state.value.response?.let {
-                        val saveResponse = mediaRepository.saveAudio(audioByteArray = audio)
-                        if (saveResponse.status == ResultStatus.SUCCESS) {
-                            saveResponse.data?.let { url ->
-                                _state.update { it.copy(audioUrl = url) }
-                            }
-                        }
-                    } ?: run {
-                        _state.update { it.copy(
-                            error = "No answer recorded. Please Try Again",
-                            isLoading = false,
-                            audioByteArray = null
-                        ) }
-
-                        delay(4000)
-                        _state.update { it.copy(error = null) }
-
-                        return@launch
-                    }
-
-                    _state.update { currentState ->
-
-                        val comparisonResult = compareResponseStrings(content, _state.value.response ?: "")
-
-                        val newResult = ReadingAssessmentResult(
-                            type = assessmentType,
-                            content = content,
-                            metadata = ReadingAssessmentMetadata(
-                                audio_url = _state.value.audioUrl ?: "",
-                                transcript = _state.value.response ?: "",
-                                passed = comparisonResult.isMatch
-                            )
-                        )
-
-                        currentState.copy(
-                            readingAssessmentResults = _state.value.readingAssessmentResults.apply { add(element = newResult) },
-                            isLoading = false,
-                            error = null
-                        )
-
-                    }
-
-                    onSuccess.invoke()
-                }
-            } catch (e: Exception) {
-                _state.update { it.copy(
-                    error = "Error processing assessment: ${e.message}",
-                    isLoading = false
-                ) }
-
-                delay(4000)
-                _state.update { it.copy(error = null) }
-            }
-
+            return
         }
 
-    }
+        _state.update { it.copy(isLoading = true) }
 
+        val contentHash = content.hashCode().toString()
+
+        val workData = workDataOf(
+            "audioFilePath" to audioFilePath,
+            "content" to content,
+            "type" to type,
+            "assessment_id" to assessmentId,
+            "student_id" to studentId
+        )
+
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
+        val tag = "assessment_${assessmentId}_${studentId}"
+
+        val request = OneTimeWorkRequestBuilder<EvaluateReadingAssessmentWorker>()
+            .setInputData(workData)
+            .setConstraints(constraints = constraints)
+            .addTag(tag = tag)
+            .build()
+
+        val uniqueWorkName = "reading_assessment_${assessmentId}_${studentId}_${contentHash}_${System.currentTimeMillis()}"
+
+        WorkManager.getInstance(appContext)
+            .enqueueUniqueWork(
+                uniqueWorkName = uniqueWorkName,
+                ExistingWorkPolicy.REPLACE,
+                request = request
+            )
+
+        _state.update {
+            it.copy(
+                isLoading = false,
+                message = "Assessment content submitted for evaluation"
+            )
+        }
+
+        onSuccess.invoke()
+    }
 
     private fun resetAssessmentState() {
         _state.update {
@@ -371,8 +242,10 @@ class LiteracyViewModel(
     ){
 
         viewModelScope.launch(Dispatchers.IO) {
+
             _state.update { it.copy(isLoading = true) }
 
+            /*
             val response = assessmentRepository.assessReadingAssessment(
                 assessmentId = assessmentId,
                 studentID = studentId,
@@ -409,8 +282,58 @@ class LiteracyViewModel(
                     }
                 }
             }
+            */
+
+            scheduleReadingAssessmentResult(
+                assessmentId = assessmentId,
+                studentId = studentId,
+                onSuccess = onSuccess
+            )
         }
 
+    }
+
+    private fun scheduleReadingAssessmentResult(
+        assessmentId: String,
+        studentId: String,
+        onSuccess: () -> Unit
+    ){
+
+        _state.update { it.copy(isLoading = true) }
+
+        val workData = workDataOf(
+            "assessment_id" to assessmentId,
+            "student_id" to studentId
+        )
+
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
+        val tag = "assessment_${assessmentId}_${studentId}"
+
+        val request = PeriodicWorkRequestBuilder<SubmitReadingAssessmentWorker>( 5, TimeUnit.MINUTES)
+            .setInputData(workData)
+            .setConstraints(constraints = constraints)
+            .build()
+
+
+        WorkManager.getInstance(appContext)
+            .enqueueUniquePeriodicWork(
+                uniqueWorkName = "Periodic_submission_work",
+                ExistingPeriodicWorkPolicy.KEEP,
+                request = request
+            )
+
+        _state.update {
+            it.copy(
+                isLoading = false,
+                message = "Assessment content submitted for evaluation"
+            )
+        }
+
+
+        onSuccess.invoke()
     }
 
 
@@ -476,12 +399,18 @@ class LiteracyViewModel(
         }
 
         currentAssessmentContentList?.let {
-            when{
 
-                _state.value.currentIndex == currentAssessmentContentList.size - 1 -> {
-                    addToReadingAssessmentResults(
-                        content = currentAssessmentContentList[_state.value.currentIndex],
-                        onSuccess = {
+            evaluateReadingAssessmentWithWorkManager(
+                assessmentId = _state.value.assessmentId ?: return@let,
+                studentId = _state.value.studentId ?: return@let,
+                audioByteArray = _state.value.audioByteArray,
+                content = currentAssessmentContentList[_state.value.currentIndex],
+                type = _state.value.currentAssessmentLevel.label,
+                audioFilePath = _state.value.audioFilePath,
+                onSuccess = {
+                    when{
+                        _state.value.currentIndex == currentAssessmentContentList.size - 1 -> {
+
                             submitReadingAssessment(
                                 assessmentId = assessmentId,
                                 studentId = studentId,
@@ -500,46 +429,42 @@ class LiteracyViewModel(
                                         it.copy(
                                             currentAssessmentLevelIndex = nextIndex,
                                             currentAssessmentLevel = nextLevel,
-                                            currentIndex = 0
+                                            currentIndex = 0,
+                                            message = null
                                         )
                                     }
                                 }
                             )
                         }
-                    )
-
-                }
-
-                else -> {
-
-                    addToReadingAssessmentResults(
-                        content = currentAssessmentContentList[_state.value.currentIndex],
-                        onSuccess = {
+                        else -> {
                             _state.update {
                                 it.copy(
                                     currentIndex = it.currentIndex + 1,
                                     showInstructions = true,
                                     showContent = false,
                                     audioByteArray = null,
+                                    audioFilePath = null,
+                                    message = null,
                                     response = null,
                                     audioUrl = null
                                 )
                             }
                         }
-                    )
+                    }
 
                 }
-
-            }
+            )
         } ?: run {
             _state.update {
                 it.copy(
                     error = "No assessment content available."
                 )
             }
+
         }
     }
 
+    /*
     fun addMultipleChoiceResponse(
         correctOptions: List<String>,
         question: String,
@@ -599,6 +524,73 @@ class LiteracyViewModel(
             }
         }
     }
+    */
+
+    private fun evaluateMultipleChoicesAssessmentWithWorkManager(
+        question: String,
+        studentId: String?,
+        assessmentId: String?,
+        correctOptions: List<String>,
+        onSuccess: () -> Unit
+    ){
+        viewModelScope.launch {
+            if (_state.value.selectedChoice == null){
+                _state.update {
+                    it.copy(
+                        error = "Please select an answer before submitting."
+                    )
+                }
+                return@launch
+            }
+
+            if (_state.value.options.isEmpty()){
+                _state.update {
+                    it.copy(error = "No options available for this question." )
+                }
+                return@launch
+            }
+
+
+            _state.update { it.copy(isLoading = true) }
+
+            val workData = workDataOf(
+                "studentId" to studentId,
+                "assessmentId" to assessmentId,
+                "question" to question,
+                "options" to _state.value.options.toList().toTypedArray(),
+                "studentAnswer" to _state.value.selectedChoice ,
+                "passed" to ( _state.value.selectedChoice in correctOptions )
+            )
+
+
+            val questionHash = question.hashCode().toString()
+            val tag = "assessment_${assessmentId}_${studentId}"
+
+            val request = OneTimeWorkRequestBuilder<EvaluateMultipleChoiceQuestionWorker>()
+                .setInputData(workData)
+                .addTag(tag)
+                .build()
+
+            val uniqueWorkName = "multiple_choices_${assessmentId}_${studentId}_${questionHash}_${System.currentTimeMillis()}"
+
+            WorkManager.getInstance(appContext)
+                .enqueueUniqueWork(
+                    uniqueWorkName = uniqueWorkName,
+                    ExistingWorkPolicy.REPLACE,
+                    request = request
+                )
+
+            _state.update {
+                it.copy(
+                    isLoading = false,
+                    message = "Assessment content submitted for evaluation"
+                )
+            }
+
+            onSuccess.invoke()
+        }
+    }
+
 
 
     fun onSubmitStoryAssessment(
@@ -611,15 +603,61 @@ class LiteracyViewModel(
             else -> emptyList()
         }
 
+        if (contentList.isEmpty()){
+            _state.update {
+                it.copy(error = "Something went wrong. Try again")
+            }
+            return
+        }
+
+        evaluateMultipleChoicesAssessmentWithWorkManager(
+            correctOptions = contentList[_state.value.currentIndex].multipleChoices.correctChoices,
+            studentId = _state.value.studentId,
+            assessmentId = _state.value.assessmentId,
+            question = contentList[_state.value.currentIndex].question,
+            onSuccess = {
+                when{
+                    _state.value.currentIndex == contentList.size - 1 -> {
+                        _state.update {
+                            val nextIndex = if (_state.value.currentAssessmentLevelIndex < _state.value.assessmentFlow.size - 1)
+                                _state.value.currentAssessmentLevelIndex + 1
+                            else 0
+
+                            val nextLevel = if (nextIndex < _state.value.assessmentFlow.size)
+                                _state.value.assessmentFlow[nextIndex]
+                            else
+                                _state.value.assessmentFlow[0]
+
+                            it.copy(
+                                currentAssessmentLevelIndex = nextIndex,
+                                currentAssessmentLevel = nextLevel,
+                                currentIndex = 0,
+                                multipleChoiceQuestionsResult = mutableListOf()
+                            )
+                        }
+                    }
+
+
+                    else -> {
+                        _state.update {
+                            it.copy(
+                                currentIndex = it.currentIndex + 1,
+                                options = emptyList(),
+                                selectedChoice = null
+                            )
+                        }
+                    }
+                }
+            }
+        )
+
+        /*
         when{
             contentList.isEmpty() -> {
-                _state.update {
-                    it.copy(error = "Something went wrong. Try again")
-                    return
-                }
             }
 
             _state.value.currentIndex == contentList.size - 1 -> {
+                /*
                 addMultipleChoiceResponse(
                     correctOptions = contentList[_state.value.currentIndex].multipleChoices.correctChoices,
                     question = contentList[_state.value.currentIndex].question,
@@ -650,7 +688,9 @@ class LiteracyViewModel(
                             }
                         )
                     }
-                )
+                )*/
+
+//                eva
 
 
             }
@@ -670,7 +710,7 @@ class LiteracyViewModel(
                     }
                 )
             }
-        }
+        } */
 
     }
 

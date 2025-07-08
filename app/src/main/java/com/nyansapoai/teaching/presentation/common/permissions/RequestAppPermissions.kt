@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -17,9 +18,12 @@ import androidx.core.content.ContextCompat
 
 @Composable
 fun RequestAppPermissions(
+    modifier: Modifier = Modifier,
     permissionsArray: Array<String>,
     onSuccess: () -> Unit,
-    modifier: Modifier = Modifier,
+    onFailure: () -> Unit = {},
+    content: (@Composable (() -> Unit ) -> Unit)? = null,
+    isButtonClicked: Boolean = false
 ) {
     val context = LocalContext.current
 
@@ -32,8 +36,6 @@ fun RequestAppPermissions(
         }
     }
 
-
-
     val requestPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
@@ -43,7 +45,16 @@ fun RequestAppPermissions(
             onSuccess.invoke()
             isRequestingPermissions = false
         } else {
-            isRequestingPermissions = false
+//            onFailure.invoke()
+
+            when(isButtonClicked){
+                true -> {
+                    isRequestingPermissions = true
+                }
+                false -> {
+                    onFailure.invoke()
+                }
+            }
         }
     }
 
@@ -53,7 +64,18 @@ fun RequestAppPermissions(
             onSuccess.invoke()
         } else if (!isRequestingPermissions) {
             isRequestingPermissions = true
-            requestPermissionLauncher.launch(permissionsArray)
+        }
+    }
+
+    AnimatedVisibility(
+        visible = !allPermissionsGranted
+    ) {
+        Box(modifier = modifier) {
+            content?.invoke(
+                {
+                    requestPermissionLauncher.launch(input = permissionsArray)
+                }
+            )
         }
     }
 

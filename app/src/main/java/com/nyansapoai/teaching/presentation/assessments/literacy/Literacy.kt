@@ -69,6 +69,10 @@ fun LiteracyScreen(
     onAction: (LiteracyAction) -> Unit = {},
 ) {
 
+    LaunchedEffect(true) {
+        onAction(LiteracyAction.SetIds(assessmentId = assessmentId, studentId = studentId))
+    }
+
     Scaffold(
         /*
         topBar = {
@@ -126,6 +130,9 @@ fun LiteracyScreen(
                             },
                             response = state.response,
                             isLoading = state.isLoading,
+                            onAudioPathChange = {
+                                onAction(SetAudioFilePath(audioFilePath = it))
+                            },
                             onSubmit = {
                                 onAction(
                                     OnSubmitResponse(
@@ -160,6 +167,9 @@ fun LiteracyScreen(
                             },
                             response = state.response,
                             isLoading = state.isLoading,
+                            onAudioPathChange = {
+                                onAction(SetAudioFilePath(audioFilePath = it))
+                            },
                             onSubmit = {
                                 onAction(
                                     OnSubmitResponse(
@@ -194,6 +204,9 @@ fun LiteracyScreen(
                             },
                             response = state.response,
                             isLoading = state.isLoading,
+                            onAudioPathChange = {
+                                onAction(SetAudioFilePath(audioFilePath = it))
+                            },
                             onSubmit = {
                                 onAction(
                                     OnSubmitResponse(
@@ -230,6 +243,9 @@ fun LiteracyScreen(
                             },
                             response = state.response,
                             isLoading = state.isLoading,
+                            onAudioPathChange = {
+                                onAction(SetAudioFilePath(audioFilePath = it))
+                            },
                             onSubmit = {
                                 onAction(
                                     OnSubmitResponse(
@@ -315,6 +331,29 @@ fun LiteracyScreen(
             ) {
                 Text(
                     text = state.error ?: "An error occurred. Please try again.",
+                    color = MaterialTheme.colorScheme.onTertiary,
+                    modifier = Modifier
+                        .padding(12.dp),
+                    fontSize = 16.sp
+                )
+            }
+
+            AnimatedVisibility(
+                visible = state.message != null,
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(12.dp)
+                    .clip(RoundedCornerShape(10))
+                    .background(MaterialTheme.colorScheme.tertiary)
+                    .border(
+                        width = 2.dp,
+                        color = MaterialTheme.colorScheme.secondary,
+                        shape = RoundedCornerShape(10)
+                    )
+
+            ) {
+                Text(
+                    text = state.message ?: "Message Unknown",
                     color = MaterialTheme.colorScheme.onTertiary,
                     modifier = Modifier
                         .padding(12.dp),

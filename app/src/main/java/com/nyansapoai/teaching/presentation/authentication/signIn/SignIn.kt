@@ -91,7 +91,6 @@ fun SignInScreen(
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.tertiary
                         ),
-
                     )
 
 
@@ -102,8 +101,6 @@ fun SignInScreen(
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.secondary
                         ),
-
-
                     )
 
                 }
@@ -161,6 +158,9 @@ fun SignInScreen(
                     AppButton(
                         enabled = canSubmit,
                         onClick = {
+                            navController.navigate(OTPPage(phoneNumber = phoneNumber))
+
+                            /*
                             onAction.invoke(SignInAction.OnSubmit(onSuccess = {
 
                                 Log.d("Sign In Button", "Button Clicked")
@@ -171,7 +171,7 @@ fun SignInScreen(
                                 )
 
                                 navController.navigate(OTPPage(phoneNumber = phoneNumber))
-                            }))
+                            })) */
                         },
                         modifier = Modifier
                             .fillMaxWidth(),
