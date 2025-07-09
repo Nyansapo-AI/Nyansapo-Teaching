@@ -64,7 +64,7 @@ fun AssessmentsScreen(
             ) {
                 Text(
                     text = stringResource(R.string.assessment),
-                    style = MaterialTheme.typography.titleMedium,
+                    style = MaterialTheme.typography.headlineSmall,
                 )
 
                 TextButton (

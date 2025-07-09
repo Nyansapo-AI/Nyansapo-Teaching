@@ -4,17 +4,14 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.Constraints
-import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.workDataOf
 import com.nyansapoai.teaching.data.remote.ai.ArtificialIntelligenceRepository
 import com.nyansapoai.teaching.data.remote.assessment.AssessmentRepository
 import com.nyansapoai.teaching.data.remote.media.MediaRepository
-import com.nyansapoai.teaching.domain.models.assessments.literacy.MultipleChoicesResult
 import com.nyansapoai.teaching.domain.models.assessments.literacy.literacyAssessmentContent
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.LiteracyAssessmentLevel
 import com.nyansapoai.teaching.presentation.assessments.literacy.workers.EvaluateMultipleChoiceQuestionWorker
@@ -22,7 +19,6 @@ import com.nyansapoai.teaching.presentation.assessments.literacy.workers.Evaluat
 import com.nyansapoai.teaching.presentation.assessments.literacy.workers.MarkLiteracyAssessmentWorker
 import com.nyansapoai.teaching.presentation.assessments.literacy.workers.SubmitMultipleChoiceResultsWorker
 import com.nyansapoai.teaching.presentation.assessments.literacy.workers.SubmitReadingAssessmentWorker
-import com.nyansapoai.teaching.utils.ResultStatus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -30,7 +26,6 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.util.concurrent.TimeUnit
 
 class LiteracyViewModel(
     private val assessmentRepository: AssessmentRepository,
@@ -79,8 +74,6 @@ class LiteracyViewModel(
 
             is LiteracyAction.OnSubmitResponse -> {
                 onSubmitReadingAssessment(
-                    assessmentId = action.assessmentId,
-                    studentId = action.studentId
                 )
             }
             is LiteracyAction.SetAudioByteArray -> {
@@ -121,8 +114,6 @@ class LiteracyViewModel(
 
             is LiteracyAction.OnSubmitMultipleChoiceResponse -> {
                 onSubmitStoryAssessment(
-                    studentId = action.studentId,
-                    assessmentId = action.assessmentId
                 )
             }
             is LiteracyAction.SetSelectedChoice -> {
@@ -168,56 +159,59 @@ class LiteracyViewModel(
         onSuccess: () -> Unit
     ){
 
-        if (assessmentId.isNullOrEmpty() || studentId.isNullOrEmpty() || audioFilePath.isNullOrEmpty()||audioByteArray == null){
+        viewModelScope.launch {
+
+            if (assessmentId.isNullOrEmpty() || studentId.isNullOrEmpty() || audioFilePath.isNullOrEmpty() || audioByteArray == null) {
+                _state.update {
+                    it.copy(
+                        error = "Assessment can not be evaluated"
+                    )
+                }
+                return@launch
+            }
+
+            _state.update { it.copy(isLoading = true) }
+
+            val contentHash = content.hashCode().toString()
+
+            val workData = workDataOf(
+                "audioFilePath" to audioFilePath,
+                "content" to content,
+                "type" to type,
+                "assessment_id" to assessmentId,
+                "student_id" to studentId
+            )
+
+            val constraints = Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .build()
+
+            val tag = "assessment_${assessmentId}_${studentId}"
+
+            val request = OneTimeWorkRequestBuilder<EvaluateReadingAssessmentWorker>()
+                .setInputData(workData)
+                .setConstraints(constraints = constraints)
+                .addTag(tag = tag)
+                .build()
+
+            val uniqueWorkName = "reading_assessment_${assessmentId}_${studentId}_${contentHash}_${System.currentTimeMillis()}"
+
+            WorkManager.getInstance(appContext)
+                .enqueueUniqueWork(
+                    uniqueWorkName = uniqueWorkName,
+                    ExistingWorkPolicy.REPLACE,
+                    request = request
+                )
+
             _state.update {
                 it.copy(
-                    error = "Assessment can not be evaluated"
+                    isLoading = false,
+                    message = "Assessment content submitted for evaluation"
                 )
             }
-            return
+
+            onSuccess.invoke()
         }
-
-        _state.update { it.copy(isLoading = true) }
-
-        val contentHash = content.hashCode().toString()
-
-        val workData = workDataOf(
-            "audioFilePath" to audioFilePath,
-            "content" to content,
-            "type" to type,
-            "assessment_id" to assessmentId,
-            "student_id" to studentId
-        )
-
-        val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .build()
-
-        val tag = "assessment_${assessmentId}_${studentId}"
-
-        val request = OneTimeWorkRequestBuilder<EvaluateReadingAssessmentWorker>()
-            .setInputData(workData)
-            .setConstraints(constraints = constraints)
-            .addTag(tag = tag)
-            .build()
-
-        val uniqueWorkName = "reading_assessment_${assessmentId}_${studentId}_${contentHash}_${System.currentTimeMillis()}"
-
-        WorkManager.getInstance(appContext)
-            .enqueueUniqueWork(
-                uniqueWorkName = uniqueWorkName,
-                ExistingWorkPolicy.REPLACE,
-                request = request
-            )
-
-        _state.update {
-            it.copy(
-                isLoading = false,
-                message = "Assessment content submitted for evaluation"
-            )
-        }
-
-        onSuccess.invoke()
     }
 
     private fun resetAssessmentState() {
@@ -235,123 +229,7 @@ class LiteracyViewModel(
         }
     }
 
-    /*
-    fun submitReadingAssessment(
-        assessmentId: String,
-        studentId: String,
-        onSuccess: () -> Unit
-    ){
-
-        viewModelScope.launch(Dispatchers.IO) {
-
-            _state.update { it.copy(isLoading = true) }
-
-            scheduleReadingAssessmentResult(
-                assessmentId = assessmentId,
-                studentId = studentId,
-                onSuccess = onSuccess
-            )
-        }
-
-    }*/
-
-    /*
-    private fun scheduleReadingAssessmentResult(
-        assessmentId: String,
-        studentId: String,
-        onSuccess: () -> Unit
-    ){
-
-        _state.update { it.copy(isLoading = true) }
-
-        val workData = workDataOf(
-            "assessment_id" to assessmentId,
-            "student_id" to studentId
-        )
-
-        val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .build()
-
-        val tag = "assessment_${assessmentId}_${studentId}"
-
-        val request = PeriodicWorkRequestBuilder<SubmitReadingAssessmentWorker>( 5, TimeUnit.MINUTES)
-            .setInputData(workData)
-            .setConstraints(constraints = constraints)
-            .build()
-
-
-        WorkManager.getInstance(appContext)
-            .enqueueUniquePeriodicWork(
-                uniqueWorkName = "Periodic_submission_work",
-                ExistingPeriodicWorkPolicy.KEEP,
-                request = request
-            )
-
-        _state.update {
-            it.copy(
-                isLoading = false,
-                message = "Assessment content submitted for evaluation"
-            )
-        }
-
-
-        onSuccess.invoke()
-    }
-    */
-
-
-    private fun submitMultipleChoiceQuestions(
-        assessmentId: String,
-        studentId: String,
-        multipleChoiceQuestionsResult: List<MultipleChoicesResult>,
-        onSuccess: () -> Unit
-    ) {
-        viewModelScope.launch(Dispatchers.IO) {
-            _state.update { it.copy(isLoading = true) }
-
-            val response = assessmentRepository.assessMultipleChoiceQuestions(
-                assessmentId = assessmentId,
-                studentID = studentId,
-                multipleChoiceQuestions = multipleChoiceQuestionsResult
-            )
-
-            when(response.status){
-                ResultStatus.INITIAL ,
-                ResultStatus.LOADING -> {}
-                ResultStatus.SUCCESS -> {
-                    _state.update {
-                        it.copy(
-                            message = "Assessment submitted successfully.",
-                            isLoading = false,
-                            showInstructions = false,
-                            showContent = false,
-                            currentIndex = 0,
-                            audioByteArray = null,
-                            response = null,
-                            audioUrl = null,
-                            multipleChoiceQuestionsResult = mutableListOf()
-                        )
-                    }
-
-                    onSuccess.invoke()
-                }
-                ResultStatus.ERROR -> {
-                    _state.update {
-                        it.copy(
-                            error = response.message ?: "Can not submit assessment result",
-                            isLoading = false
-                        )
-                    }
-                }
-            }
-        }
-    }
-
-    fun onSubmitReadingAssessment(
-        assessmentId: String,
-        studentId: String,
-    ){
+    fun onSubmitReadingAssessment(){
 
         val currentAssessmentContentList =when(_state.value.currentAssessmentLevel){
             LiteracyAssessmentLevel.LETTER_RECOGNITION -> _state.value.assessmentContent?.letters ?: emptyList()
@@ -488,10 +366,7 @@ class LiteracyViewModel(
 
 
 
-    fun onSubmitStoryAssessment(
-        assessmentId: String,
-        studentId: String,
-    ) {
+    fun onSubmitStoryAssessment() {
 
         val contentList = when(_state.value.currentAssessmentLevel){
             LiteracyAssessmentLevel.MULTIPLE_CHOICE -> _state.value.assessmentContent?.questionsData ?: emptyList()

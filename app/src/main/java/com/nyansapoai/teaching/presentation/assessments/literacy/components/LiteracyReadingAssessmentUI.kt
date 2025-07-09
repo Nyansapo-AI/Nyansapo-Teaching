@@ -109,7 +109,6 @@ fun LiteracyReadingAssessmentUI(
                 )
             }
 
-
         },
         onSuccess = {
             allPermissionsAllowed = true
@@ -171,12 +170,20 @@ fun LiteracyReadingAssessmentUI(
                     }
 
                 })
-
         }
     )
 
+    if (readingList.isEmpty()){
+        Text(
+            text= "Questions are not available",
+            style = MaterialTheme.typography.titleMedium,
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .fillMaxWidth()
+        )
 
-
+        return
+    }
 
 
     val context = LocalContext.current
@@ -191,10 +198,10 @@ fun LiteracyReadingAssessmentUI(
     }
 
     LaunchedEffect(currentIndex) {
-        if (currentIndex < readingList.size) {
-            progress = (currentIndex + 1).toFloat() / readingList.size.toFloat()
+        progress = if (currentIndex < readingList.size) {
+            (currentIndex + 1).toFloat() / readingList.size.toFloat()
         } else {
-            progress = 1f
+            1f
         }
     }
 

@@ -56,6 +56,11 @@ class SubmitMultipleChoiceResultsWorker(
                                 studentId = groupStudentId,
                                 assessmentId = groupAssessmentId
                             )
+
+                            localDataSource.clearSubmittedMultipleChoicesResults(
+                                assessmentId = groupAssessmentId,
+                                studentId = groupStudentId
+                            )
                             true
                         }
                         ResultStatus.ERROR -> {

@@ -26,7 +26,7 @@ data class LiteracyState(
     val selectedChoice: String? = null,
     val options: List<String> = emptyList(),
 
-    val currentAssessmentLevel: LiteracyAssessmentLevel = LiteracyAssessmentLevel.PARAGRAPH,
+    val currentAssessmentLevel: LiteracyAssessmentLevel = LiteracyAssessmentLevel.LETTER_RECOGNITION,
     val currentAssessmentLevelIndex: Int = 0,
     val assessmentContent: LiteracyAssessmentData? = null,
     val readingAssessmentResults: MutableList<ReadingAssessmentResult> = mutableListOf(),

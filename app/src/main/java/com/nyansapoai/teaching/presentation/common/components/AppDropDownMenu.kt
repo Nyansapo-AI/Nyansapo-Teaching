@@ -45,7 +45,6 @@ fun AppDropDownMenu(
             placeholder = placeholder,
             onValueChanged = {},
             keyboardType = KeyboardType.Text,
-//            onTextFieldClick = onClick,
             error = error,
             trailingIcon = {
                 IconButton(
@@ -87,7 +86,7 @@ fun AppDropDownMenu(
                 ),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 8.dp)
+//                    .padding(vertical = 8.dp)
             ) {
                 content()
             }
