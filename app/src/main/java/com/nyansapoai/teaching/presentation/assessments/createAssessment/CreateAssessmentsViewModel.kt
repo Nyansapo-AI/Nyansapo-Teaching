@@ -101,6 +101,8 @@ class CreateAssessmentsViewModel(
         assignedStudents: List<AssignedStudent> // Assuming AssignedStudent is a String for simplicity
     ) {
         viewModelScope.launch {
+            _state.update { it.copy(isLoading = true) }
+
             val result = assessmentRepository.createAssessment(
                 name = name,
                 type = type,
@@ -111,7 +113,9 @@ class CreateAssessmentsViewModel(
 
             when (result.status){
                 ResultStatus.INITIAL ,
-                ResultStatus.LOADING -> {}
+                ResultStatus.LOADING -> {
+                    _state.update { it.copy(isLoading = true) }
+                }
                 ResultStatus.SUCCESS -> {
 
                     _state.update {
@@ -124,7 +128,8 @@ class CreateAssessmentsViewModel(
                             isAssessmentNumberDropDownExpanded = false,
                             isStartLevelDropDownExpanded = false,
                             isTypeDropDownExpanded = false,
-                            isStudentListDropDownExpanded = false
+                            isStudentListDropDownExpanded = false,
+                            isLoading = false
                         )
                     }
 

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -63,7 +64,7 @@ fun CreateAssessmentsScreen(
                 title = {
                     Text(
                         text = "Create Assessment",
-                        style = MaterialTheme.typography.titleMedium,
+                        style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold
                     )
                 },
@@ -98,6 +99,7 @@ fun CreateAssessmentsScreen(
                     AppTextField(
                         value = state.name,
                         onValueChanged = { onAction(CreateAssessmentsAction.SetName(it)) },
+                        required = true,
                         label = "Assessment Name",
                         placeholder = "Enter assessment name",
                     )
@@ -110,6 +112,7 @@ fun CreateAssessmentsScreen(
                         label = "Assessment Type",
                         placeholder = "Select assessment type",
                         value = state.type,
+                        required = true,
                         onClick = { onAction(CreateAssessmentsAction.ToggleTypeDropDown(isExpanded = !state.isTypeDropDownExpanded)) },
                         error = null
                     ) {
@@ -128,6 +131,7 @@ fun CreateAssessmentsScreen(
                     AppDropDownMenu(
                         expanded = state.isAssessmentNumberDropDownExpanded,
                         label = "Assessment Number",
+                        required = true,
                         placeholder = "Select assessment number",
                         value = state.assessmentNumber.toString(),
                         onClick = { onAction(CreateAssessmentsAction.ToggleAssessmentNumberDropDown(isExpanded = !state.isAssessmentNumberDropDownExpanded)) },
@@ -157,6 +161,7 @@ fun CreateAssessmentsScreen(
                         expanded = state.isStudentListDropDownExpanded,
                         label = "Assigned Students",
                         placeholder = "Select students to assign",
+                        required = true,
                         value = if (state.assignedStudents.size > 1) "${state.assignedStudents.size} student" else "${state.assignedStudents.size} students",
                         onClick = {
                             onAction(CreateAssessmentsAction.ToggleStudentListDropDown(isExpanded = !state.isStudentListDropDownExpanded))
@@ -189,6 +194,7 @@ fun CreateAssessmentsScreen(
            ) {
                AppButton(
                    enabled = state.canSubmit,
+                   isLoading = state.isLoading,
                    onClick = {
                        onAction(CreateAssessmentsAction.SubmitAssessment(
                            onSuccess = {

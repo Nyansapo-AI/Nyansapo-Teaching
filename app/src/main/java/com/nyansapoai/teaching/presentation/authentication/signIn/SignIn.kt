@@ -134,7 +134,7 @@ fun SignInScreen(
 
                     AppTextField(
                         value = name,
-                        placeholder = "Name",
+                        placeholder = "eg. John Doe",
                         imeAction = ImeAction.Next,
                         onValueChanged = { string ->
                             onAction.invoke(SignInAction.OnNameChange(name = string))
@@ -143,7 +143,7 @@ fun SignInScreen(
 
                     AppTextField(
                         value = phoneNumber,
-                        placeholder = "Phone Number",
+                        placeholder = "eg. +254712345607",
                         imeAction = ImeAction.Done,
                         keyboardType = KeyboardType.Text,
                         onValueChanged = { string ->
@@ -156,18 +156,6 @@ fun SignInScreen(
                         onClick = {
                             navController.navigate(OTPPage(phoneNumber = phoneNumber))
 
-                            /*
-                            onAction.invoke(SignInAction.OnSubmit(onSuccess = {
-
-                                Log.d("Sign In Button", "Button Clicked")
-                                phoneAuth.StartPhoneNumberVerification(
-                                    phoneNumber = phoneNumber,
-                                    code = "",
-                                    canVerify = false
-                                )
-
-                                navController.navigate(OTPPage(phoneNumber = phoneNumber))
-                            })) */
                         },
                         modifier = Modifier
                             .fillMaxWidth(),
@@ -217,63 +205,67 @@ fun SignInScreen(
 
 
 
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
+            }
+
+
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+            ) {
+
+
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
                     modifier = Modifier
-                        .fillMaxWidth()
                 ) {
-
-
-
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(6.dp),
-                        modifier = Modifier
+                    TextButton(
+                        onClick = {}
                     ) {
-                        TextButton(
-                            onClick = {}
-                        ) {
-                            Text(
-                                text = stringResource(R.string.term_services),
-                                textAlign = TextAlign.Center,
-                                style = MaterialTheme.typography.titleSmall.copy(
-                                    fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.tertiary
-                                ),
-                                modifier = Modifier
-                            )
-
-                        }
-
                         Text(
-                            text = stringResource(R.string.and),
+                            text = stringResource(R.string.term_services),
                             textAlign = TextAlign.Center,
                             style = MaterialTheme.typography.titleSmall.copy(
-                                fontWeight = FontWeight.Bold
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.tertiary
                             ),
                             modifier = Modifier
                         )
 
-                        TextButton(
-                            onClick = {}
-                        ) {
-                            Text(
-                                text = stringResource(R.string.privacy_policy),
-                                textAlign = TextAlign.Center,
-                                style = MaterialTheme.typography.titleSmall.copy(
-                                    fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.tertiary
-                                ),
-                                modifier = Modifier
-                            )
+                    }
 
-                        }
+                    Text(
+                        text = stringResource(R.string.and),
+                        textAlign = TextAlign.Center,
+                        style = MaterialTheme.typography.titleSmall.copy(
+                            fontWeight = FontWeight.Bold
+                        ),
+                        modifier = Modifier
+                    )
+
+                    TextButton(
+                        onClick = {}
+                    ) {
+                        Text(
+                            text = stringResource(R.string.privacy_policy),
+                            textAlign = TextAlign.Center,
+                            style = MaterialTheme.typography.titleSmall.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.tertiary
+                            ),
+                            modifier = Modifier
+                        )
 
                     }
 
                 }
+
             }
+
         }
     }
 

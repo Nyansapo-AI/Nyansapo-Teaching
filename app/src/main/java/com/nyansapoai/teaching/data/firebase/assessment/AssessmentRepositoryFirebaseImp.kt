@@ -54,11 +54,13 @@ class AssessmentRepositoryFirebaseImp(
             assigned_students = assignedStudents
         )
 
+
         // Create the main assessment document
         firebaseDb.collection(assessmentCollection)
             .document(newAssessment.id)
             .set(newAssessment)
             .addOnSuccessListener {
+
                 // Create assessment result documents for each assigned student
                 val batch = firebaseDb.batch()
 
