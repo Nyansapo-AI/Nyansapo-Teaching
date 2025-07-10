@@ -1,12 +1,16 @@
 package com.nyansapoai.teaching.presentation.assessments.numeracy.components
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
@@ -15,7 +19,9 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -24,82 +30,164 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.nyansapoai.teaching.R
 import com.nyansapoai.teaching.presentation.common.components.AppButton
+import com.nyansapoai.teaching.presentation.common.components.AppLinearProgressIndicator
 
 @Composable
 fun NumeracyCountAndMatch(
     modifier: Modifier = Modifier,
     count: Int = 10,
+    countList: List<Int> = listOf(1, 2, 6, 7),
+    currentIndex: Int = 0,
     onSelectCount: (Int) -> Unit = { /* Handle count selection */ },
     onSubmit: () -> Unit = { /* Handle submission */ },
     selectedCount: Int? = null, // Optional selected count for highlighting
 ) {
-    val options by remember { mutableStateOf(generateOptionsWithCorrectAnswer(correctNumber = count)) } // Randomly select 4 unique numbers from 1 to 10
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(24.dp)
-    ) {
+    if (countList.isEmpty()){
         Text(
-            text = "Count and Match",
-            style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.secondary
+            text = "Questions are not available",
+            style = MaterialTheme.typography.titleMedium,
+            textAlign = TextAlign.Center,
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(12.dp)
         )
 
-        FlowRow(
-            horizontalArrangement = Arrangement.Center,
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            itemVerticalAlignment = Alignment.CenterVertically,
-            maxItemsInEachRow = 5
+        return
+    }
+
+    var progress by remember {
+        mutableFloatStateOf(0f)
+    }
+
+    LaunchedEffect(currentIndex) {
+        progress = if (currentIndex < countList.size) {
+            (currentIndex + 1).toFloat() / countList.size.toFloat()
+        } else {
+            1f
+        }
+    }
+
+    val options by remember { mutableStateOf(generateOptionsWithCorrectAnswer(correctNumber = countList[currentIndex])) } // Randomly select 4 unique numbers from 1 to 10
+
+    Box(
+        modifier =modifier
+            .fillMaxSize()
+            .padding(12.dp)
+    ) {
+
+        LazyColumn (
+            verticalArrangement = Arrangement.spacedBy(20.dp),
+            modifier = Modifier
+                .fillMaxSize()
         ) {
-            repeat(count) { index ->
-                CountItem()
-            }
-        }
-
-        Divider(
-            color = MaterialTheme.colorScheme.onBackground,
-            thickness = 1.dp,
-            modifier = Modifier.padding(vertical = 16.dp)
-        )
-
-        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                OptionButton(
-                    number = options[0],
-                    onClick = { onSelectCount(options[0]) },
-                    isSelected = selectedCount == options[0]
+            item{
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier
+                ) {
+                    Text(
+                        text = "Count and Match",
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.secondary,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .fillMaxWidth()
                     )
-                OptionButton(
-                    number = options[1],
-                    onClick = { onSelectCount(options[1]) },
-                    isSelected = selectedCount == options[1]
-                )
+
+                    Spacer(Modifier.padding(16.dp))
+
+                    Text(
+                        text = "Question ${currentIndex + 1}/${countList.size}",
+                        style = MaterialTheme.typography.titleMedium,
+                    )
+
+
+                    AppLinearProgressIndicator(
+                        progress = progress
+                    )
+
+                }
             }
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                OptionButton(
-                    number = options[2],
-                    onClick = { onSelectCount(options[2]) },
-                    isSelected = selectedCount == options[2]
-                )
-                OptionButton(
-                    number = options[3],
-                    onClick = { onSelectCount(options[3]) },
-                    isSelected = selectedCount == options[3]
-                )
+
+
+            item {
+                Spacer(Modifier.size(20.dp))
             }
+
+            item{
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center,
+                    modifier = Modifier
+
+                ) {
+
+                    FlowRow(
+                        horizontalArrangement = Arrangement.Center,
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        itemVerticalAlignment = Alignment.CenterVertically,
+                        maxItemsInEachRow = 5
+                    ) {
+                        repeat(countList[currentIndex]) { index ->
+                            CountItem()
+                        }
+                    }
+
+                    Divider(
+                        color = MaterialTheme.colorScheme.onBackground,
+                        thickness = 1.dp,
+                        modifier = Modifier.padding(vertical = 16.dp)
+                    )
+
+                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        Row(horizontalArrangement = Arrangement.spacedBy(20.dp)) {
+                            OptionButton(
+                                number = options[0],
+                                onClick = { onSelectCount(options[0]) },
+                                isSelected = selectedCount == options[0]
+                            )
+                            OptionButton(
+                                number = options[1],
+                                onClick = { onSelectCount(options[1]) },
+                                isSelected = selectedCount == options[1]
+                            )
+                        }
+                        Row(horizontalArrangement = Arrangement.spacedBy(20.dp)) {
+                            OptionButton(
+                                number = options[2],
+                                onClick = { onSelectCount(options[2]) },
+                                isSelected = selectedCount == options[2]
+                            )
+                            OptionButton(
+                                number = options[3],
+                                onClick = { onSelectCount(options[3]) },
+                                isSelected = selectedCount == options[3]
+                            )
+                        }
+                    }
+
+
+                }
+
+            }
+
+
         }
+
 
         AppButton(
             onClick = onSubmit,
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFC107))
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFC107)),
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()
         ) {
             Text(
                 "Submit",
