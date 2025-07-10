@@ -101,7 +101,7 @@
 } 
 ```
 
-## Subcollection: Attendance under Camps
+## Subcollection: Attendance under Schools
 
 ```json
 {
