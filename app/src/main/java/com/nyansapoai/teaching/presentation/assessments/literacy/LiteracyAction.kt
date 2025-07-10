@@ -23,6 +23,12 @@ sealed interface LiteracyAction {
         val studentId: String,
     ) : LiteracyAction
 
+
+    data class OnSubmitLiteracyResults(
+        val assessmentId: String,
+        val studentId: String,
+    ): LiteracyAction
+
     data class SetSelectedChoice(val selectedChoice: String) : LiteracyAction
 
     data class SetMultipleQuestionOptions(

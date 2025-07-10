@@ -2,9 +2,13 @@ package com.nyansapoai.teaching.presentation.assessments.numeracy.components
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyAssessmentContent
 import com.nyansapoai.teaching.presentation.assessments.components.InputResponseAlert
 import com.nyansapoai.teaching.presentation.common.components.AppCircularLoading
@@ -43,7 +47,9 @@ fun NumeracyContent(
 ) {
 
     AnimatedContent(
-        targetState = isLoading
+        targetState = isLoading,
+        modifier = modifier
+            .fillMaxSize(),
     ) { loading ->
         when(loading){
             true -> {
@@ -51,7 +57,10 @@ fun NumeracyContent(
             }
             false -> {
                 AnimatedContent(
-                    targetState = assessmentLevel
+                    targetState = assessmentLevel,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .widthIn(max= 500.dp)
                 ) { level ->
 
                     InputResponseAlert(
@@ -81,6 +90,8 @@ fun NumeracyContent(
                             ){
                                 NumeracyCountAndMatch(
                                     count = assessmentContent.countAndMatchNumbersList[countMatchIndex],
+                                    countList = assessmentContent.countAndMatchNumbersList,
+                                    currentIndex = countMatchIndex,
                                     onSelectCount = onSelectCountMatch,
                                     selectedCount = selectedCount ,
                                     onSubmit = onSubmitCountMatch

@@ -1,7 +1,6 @@
 package com.nyansapoai.teaching.presentation.assessments.literacy.components
 
 import android.os.Build
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -9,16 +8,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -90,37 +86,43 @@ fun LiteracyReadingAssessmentUI(
 
 
     RequestAppPermissions(
-        permissionsArray = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-            /*
-            For Android versions below Q, we need to request both READ_EXTERNAL_STORAGE and WRITE_EXTERNAL_STORAGE
-             */
-            arrayOf(
-                android.Manifest.permission.RECORD_AUDIO,
-                android.Manifest.permission.READ_MEDIA_AUDIO,
-                android.Manifest.permission.WRITE_EXTERNAL_STORAGE
-            )
-        } else {
-            /*
-            For Android Q and above, we only need to request RECORD_AUDIO
-             */
-            arrayOf(
-                android.Manifest.permission.RECORD_AUDIO,
-            )
+        permissionsArray =  when {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> {
+                // Android 13+ (API 33+): Need RECORD_AUDIO and READ_MEDIA_AUDIO
+                arrayOf(
+                    android.Manifest.permission.RECORD_AUDIO,
+                    android.Manifest.permission.READ_MEDIA_AUDIO
+                )
+            }
+
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> {
+                // Android 10-12 (API 29-32): Only need RECORD_AUDIO
+                arrayOf(android.Manifest.permission.RECORD_AUDIO)
+            }
+
+            else -> {
+                // Below Android 10 (API < 29): Need legacy storage permissions
+                arrayOf(
+                    android.Manifest.permission.RECORD_AUDIO,
+                    android.Manifest.permission.READ_EXTERNAL_STORAGE,
+                    android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+                )
+            }
+
         },
         onSuccess = {
             allPermissionsAllowed = true
         },
         onFailure = {
-//            allPermissionsAllowed = false
             navController.popBackStack()
-//            return@RequestAppPermissions
         },
         content = { action ->
             BasicAlertDialog(
                 onDismissRequest = {
+                    navController.popBackStack()
                     isButtonClicked = false
                 },
-                properties = DialogProperties(),
+                properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),
                 content = {
                     Column(
                         verticalArrangement = Arrangement.spacedBy(20.dp),
@@ -168,12 +170,20 @@ fun LiteracyReadingAssessmentUI(
                     }
 
                 })
-
         }
     )
 
+    if (readingList.isEmpty()){
+        Text(
+            text= "Questions are not available",
+            style = MaterialTheme.typography.titleMedium,
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .fillMaxWidth()
+        )
 
-
+        return
+    }
 
 
     val context = LocalContext.current
@@ -188,10 +198,10 @@ fun LiteracyReadingAssessmentUI(
     }
 
     LaunchedEffect(currentIndex) {
-        if (currentIndex < readingList.size) {
-            progress = (currentIndex + 1).toFloat() / readingList.size.toFloat()
+        progress = if (currentIndex < readingList.size) {
+            (currentIndex + 1).toFloat() / readingList.size.toFloat()
         } else {
-            progress = 1f
+            1f
         }
     }
 
@@ -211,7 +221,7 @@ fun LiteracyReadingAssessmentUI(
             audioFile?.let {
 
                 when {
-                    audioFile != null && !isLoading -> {
+                    !isLoading -> {
                         onAudioByteArrayChange(appAudioRecorder.getOutputFileByteArray(outputFile = audioFile!!))
                         onAudioPathChange(it.absolutePath)
                         onSubmit.invoke()

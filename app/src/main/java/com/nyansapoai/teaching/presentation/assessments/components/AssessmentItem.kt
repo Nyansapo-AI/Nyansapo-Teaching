@@ -55,6 +55,7 @@ fun AssessmentItem(
             Text(
                 text = assessment.name,
                 style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onTertiary,
                 fontWeight = FontWeight.Bold
             )
         },
@@ -87,24 +88,6 @@ fun AssessmentItem(
             }
         },
         supportingContent = {
-            /*
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.child),
-                    contentDescription = "students icon",
-                )
-                Text(
-                    text = when(assessment.assigned_students.size) {
-                        0 -> "No students"
-                        1 -> "1 student"
-                        else -> "${assessment.assigned_students.size} students"
-                    },
-                )
-            }
-            */
         },
         trailingContent = {
             Text(
@@ -113,38 +96,8 @@ fun AssessmentItem(
                     1 -> "1 student"
                     else -> "${assessment.assigned_students.size} students"
                 },
+                color = MaterialTheme.colorScheme.onTertiaryContainer
             )
-
-            /*
-            Column(
-                verticalArrangement = Arrangement.SpaceBetween,
-                horizontalAlignment = Alignment.End,
-            ) {
-                /* Text(text = formatDate(isoDateString = assessment.created_at))
-                */
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    /*
-                    Icon(
-                        painter = painterResource(R.drawable.child),
-                        contentDescription = "students icon",
-                    )
-
-                     */
-                    Text(
-                        text = when(assessment.assigned_students.size) {
-                            0 -> "No students"
-                            1 -> "1 student"
-                            else -> "${assessment.assigned_students.size} students"
-                        },
-                    )
-                }
-
-            }
-
-             */
         },
         colors = ListItemDefaults.colors(
             containerColor = MaterialTheme.colorScheme.tertiary

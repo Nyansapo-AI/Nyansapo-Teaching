@@ -1,11 +1,8 @@
 package com.nyansapoai.teaching.presentation.authentication.signIn
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -28,13 +25,12 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nyansapoai.teaching.R
 import com.nyansapoai.teaching.navController
 import com.nyansapoai.teaching.presentation.authentication.otp.components.PhoneAuth
 import com.nyansapoai.teaching.presentation.common.components.AppButton
 import com.nyansapoai.teaching.presentation.common.components.AppTextField
-import com.nyansapoai.teaching.presentation.navigation.OTPPage
+import com.nyansapoai.teaching.navigation.OTPPage
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -138,7 +134,7 @@ fun SignInScreen(
 
                     AppTextField(
                         value = name,
-                        placeholder = "Name",
+                        placeholder = "eg. John Doe",
                         imeAction = ImeAction.Next,
                         onValueChanged = { string ->
                             onAction.invoke(SignInAction.OnNameChange(name = string))
@@ -147,7 +143,7 @@ fun SignInScreen(
 
                     AppTextField(
                         value = phoneNumber,
-                        placeholder = "Phone Number",
+                        placeholder = "eg. +254712345607",
                         imeAction = ImeAction.Done,
                         keyboardType = KeyboardType.Text,
                         onValueChanged = { string ->
@@ -160,18 +156,6 @@ fun SignInScreen(
                         onClick = {
                             navController.navigate(OTPPage(phoneNumber = phoneNumber))
 
-                            /*
-                            onAction.invoke(SignInAction.OnSubmit(onSuccess = {
-
-                                Log.d("Sign In Button", "Button Clicked")
-                                phoneAuth.StartPhoneNumberVerification(
-                                    phoneNumber = phoneNumber,
-                                    code = "",
-                                    canVerify = false
-                                )
-
-                                navController.navigate(OTPPage(phoneNumber = phoneNumber))
-                            })) */
                         },
                         modifier = Modifier
                             .fillMaxWidth(),
@@ -221,63 +205,67 @@ fun SignInScreen(
 
 
 
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
+            }
+
+
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+            ) {
+
+
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
                     modifier = Modifier
-                        .fillMaxWidth()
                 ) {
-
-
-
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(6.dp),
-                        modifier = Modifier
+                    TextButton(
+                        onClick = {}
                     ) {
-                        TextButton(
-                            onClick = {}
-                        ) {
-                            Text(
-                                text = stringResource(R.string.term_services),
-                                textAlign = TextAlign.Center,
-                                style = MaterialTheme.typography.titleSmall.copy(
-                                    fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.tertiary
-                                ),
-                                modifier = Modifier
-                            )
-
-                        }
-
                         Text(
-                            text = stringResource(R.string.and),
+                            text = stringResource(R.string.term_services),
                             textAlign = TextAlign.Center,
                             style = MaterialTheme.typography.titleSmall.copy(
-                                fontWeight = FontWeight.Bold
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.tertiary
                             ),
                             modifier = Modifier
                         )
 
-                        TextButton(
-                            onClick = {}
-                        ) {
-                            Text(
-                                text = stringResource(R.string.privacy_policy),
-                                textAlign = TextAlign.Center,
-                                style = MaterialTheme.typography.titleSmall.copy(
-                                    fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.tertiary
-                                ),
-                                modifier = Modifier
-                            )
+                    }
 
-                        }
+                    Text(
+                        text = stringResource(R.string.and),
+                        textAlign = TextAlign.Center,
+                        style = MaterialTheme.typography.titleSmall.copy(
+                            fontWeight = FontWeight.Bold
+                        ),
+                        modifier = Modifier
+                    )
+
+                    TextButton(
+                        onClick = {}
+                    ) {
+                        Text(
+                            text = stringResource(R.string.privacy_policy),
+                            textAlign = TextAlign.Center,
+                            style = MaterialTheme.typography.titleSmall.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.tertiary
+                            ),
+                            modifier = Modifier
+                        )
 
                     }
 
                 }
+
             }
+
         }
     }
 

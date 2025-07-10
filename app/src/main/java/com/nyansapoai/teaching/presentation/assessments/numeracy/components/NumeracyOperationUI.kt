@@ -59,8 +59,6 @@ fun NumeracyOperationUI(
 
     var isEraserMode by remember { mutableStateOf(false) }
 
-
-
     Box(
         modifier = Modifier
             .fillMaxWidth()

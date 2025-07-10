@@ -60,7 +60,7 @@ fun LearningLevelItem(
                 containerWidth = size.width
             }
             .heightIn(min = 200.dp)
-            .widthIn(max = 420.dp)
+            .widthIn(max = 360.dp)
     ) {
         Column(
             verticalArrangement = Arrangement.spacedBy(16.dp),

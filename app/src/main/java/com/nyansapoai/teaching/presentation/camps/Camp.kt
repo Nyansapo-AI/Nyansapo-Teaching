@@ -71,6 +71,7 @@ fun CampScreen(
 
         item {
             Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -82,8 +83,11 @@ fun CampScreen(
 
 
                 FlowRow(
+                    itemVerticalAlignment = Alignment.CenterVertically,
                     verticalArrangement = Arrangement.spacedBy(12.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    modifier = Modifier
+                        .fillMaxWidth()
                 ) {
                     state.camp.learning_level_description.forEach {
                         LearningLevelItem(

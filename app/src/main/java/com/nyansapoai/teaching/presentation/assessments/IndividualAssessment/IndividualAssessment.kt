@@ -4,8 +4,8 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -28,18 +28,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.nyansapoai.teaching.navController
 import com.nyansapoai.teaching.presentation.camps.LearningLevelDescription
 import com.nyansapoai.teaching.presentation.camps.components.LearningLevelItem
 import com.nyansapoai.teaching.presentation.common.components.AppCircularLoading
-import com.nyansapoai.teaching.presentation.navigation.ConductAssessmentPage
+import com.nyansapoai.teaching.navigation.ConductAssessmentPage
 import com.nyansapoai.teaching.utils.ResultStatus
 import org.koin.androidx.compose.koinViewModel
 
@@ -74,7 +72,8 @@ fun IndividualAssessmentScreen(
                 title = {
                     Text(
                         text = state.assessmentState.data?.name ?: "Unknown Assessment",
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.titleLarge
                     )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -156,7 +155,7 @@ fun IndividualAssessmentScreen(
                             items(items = assessment.assigned_students, key = { it.student_id }) { student ->
                                 ElevatedCard(
                                     colors = CardDefaults.outlinedCardColors(
-                                        containerColor = MaterialTheme.colorScheme.primaryContainer
+                                        containerColor = MaterialTheme.colorScheme.tertiary
                                     ),
                                     elevation = CardDefaults.cardElevation(
                                         defaultElevation = 12.dp
@@ -165,6 +164,17 @@ fun IndividualAssessmentScreen(
                                         .fillMaxWidth()
                                         .widthIn(max = 420.dp)
                                         .padding(horizontal = 12.dp)
+                                        .clickable(
+                                            onClick = {
+                                                navController.navigate(ConductAssessmentPage(
+                                                    assessmentId = assessment.id,
+                                                    studentId = student.student_id,
+                                                    assessmentType = assessment.type,
+                                                    assessmentNo = assessment.assessmentNumber
+                                                ))
+
+                                            }
+                                        )
                                 ) {
                                     Row(
                                         verticalAlignment = Alignment.CenterVertically,
@@ -178,7 +188,6 @@ fun IndividualAssessmentScreen(
                                             text = student.student_name,
                                             style = MaterialTheme.typography.titleMedium,
                                             modifier = Modifier
-//                                                .padding(16.dp)
                                         )
 
                                         TextButton(

@@ -1,6 +1,7 @@
 package com.nyansapoai.teaching.presentation.assessments.literacy.workers
 
 import android.content.Context
+import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.nyansapoai.teaching.data.local.LocalDataSource
@@ -13,55 +14,70 @@ import org.koin.core.component.inject
 class SubmitMultipleChoiceResultsWorker(
     appContext: Context,
     params: WorkerParameters
-): CoroutineWorker(appContext, params), KoinComponent {
+) : CoroutineWorker(appContext, params), KoinComponent {
 
     private val localDataSource: LocalDataSource by inject()
-    private val assessmentRepository : AssessmentRepository by inject()
+    private val assessmentRepository: AssessmentRepository by inject()
 
     override suspend fun doWork(): Result {
+        val assessmentId = inputData.getString("assessment_id")
+        val studentId = inputData.getString("student_id")
+
+        if (assessmentId.isNullOrEmpty() || studentId.isNullOrEmpty()) {
+            Log.e("SubmitMCResultsWorker", "Missing assessmentId or studentId")
+            return Result.failure()
+        }
+
         return try {
-            val assessmentId = inputData.getString("assessment_id") ?: return Result.failure()
-            val studentId = inputData.getString("student_id") ?: return Result.failure()
+            val pending = localDataSource.getPendingMultipleChoicesResults(
+                assessmentId = assessmentId,
+                studentId = studentId
+            ).first()
 
-            val pending = localDataSource.getPendingMultipleChoicesResults(assessmentId = assessmentId, studentId = studentId).first()
-
-            if (pending.isEmpty()) return Result.success()
+            if (pending.isEmpty()) {
+                Log.i("SubmitMCResultsWorker", "No pending results to submit")
+                return Result.success()
+            }
 
             val grouped = pending.groupBy { it.assessmentId to it.studentId }
 
-            var hasFailure = false
-
-            grouped.forEach { (key, results) ->
-                val (assessmentId, studentId) = key
+            val allSucceeded = grouped.all { (key, results) ->
+                val (groupAssessmentId, groupStudentId) = key
                 val pendingResults = results.map { it.multipleChoicesResult }
+                try {
+                    val response = assessmentRepository.assessMultipleChoiceQuestions(
+                        assessmentId = groupAssessmentId,
+                        studentID = groupStudentId,
+                        multipleChoiceQuestions = pendingResults
+                    )
+                    when (response.status) {
+                        ResultStatus.SUCCESS -> {
+                            localDataSource.markMultipleChoicesResultsAsSubmitted(
+                                studentId = groupStudentId,
+                                assessmentId = groupAssessmentId
+                            )
 
-                val response = assessmentRepository.assessMultipleChoiceQuestions(
-                    assessmentId = assessmentId,
-                    studentID = studentId,
-                    multipleChoiceQuestions = pendingResults
-                )
-
-                when(response.status){
-                    ResultStatus.INITIAL,
-                    ResultStatus.LOADING -> {}
-                    ResultStatus.SUCCESS -> {
-
-                        localDataSource.markMultipleChoicesResultsAsSubmitted(
-                            studentId = studentId,
-                            assessmentId = assessmentId
-                        )
+                            localDataSource.clearSubmittedMultipleChoicesResults(
+                                assessmentId = groupAssessmentId,
+                                studentId = groupStudentId
+                            )
+                            true
+                        }
+                        ResultStatus.ERROR -> {
+                            Log.e("SubmitMCResultsWorker", "Submission failed for $groupAssessmentId/$groupStudentId: ${response.message}")
+                            false
+                        }
+                        else -> true
                     }
-                    ResultStatus.ERROR -> {
-                        hasFailure = true
-                    }
-
+                } catch (e: Exception) {
+                    Log.e("SubmitMCResultsWorker", "Exception for $groupAssessmentId/$groupStudentId", e)
+                    false
                 }
             }
 
-            if(hasFailure) Result.retry() else Result.success()
-
-        }catch (e: Exception){
-            e.printStackTrace()
+            if (allSucceeded) Result.success() else Result.retry()
+        } catch (e: Exception) {
+            Log.e("SubmitMCResultsWorker", "Exception in doWork", e)
             Result.failure()
         }
     }

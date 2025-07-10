@@ -22,6 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nyansapoai.teaching.domain.models.assessments.literacy.MultipleChoices
@@ -39,6 +40,17 @@ fun MultichoiceQuestionsUI(
     onSetOptionsList: (List<String>) -> Unit,
     onSubmitMultipleChoices: () -> Unit
 ) {
+
+
+    if (questionsList.isEmpty()){
+        Text(
+            text = "Questions are not available.",
+            style = MaterialTheme.typography.titleMedium,
+            textAlign = TextAlign.Center
+        )
+
+        return
+    }
 
     var progress by remember {
         mutableFloatStateOf(0f)

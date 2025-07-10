@@ -30,7 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nyansapoai.teaching.R
 import com.nyansapoai.teaching.navController
-import com.nyansapoai.teaching.presentation.navigation.SignInPage
+import com.nyansapoai.teaching.navigation.SignInPage
 import org.koin.androidx.compose.koinViewModel
 
 
