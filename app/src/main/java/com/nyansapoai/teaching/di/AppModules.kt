@@ -7,6 +7,7 @@ import com.nyansapoai.teaching.Database
 import com.nyansapoai.teaching.data.azure.ai.AzureArtificialIntelligenceRepositoryImp
 import com.nyansapoai.teaching.data.firebase.assessment.AssessmentRepositoryFirebaseImp
 import com.nyansapoai.teaching.data.firebase.media.FirebaseMediaRepositoryImpl
+import com.nyansapoai.teaching.data.firebase.user.UserRepositoryFirebaseImp
 import com.nyansapoai.teaching.data.local.LocalDataSource
 import com.nyansapoai.teaching.data.local.LocalDatabaseDriverFactory
 import com.nyansapoai.teaching.data.local.sqldelight.SQLDelightDataSourceImp
@@ -17,6 +18,7 @@ import com.nyansapoai.teaching.data.remote.assessment.AssessmentRepository
 import com.nyansapoai.teaching.data.remote.authentication.AuthenticationRepository
 import com.nyansapoai.teaching.data.remote.authentication.AuthenticationRepositoryImp
 import com.nyansapoai.teaching.data.remote.media.MediaRepository
+import com.nyansapoai.teaching.data.remote.user.UserRepository
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 import com.nyansapoai.teaching.presentation.onboarding.OnboardingViewModel
@@ -129,6 +131,13 @@ val appModules = module {
     single<LocalDataSource> {
         SQLDelightDataSourceImp(
             database = get<Database>()
+        )
+    }
+
+    single<UserRepository> {
+        UserRepositoryFirebaseImp(
+            auth = get(),
+            firebaseDb = get()
         )
     }
 

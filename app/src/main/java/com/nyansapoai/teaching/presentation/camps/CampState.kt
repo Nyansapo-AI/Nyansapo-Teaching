@@ -3,15 +3,19 @@ package com.nyansapoai.teaching.presentation.camps
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.nyansapoai.teaching.domain.models.user.NyansapoUser
 
 data class CampState(
     val greeting: String = "Good Morning",
-    val camp: Camp = Camp()
+    val camp: Camp = Camp(),
+    val user: NyansapoUser? = null,
+
 )
 
 data class Camp(
     val id: String = "",
     val name: String = "Camp One",
+    val error: String? = null,
     val learning_level_description: List<LearningLevelDescription> = listOf(
         LearningLevelDescription(
             type = "Numeracy",

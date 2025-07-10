@@ -59,7 +59,7 @@ fun CampScreen(
                     )
 
                     Text(
-                        text = "Wallace Otieno",
+                        text = state.user?.name ?: "Unknown Name",
                         style = MaterialTheme.typography.titleLarge,
                         color = MaterialTheme.colorScheme.secondary,
                         fontWeight = FontWeight.Bold
