@@ -17,14 +17,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.nyansapoai.teaching.R
+import com.nyansapoai.teaching.domain.models.project.NyansapoProject
 import com.nyansapoai.teaching.presentation.onboarding.OnboardingProjectState
 
 @Composable
 fun SelectProject(
     modifier: Modifier = Modifier,
-    projectList: List<OnboardingProjectState>,
-    selectedProject: OnboardingProjectState?,
-    onSelectProject: (OnboardingProjectState) -> Unit
+    projectList: List<NyansapoProject>,
+    selectedProject: NyansapoProject?,
+    onSelectProject: (NyansapoProject) -> Unit
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(24.dp),

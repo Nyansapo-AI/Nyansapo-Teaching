@@ -5,5 +5,5 @@ import com.google.firebase.firestore.IgnoreExtraProperties
 @IgnoreExtraProperties
 data class NyansapoSchool(
     val id: String = "",
-    val name: String = ""
+    val name: String = "",
 )

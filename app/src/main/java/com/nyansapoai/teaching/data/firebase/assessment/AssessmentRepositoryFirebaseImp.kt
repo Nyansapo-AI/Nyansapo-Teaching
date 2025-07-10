@@ -1,6 +1,7 @@
 package com.nyansapoai.teaching.data.firebase.assessment
 
 import android.util.Log
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
@@ -29,7 +30,8 @@ import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
 class AssessmentRepositoryFirebaseImp(
-    private val firebaseDb: FirebaseFirestore
+    private val firebaseDb: FirebaseFirestore,
+//    private val assessmentDocumentReference: DocumentReference
 ): AssessmentRepository {
 
     private val assessmentCollection = "assessments"
@@ -43,6 +45,17 @@ class AssessmentRepositoryFirebaseImp(
         assignedStudents: List<AssignedStudent>
     ): Results<Unit> {
         val deferred = CompletableDeferred<Results<Unit>>()
+
+
+        val resultRef = firebaseDb
+            .collection("assessments")
+            .document("assessmentId")
+            .collection("students")
+            .document("entID")
+            .collection("results")
+            .document("wordProblems")
+
+
 
         val newAssessment = Assessment(
             id = Uuid.random().toString(),

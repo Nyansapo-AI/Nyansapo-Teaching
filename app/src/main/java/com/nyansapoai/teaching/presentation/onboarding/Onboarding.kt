@@ -22,6 +22,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.nyansapoai.teaching.R
+import com.nyansapoai.teaching.navController
+import com.nyansapoai.teaching.navigation.HomePage
 import com.nyansapoai.teaching.presentation.common.components.AppButton
 import com.nyansapoai.teaching.presentation.common.components.StepContent
 import com.nyansapoai.teaching.presentation.common.components.StepsRow
@@ -58,12 +60,7 @@ fun OnboardingScreen(
         StepContent(
             screen = {
                 SelectOrganization(
-                    organizationList = listOf(
-                        OnboardingOrganizationState(name = "Nyansapo", id = "1"),
-                        OnboardingOrganizationState(name = "Organization 1", id = "2"),
-                        OnboardingOrganizationState(name = "Organization 2", id = "3"),
-                        OnboardingOrganizationState(name = "Team Name", id = "4")
-                    ),
+                    organizationList = state.userData?.organizations ?: emptyList(),
                     selectedOrganization = state.selectedOrganization,
                     onSelectOrganization = { organization ->
                         onAction(OnboardingAction.OnSelectOrganization(organizationUI = organization))
@@ -76,13 +73,7 @@ fun OnboardingScreen(
         StepContent(
             screen = {
                 SelectProject(
-                    projectList = listOf(
-                        OnboardingProjectState(name = "Project name 1", id = "1"),
-                        OnboardingProjectState(name = "Project Thing", id = "1"),
-                        OnboardingProjectState(name = "Name", id = "4"),
-                        OnboardingProjectState(name = "Name", id = "5"),
-                        OnboardingProjectState(name = "Name", id = "7"),
-                    ),
+                    projectList = state.selectedOrganization?.projects ?: emptyList(),
                     selectedProject = state.selectedProject,
                     onSelectProject = { project ->
                         onAction.invoke(OnboardingAction.OnSelectProject(project = project))
@@ -95,11 +86,7 @@ fun OnboardingScreen(
         StepContent(
             screen = {
                 SelectSchool(
-                    schoolList = listOf(
-                        OnboardingSchoolState(name = "Nairobi School", id = "1"),
-                        OnboardingSchoolState(name = "Kitui Primary School", id = "31"),
-                        OnboardingSchoolState(name = "Junior School", id = "1"),
-                    ),
+                    schoolList = state.selectedProject?.schools ?: emptyList(),
                     selectedSchool = state.selectedSchool,
                     onSelectSchool = {school ->
                         onAction.invoke(OnboardingAction.OnSelectSchool(school = school))
@@ -109,6 +96,7 @@ fun OnboardingScreen(
             onSubmit = {},
             title = "School"
         ),
+        /*
         StepContent(
             screen = {
                 SelectCamp(
@@ -127,7 +115,7 @@ fun OnboardingScreen(
             },
             onSubmit = {},
             title = "Camp"
-        )
+        )*/
     )
 
     Scaffold(
@@ -136,7 +124,9 @@ fun OnboardingScreen(
             .statusBarsPadding()
     ) { innerPadding ->
         Box(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
         ) {
             Column(
                 verticalArrangement = Arrangement.spacedBy(30.dp),
@@ -158,14 +148,22 @@ fun OnboardingScreen(
                 onboardingSteps[state.currentStep - 1].screen(Modifier)
             }
 
+
             AppButton(
-                onClick = { /* Handle next action */ },
+                enabled = state.selectedOrganization != null && state.selectedProject != null && state.selectedSchool != null ,
+                onClick = {
+                    onAction.invoke(OnboardingAction.OnContinue(
+                        onSuccess = {
+                            navController.navigate(HomePage)
+                        }
+                    ))
+                },
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .fillMaxWidth(0.9f)
             ) {
                 Text(
-                    text = stringResource(R.string.next),
+                    text = stringResource(R.string.continue_text),
                     style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
                 )
             }
