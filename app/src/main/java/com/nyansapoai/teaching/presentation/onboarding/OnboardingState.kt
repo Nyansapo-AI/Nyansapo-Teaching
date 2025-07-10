@@ -6,7 +6,7 @@ import com.nyansapoai.teaching.domain.models.school.NyansapoSchool
 import com.nyansapoai.teaching.domain.models.user.NyansapoUser
 
 data class OnboardingState(
-    val currentStep: Int = 0,
+    val currentStep: Int = 1,
     val isLoading: Boolean = false,
     val error: String? = null,
     val userData: NyansapoUser? = null,

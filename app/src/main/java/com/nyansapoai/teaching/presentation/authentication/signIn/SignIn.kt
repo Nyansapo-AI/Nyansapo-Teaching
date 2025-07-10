@@ -71,7 +71,7 @@ fun SignInScreen(
         ){
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.SpaceEvenly,
+                verticalArrangement = Arrangement.Center,
                 modifier = Modifier
                     .widthIn(max = 500.dp)
                     .fillMaxHeight()
@@ -132,6 +132,7 @@ fun SignInScreen(
                         .imePadding()
                 ) {
 
+                    /*
                     AppTextField(
                         value = name,
                         placeholder = "eg. John Doe",
@@ -139,7 +140,7 @@ fun SignInScreen(
                         onValueChanged = { string ->
                             onAction.invoke(SignInAction.OnNameChange(name = string))
                         }
-                    )
+                    )*/
 
                     AppTextField(
                         value = phoneNumber,
@@ -201,8 +202,6 @@ fun SignInScreen(
 
                     }
                 }
-
-
 
 
             }

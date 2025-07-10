@@ -57,6 +57,7 @@ fun OnboardingScreen(
     }
 
     val onboardingSteps = listOf(
+        /*
         StepContent(
             screen = {
                 SelectOrganization(
@@ -82,7 +83,7 @@ fun OnboardingScreen(
             },
             onSubmit = {},
             title = "Project"
-        ),
+        ),*/
         StepContent(
             screen = {
                 SelectSchool(
@@ -126,7 +127,7 @@ fun OnboardingScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp)
+                .padding(vertical = 16.dp)
         ) {
             Column(
                 verticalArrangement = Arrangement.spacedBy(30.dp),

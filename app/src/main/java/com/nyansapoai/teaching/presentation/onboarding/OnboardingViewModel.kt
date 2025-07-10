@@ -54,7 +54,7 @@ class OnboardingViewModel(
                 _state.update { it.copy(selectedProject = action.project, currentStep = it.currentStep + 1) }
             }
             is OnboardingAction.OnSelectSchool -> {
-                _state.update { it.copy(selectedSchool = action.school, currentStep = it.currentStep + 1) }
+                _state.update { it.copy(selectedSchool = action.school, currentStep = it.currentStep) }
             }
 
             is OnboardingAction.OnContinue -> {
@@ -78,7 +78,13 @@ class OnboardingViewModel(
 
                 }
                 ResultStatus.SUCCESS -> {
-                    _state.update { it.copy(userData = userData.data ) }
+                    _state.update {
+                        it.copy(
+                            userData = userData.data,
+                            selectedOrganization = userData.data?.organizations[0],
+                            selectedProject = userData.data?.organizations[0]?.projects[0],
+                        )
+                    }
                 }
                 ResultStatus.ERROR -> {
                     _state.update {
@@ -105,7 +111,10 @@ class OnboardingViewModel(
                 projectUid = _state.value.selectedProject?.id ?: "",
                 schoolUid = _state.value.selectedSchool?.id ?: ""
             )
+
         }
+        onSuccess.invoke()
+
     }
 
 }
