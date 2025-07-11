@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -27,7 +28,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.nyansapoai.teaching.R
 import com.nyansapoai.teaching.navController
-import com.nyansapoai.teaching.presentation.authentication.otp.components.PhoneAuth
 import com.nyansapoai.teaching.presentation.common.components.AppButton
 import com.nyansapoai.teaching.presentation.common.components.AppTextField
 import com.nyansapoai.teaching.navigation.OTPPage
@@ -43,7 +43,6 @@ fun SignInRoot() {
     val canSubmit by viewModel.canSubmit.collectAsState()
 
     SignInScreen(
-        name = name ,
         phoneNumber = phoneNumber,
         canSubmit = canSubmit,
         onAction = viewModel::onAction
@@ -52,14 +51,10 @@ fun SignInRoot() {
 
 @Composable
 fun SignInScreen(
-    name: String,
     phoneNumber: String,
     canSubmit: Boolean,
     onAction: (SignInAction) -> Unit,
 ) {
-
-    val phoneAuth = PhoneAuth
-
     Scaffold(
         modifier = Modifier
     ) { innerPadding ->
@@ -101,6 +96,8 @@ fun SignInScreen(
 
                 }
 
+                Spacer(Modifier.padding(16.dp))
+
 
                 Column {
                     Text(
@@ -123,6 +120,8 @@ fun SignInScreen(
                             .fillMaxWidth()
                     )
                 }
+
+                Spacer(Modifier.padding(16.dp))
 
 
                 Column(
@@ -197,12 +196,10 @@ fun SignInScreen(
                                 ),
                                 modifier = Modifier
                             )
-
                         }
 
                     }
                 }
-
 
             }
 
@@ -213,7 +210,8 @@ fun SignInScreen(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .fillMaxWidth()
-            ) {
+            )
+            {
 
 
 
@@ -269,4 +267,3 @@ fun SignInScreen(
     }
 
 }
-

@@ -1,6 +1,7 @@
 package com.nyansapoai.teaching.data.local
 
 import com.nyansapoai.teaching.data.remote.school.LocalSchoolInfo
+import com.nyansapoai.teaching.domain.models.assessments.CompletedAssessment
 import com.nyansapoai.teaching.domain.models.assessments.literacy.PendingMultipleChoicesResult
 import com.nyansapoai.teaching.domain.models.assessments.literacy.PendingReadingAssessmentResult
 import kotlinx.coroutines.flow.Flow
@@ -25,5 +26,17 @@ interface LocalDataSource {
     suspend fun saveCurrentSchoolInfo(organizationUid: String, projectUid: String, schoolUid: String)
 
     suspend fun getSavedCurrentSchoolInfo(): Flow<LocalSchoolInfo>
+
+    suspend fun insertCompletedAssessment(studentId:String, assessmentId: String,)
+
+    suspend fun completeAssessment(studentId:String, assessmentId: String,isCompleted: Boolean )
+
+    suspend fun getCompletedAssessments(assessmentId: String): Flow<List<CompletedAssessment>>
+
+    suspend fun insertLiteracyAssessmentWorkerRequest(assessmentId: String, studentId: String, requestId: String, type: String)
+
+    suspend fun getLiteracyAssessmentWorkerRequests(assessmentId: String, studentId: String, type: String): Flow<List<String>>
+
+    suspend fun clearLiteracyAssessmentRequests(assessmentId: String, studentId: String, type: String)
 
 }

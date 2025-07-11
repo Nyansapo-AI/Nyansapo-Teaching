@@ -1,5 +1,6 @@
 package com.nyansapoai.teaching.di
 
+import androidx.work.WorkManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
@@ -139,6 +140,10 @@ val appModules = module {
             auth = get(),
             firebaseDb = get()
         )
+    }
+
+    single<WorkManager> {
+        WorkManager.getInstance(context = get())
     }
 
 }

@@ -9,6 +9,7 @@ import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.workDataOf
+import com.nyansapoai.teaching.data.local.LocalDataSource
 import com.nyansapoai.teaching.data.remote.ai.ArtificialIntelligenceRepository
 import com.nyansapoai.teaching.data.remote.assessment.AssessmentRepository
 import com.nyansapoai.teaching.data.remote.media.MediaRepository
@@ -31,7 +32,8 @@ class LiteracyViewModel(
     private val assessmentRepository: AssessmentRepository,
     private val artificialIntelligenceRepository: ArtificialIntelligenceRepository,
     private val mediaRepository: MediaRepository,
-    private val appContext: Context
+    private val appContext: Context,
+    private val localDataSource: LocalDataSource
 ) : ViewModel() {
 
     private var hasLoadedInitialData = false
@@ -203,6 +205,13 @@ class LiteracyViewModel(
                     request = request
                 )
 
+            localDataSource.insertLiteracyAssessmentWorkerRequest(
+                assessmentId = assessmentId,
+                studentId = studentId,
+                requestId = request.id.toString(),
+                type = "reading_assessment"
+            )
+
             _state.update {
                 it.copy(
                     isLoading = false,
@@ -306,6 +315,18 @@ class LiteracyViewModel(
         correctOptions: List<String>,
         onSuccess: () -> Unit
     ){
+
+        if (assessmentId.isNullOrEmpty() || studentId.isNullOrEmpty()) {
+            _state.update {
+                it.copy(
+                    error = "Assessment can not be evaluated"
+                )
+            }
+            return
+        }
+
+
+
         viewModelScope.launch {
             if (_state.value.selectedChoice == null){
                 _state.update {
@@ -352,6 +373,14 @@ class LiteracyViewModel(
                     ExistingWorkPolicy.REPLACE,
                     request = request
                 )
+
+
+            localDataSource.insertLiteracyAssessmentWorkerRequest(
+                assessmentId = assessmentId,
+                studentId = studentId,
+                requestId = request.id.toString(),
+                type = "multiple_choices"
+            )
 
             _state.update {
                 it.copy(
