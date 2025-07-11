@@ -3,6 +3,7 @@ package com.nyansapoai.teaching.presentation.assessments.literacy.workers
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import com.nyansapoai.teaching.data.local.LocalDataSource
 import com.nyansapoai.teaching.data.remote.assessment.AssessmentRepository
 import com.nyansapoai.teaching.utils.ResultStatus
 import org.koin.core.component.KoinComponent
@@ -14,6 +15,7 @@ class MarkLiteracyAssessmentWorker(
 ): CoroutineWorker(appContext, params), KoinComponent {
 
     private val assessmentRepository : AssessmentRepository by inject()
+    private val localDataSource: LocalDataSource by inject()
 
     override suspend fun doWork(): Result {
         return try {
@@ -27,6 +29,10 @@ class MarkLiteracyAssessmentWorker(
             when(response.status){
                 ResultStatus.ERROR -> {
                     hasFailure = true
+                }
+                ResultStatus.SUCCESS -> {
+                    localDataSource.clearLiteracyAssessmentRequests(assessmentId = assessmentId, studentId = studentId, type = "reading_assessment")
+                    localDataSource.clearLiteracyAssessmentRequests(assessmentId = assessmentId, studentId = studentId, type = "multiple_choices")
                 }
                 else -> {}
             }

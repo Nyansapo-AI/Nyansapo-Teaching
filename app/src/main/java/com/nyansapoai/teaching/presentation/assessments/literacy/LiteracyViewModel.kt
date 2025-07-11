@@ -17,6 +17,7 @@ import com.nyansapoai.teaching.domain.models.assessments.literacy.literacyAssess
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.LiteracyAssessmentLevel
 import com.nyansapoai.teaching.presentation.assessments.literacy.workers.EvaluateMultipleChoiceQuestionWorker
 import com.nyansapoai.teaching.presentation.assessments.literacy.workers.EvaluateReadingAssessmentWorker
+import com.nyansapoai.teaching.presentation.assessments.literacy.workers.LiteracyAssessmentsMonitorWorker
 import com.nyansapoai.teaching.presentation.assessments.literacy.workers.MarkLiteracyAssessmentWorker
 import com.nyansapoai.teaching.presentation.assessments.literacy.workers.SubmitMultipleChoiceResultsWorker
 import com.nyansapoai.teaching.presentation.assessments.literacy.workers.SubmitReadingAssessmentWorker
@@ -481,8 +482,30 @@ class LiteracyViewModel(
             "assessment_id" to assessmentId
         )
 
+        val readingWorkData = workDataOf(
+            "assessment_type" to "reading_assessment",
+            "student_id" to studentId,
+            "assessment_id" to assessmentId
+        )
+
+        val mcWorkData = workDataOf(
+            "assessment_type" to "multiple_choices",
+            "student_id" to studentId,
+            "assessment_id" to assessmentId
+        )
+
+
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
+
+        val readingMonitorRequest = OneTimeWorkRequestBuilder<LiteracyAssessmentsMonitorWorker>()
+            .setInputData(readingWorkData)
+            .build()
+
+        val multipleChoicesMonitorRequest = OneTimeWorkRequestBuilder<LiteracyAssessmentsMonitorWorker>()
+            .setInputData(mcWorkData)
             .build()
 
         val submitReadingResultsRequest = OneTimeWorkRequestBuilder<SubmitReadingAssessmentWorker>()
@@ -504,8 +527,10 @@ class LiteracyViewModel(
             .beginUniqueWork(
                 uniqueWorkName ="complete_assessment_${assessmentId}_${studentId}",
                  existingWorkPolicy =  ExistingWorkPolicy.REPLACE,
-                request = submitReadingResultsRequest
+                request = readingMonitorRequest
             )
+            .then(multipleChoicesMonitorRequest)
+            .then(submitReadingResultsRequest)
             .then(submitMultipleChoicesResultsRequest)
             .then(markLiteracyAssessmentRequest)
             .enqueue()

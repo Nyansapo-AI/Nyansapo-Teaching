@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
+import com.nyansapoai.teaching.data.local.LocalDataSource
+import kotlinx.coroutines.flow.first
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.util.UUID
@@ -14,14 +16,19 @@ class LiteracyAssessmentsMonitorWorker(
 ): CoroutineWorker(appContext, params), KoinComponent {
 
     private val workManager: WorkManager by inject()
+    private val localDataSource: LocalDataSource by inject()
 
     override suspend fun doWork(): Result {
         try {
 
+            val studentId = inputData.getString("student_id") ?: return Result.failure()
+            val assessmentId = inputData.getString("assessment_id") ?: return Result.failure()
             val assessmentType = inputData.getString("assessment_type") ?: return Result.failure()
-            val workIdStrings = inputData.getStringArray(assessmentType) ?: return Result.failure()
 
-            val worksId = workIdStrings.map { UUID.fromString(it) }
+            val requestsId = localDataSource.getLiteracyAssessmentWorkerRequests(assessmentId = assessmentId, studentId = studentId, type = assessmentType).first()
+
+
+            val worksId = requestsId.map { UUID.fromString(it) }
 
             if (worksId.isEmpty()){
                 return Result.success()
