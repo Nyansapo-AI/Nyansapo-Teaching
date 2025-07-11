@@ -427,6 +427,8 @@ class LiteracyViewModel(
                             else
                                 _state.value.assessmentFlow[0]
 
+
+
                             it.copy(
                                 currentAssessmentLevelIndex = nextIndex,
                                 currentAssessmentLevel = nextLevel,
@@ -434,6 +436,9 @@ class LiteracyViewModel(
                                 multipleChoiceQuestionsResult = mutableListOf()
                             )
                         }
+
+                        addCompleteAssessment()
+
                     }
 
 
@@ -451,6 +456,20 @@ class LiteracyViewModel(
         )
     }
 
+
+    private fun addCompleteAssessment(){
+        if (_state.value.studentId.isNullOrBlank() ||_state.value.assessmentId.isNullOrBlank()){
+            return
+        }
+
+        viewModelScope.launch {
+            localDataSource.insertCompletedAssessment(
+                studentId = _state.value.studentId ?: "",
+                assessmentId = _state.value.assessmentId ?: ""
+            )
+
+        }
+    }
 
     private fun submitLiteracyAssessment(
         assessmentId: String,
