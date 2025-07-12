@@ -22,6 +22,9 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -35,6 +38,7 @@ import com.nyansapoai.teaching.navController
 import com.nyansapoai.teaching.presentation.authentication.otp.components.OTPImplementation
 import com.nyansapoai.teaching.presentation.common.components.CodeTextField
 import com.nyansapoai.teaching.navigation.OnboardingPage
+import com.nyansapoai.teaching.presentation.common.components.AppButton
 import com.nyansapoai.teaching.utils.Utils
 import org.koin.androidx.compose.koinViewModel
 
@@ -73,6 +77,8 @@ fun OTPScreen(
     canSubmit: Boolean = false,
     onAction: (OTPAction) -> Unit,
 ) {
+
+    var isLoading by remember { mutableStateOf(false) }
 
     Scaffold(
         modifier = Modifier
@@ -195,6 +201,24 @@ fun OTPScreen(
                     modifier = Modifier
                         .fillMaxWidth(0.9f)
                 ) {
+                    AppButton(
+                        enabled = isOTPComplete,
+                        isLoading = isLoading,
+                        onClick = {
+                            onAction.invoke(OTPAction.OnCanSubmitChange(true))
+                            isLoading = true
+                        }
+                    ) {
+                        Text(
+                            text = stringResource(R.string.continue_text),
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = FontWeight.Bold
+                            )
+                        )
+
+                    }
+
+                    /*
                     Button(
                         enabled = isOTPComplete,
                         shape = RoundedCornerShape(5.dp),
@@ -216,7 +240,7 @@ fun OTPScreen(
                                 fontWeight = FontWeight.Bold
                             )
                         )
-                    }
+                    }*/
 
                     OutlinedButton(
                         shape = RoundedCornerShape(5.dp),

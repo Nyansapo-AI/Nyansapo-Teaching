@@ -17,14 +17,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.nyansapoai.teaching.R
+import com.nyansapoai.teaching.domain.models.organization.NyansapoOrganization
 import com.nyansapoai.teaching.presentation.onboarding.OnboardingOrganizationState
 
 @Composable
 fun SelectOrganization(
     modifier: Modifier = Modifier,
-    organizationList: List<OnboardingOrganizationState> = emptyList(),
-    selectedOrganization: OnboardingOrganizationState?,
-    onSelectOrganization: (OnboardingOrganizationState) -> Unit = {}
+    organizationList: List<NyansapoOrganization> = emptyList(),
+    selectedOrganization: NyansapoOrganization?,
+    onSelectOrganization: (NyansapoOrganization) -> Unit = {}
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(24.dp),

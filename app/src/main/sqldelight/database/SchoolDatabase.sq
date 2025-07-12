@@ -1,0 +1,17 @@
+
+CREATE TABLE SchoolInfoEntity(
+    organizationUID TEXT NOT NULL,
+    projectUID TEXT NOT NULL,
+    schoolUID TEXT NOT NULL
+);
+
+insertSchoolInfo:
+INSERT OR REPLACE INTO SchoolInfoEntity (organizationUID, projectUID, schoolUID)
+VALUES (?, ?, ?);
+
+getSchoolInfo:
+SELECT * FROM SchoolInfoEntity
+LIMIT 1;
+
+clearSchoolInfo:
+DELETE FROM SchoolInfoEntity;

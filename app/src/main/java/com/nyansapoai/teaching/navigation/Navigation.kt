@@ -72,7 +72,7 @@ fun Navigation(){
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = if (firebaseAuth.currentUser == null ) GetStartedPage else HomePage,
+            startDestination = if (firebaseAuth.currentUser == null ) GetStartedPage else OnboardingPage,
             modifier = Modifier
                 .padding(innerPadding)
         ){

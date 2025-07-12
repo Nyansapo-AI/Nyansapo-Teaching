@@ -6,6 +6,7 @@ import com.nyansapoai.teaching.R
 import com.nyansapoai.teaching.presentation.assessments.AssessmentsRoot
 import com.nyansapoai.teaching.presentation.assessments.components.HasCompletedAssessment
 import com.nyansapoai.teaching.presentation.camps.CampRoot
+import com.nyansapoai.teaching.presentation.common.components.AppComingSoon
 
 data class BottomNavigationItem(
     val title: String,
@@ -35,13 +36,15 @@ data class BottomNavigationItem(
             BottomNavigationItem(
                 title = "Attendance",
                 icon = R.drawable.attendance,
-                screen = { HasCompletedAssessment() },
+                screen = { AppComingSoon() },
             ),
 
             BottomNavigationItem(
                 title = "Sessions",
                 icon = R.drawable.sessions,
-                screen = {  },
+                screen = {
+                    AppComingSoon()
+                },
             ),
         )
     }

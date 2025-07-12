@@ -66,3 +66,51 @@ WHERE assessmentId = ? AND studentId = ?;
 clearSubmittedMultipleChoicesResults:
 DELETE FROM PendingMultipleChoicesResultEntity
 WHERE isPending = 0 AND assessmentId = ? AND studentId = ?;
+
+
+CREATE TABLE CompleteAssessmentEntity(
+    assessmentId TEXT NOT NULL,
+    studentId TEXT NOT NULL,
+    isCompleted INTEGER NOT NULL,
+    PRIMARY KEY (assessmentId, studentId)
+);
+
+insertCompleteAssessment:
+INSERT OR REPLACE INTO CompleteAssessmentEntity(assessmentId, studentId, isCompleted)
+VALUES (?, ?, ?);
+
+updateAssessmentCompletion:
+UPDATE CompleteAssessmentEntity
+SET isCompleted = ?
+WHERE assessmentId = ? AND studentId = ?;
+
+getCompletedAssessments:
+SELECT * FROM CompleteAssessmentEntity
+WHERE isCompleted = 1;
+
+getCompletedAssessmentsByAssessment:
+SELECT * FROM CompleteAssessmentEntity
+WHERE isCompleted = 1 AND assessmentId = ?;
+
+clearCompletedAssessments:
+DELETE FROM CompleteAssessmentEntity
+WHERE assessmentId = ? AND studentId = ? AND isCompleted = 1;
+
+CREATE TABLE LiteracyAssessmentWorkerRequestEntity(
+    requestId TEXT PRIMARY KEY,
+    assessmentId TEXT NOT NULL,
+    studentId TEXT NOT NULL,
+    assessmentType TEXT NOT NULL
+);
+
+insertLIteracyAssessmentWorkerRequest:
+INSERT OR REPLACE INTO LiteracyAssessmentWorkerRequestEntity(requestId, assessmentId, studentId, assessmentType)
+VALUES (?,?,?,?);
+
+getLIteracyAssessmentWorkerRequestByAssessmentIDandStudentIDandAssessmentType:
+SELECT * FROM LiteracyAssessmentWorkerRequestEntity
+WHERE assessmentId = ? AND studentId = ? AND assessmentType = ?;
+
+clearLIteracyAssessmentWorkerRequestByAssessmentIDandStudentIDandAssessmentType:
+DELETE FROM LiteracyAssessmentWorkerRequestEntity
+WHERE assessmentId = ? AND studentId = ? AND assessmentType = ?;

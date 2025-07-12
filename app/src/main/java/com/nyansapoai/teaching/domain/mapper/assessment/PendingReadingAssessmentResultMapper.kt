@@ -1,4 +1,4 @@
-package com.nyansapoai.teaching.domain.mapper
+package com.nyansapoai.teaching.domain.mapper.assessment
 
 import com.nyansapoai.teaching.domain.models.assessments.literacy.PendingReadingAssessmentResult
 import database.PendingReadingResult

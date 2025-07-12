@@ -4,6 +4,7 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -30,6 +31,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -155,7 +157,7 @@ fun IndividualAssessmentScreen(
                             items(items = assessment.assigned_students, key = { it.student_id }) { student ->
                                 ElevatedCard(
                                     colors = CardDefaults.outlinedCardColors(
-                                        containerColor = MaterialTheme.colorScheme.tertiary
+                                        containerColor = MaterialTheme.colorScheme.tertiary,
                                     ),
                                     elevation = CardDefaults.cardElevation(
                                         defaultElevation = 12.dp
@@ -172,9 +174,14 @@ fun IndividualAssessmentScreen(
                                                     assessmentType = assessment.type,
                                                     assessmentNo = assessment.assessmentNumber
                                                 ))
-
                                             }
                                         )
+                                        .border(
+                                            width = 2.dp,
+                                            color = Color.Green,
+                                            shape = CardDefaults.elevatedShape
+                                        )
+
                                 ) {
                                     Row(
                                         verticalAlignment = Alignment.CenterVertically,

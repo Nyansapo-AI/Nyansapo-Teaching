@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 
 class SignInViewModel : ViewModel() {
@@ -38,13 +39,24 @@ class SignInViewModel : ViewModel() {
             true
         )
 
-
+/*
     val canSubmit = combine(
         isPhoneNumberValid,
-        isNameEmpty
-    ){ isNumberValid, isNameEmpty ->
-        isNumberValid && !isNameEmpty
+//        isNameEmpty
+    ){ isNumberValid, ->
+        isNumberValid
+//        isNumberValid && !isNameEmpty
     }
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            false
+        )*/
+
+    val canSubmit= isPhoneNumberValid
+        .onStart {
+
+        }
         .stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5000),

@@ -1,14 +1,13 @@
 package com.nyansapoai.teaching.presentation.camps
 
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import com.nyansapoai.teaching.domain.models.user.NyansapoUser
 
-data class CampState(
+data class SchoolState(
     val greeting: String = "Good Morning",
     val camp: Camp = Camp(),
     val user: NyansapoUser? = null,
+    val showSchoolSelector: Boolean = false
 
 )
 

@@ -10,7 +10,7 @@ import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyWordPr
 import com.nyansapoai.teaching.utils.Results
 import kotlinx.coroutines.flow.Flow
 
-interface AssessmentRepository {
+interface  AssessmentRepository {
     suspend fun createAssessment(
         name: String,
         type: String,

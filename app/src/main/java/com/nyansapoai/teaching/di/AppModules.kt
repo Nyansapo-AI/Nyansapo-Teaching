@@ -1,5 +1,6 @@
 package com.nyansapoai.teaching.di
 
+import androidx.work.WorkManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
@@ -26,7 +27,7 @@ import com.nyansapoai.teaching.presentation.getStarted.GetStartedViewModel
 import com.nyansapoai.teaching.presentation.authentication.signIn.SignInViewModel
 import com.nyansapoai.teaching.presentation.authentication.otp.OTPViewModel
 import com.nyansapoai.teaching.presentation.home.HomeViewModel
-import com.nyansapoai.teaching.presentation.camps.CampViewModel
+import com.nyansapoai.teaching.presentation.camps.SchoolViewModel
 import com.nyansapoai.teaching.presentation.assessments.AssessmentsViewModel
 import com.nyansapoai.teaching.presentation.assessments.createAssessment.CreateAssessmentsViewModel
 import com.nyansapoai.teaching.presentation.assessments.IndividualAssessment.IndividualAssessmentViewModel
@@ -47,7 +48,7 @@ val appModules = module {
     viewModelOf(::SignInViewModel)
     viewModelOf(::OTPViewModel)
     viewModelOf(::HomeViewModel)
-    viewModelOf(::CampViewModel)
+    viewModelOf(::SchoolViewModel)
     viewModelOf(::AssessmentsViewModel)
     viewModelOf(::CreateAssessmentsViewModel)
     viewModelOf(::IndividualAssessmentViewModel)
@@ -139,6 +140,10 @@ val appModules = module {
             auth = get(),
             firebaseDb = get()
         )
+    }
+
+    single<WorkManager> {
+        WorkManager.getInstance(context = get())
     }
 
 }

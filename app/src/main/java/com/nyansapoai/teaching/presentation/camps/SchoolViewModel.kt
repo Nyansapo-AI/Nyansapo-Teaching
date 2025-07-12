@@ -15,13 +15,13 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
-class CampViewModel(
+class SchoolViewModel(
     private val userRepository: UserRepository
 ) : ViewModel() {
 
     private var hasLoadedInitialData = false
 
-    private val _state = MutableStateFlow(CampState())
+    private val _state = MutableStateFlow(SchoolState())
     val state = _state
         .onStart {
             if (!hasLoadedInitialData) {
@@ -37,10 +37,10 @@ class CampViewModel(
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000L),
-            initialValue = CampState()
+            initialValue = SchoolState()
         )
 
-    fun onAction(action: CampAction) {
+    fun onAction(action: SchoolAction) {
         when (action) {
             else -> TODO("Handle actions")
         }

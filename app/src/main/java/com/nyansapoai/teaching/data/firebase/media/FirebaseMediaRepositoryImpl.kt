@@ -16,11 +16,13 @@ class FirebaseMediaRepositoryImpl(
     val audioStorageRef = firebaseStorage.reference.child("audio")
 
 
-    override suspend fun saveImage(imageByteArray: ByteArray): Results<String> {
+    override suspend fun saveImage(imageByteArray: ByteArray, folder: String): Results<String> {
 
         val deferred = CompletableDeferred<Results<String>>()
 
-        mediaStorageRef.putBytes(imageByteArray)
+        firebaseStorage.reference.child(folder)
+            .child("image_${imageByteArray.take(7)}")
+            .putBytes(imageByteArray)
             .addOnFailureListener {
                 deferred.complete(Results.error(msg = it.message ?: "Error uploading image"))
             }
@@ -44,11 +46,14 @@ class FirebaseMediaRepositoryImpl(
         }
     }
 
-    override suspend fun saveAudio(audioByteArray: ByteArray): Results<String> {
+    override suspend fun saveAudio(audioByteArray: ByteArray, folder: String): Results<String> {
 
         val deferred = CompletableDeferred<Results<String>>()
 
-        audioStorageRef.putBytes(audioByteArray)
+        firebaseStorage.reference.child(folder)
+//            audioStorageRef
+            .child("audio_${audioByteArray.take(7).hashCode()}")
+            .putBytes(audioByteArray)
             .addOnFailureListener {
                 deferred.complete(Results.error(msg = it.message ?: "Error uploading audio"))
             }
