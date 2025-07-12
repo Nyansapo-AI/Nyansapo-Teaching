@@ -224,7 +224,7 @@ fun LiteracyReadingAssessmentUI(
                     !isLoading -> {
                         onAudioByteArrayChange(appAudioRecorder.getOutputFileByteArray(outputFile = audioFile!!))
                         onAudioPathChange(it.absolutePath)
-                        onSubmit.invoke()
+//                        onSubmit.invoke()
                         audioFile = null
                     }
                 }
@@ -368,7 +368,7 @@ fun LiteracyReadingAssessmentUI(
         }
 
 
-        /*
+
         AppButton(
             enabled = audioByteArray != null,
             onClick = onSubmit,
@@ -376,11 +376,11 @@ fun LiteracyReadingAssessmentUI(
                 .fillMaxWidth()
         ) {
             Text(
-                text = "Submit",
+                text = "Next",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
-        }*/
+        }
     }
 
 

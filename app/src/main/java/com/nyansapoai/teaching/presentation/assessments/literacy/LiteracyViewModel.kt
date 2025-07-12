@@ -22,6 +22,7 @@ import com.nyansapoai.teaching.presentation.assessments.literacy.workers.MarkLit
 import com.nyansapoai.teaching.presentation.assessments.literacy.workers.SubmitMultipleChoiceResultsWorker
 import com.nyansapoai.teaching.presentation.assessments.literacy.workers.SubmitReadingAssessmentWorker
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.onStart
@@ -212,6 +213,8 @@ class LiteracyViewModel(
                 requestId = request.id.toString(),
                 type = "reading_assessment"
             )
+
+            delay(1000)
 
             _state.update {
                 it.copy(

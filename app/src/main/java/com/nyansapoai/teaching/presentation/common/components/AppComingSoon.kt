@@ -43,7 +43,7 @@ fun AppComingSoon(modifier: Modifier = Modifier) {
                 style = MaterialTheme.typography.titleLarge,
                 textAlign = TextAlign.Center,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.secondary,
+                color = MaterialTheme.colorScheme.tertiary,
                 modifier = Modifier
                     .fillMaxWidth()
             )

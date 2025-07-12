@@ -133,6 +133,7 @@ fun OnboardingScreen(
                 verticalArrangement = Arrangement.spacedBy(30.dp),
                 modifier = Modifier.padding(innerPadding)
             ) {
+                /*
                 StepsRow(
                     state = stepState,
                     modifier = Modifier
@@ -144,7 +145,7 @@ fun OnboardingScreen(
                     onClick = { step ->
                         onAction(OnboardingAction.OnStepChange(step = step))
                     }
-                )
+                )*/
 
                 onboardingSteps[state.currentStep - 1].screen(Modifier)
             }
