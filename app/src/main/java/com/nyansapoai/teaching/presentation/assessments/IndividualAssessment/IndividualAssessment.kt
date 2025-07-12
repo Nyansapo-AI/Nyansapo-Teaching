@@ -36,8 +36,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nyansapoai.teaching.navController
-import com.nyansapoai.teaching.presentation.camps.LearningLevelDescription
-import com.nyansapoai.teaching.presentation.camps.components.LearningLevelItem
+import com.nyansapoai.teaching.presentation.schools.LearningLevelDescription
+import com.nyansapoai.teaching.presentation.schools.components.LearningLevelItem
 import com.nyansapoai.teaching.presentation.common.components.AppCircularLoading
 import com.nyansapoai.teaching.navigation.ConductAssessmentPage
 import com.nyansapoai.teaching.utils.ResultStatus

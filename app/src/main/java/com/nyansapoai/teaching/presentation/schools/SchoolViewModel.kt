@@ -1,9 +1,10 @@
-package com.nyansapoai.teaching.presentation.camps
+package com.nyansapoai.teaching.presentation.schools
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nyansapoai.teaching.data.remote.user.UserRepository
+import com.nyansapoai.teaching.utils.ResultStatus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -42,7 +43,13 @@ class SchoolViewModel(
 
     fun onAction(action: SchoolAction) {
         when (action) {
-            else -> TODO("Handle actions")
+            is SchoolAction.OnShowSchoolSelector -> {
+                _state.update {
+                    it.copy(
+                        showSchoolSelector = action.show
+                    )
+                }
+            }
         }
     }
 
@@ -65,11 +72,23 @@ class SchoolViewModel(
 
             Log.d("user data", "user information: $userData")
 
-            _state.update {
-                it.copy(
-                    user = userData.data
-                )
+            when(userData.status){
+                ResultStatus.INITIAL ,
+                ResultStatus.LOADING -> {
+                    _state.update { it.copy(isLoading = true) }
+                }
+                ResultStatus.SUCCESS -> {
+                    _state.update {
+                        it.copy(
+                            user = userData.data
+                        )
+                    }
+                }
+                ResultStatus.ERROR -> {
+
+                }
             }
+
         }
     }
 
