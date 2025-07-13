@@ -39,7 +39,7 @@ fun AppCardItem(
     title: String = "Teachers",
     count: String = "12",
     brush: Brush = Brush.linearGradient(listOf(MaterialTheme.colorScheme.tertiary,MaterialTheme.colorScheme.tertiary, MaterialTheme.colorScheme.secondary)),
-    @DrawableRes imageResId:  Int = R.drawable.animated_teacher
+    @DrawableRes imageResId:  Int = R.drawable.animated_female_student
 ) {
 
     var isViewed by remember { mutableStateOf(false) }
@@ -60,13 +60,22 @@ fun AppCardItem(
     )
     {
         Column(
-            verticalArrangement = Arrangement.SpaceBetween,
+//            verticalArrangement = Arrangement.SpaceBetween,
             horizontalAlignment = Alignment.Start,
             modifier = Modifier
                 .fillMaxHeight()
                 .padding(12.dp)
         )
         {
+            Text(
+                text = Utils.animatedNumberString(number = count, animatedPlayed = isViewed),
+                style = MaterialTheme.typography.displayLarge,
+                fontWeight = FontWeight.ExtraBold,
+                overflow = TextOverflow.Ellipsis,
+                maxLines = 1,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+
 
             Text(
                 text = title,
@@ -77,14 +86,6 @@ fun AppCardItem(
                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
             )
 
-            Text(
-                text = Utils.animatedNumberString(number = count, animatedPlayed = isViewed),
-                style = MaterialTheme.typography.displayLarge,
-                fontWeight = FontWeight.ExtraBold,
-                overflow = TextOverflow.Ellipsis,
-                maxLines = 1,
-                color = MaterialTheme.colorScheme.onBackground
-            )
 
         }
 

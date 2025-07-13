@@ -78,13 +78,13 @@ fun SchoolScreen(
                         Icon(
                             painter = painterResource(id = R.drawable.school),
                             contentDescription = "school",
-                            tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f)
+                            tint = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.3f)
                         )
 
                         Text(
                             text = stringResource(R.string.select_school),
                             style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.onBackground
+                            color = MaterialTheme.colorScheme.onPrimary
                         )
                     }
                 }

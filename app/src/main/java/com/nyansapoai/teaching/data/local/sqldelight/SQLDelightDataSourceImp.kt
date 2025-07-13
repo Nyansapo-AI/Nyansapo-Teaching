@@ -5,7 +5,7 @@ import app.cash.sqldelight.coroutines.mapToList
 import app.cash.sqldelight.coroutines.mapToOne
 import com.nyansapoai.teaching.Database
 import com.nyansapoai.teaching.data.local.LocalDataSource
-import com.nyansapoai.teaching.data.remote.school.LocalSchoolInfo
+import com.nyansapoai.teaching.domain.models.school.LocalSchoolInfo
 import com.nyansapoai.teaching.domain.mapper.assessment.toCompletedAssessment
 import com.nyansapoai.teaching.domain.mapper.assessment.toPendingMultipleChoicesResult
 import com.nyansapoai.teaching.domain.mapper.assessment.toPendingReadingAssessmentResult
