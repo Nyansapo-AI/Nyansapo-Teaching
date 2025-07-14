@@ -51,7 +51,6 @@ class FirebaseMediaRepositoryImpl(
         val deferred = CompletableDeferred<Results<String>>()
 
         firebaseStorage.reference.child(folder)
-//            audioStorageRef
             .child("audio_${audioByteArray.take(7).hashCode()}")
             .putBytes(audioByteArray)
             .addOnFailureListener {

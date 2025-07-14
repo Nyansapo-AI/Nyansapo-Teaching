@@ -2,7 +2,8 @@ package com.nyansapoai.teaching.data.remote.user
 
 import com.nyansapoai.teaching.domain.models.user.NyansapoUser
 import com.nyansapoai.teaching.utils.Results
+import kotlinx.coroutines.flow.Flow
 
 interface UserRepository {
-    suspend fun getUserDetails(): Results<NyansapoUser>
+    fun getUserDetails(): Flow<Results<NyansapoUser>>
 }

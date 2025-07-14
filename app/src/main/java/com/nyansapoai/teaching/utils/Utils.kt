@@ -2,6 +2,9 @@ package com.nyansapoai.teaching.utils
 
 import android.content.Context
 import android.graphics.Bitmap
+import androidx.compose.animation.core.animateIntAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
 import kotlinx.datetime.toLocalDateTime
@@ -162,6 +165,23 @@ object Utils {
             e.printStackTrace()
             false
         }
+    }
+
+
+    @Composable
+    fun animatedNumberString(number: String, animatedPlayed: Boolean): String {
+        val numberInt = number.toIntOrNull()
+
+        return numberInt?.let {
+            animateIntAsState(
+                targetValue = if (animatedPlayed) numberInt else 0,
+                animationSpec = tween(
+                    durationMillis = if (numberInt > 20) 3000  else 1000,
+                    delayMillis = 100
+                ),
+                label = "animated int string",
+            ).value.toString()
+        } ?: number
     }
 
 

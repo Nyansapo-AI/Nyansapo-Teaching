@@ -1,4 +1,4 @@
-package com.nyansapoai.teaching.data.remote.school
+package com.nyansapoai.teaching.domain.models.school
 
 data class LocalSchoolInfo(
     val organizationUid: String = "",

@@ -8,6 +8,7 @@ import com.nyansapoai.teaching.utils.ResultStatus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -69,7 +70,7 @@ class OnboardingViewModel(
     private fun fetchUserData(){
         viewModelScope.launch(Dispatchers.IO) {
 
-            val userData = userRepository.getUserDetails()
+            val userData = userRepository.getUserDetails().first()
 
             when(userData.status){
                 ResultStatus.INITIAL,

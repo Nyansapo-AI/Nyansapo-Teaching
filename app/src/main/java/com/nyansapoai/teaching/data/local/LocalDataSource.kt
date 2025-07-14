@@ -1,6 +1,6 @@
 package com.nyansapoai.teaching.data.local
 
-import com.nyansapoai.teaching.data.remote.school.LocalSchoolInfo
+import com.nyansapoai.teaching.domain.models.school.LocalSchoolInfo
 import com.nyansapoai.teaching.domain.models.assessments.CompletedAssessment
 import com.nyansapoai.teaching.domain.models.assessments.literacy.PendingMultipleChoicesResult
 import com.nyansapoai.teaching.domain.models.assessments.literacy.PendingReadingAssessmentResult
@@ -25,7 +25,7 @@ interface LocalDataSource {
 
     suspend fun saveCurrentSchoolInfo(organizationUid: String, projectUid: String, schoolUid: String)
 
-    suspend fun getSavedCurrentSchoolInfo(): Flow<LocalSchoolInfo>
+    fun getSavedCurrentSchoolInfo(): Flow<LocalSchoolInfo>
 
     suspend fun insertCompletedAssessment(studentId:String, assessmentId: String,)
 

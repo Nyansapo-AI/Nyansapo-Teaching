@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.nyansapoai.teaching.presentation.common.components.getDeviceWidth
@@ -78,7 +79,11 @@ fun HomeScreen(
                         label = {
                             Text(
                                 text = item.title,
-//                                autoSize = TextAutoSize.StepBased(),
+                                autoSize = TextAutoSize.StepBased(
+                                    minFontSize = 6.sp,
+                                    maxFontSize = 10.sp,
+                                    stepSize = 1.sp
+                                ),
                                 color =
                                     if (item == state.currentNavigationItem) {
                                         MaterialTheme.colorScheme.secondary
