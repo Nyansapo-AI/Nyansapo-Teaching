@@ -1,9 +1,11 @@
 package com.nyansapoai.teaching.presentation.assessments.IndividualAssessment
 
+import android.widget.Toast
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -12,8 +14,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
@@ -32,14 +36,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.nyansapoai.teaching.R
 import com.nyansapoai.teaching.navController
 import com.nyansapoai.teaching.presentation.schools.LearningLevelDescription
 import com.nyansapoai.teaching.presentation.schools.components.LearningLevelItem
 import com.nyansapoai.teaching.presentation.common.components.AppCircularLoading
 import com.nyansapoai.teaching.navigation.ConductAssessmentPage
+import com.nyansapoai.teaching.presentation.onboarding.components.OptionsItemUI
 import com.nyansapoai.teaching.utils.ResultStatus
 import org.koin.androidx.compose.koinViewModel
 
@@ -68,6 +78,15 @@ fun IndividualAssessmentScreen(
     state: IndividualAssessmentState,
     onAction: (IndividualAssessmentAction) -> Unit,
 ) {
+
+    val context = LocalContext.current
+
+    LaunchedEffect(true) {
+        onAction.invoke(
+            IndividualAssessmentAction.OnGetCompletedAssessments(assessmentId = state.assessmentState.data?.id ?: "")
+        )
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -147,14 +166,52 @@ fun IndividualAssessmentScreen(
                             stickyHeader {
                                 Text(
                                     text = "Students",
-                                    style = MaterialTheme.typography.titleMedium,
+                                    style = MaterialTheme.typography.titleLarge,
+                                    fontWeight = FontWeight.ExtraBold,
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(16.dp)
                                 )
                             }
+                            item {
+                                val grades = listOf<Int?>(null, 1, 2, 3, 4, 5,6,7,8,9)
 
-                            items(items = assessment.assigned_students, key = { it.student_id }) { student ->
+                                LazyRow(
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    items(items = grades){ item ->
+                                        OptionsItemUI(
+                                            text = item?.let{"Grade $item"} ?: "All",
+                                            isSelected = item == state.selectedGrade,
+                                            onClick = {
+                                                onAction.invoke(
+                                                    IndividualAssessmentAction.OnSetGrade(grade = item)
+                                                )
+                                            },
+                                            modifier = Modifier
+                                                .then(if(item == grades.first()) Modifier.padding(start = 16.dp) else Modifier)
+                                                .then(if(item == grades.last()) Modifier.padding(end = 16.dp) else Modifier)
+                                        )
+                                    }
+
+                                }
+                            }
+
+                            item {
+                                if (state.studentsList.isEmpty()){
+                                    Text(
+                                        text = "No Student assigned",
+                                        style = MaterialTheme.typography.titleMedium,
+                                        color = MaterialTheme.colorScheme.tertiary,
+                                        fontWeight = FontWeight.Bold,
+                                        textAlign = TextAlign.Left
+                                    )
+                                }
+                                return@item
+                            }
+
+
+                            items(items = state.studentsList, key = { it.id }) { student ->
                                 ElevatedCard(
                                     colors = CardDefaults.outlinedCardColors(
                                         containerColor = MaterialTheme.colorScheme.tertiary,
@@ -168,9 +225,14 @@ fun IndividualAssessmentScreen(
                                         .padding(horizontal = 12.dp)
                                         .clickable(
                                             onClick = {
+                                                if (student.id in state.completedAssessments.map { it.studentId }){
+                                                    Toast.makeText(context, "${student.first_name} ${student.last_name} has already done the assessment", Toast.LENGTH_SHORT).show()
+                                                    return@clickable
+                                                }
+
                                                 navController.navigate(ConductAssessmentPage(
                                                     assessmentId = assessment.id,
-                                                    studentId = student.student_id,
+                                                    studentId = student.id,
                                                     assessmentType = assessment.type,
                                                     assessmentNo = assessment.assessmentNumber
                                                 ))
@@ -178,7 +240,7 @@ fun IndividualAssessmentScreen(
                                         )
                                         .border(
                                             width = 2.dp,
-                                            color = Color.Green,
+                                            color = if (student.id in state.completedAssessments.map { it.studentId })Color.Green else Color.Transparent,
                                             shape = CardDefaults.elevatedShape
                                         )
 
@@ -192,17 +254,24 @@ fun IndividualAssessmentScreen(
 
                                     ) {
                                         Text(
-                                            text = student.student_name,
+                                            text = "${student.first_name} ${student.last_name}",
                                             style = MaterialTheme.typography.titleMedium,
+                                            color = MaterialTheme.colorScheme.onBackground,
                                             modifier = Modifier
                                         )
 
                                         TextButton(
                                             onClick = {
 
+                                                if (student.id in state.completedAssessments.map { it.studentId }){
+                                                    Toast.makeText(context, "${student.first_name} ${student.last_name} has already done the assessment", Toast.LENGTH_SHORT).show()
+                                                    return@TextButton
+                                                }
+
+
                                                 navController.navigate(ConductAssessmentPage(
                                                     assessmentId = assessment.id,
-                                                    studentId = student.student_id,
+                                                    studentId = student.id,
                                                     assessmentType = assessment.type,
                                                     assessmentNo = assessment.assessmentNumber
                                                 ))
@@ -211,8 +280,22 @@ fun IndividualAssessmentScreen(
                                                 contentColor = MaterialTheme.colorScheme.onBackground,
                                             ),
                                         ) {
+
+                                            if (student.id in state.completedAssessments.map { it.studentId }){
+                                                Image(
+                                                    painter = painterResource(R.drawable.done_3_),
+                                                    contentDescription = "has completed the assessment",
+                                                    contentScale = ContentScale.Fit,
+                                                    modifier = Modifier
+                                                        .size(40.dp)
+                                                        .graphicsLayer(
+                                                            rotationZ = -0.2f
+                                                        )
+                                                )
+                                                return@TextButton
+                                            }
                                             Text(
-                                                text = student.competence?.let { "$it" } ?: "Assess",
+                                                text = student.baseline,
                                                 style = MaterialTheme.typography.bodyMedium,
                                                 color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.7f),
                                                 modifier = Modifier

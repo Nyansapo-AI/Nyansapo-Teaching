@@ -3,8 +3,10 @@ package com.nyansapoai.teaching.presentation.assessments
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.nyansapoai.teaching.data.local.LocalDataSource
 import com.nyansapoai.teaching.data.remote.assessment.AssessmentRepository
 import com.nyansapoai.teaching.utils.Results
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.catch
@@ -36,7 +38,9 @@ class AssessmentsViewModel(
 
     fun onAction(action: AssessmentsAction) {
         when (action) {
-            else -> TODO("Handle actions")
+            is AssessmentsAction.OnGetCompletedAssessments -> {
+
+            }
         }
     }
 
@@ -58,5 +62,6 @@ class AssessmentsViewModel(
                 }
         }
     }
+
 
 }

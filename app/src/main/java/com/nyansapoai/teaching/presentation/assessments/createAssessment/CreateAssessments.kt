@@ -1,5 +1,6 @@
 package com.nyansapoai.teaching.presentation.assessments.createAssessment
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -7,18 +8,23 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,6 +35,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.nyansapoai.teaching.R
 import com.nyansapoai.teaching.navController
+import com.nyansapoai.teaching.presentation.assessments.createAssessment.components.StudentSelectionListUI
 import com.nyansapoai.teaching.presentation.common.components.AppButton
 import com.nyansapoai.teaching.presentation.common.components.AppDropDownItem
 import com.nyansapoai.teaching.presentation.common.components.AppDropDownMenu
@@ -54,6 +61,18 @@ fun CreateAssessmentsScreen(
     state: CreateAssessmentsState,
     onAction: (CreateAssessmentsAction) -> Unit,
 ) {
+
+    LaunchedEffect(state.selectedGrade , state.localSchoolInfo) {
+        onAction.invoke(
+            CreateAssessmentsAction.OnFetchStudents(
+                organizationId = state.localSchoolInfo?.organizationUid ?: "",
+                projectId = state.localSchoolInfo?.projectUId ?: "",
+                schoolId = state.localSchoolInfo?.schoolUId ?: "",
+                grade = state.selectedGrade
+            )
+        )
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -81,15 +100,51 @@ fun CreateAssessmentsScreen(
                     }
                 },
             )
+        },
+        modifier = Modifier
+            .navigationBarsPadding()
+            .statusBarsPadding()
+    )
+    { innerPadding ->
+
+        AnimatedVisibility(
+            visible = state.isStudentListDropDownExpanded,
+            modifier = Modifier
+        )
+        {
+            ModalBottomSheet(
+                onDismissRequest = {onAction(CreateAssessmentsAction.ToggleStudentListDropDown(isExpanded = false))},
+                containerColor = MaterialTheme.colorScheme.background,
+                contentColor = MaterialTheme.colorScheme.onBackground ,
+                sheetState = rememberModalBottomSheetState(
+                    skipPartiallyExpanded = true,
+//                    confirmValueChange = {  }
+                )
+            ) {
+                StudentSelectionListUI(
+                    studentList = state.studentList,
+                    selectedStudents = state.assignedStudents,
+                    onSelectStudent = { student ->
+                        onAction(CreateAssessmentsAction.AddAssignedStudent(student))
+                    },
+                    selectedGrade = state.selectedGrade,
+                    onOptionSelected = { grade ->
+                        onAction.invoke(
+                            CreateAssessmentsAction.SetSelectedGrade(grade = grade)
+                        )
+                    }
+
+                )
+            }
         }
-    ) { innerPadding ->
 
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
                 .padding(horizontal = 16.dp)
-        ) {
+        )
+        {
             LazyColumn(
                 modifier = Modifier
                     .imePadding()
@@ -158,7 +213,7 @@ fun CreateAssessmentsScreen(
 
                 item {
                     AppDropDownMenu(
-                        expanded = state.isStudentListDropDownExpanded,
+                        expanded = false,
                         label = "Assigned Students",
                         placeholder = "Select students to assign",
                         required = true,
@@ -170,7 +225,7 @@ fun CreateAssessmentsScreen(
                     ) {
                         state.studentList.forEach { student ->
                             AppDropDownItem(
-                                item = student.student_name,
+                                item = student.name,
                                 isSelected = student in state.assignedStudents,
                                 onClick = {
                                     onAction(CreateAssessmentsAction.AddAssignedStudent(student = student))

@@ -9,6 +9,7 @@ import com.nyansapoai.teaching.data.azure.ai.AzureArtificialIntelligenceReposito
 import com.nyansapoai.teaching.data.firebase.assessment.AssessmentRepositoryFirebaseImp
 import com.nyansapoai.teaching.data.firebase.media.FirebaseMediaRepositoryImpl
 import com.nyansapoai.teaching.data.firebase.schools.SchoolRepositoryFirebaseImp
+import com.nyansapoai.teaching.data.firebase.students.StudentsRepositoryFirebaseImp
 import com.nyansapoai.teaching.data.firebase.user.UserRepositoryFirebaseImp
 import com.nyansapoai.teaching.data.local.LocalDataSource
 import com.nyansapoai.teaching.data.local.LocalDatabaseDriverFactory
@@ -21,6 +22,7 @@ import com.nyansapoai.teaching.data.remote.authentication.AuthenticationReposito
 import com.nyansapoai.teaching.data.remote.authentication.AuthenticationRepositoryImp
 import com.nyansapoai.teaching.data.remote.media.MediaRepository
 import com.nyansapoai.teaching.data.remote.school.SchoolRepository
+import com.nyansapoai.teaching.data.remote.students.StudentsRepository
 import com.nyansapoai.teaching.data.remote.user.UserRepository
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
@@ -152,6 +154,12 @@ val appModules = module {
         SchoolRepositoryFirebaseImp(
             localDataSource = get(),
             firebaseDb = get()
+        )
+    }
+
+    single<StudentsRepository> {
+        StudentsRepositoryFirebaseImp(
+            firebaseDb = get(),
         )
     }
 

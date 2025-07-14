@@ -6,6 +6,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -69,6 +70,9 @@ fun AppDropDownMenu(
                 disabledIndicatorColor = Color.Transparent,
             ),
             modifier = Modifier
+                .clickable(
+                    onClick = onClick
+                )
         )
 
 
