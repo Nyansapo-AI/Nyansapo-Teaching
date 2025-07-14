@@ -37,7 +37,7 @@ import com.nyansapoai.teaching.utils.Utils
 fun AppCardItem(
     modifier: Modifier = Modifier,
     title: String = "Teachers",
-    count: String = "12",
+    count: Int? = null,
     brush: Brush = Brush.linearGradient(listOf(MaterialTheme.colorScheme.tertiary,MaterialTheme.colorScheme.tertiary, MaterialTheme.colorScheme.secondary)),
     @DrawableRes imageResId:  Int = R.drawable.animated_female_student
 ) {
@@ -68,7 +68,7 @@ fun AppCardItem(
         )
         {
             Text(
-                text = Utils.animatedNumberString(number = count, animatedPlayed = isViewed),
+                text = Utils.animatedNumberString(number = count?.toString() ?: "0", animatedPlayed = isViewed),
                 style = MaterialTheme.typography.displayLarge,
                 fontWeight = FontWeight.ExtraBold,
                 overflow = TextOverflow.Ellipsis,

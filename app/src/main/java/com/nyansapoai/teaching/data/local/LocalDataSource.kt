@@ -25,7 +25,7 @@ interface LocalDataSource {
 
     suspend fun saveCurrentSchoolInfo(organizationUid: String, projectUid: String, schoolUid: String)
 
-    suspend fun getSavedCurrentSchoolInfo(): Flow<LocalSchoolInfo>
+    fun getSavedCurrentSchoolInfo(): Flow<LocalSchoolInfo>
 
     suspend fun insertCompletedAssessment(studentId:String, assessmentId: String,)
 

@@ -145,7 +145,7 @@ class SQLDelightDataSourceImp(
         }
     }
 
-    override suspend fun getSavedCurrentSchoolInfo(): Flow<LocalSchoolInfo> {
+    override fun getSavedCurrentSchoolInfo(): Flow<LocalSchoolInfo> {
         return schoolDatabaseQueries.getSchoolInfo()
             .asFlow()
             .mapToOne(Dispatchers.IO)

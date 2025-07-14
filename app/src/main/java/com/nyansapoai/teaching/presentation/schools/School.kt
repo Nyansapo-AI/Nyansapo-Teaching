@@ -23,6 +23,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -56,6 +57,16 @@ fun SchoolScreen(
     state: SchoolState,
     onAction: (SchoolAction) -> Unit,
 ) {
+
+    LaunchedEffect(state.localSchoolInfo) {
+        onAction.invoke(
+            SchoolAction.OnFetchSchoolDetails(
+                organizationId = state.localSchoolInfo?.organizationUid ?: "",
+                projectId = state.localSchoolInfo?.projectUId ?: "",
+                schoolId = state.localSchoolInfo?.schoolUId ?: ""
+            )
+        )
+    }
 
     AnimatedVisibility(
         visible = state.showSchoolSelector
@@ -168,8 +179,8 @@ fun SchoolScreen(
             ) {
                 item {
                     AppCardItem(
-                        title = "Students",
-                        count = "46",
+                        title = if (state.schoolDetails?.total_students == 1) "Student" else "Students",
+                        count = state.schoolDetails?.total_students,
                         imageResId = R.drawable.animated_student,
                         modifier = Modifier
                             .padding(start = 12.dp)
@@ -178,8 +189,8 @@ fun SchoolScreen(
 
                 item {
                     AppCardItem(
-                        title = "Teachers",
-                        count = "3",
+                        title = if (state.schoolDetails?.total_teachers == 1) "Teacher" else "Teachers",
+                        count = state.schoolDetails?.total_teachers,
                         imageResId = R.drawable.animated_teacher,
                         modifier = Modifier
                             .padding(end = 12.dp)
@@ -223,6 +234,13 @@ fun SchoolScreen(
         } */
 
 
+        item{
+            Text(
+                text = "School Assessment Results",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+            )
+        }
         item{
             AppComingSoon(
                 modifier = Modifier
