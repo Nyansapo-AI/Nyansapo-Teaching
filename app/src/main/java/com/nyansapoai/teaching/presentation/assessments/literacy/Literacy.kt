@@ -101,7 +101,7 @@ fun LiteracyScreen(
                     LiteracyAssessmentLevel.LETTER_RECOGNITION -> {
                         LiteracyReadingAssessmentUI(
                             modifier = Modifier,
-                            readingList = state.assessmentContent?.letters ?: emptyList(),
+                            readingList = state.assessmentContent?.letters?.take(5) ?: emptyList(),
                             currentIndex = state.currentIndex,
                             showInstructions = state.showInstructions,
                             onShowInstructionsChange = {
@@ -137,7 +137,7 @@ fun LiteracyScreen(
                     LiteracyAssessmentLevel.WORD -> {
                         LiteracyReadingAssessmentUI(
                             modifier = Modifier,
-                            readingList = state.assessmentContent?.words ?: emptyList(),
+                            readingList = state.assessmentContent?.words?.take(5) ?: emptyList(),
                             currentIndex = state.currentIndex,
                             showInstructions = state.showInstructions,
                             onShowInstructionsChange = {
@@ -174,7 +174,7 @@ fun LiteracyScreen(
                     LiteracyAssessmentLevel.PARAGRAPH -> {
                         LiteracyReadingAssessmentUI(
                             modifier = Modifier,
-                            readingList = state.assessmentContent?.paragraphs ?: emptyList(),
+                            readingList = state.assessmentContent?.paragraphs?.take(1) ?: emptyList(),
                             currentIndex = state.currentIndex,
                             showInstructions = state.showInstructions,
                             onShowInstructionsChange = {

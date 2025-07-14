@@ -29,7 +29,7 @@ interface LocalDataSource {
 
     suspend fun insertCompletedAssessment(studentId:String, assessmentId: String,)
 
-    suspend fun completeAssessment(studentId:String, assessmentId: String,isCompleted: Boolean )
+    fun completeAssessment(studentId:String, assessmentId: String,isCompleted: Boolean )
 
     suspend fun getCompletedAssessments(assessmentId: String): Flow<List<CompletedAssessment>>
 

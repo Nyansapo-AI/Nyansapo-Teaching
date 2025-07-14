@@ -3,8 +3,10 @@ package com.nyansapoai.teaching.presentation.assessments.IndividualAssessment
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.nyansapoai.teaching.data.local.LocalDataSource
 import com.nyansapoai.teaching.data.remote.assessment.AssessmentRepository
 import com.nyansapoai.teaching.utils.Results
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,7 +17,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class IndividualAssessmentViewModel(
-    private val assessmentRepository: AssessmentRepository
+    private val assessmentRepository: AssessmentRepository,
+    private val localDataSource: LocalDataSource
+
 ) : ViewModel() {
 
     private var hasLoadedInitialData = false
@@ -37,7 +41,18 @@ class IndividualAssessmentViewModel(
          */
     fun onAction(action: IndividualAssessmentAction) {
         when (action) {
-            else -> TODO("Handle actions")
+            is IndividualAssessmentAction.OnGetCompletedAssessments -> {
+                getCompletedAssessments(action.assessmentId)
+            }
+
+            is IndividualAssessmentAction.OnSetGrade -> {
+                _state.update { currentState ->
+                    currentState.copy(
+                        selectedGrade = action.grade,
+                        studentsList = action.grade?.let { currentState.assessmentState.data?.assigned_students?.filter { it.grade == action.grade } }  ?: currentState.assessmentState.data?.assigned_students ?: emptyList()
+                    )
+                }
+            }
         }
     }
 
@@ -58,5 +73,20 @@ class IndividualAssessmentViewModel(
                 }
         }
     }
+
+
+    fun getCompletedAssessments(assessmentId: String){
+        viewModelScope.launch(Dispatchers.IO) {
+            localDataSource.getCompletedAssessments(assessmentId = assessmentId)
+                .catch { e ->
+                    Log.e("AssessmentsViewModel", "Error fetching completed assessments: ${e.message}")
+                    _state.update { it.copy(completedAssessments = emptyList()) }
+                }
+                .collect { completedAssessments ->
+                    Log.d("AssessmentsViewModel", "Fetched completed assessments: ${completedAssessments}")
+                    _state.update { it.copy(completedAssessments = completedAssessments) }                }
+        }
+    }
+
 
 }

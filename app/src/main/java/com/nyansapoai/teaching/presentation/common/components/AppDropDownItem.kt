@@ -38,6 +38,7 @@ fun AppDropDownItem(
         Text(
             text = item,
             fontSize = 16.sp,
+            color = MaterialTheme.colorScheme.onBackground,
             style = MaterialTheme.typography.titleSmall
         )
 

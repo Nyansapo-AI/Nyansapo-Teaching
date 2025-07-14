@@ -5,5 +5,5 @@ import com.nyansapoai.teaching.utils.Results
 import kotlinx.coroutines.flow.Flow
 
 interface StudentsRepository {
-    suspend fun getSchoolStudents(): Flow<Results<List<NyansapoStudent>>>
+    suspend fun getSchoolStudents(organizationId: String, projectId: String, schoolId: String, studentClass: Int?): Flow<Results<List<NyansapoStudent>>>
 }

@@ -239,6 +239,8 @@ fun SchoolScreen(
                 text = "School Assessment Results",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
+                modifier = Modifier
+                    .padding(horizontal = 12.dp, vertical = 8.dp)
             )
         }
         item{

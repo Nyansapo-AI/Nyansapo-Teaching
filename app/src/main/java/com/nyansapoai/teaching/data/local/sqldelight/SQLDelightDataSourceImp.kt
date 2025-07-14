@@ -164,7 +164,7 @@ class SQLDelightDataSourceImp(
         )
     }
 
-    override suspend fun completeAssessment(
+    override fun completeAssessment(
         studentId: String,
         assessmentId: String,
         isCompleted: Boolean

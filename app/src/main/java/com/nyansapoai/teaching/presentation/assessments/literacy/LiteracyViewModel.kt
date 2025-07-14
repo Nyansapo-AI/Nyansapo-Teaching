@@ -245,9 +245,9 @@ class LiteracyViewModel(
     fun onSubmitReadingAssessment(){
 
         val currentAssessmentContentList =when(_state.value.currentAssessmentLevel){
-            LiteracyAssessmentLevel.LETTER_RECOGNITION -> _state.value.assessmentContent?.letters ?: emptyList()
-            LiteracyAssessmentLevel.WORD -> _state.value.assessmentContent?.words ?: emptyList()
-            LiteracyAssessmentLevel.PARAGRAPH -> _state.value.assessmentContent?.paragraphs
+            LiteracyAssessmentLevel.LETTER_RECOGNITION -> _state.value.assessmentContent?.letters?.take(5) ?: emptyList()
+            LiteracyAssessmentLevel.WORD -> _state.value.assessmentContent?.words?.take(5) ?: emptyList()
+            LiteracyAssessmentLevel.PARAGRAPH -> _state.value.assessmentContent?.paragraphs?.take(1) ?: emptyList()
             LiteracyAssessmentLevel.STORY -> _state.value.assessmentContent?.storys[0]?.split(".") ?: emptyList()
             LiteracyAssessmentLevel.MULTIPLE_CHOICE -> emptyList()
             LiteracyAssessmentLevel.COMPLETED -> emptyList()

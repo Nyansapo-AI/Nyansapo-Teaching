@@ -61,6 +61,7 @@ class SubmitMultipleChoiceResultsWorker(
                                 assessmentId = groupAssessmentId,
                                 studentId = groupStudentId
                             )
+
                             true
                         }
                         ResultStatus.ERROR -> {

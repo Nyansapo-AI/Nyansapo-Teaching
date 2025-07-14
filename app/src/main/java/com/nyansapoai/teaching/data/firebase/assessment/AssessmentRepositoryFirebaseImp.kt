@@ -1,20 +1,18 @@
 package com.nyansapoai.teaching.data.firebase.assessment
 
 import android.util.Log
-import com.google.firebase.firestore.DocumentReference
-import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.toObject
 import com.nyansapoai.teaching.data.remote.assessment.AssessmentRepository
 import com.nyansapoai.teaching.domain.models.assessments.Assessment
-import com.nyansapoai.teaching.domain.models.assessments.AssignedStudent
 import com.nyansapoai.teaching.domain.models.assessments.literacy.MultipleChoicesResult
 import com.nyansapoai.teaching.domain.models.assessments.literacy.ReadingAssessmentMetadata
 import com.nyansapoai.teaching.domain.models.assessments.literacy.ReadingAssessmentResult
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.CountMatch
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyArithmeticOperation
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyWordProblem
+import com.nyansapoai.teaching.domain.models.students.NyansapoStudent
 import com.nyansapoai.teaching.utils.Results
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
@@ -24,8 +22,6 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
-import kotlin.text.set
-import kotlin.toString
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -42,7 +38,7 @@ class AssessmentRepositoryFirebaseImp(
         type: String,
         startLevel: String,
         assessmentNumber: Int,
-        assignedStudents: List<AssignedStudent>
+        assignedStudents: List<NyansapoStudent>
     ): Results<Unit> {
         val deferred = CompletableDeferred<Results<Unit>>()
 
@@ -81,11 +77,11 @@ class AssessmentRepositoryFirebaseImp(
                     val resultDocRef = firebaseDb.collection(assessmentCollection)
                         .document(newAssessment.id)
                         .collection("assessments-results")
-                        .document("${newAssessment.id}_${student.student_id}")
+                        .document("${newAssessment.id}_${student.id}")
 
                     batch.set(resultDocRef, mapOf(
                         "assessmentId" to newAssessment.id,
-                        "student_id" to student.student_id,
+                        "student_id" to student.id,
                         type to null
                     ))
                 }

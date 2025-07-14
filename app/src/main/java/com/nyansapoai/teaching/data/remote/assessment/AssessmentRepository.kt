@@ -7,6 +7,7 @@ import com.nyansapoai.teaching.domain.models.assessments.literacy.ReadingAssessm
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.CountMatch
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyArithmeticOperation
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyWordProblem
+import com.nyansapoai.teaching.domain.models.students.NyansapoStudent
 import com.nyansapoai.teaching.utils.Results
 import kotlinx.coroutines.flow.Flow
 
@@ -16,7 +17,7 @@ interface  AssessmentRepository {
         type: String,
         startLevel: String,
         assessmentNumber: Int,
-        assignedStudents: List<AssignedStudent>
+        assignedStudents: List<NyansapoStudent>
     ): Results<Unit>
 
     suspend fun getAssessments(): Flow<List<Assessment>>

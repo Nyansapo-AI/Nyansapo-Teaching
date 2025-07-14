@@ -40,14 +40,6 @@ class SchoolViewModel(
         )
     }.onStart {
         _state.update { it.copy(isLoading = true) }
-        /*
-        fetchSchoolDetails(
-            organizationId = _state.value.localSchoolInfo?.organizationUid ?: "",
-            projectId = _state.value.localSchoolInfo?.projectUId ?: "",
-            schoolId = _state.value.localSchoolInfo?.schoolUId ?: ""
-        )
-
-         */
         _state.update {
             it.copy(greeting = getTimeBasedGreeting())
         }
