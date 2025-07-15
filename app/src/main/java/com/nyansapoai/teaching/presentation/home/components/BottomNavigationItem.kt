@@ -6,6 +6,7 @@ import com.nyansapoai.teaching.R
 import com.nyansapoai.teaching.presentation.assessments.AssessmentsRoot
 import com.nyansapoai.teaching.presentation.schools.CampRoot
 import com.nyansapoai.teaching.presentation.common.components.AppComingSoon
+import com.nyansapoai.teaching.presentation.students.StudentsRoot
 
 data class BottomNavigationItem(
     val title: String,
@@ -23,7 +24,7 @@ data class BottomNavigationItem(
             BottomNavigationItem(
                 title = "Students",
                 icon = R.drawable.students,
-                screen = {  },
+                screen = { StudentsRoot() },
             ),
 
             BottomNavigationItem(

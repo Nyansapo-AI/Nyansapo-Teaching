@@ -44,6 +44,7 @@ import com.nyansapoai.teaching.presentation.common.audio.record.AndroidAppAudioR
 import com.nyansapoai.teaching.presentation.common.audio.record.AppAudioRecorder
 import com.nyansapoai.teaching.presentation.common.textToSpeech.TextToSpeechViewModel
 import com.nyansapoai.teaching.presentation.common.snackbar.SnackBarHandler
+import com.nyansapoai.teaching.presentation.students.StudentsViewModel
 
 val appModules = module {
 
@@ -60,6 +61,7 @@ val appModules = module {
     viewModelOf(::NumeracyAssessmentViewModel)
     viewModelOf(::TextToSpeechViewModel)
     viewModelOf(::LiteracyViewModel)
+    viewModelOf(::StudentsViewModel)
 
 
 

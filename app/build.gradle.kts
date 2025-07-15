@@ -11,6 +11,7 @@ plugins {
 
     id("app.cash.sqldelight") version "2.1.0"
     alias(libs.plugins.google.firebase.appdistribution)
+    id("com.google.firebase.crashlytics")
 }
 
 
@@ -45,8 +46,6 @@ android {
                 "proguard-rules.pro"
             )
         }
-
-
         getByName("debug") {
             buildConfigField(
                 "String",
@@ -133,6 +132,7 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.storage)
+    implementation(libs.google.firebase.analytics)
 
     //datetime
     implementation (libs.kotlinx.datetime)
@@ -175,6 +175,5 @@ dependencies {
     //SQLDelight
     implementation(libs.android.driver)
     implementation(libs.sqlDelight.coroutine)
-
 
 }

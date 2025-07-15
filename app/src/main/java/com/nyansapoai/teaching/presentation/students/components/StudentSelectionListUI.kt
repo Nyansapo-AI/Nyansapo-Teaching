@@ -1,4 +1,4 @@
-package com.nyansapoai.teaching.presentation.assessments.createAssessment.components
+package com.nyansapoai.teaching.presentation.students.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -13,13 +13,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.nyansapoai.teaching.domain.models.students.NyansapoStudent
 import com.nyansapoai.teaching.presentation.common.components.AppDropDownItem
 import com.nyansapoai.teaching.presentation.onboarding.components.OptionsItemUI
 
-@Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun StudentSelectionListUI(
     modifier: Modifier = Modifier,
@@ -27,10 +25,22 @@ fun StudentSelectionListUI(
     studentList: List<NyansapoStudent> = emptyList(),
     selectedStudents: List<NyansapoStudent> = emptyList(),
     onSelectStudent: (NyansapoStudent) -> Unit = {  },
+    studentItemContent: @Composable (NyansapoStudent) -> Unit = { student ->
+        AppDropDownItem(
+            item = student.name.ifEmpty { "${student.first_name} ${student.last_name}" },
+            isSelected = student in selectedStudents,
+            onClick = {
+                onSelectStudent(student)
+            },
+            modifier = Modifier
+                .padding(horizontal = 16.dp, )
+        )
+    },
     selectedGrade: Int? = null,
     onOptionSelected: (Int?) -> Unit = {  },
 ) {
     LazyColumn(
+        verticalArrangement = Arrangement.spacedBy(12.dp),
         modifier = modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
@@ -72,16 +82,7 @@ fun StudentSelectionListUI(
         }
 
         items(items= studentList){ student ->
-            AppDropDownItem(
-                item = student.name.ifEmpty { "${student.first_name} ${student.last_name}" },
-                isSelected = student in selectedStudents,
-                onClick = {
-                    onSelectStudent(student)
-                },
-                modifier = Modifier
-                    .padding(horizontal = 16.dp, )
-            )
-
+            studentItemContent(student)
         }
 
     }
