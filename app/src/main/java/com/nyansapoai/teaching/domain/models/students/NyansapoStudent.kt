@@ -7,11 +7,11 @@ import kotlinx.serialization.Serializable
 @IgnoreExtraProperties
 data class NyansapoStudent(
     val id: String = "",
-    val baseline: String = "",
+    val baseline: String? = null,
     val grade: Int? = null,
-    val createdAt: String = "",
+//    val createdAt: String = "",
     val group: String = "",
-    val lastUpdated: String = "",
+//    val lastUpdated: String = "",
     val name: String = "",
     val sex: String = "",
     val first_name: String = "",

@@ -73,7 +73,7 @@ fun StudentSelectionListUI(
 
         items(items= studentList){ student ->
             AppDropDownItem(
-                item = "${student.first_name} ${student.last_name}",
+                item = student.name.ifEmpty { "${student.first_name} ${student.last_name}" },
                 isSelected = student in selectedStudents,
                 onClick = {
                     onSelectStudent(student)
