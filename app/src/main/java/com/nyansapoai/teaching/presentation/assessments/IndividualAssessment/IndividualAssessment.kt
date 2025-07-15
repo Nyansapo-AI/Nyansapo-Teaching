@@ -254,7 +254,7 @@ fun IndividualAssessmentScreen(
 
                                     ) {
                                         Text(
-                                            text = "${student.first_name} ${student.last_name}",
+                                            text = student.name.ifEmpty { "${student.first_name} ${student.last_name}" },
                                             style = MaterialTheme.typography.titleMedium,
                                             color = MaterialTheme.colorScheme.onBackground,
                                             modifier = Modifier
@@ -295,7 +295,7 @@ fun IndividualAssessmentScreen(
                                                 return@TextButton
                                             }
                                             Text(
-                                                text = student.baseline,
+                                                text = student.baseline?:"Start",
                                                 style = MaterialTheme.typography.bodyMedium,
                                                 color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.7f),
                                                 modifier = Modifier

@@ -156,7 +156,7 @@ class CreateAssessmentsViewModel(
                             name = "",
                             type = "",
                             startLevel = "",
-                            assessmentNumber = 1,
+                            assessmentNumber = 5,
                             assignedStudents = emptyList(),
                             isAssessmentNumberDropDownExpanded = false,
                             isStartLevelDropDownExpanded = false,
