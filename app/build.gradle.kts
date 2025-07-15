@@ -133,6 +133,7 @@ dependencies {
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.storage)
     implementation(libs.google.firebase.analytics)
+    implementation(libs.firebase.crashlytics.ndk)
 
     //datetime
     implementation (libs.kotlinx.datetime)

@@ -6,7 +6,7 @@ import database.CompleteAssessmentEntity
 fun CompleteAssessmentEntity.toCompletedAssessment(): CompletedAssessment {
     return CompletedAssessment(
         assessmentId = assessmentId,
-        studentId = studentId,
-        isCompleted = isCompleted.toInt() == 1
+        student_id = studentId,
+        completed_assessment = isCompleted.toInt() == 1
     )
 }

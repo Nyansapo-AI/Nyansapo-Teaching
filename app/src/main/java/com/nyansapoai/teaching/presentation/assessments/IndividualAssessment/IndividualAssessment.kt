@@ -81,7 +81,7 @@ fun IndividualAssessmentScreen(
 
     val context = LocalContext.current
 
-    LaunchedEffect(true) {
+    LaunchedEffect(state.assessmentState) {
         onAction.invoke(
             IndividualAssessmentAction.OnGetCompletedAssessments(assessmentId = state.assessmentState.data?.id ?: "")
         )
@@ -225,7 +225,7 @@ fun IndividualAssessmentScreen(
                                         .padding(horizontal = 12.dp)
                                         .clickable(
                                             onClick = {
-                                                if (student.id in state.completedAssessments.map { it.studentId }){
+                                                if (student.id in state.completedAssessments.map { it.student_id }){
                                                     Toast.makeText(context, "${student.first_name} ${student.last_name} has already done the assessment", Toast.LENGTH_SHORT).show()
                                                     return@clickable
                                                 }
@@ -240,7 +240,7 @@ fun IndividualAssessmentScreen(
                                         )
                                         .border(
                                             width = 2.dp,
-                                            color = if (student.id in state.completedAssessments.map { it.studentId })Color.Green else Color.Transparent,
+                                            color = if (student.id in state.completedAssessments.map { it.student_id })Color.Green else Color.Transparent,
                                             shape = CardDefaults.elevatedShape
                                         )
 
@@ -263,7 +263,7 @@ fun IndividualAssessmentScreen(
                                         TextButton(
                                             onClick = {
 
-                                                if (student.id in state.completedAssessments.map { it.studentId }){
+                                                if (student.id in state.completedAssessments.map { it.student_id }){
                                                     Toast.makeText(context, "${student.first_name} ${student.last_name} has already done the assessment", Toast.LENGTH_SHORT).show()
                                                     return@TextButton
                                                 }
@@ -281,7 +281,7 @@ fun IndividualAssessmentScreen(
                                             ),
                                         ) {
 
-                                            if (student.id in state.completedAssessments.map { it.studentId }){
+                                            if (student.id in state.completedAssessments.map { it.student_id }){
                                                 Image(
                                                     painter = painterResource(R.drawable.done_3_),
                                                     contentDescription = "has completed the assessment",

@@ -154,8 +154,6 @@ fun OnboardingScreen(
             AppButton(
                 enabled = state.selectedOrganization != null && state.selectedProject != null && state.selectedSchool != null ,
                 onClick = {
-//                    throw RuntimeException("Test Crash")
-
                     onAction.invoke(OnboardingAction.OnContinue(
                         onSuccess = {
                             navController.navigate(HomePage)

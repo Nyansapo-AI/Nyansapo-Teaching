@@ -31,7 +31,7 @@ interface LocalDataSource {
 
     fun completeAssessment(studentId:String, assessmentId: String,isCompleted: Boolean )
 
-    suspend fun getCompletedAssessments(assessmentId: String): Flow<List<CompletedAssessment>>
+    suspend fun fetchCompletedAssessments(assessmentId: String): Flow<List<CompletedAssessment>>
 
     suspend fun insertLiteracyAssessmentWorkerRequest(assessmentId: String, studentId: String, requestId: String, type: String)
 
