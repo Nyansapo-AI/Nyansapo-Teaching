@@ -6,6 +6,8 @@ import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.toObject
 import com.nyansapoai.teaching.data.remote.assessment.AssessmentRepository
 import com.nyansapoai.teaching.domain.models.assessments.Assessment
+import com.nyansapoai.teaching.domain.models.assessments.CompletedAssessment
+import com.nyansapoai.teaching.domain.models.assessments.RemoteCompletedAssessment
 import com.nyansapoai.teaching.domain.models.assessments.literacy.MultipleChoicesResult
 import com.nyansapoai.teaching.domain.models.assessments.literacy.ReadingAssessmentMetadata
 import com.nyansapoai.teaching.domain.models.assessments.literacy.ReadingAssessmentResult
@@ -31,6 +33,7 @@ class AssessmentRepositoryFirebaseImp(
 ): AssessmentRepository {
 
     private val assessmentCollection = "assessments"
+    private val assessmentResultsCollection = "assessments-results"
 
     @OptIn(ExperimentalUuidApi::class)
     override suspend fun createAssessment(
@@ -360,6 +363,56 @@ class AssessmentRepositoryFirebaseImp(
 
         return withContext(Dispatchers.IO) {
             deferred.await()
+        }
+    }
+
+    override fun getCompletedAssessments(assessmentId: String): Flow<Results<List<CompletedAssessment>>> = callbackFlow {
+        // Validate assessmentId first to prevent malformed paths
+        if (assessmentId.isBlank()) {
+            trySend(Results.error(msg = "Invalid assessment ID provided"))
+            close()
+            return@callbackFlow
+        }
+
+        try {
+            // Log the path for debugging
+            val path = "$assessmentCollection/$assessmentId/$assessmentResultsCollection"
+            Log.d("AssessmentRepo", "Fetching completed assessments from: $path")
+
+            val snapshotListener = firebaseDb.collection(assessmentCollection)
+                .document(assessmentId)
+                .collection(assessmentResultsCollection)
+                .whereEqualTo("completed_assessment", true)
+                .addSnapshotListener { snapshot, error ->
+                    if (error != null) {
+                        Log.e("AssessmentRepo", "Error fetching completed assessments: ${error.message}", error)
+                        trySend(Results.error(msg = error.message ?: "Something went wrong"))
+                        close(error)
+                        return@addSnapshotListener
+                    }
+
+                    if (snapshot != null) {
+                        val completedAssessments = snapshot.documents.mapNotNull { documentSnapshot ->
+                            try {
+                                documentSnapshot.toObject<CompletedAssessment>()
+                            } catch (e: Exception) {
+                                Log.e("AssessmentRepo", "Error parsing assessment: ${e.message}")
+                                null
+                            }
+                        }
+                        trySend(Results.success(data = completedAssessments))
+                    } else {
+                        trySend(Results.error(msg = "No assessment data found"))
+                    }
+                }
+
+            awaitClose {
+                snapshotListener.remove()
+            }
+        } catch (e: Exception) {
+            Log.e("AssessmentRepo", "Exception in getCompletedAssessments: ${e.message}", e)
+            trySend(Results.error(msg = "Error accessing assessments: ${e.message}"))
+            close(e)
         }
     }
 

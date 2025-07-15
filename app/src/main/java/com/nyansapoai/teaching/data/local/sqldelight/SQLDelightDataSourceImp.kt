@@ -176,7 +176,7 @@ class SQLDelightDataSourceImp(
         )
     }
 
-    override suspend fun getCompletedAssessments(assessmentId: String): Flow<List<CompletedAssessment>> {
+    override suspend fun fetchCompletedAssessments(assessmentId: String): Flow<List<CompletedAssessment>> {
         return assessmentQueries.getCompletedAssessments()
             .asFlow()
             .mapToList(Dispatchers.IO)
