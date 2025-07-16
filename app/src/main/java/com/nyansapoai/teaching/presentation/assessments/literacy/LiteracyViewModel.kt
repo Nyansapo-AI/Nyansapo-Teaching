@@ -34,8 +34,9 @@ class LiteracyViewModel(
     private val assessmentRepository: AssessmentRepository,
     private val artificialIntelligenceRepository: ArtificialIntelligenceRepository,
     private val mediaRepository: MediaRepository,
-    private val appContext: Context,
-    private val localDataSource: LocalDataSource
+//    private val appContext: Context,
+    private val localDataSource: LocalDataSource,
+    private val workManager: WorkManager
 ) : ViewModel() {
 
     private var hasLoadedInitialData = false
@@ -200,7 +201,7 @@ class LiteracyViewModel(
 
             val uniqueWorkName = "reading_assessment_${assessmentId}_${studentId}_${contentHash}_${System.currentTimeMillis()}"
 
-            WorkManager.getInstance(appContext)
+            workManager
                 .enqueueUniqueWork(
                     uniqueWorkName = uniqueWorkName,
                     ExistingWorkPolicy.REPLACE,
@@ -219,7 +220,7 @@ class LiteracyViewModel(
             _state.update {
                 it.copy(
                     isLoading = false,
-                    message = "Assessment content submitted for evaluation"
+//                    message = "Assessment content submitted for evaluation"
                 )
             }
 
@@ -371,7 +372,7 @@ class LiteracyViewModel(
 
             val uniqueWorkName = "multiple_choices_${assessmentId}_${studentId}_${questionHash}_${System.currentTimeMillis()}"
 
-            WorkManager.getInstance(appContext)
+            workManager
                 .enqueueUniqueWork(
                     uniqueWorkName = uniqueWorkName,
                     ExistingWorkPolicy.REPLACE,
@@ -526,7 +527,7 @@ class LiteracyViewModel(
             .setConstraints(constraints = constraints)
             .build()
 
-        WorkManager.getInstance(appContext)
+        workManager
             .beginUniqueWork(
                 uniqueWorkName ="complete_assessment_${assessmentId}_${studentId}",
                  existingWorkPolicy =  ExistingWorkPolicy.REPLACE,

@@ -34,7 +34,8 @@ class EvaluateReadingAssessmentWorker(
             val assessmentId = inputData.getString("assessment_id") ?: return Result.failure()
             val studentId = inputData.getString("student_id") ?: return Result.failure()
 
-            val audioBytes = File(audioFilePath).readBytes()
+//            val audioBytes = File(audioFilePath).readBytes()
+            val audioBytes = readAudioFile(audioFilePath) ?: return Result.failure()
 
             val audioUrl = mediaRepository.saveAudio(audioByteArray = audioBytes).data ?: return Result.retry()
 
@@ -66,6 +67,17 @@ class EvaluateReadingAssessmentWorker(
             Log.d("Worker", "Failed, ${e.message}")
             e.printStackTrace()
             Result.failure()
+        }
+    }
+
+    private fun readAudioFile(path: String): ByteArray? {
+        return try {
+            File(path).readBytes().also {
+                Log.d("EvaluateReadingAssessmentWorker", "Read ${it.size} bytes from audio file")
+            }
+        } catch (e: Exception) {
+            Log.e("EvaluateReadingAssessmentWorker", "Failed to read audio file: ${e.message}", e)
+            null
         }
     }
 }
