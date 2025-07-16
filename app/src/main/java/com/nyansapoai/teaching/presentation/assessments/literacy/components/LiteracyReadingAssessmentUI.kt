@@ -213,7 +213,6 @@ fun LiteracyReadingAssessmentUI(
             ).also { file ->
                 appAudioRecorder.start(outputFile = file)
                 audioFile = file
-
             }
         }else if (audioFile != null){
             delay(1000)
@@ -222,13 +221,12 @@ fun LiteracyReadingAssessmentUI(
 
                 when {
                     !isLoading -> {
-                        onAudioByteArrayChange(appAudioRecorder.getOutputFileByteArray(outputFile = audioFile!!))
+//                        onAudioByteArrayChange(appAudioRecorder.getOutputFileByteArray(outputFile = audioFile!!))
                         onAudioPathChange(it.absolutePath)
-//                        onSubmit.invoke()
                         audioFile = null
                     }
                 }
-            }
+            }?: return@LaunchedEffect
         }
     }
 

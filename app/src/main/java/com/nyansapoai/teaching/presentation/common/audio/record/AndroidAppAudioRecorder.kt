@@ -89,6 +89,10 @@ class AndroidAppAudioRecorder(
     }
 
     override fun getOutputFileByteArray(outputFile: File): ByteArray {
+        if (!outputFile.exists()){
+            return ByteArray(0)
+        }
+
         return outputFile.readBytes()
     }
 

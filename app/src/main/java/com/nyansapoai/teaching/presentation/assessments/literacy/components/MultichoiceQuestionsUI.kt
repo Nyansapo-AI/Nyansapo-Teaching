@@ -48,9 +48,9 @@ fun MultichoiceQuestionsUI(
             style = MaterialTheme.typography.titleMedium,
             textAlign = TextAlign.Center
         )
-
         return
     }
+
 
     var progress by remember {
         mutableFloatStateOf(0f)
@@ -59,6 +59,10 @@ fun MultichoiceQuestionsUI(
     var showStory by remember { mutableStateOf(false) }
 
     val choiceList = remember(currentIndex) {
+        if (currentIndex >= questionsList.size) {
+            return@remember emptyList<String>()
+        }
+
         (listOf(questionsList[currentIndex].multipleChoices.correctChoices.random()) +
                 questionsList[currentIndex].multipleChoices.wrongChoices.shuffled().take(2)).shuffled()
     }
