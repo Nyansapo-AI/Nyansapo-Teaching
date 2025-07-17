@@ -16,7 +16,6 @@ object MediaUtils {
             null
         }
     }
-
     fun cleanUpMediaFile(path: String) {
         try {
             val file = File(path)
@@ -33,7 +32,6 @@ object MediaUtils {
             Log.e(TAG, "Error deleting media file: $path : ${e.message}", e)
         }
     }
-
     fun checkFileSizeInMB(file: File?, maxSizeMB: Int): Boolean {
         file?.let {
             if (!it.exists()) return false

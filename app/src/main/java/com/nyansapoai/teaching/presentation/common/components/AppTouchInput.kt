@@ -43,7 +43,8 @@ fun AppTouchInput(
     modifier: Modifier = Modifier,
     isEraserMode: Boolean = false,
     brushColor: Color = Color.Black,
-                  ) {
+
+    ) {
 
     MultiTouchDrawingCanvas(
         modifier = modifier
@@ -274,6 +275,7 @@ fun DrawScope.drawPressurePath(pressurePath: PressurePath) {
     }
 }
 
+/*
 @Composable
 fun GestureDrawingCanvas() {
     var shapes by remember { mutableStateOf(listOf<DrawnShape>()) }
@@ -362,6 +364,7 @@ fun GestureDrawingCanvas() {
         }
     }
 }
+*/
 
 data class PressurePoint(
     val offset: Offset,

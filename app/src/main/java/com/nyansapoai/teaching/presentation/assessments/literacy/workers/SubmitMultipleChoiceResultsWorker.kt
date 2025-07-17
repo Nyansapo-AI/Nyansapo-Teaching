@@ -20,11 +20,13 @@ class SubmitMultipleChoiceResultsWorker(
     private val assessmentRepository: AssessmentRepository by inject()
 
     override suspend fun doWork(): Result {
+
+        val retryAttempt = runAttemptCount
         val assessmentId = inputData.getString("assessment_id")
         val studentId = inputData.getString("student_id")
 
         if (assessmentId.isNullOrEmpty() || studentId.isNullOrEmpty()) {
-            Log.e("SubmitMCResultsWorker", "Missing assessmentId or studentId")
+            Log.e(WORK_NAME, "Missing assessmentId or studentId")
             return Result.failure()
         }
 
@@ -35,7 +37,7 @@ class SubmitMultipleChoiceResultsWorker(
             ).first()
 
             if (pending.isEmpty()) {
-                Log.i("SubmitMCResultsWorker", "No pending results to submit")
+                Log.i(WORK_NAME, "No pending results to submit")
                 return Result.success()
             }
 
@@ -65,21 +67,36 @@ class SubmitMultipleChoiceResultsWorker(
                             true
                         }
                         ResultStatus.ERROR -> {
-                            Log.e("SubmitMCResultsWorker", "Submission failed for $groupAssessmentId/$groupStudentId: ${response.message}")
+                            Log.e(WORK_NAME, "Submission failed for $groupAssessmentId/$groupStudentId: ${response.message}")
                             false
                         }
                         else -> true
                     }
                 } catch (e: Exception) {
-                    Log.e("SubmitMCResultsWorker", "Exception for $groupAssessmentId/$groupStudentId", e)
+                    Log.e(WORK_NAME, "Exception for $groupAssessmentId/$groupStudentId", e)
                     false
                 }
             }
 
-            if (allSucceeded) Result.success() else Result.retry()
+            if (allSucceeded) Result.success() else handleRetry(attempt = retryAttempt)
         } catch (e: Exception) {
-            Log.e("SubmitMCResultsWorker", "Exception in doWork", e)
+            Log.e(WORK_NAME, "Exception in doWork", e)
             Result.failure()
         }
+    }
+
+    private fun handleRetry(attempt: Int): Result {
+        return if (attempt >= MAX_RETRIES) {
+            Log.e(WORK_NAME, "Max retries reached")
+            Result.failure()
+        } else {
+            Log.d(WORK_NAME, "Scheduling retry ${attempt + 1}")
+            Result.retry()
+        }
+    }
+
+    companion object {
+        const val WORK_NAME = "SubmitMultipleChoiceResultsWorker"
+        const val MAX_RETRIES = 4
     }
 }
