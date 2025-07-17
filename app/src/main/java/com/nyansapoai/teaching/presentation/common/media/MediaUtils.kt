@@ -34,4 +34,13 @@ object MediaUtils {
         }
     }
 
+    fun checkFileSizeInMB(file: File?, maxSizeMB: Int): Boolean {
+        file?.let {
+            if (!it.exists()) return false
+            val maxSizeBytes = maxSizeMB * 1024 * 1024 // Convert MB to bytes
+            return it.length() <= maxSizeBytes
+        }
+        return false
+    }
+
 }
