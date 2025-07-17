@@ -1,6 +1,7 @@
 package com.nyansapoai.teaching.presentation.assessments.literacy.components
 
 import android.os.Build
+import android.widget.Toast
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -46,6 +47,7 @@ import com.nyansapoai.teaching.presentation.common.audio.record.AppAudioRecorder
 import com.nyansapoai.teaching.presentation.common.components.AppButton
 import com.nyansapoai.teaching.presentation.common.components.AppLinearProgressIndicator
 import com.nyansapoai.teaching.presentation.common.components.AppShowInstructions
+import com.nyansapoai.teaching.presentation.common.media.MediaUtils
 import com.nyansapoai.teaching.presentation.common.permissions.RequestAppPermissions
 import kotlinx.coroutines.delay
 import org.koin.compose.koinInject
@@ -212,7 +214,13 @@ fun LiteracyReadingAssessmentUI(
                 "audio_recording_${Clock.System.now().epochSeconds}.wav"
             ).also { file ->
                 appAudioRecorder.start(outputFile = file)
-                audioFile = file
+
+                if (MediaUtils.checkFileSizeInMB(file = file, maxSizeMB = 3)){
+                    audioFile = file
+                } else {
+                    audioFile = null
+                    Toast.makeText(context, "Your recording is too long. Please try again", Toast.LENGTH_LONG).show()
+                }
             }
         }else if (audioFile != null){
             delay(1000)
@@ -274,7 +282,6 @@ fun LiteracyReadingAssessmentUI(
                 ),
                 onClick = {
                     onShowInstructionsChange(!showInstructions)
-
                     audioFile?.let {
                         audioPlayer.playFile(it)
                     } ?: run {

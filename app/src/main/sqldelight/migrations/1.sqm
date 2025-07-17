@@ -1,0 +1,27 @@
+CREATE TABLE IF NOT EXISTS PendingNumeracyArithmreticResultEntity(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    assessmentId TEXT NOT NULL,
+    studentId TEXT NOT NULL,
+    operationType TEXT NOT NULL,
+    operand1 INTEGER NOT NULL,
+    operand2 INTEGER NOT NULL,
+    expectedAnswer INTEGER NOT NULL,
+    answer INTEGER,
+    passed INTEGER NOT NULL,
+    workAreaImageUrl TEXT,
+    answerImageUrl TEXT,
+    isPending INTEGER NOT NULL DEFAULT 1
+);
+
+CREATE TABLE IF NOT EXISTS PendingNumeracyWordProblemResultEntity(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    assessmentId TEXT NOT NULL,
+    studentId TEXT NOT NULL,
+    question TEXT NOT NULL,
+    studentAnswer INTEGER ,
+    expectedAnswer INTEGER NOT NULL,
+    passed INTEGER NOT NULL,
+    workAreaImageUrl TEXT,
+    answerImageUrl TEXT,
+    isPending INTEGER NOT NULL DEFAULT 1
+);

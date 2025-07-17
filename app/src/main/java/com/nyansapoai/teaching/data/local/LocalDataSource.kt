@@ -4,6 +4,8 @@ import com.nyansapoai.teaching.domain.models.school.LocalSchoolInfo
 import com.nyansapoai.teaching.domain.models.assessments.CompletedAssessment
 import com.nyansapoai.teaching.domain.models.assessments.literacy.PendingMultipleChoicesResult
 import com.nyansapoai.teaching.domain.models.assessments.literacy.PendingReadingAssessmentResult
+import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyArithmeticOperation
+import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyWordProblem
 import kotlinx.coroutines.flow.Flow
 
 interface LocalDataSource {
@@ -38,5 +40,24 @@ interface LocalDataSource {
     suspend fun getLiteracyAssessmentWorkerRequests(assessmentId: String, studentId: String, type: String): Flow<List<String>>
 
     suspend fun clearLiteracyAssessmentRequests(assessmentId: String, studentId: String, type: String)
+
+    suspend fun insertPendingNumeracyOperation(assessmentId: String, studentId: String,numeracyArithmeticOperation: NumeracyArithmeticOperation)
+
+    suspend fun getPendingNumeracyArithmeticOperations(assessmentId: String, studentId: String): Flow<List<NumeracyArithmeticOperation>>
+
+    suspend fun clearPendingNumeracyArithmeticOperations(assessmentId: String, studentId: String)
+
+    fun insertPendingNumeracyWordProblemResult(
+        assessmentId: String,
+        studentId: String,
+        numeracyWordProblem: NumeracyWordProblem
+    )
+
+    fun getPendingNumeracyWordProblems(
+        assessmentId: String,
+        studentId: String
+    ): Flow<List<NumeracyWordProblem>>
+
+    suspend fun clearPendingNumeracyWordProblems(assessmentId: String, studentId: String)
 
 }
