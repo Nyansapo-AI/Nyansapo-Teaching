@@ -8,6 +8,7 @@ import com.nyansapoai.teaching.data.local.LocalDataSource
 import com.nyansapoai.teaching.data.remote.ai.ArtificialIntelligenceRepository
 import com.nyansapoai.teaching.data.remote.media.MediaRepository
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.compareResponseStrings
+import com.nyansapoai.teaching.presentation.common.media.MediaUtils
 import kotlinx.coroutines.flow.first
 import kotlinx.datetime.Clock
 import org.koin.core.component.KoinComponent
@@ -59,8 +60,9 @@ class EvaluateReadingAssessmentWorker(
                 isPending = true,
             )
 
-            Log.d("Worker", "Running Successful")
+            MediaUtils.cleanUpMediaFile(path = audioFilePath)
 
+            Log.d("Worker", "Running Successful")
             Result.success()
         }catch (e: Exception ){
 
