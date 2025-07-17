@@ -8,6 +8,8 @@ import com.nyansapoai.teaching.data.local.LocalDataSource
 import com.nyansapoai.teaching.data.remote.ai.ArtificialIntelligenceRepository
 import com.nyansapoai.teaching.data.remote.media.MediaRepository
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.compareResponseStrings
+import com.nyansapoai.teaching.presentation.assessments.numeracy.workers.EvaluateNumeracyArithmeticOperationWorker.Companion.MAX_RETRIES
+import com.nyansapoai.teaching.presentation.assessments.numeracy.workers.EvaluateNumeracyArithmeticOperationWorker.Companion.WORK_NAME
 import com.nyansapoai.teaching.presentation.common.media.MediaUtils
 import kotlinx.coroutines.flow.first
 import kotlinx.datetime.Clock
@@ -27,6 +29,7 @@ class EvaluateReadingAssessmentWorker(
 
     override suspend fun doWork(): Result {
         return try {
+            val retryAttempt = runAttemptCount
             Log.d("Worker", "Running")
 
             val audioFilePath = inputData.getString("audioFilePath") ?: return Result.failure()
@@ -38,7 +41,7 @@ class EvaluateReadingAssessmentWorker(
 //            val audioBytes = File(audioFilePath).readBytes()
             val audioBytes = readAudioFile(audioFilePath) ?: return Result.failure()
 
-            val audioUrl = mediaRepository.saveAudio(audioByteArray = audioBytes).data ?: return Result.retry()
+            val audioUrl = mediaRepository.saveAudio(audioByteArray = audioBytes).data ?: return handleRetry(attempt = retryAttempt)
 
             val transcription = artificialIntelligenceRepository.getTextFromAudio(audioByteArray = audioBytes).first().data?.DisplayText ?: ""
 
@@ -72,6 +75,17 @@ class EvaluateReadingAssessmentWorker(
         }
     }
 
+    private fun handleRetry(attempt: Int): Result {
+        return if (attempt >= MAX_RETRIES) {
+            Log.e(WORK_NAME, "Max retries reached")
+            Result.failure()
+        } else {
+            Log.d(WORK_NAME, "Scheduling retry ${attempt + 1}")
+            Result.retry()
+        }
+    }
+
+
     private fun readAudioFile(path: String): ByteArray? {
         return try {
             File(path).readBytes().also {
@@ -81,5 +95,10 @@ class EvaluateReadingAssessmentWorker(
             Log.e("EvaluateReadingAssessmentWorker", "Failed to read audio file: ${e.message}", e)
             null
         }
+    }
+
+    companion object {
+        const val WORK_NAME = "EvaluateReadingAssessmentWorker"
+        const val MAX_RETRIES = 4
     }
 }

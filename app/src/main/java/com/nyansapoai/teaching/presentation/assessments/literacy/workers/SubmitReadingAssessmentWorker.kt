@@ -20,6 +20,7 @@ class SubmitReadingAssessmentWorker(
     private val localDataSource: LocalDataSource by inject()
 
     override suspend fun doWork(): Result {
+        val retryAttempt = runAttemptCount
         val assessmentId = inputData.getString("assessment_id")
         val studentId = inputData.getString("student_id")
 
@@ -74,10 +75,25 @@ class SubmitReadingAssessmentWorker(
                 }
             }
 
-            if (allSucceeded) Result.success() else Result.retry()
+            if (allSucceeded) Result.success() else handleRetry(attempt = retryAttempt)
         } catch (e: Exception) {
             Log.e("SubmitReadingAssessmentWorker", "Exception in doWork", e)
             Result.failure()
         }
+    }
+
+    private fun handleRetry(attempt: Int): Result {
+        return if (attempt >= MAX_RETRIES) {
+            Log.e(WORK_NAME, "Max retries reached")
+            Result.failure()
+        } else {
+            Log.d(WORK_NAME, "Scheduling retry ${attempt + 1}")
+            Result.retry()
+        }
+    }
+
+    companion object {
+        const val WORK_NAME = "SubmitReadingAssessmentWorker"
+        const val MAX_RETRIES = 4
     }
 }
