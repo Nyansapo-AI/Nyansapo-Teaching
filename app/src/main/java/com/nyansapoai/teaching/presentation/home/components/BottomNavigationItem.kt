@@ -4,6 +4,7 @@ import androidx.annotation.DrawableRes
 import androidx.compose.runtime.Composable
 import com.nyansapoai.teaching.R
 import com.nyansapoai.teaching.presentation.assessments.AssessmentsRoot
+import com.nyansapoai.teaching.presentation.assessments.literacy.result.components.ParagraphResultItem
 import com.nyansapoai.teaching.presentation.schools.CampRoot
 import com.nyansapoai.teaching.presentation.common.components.AppComingSoon
 import com.nyansapoai.teaching.presentation.students.StudentsRoot
@@ -36,7 +37,7 @@ data class BottomNavigationItem(
             BottomNavigationItem(
                 title = "Attendance",
                 icon = R.drawable.attendance,
-                screen = { AppComingSoon() },
+                screen = { ParagraphResultItem() },
             ),
 
             BottomNavigationItem(
