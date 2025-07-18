@@ -32,7 +32,7 @@ class Http() {
                             println(message)
                         }
                     }
-                level = LogLevel.ALL
+                level = LogLevel.INFO
             }
 
             install(HttpTimeout) {
@@ -67,13 +67,15 @@ class Http() {
                             println(message)
                         }
                     }
-                level = LogLevel.ALL
+                level = LogLevel.INFO
+
+                sanitizeHeader {  header -> header == "Ocp-Apim-Subscription-Key" }
             }
 
             install(HttpTimeout) {
-                requestTimeoutMillis = 60000
-                socketTimeoutMillis = 60000
-                connectTimeoutMillis = 60000
+                requestTimeoutMillis = 6000
+                socketTimeoutMillis = 6000
+                connectTimeoutMillis = 6000
             }
 
             install(ContentNegotiation) {
@@ -100,16 +102,18 @@ class Http() {
                 logger =
                     object : Logger {
                         override fun log(message: String) {
-                            println(message)
+                            println(message.take(1000))
                         }
                     }
-                level = LogLevel.ALL
+                level = LogLevel.INFO
+
+                sanitizeHeader { header -> header == "Ocp-Apim-Subscription-Key" }
             }
 
             install(HttpTimeout) {
-                requestTimeoutMillis = 60000
-                socketTimeoutMillis = 60000
-                connectTimeoutMillis = 60000
+                requestTimeoutMillis = 6000
+                socketTimeoutMillis = 6000
+                connectTimeoutMillis = 6000
             }
 
             install(ContentNegotiation) {

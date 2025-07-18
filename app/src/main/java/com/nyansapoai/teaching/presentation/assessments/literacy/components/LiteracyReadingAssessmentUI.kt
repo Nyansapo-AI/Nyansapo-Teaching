@@ -1,7 +1,6 @@
 package com.nyansapoai.teaching.presentation.assessments.literacy.components
 
 import android.os.Build
-import android.widget.Toast
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -47,7 +46,6 @@ import com.nyansapoai.teaching.presentation.common.audio.record.AppAudioRecorder
 import com.nyansapoai.teaching.presentation.common.components.AppButton
 import com.nyansapoai.teaching.presentation.common.components.AppLinearProgressIndicator
 import com.nyansapoai.teaching.presentation.common.components.AppShowInstructions
-import com.nyansapoai.teaching.presentation.common.media.MediaUtils
 import com.nyansapoai.teaching.presentation.common.permissions.RequestAppPermissions
 import kotlinx.coroutines.delay
 import org.koin.compose.koinInject
@@ -75,9 +73,9 @@ fun LiteracyReadingAssessmentUI(
     instructionTitle: String = "Read the letter",
     instructionDescription: String = "Hold the box to record your voice saying the letter.",
     showQuestionNumber: Boolean = true,
-    audioByteArray: ByteArray?,
     onAudioByteArrayChange: (ByteArray) -> Unit,
     onAudioPathChange: (String) -> Unit,
+    audioFilePath: String?,
     response: String?,
     onSubmit: () -> Unit,
 ) {
@@ -210,17 +208,13 @@ fun LiteracyReadingAssessmentUI(
     LaunchedEffect(showContent) {
         if (showContent){
             File(
-                context.cacheDir,
+                context.filesDir,
                 "audio_recording_${Clock.System.now().epochSeconds}.wav"
             ).also { file ->
                 appAudioRecorder.start(outputFile = file)
 
-                if (MediaUtils.checkFileSizeInMB(file = file, maxSizeMB = 3)){
-                    audioFile = file
-                } else {
-                    audioFile = null
-                    Toast.makeText(context, "Your recording is too long. Please try again", Toast.LENGTH_LONG).show()
-                }
+                audioFile = file
+
             }
         }else if (audioFile != null){
             delay(1000)
@@ -229,7 +223,6 @@ fun LiteracyReadingAssessmentUI(
 
                 when {
                     !isLoading -> {
-//                        onAudioByteArrayChange(appAudioRecorder.getOutputFileByteArray(outputFile = audioFile!!))
                         onAudioPathChange(it.absolutePath)
                         audioFile = null
                     }
@@ -354,7 +347,13 @@ fun LiteracyReadingAssessmentUI(
                                 }
                         ) {
                             Text(
-                                text = if (showContent) readingList[currentIndex] else "",
+                                text = if (showContent) {
+                                    if (currentIndex < readingList.size) {
+                                        readingList[currentIndex]
+                                    } else {
+                                        "No more questions available"
+                                    }
+                                } else "",
                                 style = MaterialTheme.typography.headlineLarge,
                                 color = MaterialTheme.colorScheme.secondary,
                                 textAlign = TextAlign.Center,
@@ -375,7 +374,7 @@ fun LiteracyReadingAssessmentUI(
 
 
         AppButton(
-            enabled = audioByteArray != null,
+            enabled = audioFilePath != null,
             onClick = onSubmit,
             modifier = Modifier
                 .fillMaxWidth()

@@ -28,6 +28,7 @@ class MarkLiteracyAssessmentWorker(
 
             var hasFailure = false
 
+
             val response = assessmentRepository.markLiteracyAssessmentAsComplete(assessmentId = assessmentId, studentId = studentId)
 
             when(response.status){
@@ -41,7 +42,7 @@ class MarkLiteracyAssessmentWorker(
                 else -> {}
             }
 
-            if (hasFailure) handleRetry(attempt = retryAttempt) else Result.success()
+            if (hasFailure) Result.retry() else Result.success()
 
         }catch (e: Exception){
             e.printStackTrace()

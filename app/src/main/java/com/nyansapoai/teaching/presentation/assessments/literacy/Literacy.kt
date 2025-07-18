@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LinearProgressIndicator
@@ -33,7 +32,6 @@ import com.nyansapoai.teaching.presentation.assessments.literacy.LiteracyAction.
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.LiteracyAssessmentLevel
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.LiteracyReadingAssessmentUI
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.MultichoiceQuestionsUI
-import com.nyansapoai.teaching.presentation.assessments.literacy.components.ReadingStoryEvaluationUI
 import com.nyansapoai.teaching.presentation.common.components.AppSimulateNavigation
 import org.koin.androidx.compose.koinViewModel
 
@@ -113,7 +111,6 @@ fun LiteracyScreen(
                             onShowContentChange = {
                                 onAction(SetShowContent(it))
                             },
-                            audioByteArray = state.audioByteArray,
                             onAudioByteArrayChange = {
                                 onAction(SetAudioByteArray(it))
                             },
@@ -122,6 +119,7 @@ fun LiteracyScreen(
                             onAudioPathChange = {
                                 onAction(SetAudioFilePath(audioFilePath = it))
                             },
+                            audioFilePath = state.audioFilePath,
                             onSubmit = {
                                 onAction(
                                     OnSubmitResponse(
@@ -150,7 +148,6 @@ fun LiteracyScreen(
                             onShowContentChange = {
                                 onAction(SetShowContent(it))
                             },
-                            audioByteArray = state.audioByteArray,
                             onAudioByteArrayChange = {
                                 onAction(SetAudioByteArray(it))
                             },
@@ -159,6 +156,7 @@ fun LiteracyScreen(
                             onAudioPathChange = {
                                 onAction(SetAudioFilePath(audioFilePath = it))
                             },
+                            audioFilePath = state.audioFilePath,
                             onSubmit = {
                                 onAction(
                                     OnSubmitResponse(
@@ -187,7 +185,6 @@ fun LiteracyScreen(
                             onShowContentChange = {
                                 onAction(SetShowContent(it))
                             },
-                            audioByteArray = state.audioByteArray,
                             onAudioByteArrayChange = {
                                 onAction(SetAudioByteArray(it))
                             },
@@ -196,6 +193,7 @@ fun LiteracyScreen(
                             onAudioPathChange = {
                                 onAction(SetAudioFilePath(audioFilePath = it))
                             },
+                            audioFilePath = state.audioFilePath,
                             onSubmit = {
                                 onAction(
                                     OnSubmitResponse(
@@ -226,7 +224,6 @@ fun LiteracyScreen(
                             onShowContentChange = {
                                 onAction(SetShowContent(it))
                             },
-                            audioByteArray = state.audioByteArray,
                             onAudioByteArrayChange = {
                                 onAction(SetAudioByteArray(it))
                             },
@@ -235,6 +232,7 @@ fun LiteracyScreen(
                             onAudioPathChange = {
                                 onAction(SetAudioFilePath(audioFilePath = it))
                             },
+                            audioFilePath = state.audioFilePath,
                             onSubmit = {
                                 onAction(
                                     OnSubmitResponse(

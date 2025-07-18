@@ -1,6 +1,5 @@
 package com.nyansapoai.teaching.presentation.assessments.literacy
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.Constraints
@@ -157,7 +156,6 @@ class LiteracyViewModel(
     private fun evaluateReadingAssessmentWithWorkManager(
         assessmentId: String?,
         studentId: String?,
-        audioByteArray: ByteArray?,
         audioFilePath: String?,
         content: String,
         type: String,
@@ -166,7 +164,7 @@ class LiteracyViewModel(
 
         viewModelScope.launch {
 
-            if (assessmentId.isNullOrEmpty() || studentId.isNullOrEmpty() || audioFilePath.isNullOrEmpty() || audioByteArray == null) {
+            if (assessmentId.isNullOrEmpty() || studentId.isNullOrEmpty() || audioFilePath.isNullOrEmpty()) {
                 _state.update {
                     it.copy(
                         error = "Assessment can not be evaluated"
@@ -259,7 +257,6 @@ class LiteracyViewModel(
             evaluateReadingAssessmentWithWorkManager(
                 assessmentId = _state.value.assessmentId ?: return@let,
                 studentId = _state.value.studentId ?: return@let,
-                audioByteArray = _state.value.audioByteArray,
                 content = currentAssessmentContentList[_state.value.currentIndex],
                 type = _state.value.currentAssessmentLevel.label,
                 audioFilePath = _state.value.audioFilePath,
