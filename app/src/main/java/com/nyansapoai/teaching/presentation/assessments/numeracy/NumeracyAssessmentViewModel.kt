@@ -76,9 +76,14 @@ class NumeracyAssessmentViewModel(
                     shouldCaptureWorkArea = false
                 )
             }
-            is NumeracyAssessmentAction.OnShouldCaptureAnswerChange -> {
+            is NumeracyAssessmentAction.OnIsSubmittingChange -> {
+                if (_state.value.answerImageBitmap != null) {
+                    _state.update { it.copy(error = "Please write your answer.") }
+                    return
+                }
+
                 _state.value = _state.value.copy(
-                    shouldCaptureAnswer = action.shouldCapture
+                    isSubmitting = action.isSubmitting
                 )
             }
             is NumeracyAssessmentAction.OnShouldCaptureWorkAreaChange -> {
@@ -96,13 +101,13 @@ class NumeracyAssessmentViewModel(
                     Log.d("NumeracyAssessmentViewModel", "Processing arithmetic operation: ${action.numeracyOperations}")
 
                     val imageByteArray = _state.value.answerImageByteArray
-                    if (_state.value.answerImageByteArray == null || _state.value.response == null || _state.value.responseError != null || _state.value.answerUri == null) {
+                    if (_state.value.answerImageByteArray == null || _state.value.response == null || _state.value.error != null || _state.value.answerUri == null) {
                         println("No answer image captured.")
                         _state.value = _state.value.copy(
                             shouldCaptureAnswer = false,
                             shouldCaptureWorkArea = false,
                             showResponseAlert = true,
-                            responseError = "No answer image captured. Please try again."
+                            error = "No answer image captured. Please try again."
                         )
                         return@launch
                     }
@@ -149,7 +154,7 @@ class NumeracyAssessmentViewModel(
                             shouldCaptureAnswer = false,
                             shouldCaptureWorkArea = false,
                             showResponseAlert = true,
-                            responseError = "An error occurred: ${e.message ?: "Unknown error"}"
+                            error = "An error occurred: ${e.message ?: "Unknown error"}"
                         )
                     }
                 }
@@ -160,7 +165,7 @@ class NumeracyAssessmentViewModel(
                 if (_state.value.countMatchAnswer == null) {
                     _state.value = _state.value.copy(
                         showResponseAlert = true,
-                        responseError = "Count match answer is required."
+                        error = "Count match answer is required."
                     )
                     return
                 }
@@ -180,7 +185,7 @@ class NumeracyAssessmentViewModel(
                     countAndMatchResults = _state.value.countAndMatchResults.apply { add(countMatchItem) },
                     isLoading = true,
                     showResponseAlert = false,
-                    responseError = null
+                    error = null
                 )
 
                 action.onSuccess.invoke()
@@ -210,7 +215,7 @@ class NumeracyAssessmentViewModel(
                 if (_state.value.wordProblem == null) {
                     _state.value = _state.value.copy(
                         showResponseAlert = true,
-                        responseError = "Word problem is required."
+                        error = "Word problem is required."
                     )
                     return
                 }
@@ -311,7 +316,7 @@ class NumeracyAssessmentViewModel(
                                             shouldCaptureAnswer = false,
                                             shouldCaptureWorkArea = false,
                                             response = null,
-                                            responseError = e.message ?: "Error recognizing the answer image",
+                                            error = e.message ?: "Error recognizing the answer image",
                                         )
                                     }
                                     .collect { result ->
@@ -324,7 +329,7 @@ class NumeracyAssessmentViewModel(
                                                 answerInt = result.data.response,
                                                 response = result.data.response,
                                                 showResponseAlert = true,
-                                                responseError = null
+                                                error = null
                                             )
 
                                         } ?: run {
@@ -333,7 +338,7 @@ class NumeracyAssessmentViewModel(
                                                 shouldCaptureAnswer = false,
                                                 shouldCaptureWorkArea = false,
                                                 response = null,
-                                                responseError = "No data in vision recognition response, try again"
+                                                error = "No data in vision recognition response, try again"
                                             )
                                         }
                                     }
@@ -343,7 +348,7 @@ class NumeracyAssessmentViewModel(
                                     shouldCaptureAnswer = false,
                                     shouldCaptureWorkArea = false,
                                     response = null,
-                                    responseError = e.message ?: "Error processing the answer image"
+                                    error = e.message ?: "Error processing the answer image"
                                 )
                             }
 
@@ -362,6 +367,19 @@ class NumeracyAssessmentViewModel(
                 )
 
                 println("Count match answer updated: ${_state.value.countMatchAnswer}")
+            }
+
+            is NumeracyAssessmentAction.OnAnswerImageBitmapChange -> {
+                _state.update { it.copy(answerImageBitmap = action.imageBitmap) }
+            }
+            is NumeracyAssessmentAction.OnAnswerImageFilePathChange -> {
+                _state.update { it.copy(answerFilePath = action.path) }
+            }
+            is NumeracyAssessmentAction.OnWorkAreaImageBitmapChange -> {
+                _state.update { it.copy(workAreaImageBitmap = action.imageBitmap) }
+            }
+            is NumeracyAssessmentAction.OnWorkAreaImageFilePathChange -> {
+                _state.update { it.copy(workAreaFilePath = action.path) }
             }
         }
     }
@@ -472,10 +490,6 @@ class NumeracyAssessmentViewModel(
         }
     }
 
-    private fun readHardwrittenAnswer(){
-
-    }
-
 
     private fun submitNumeracyWordProblem(
         assessmentId: String,
@@ -502,4 +516,6 @@ class NumeracyAssessmentViewModel(
             }
         }
     }
+
+
 }

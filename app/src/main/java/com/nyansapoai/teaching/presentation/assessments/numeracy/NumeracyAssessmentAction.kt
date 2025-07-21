@@ -1,5 +1,6 @@
 package com.nyansapoai.teaching.presentation.assessments.numeracy
 
+import androidx.compose.ui.graphics.ImageBitmap
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.CountMatch
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyArithmeticOperation
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyNumberRecognition
@@ -10,7 +11,16 @@ import com.nyansapoai.teaching.presentation.assessments.numeracy.components.Nume
 sealed interface NumeracyAssessmentAction {
     data class OnCaptureAnswer(val imageByteArray: ByteArray) : NumeracyAssessmentAction
     data class OnCaptureWorkArea(val imageByteArray: ByteArray) : NumeracyAssessmentAction
-    data class OnShouldCaptureAnswerChange(val shouldCapture: Boolean) : NumeracyAssessmentAction
+
+    data class OnAnswerImageBitmapChange(val imageBitmap: ImageBitmap?) : NumeracyAssessmentAction
+
+    data class OnWorkAreaImageBitmapChange(val imageBitmap: ImageBitmap?) : NumeracyAssessmentAction
+
+    data class OnAnswerImageFilePathChange(val path: String) : NumeracyAssessmentAction
+
+    data class OnWorkAreaImageFilePathChange(val path: String) : NumeracyAssessmentAction
+
+    data class OnIsSubmittingChange(val isSubmitting: Boolean) : NumeracyAssessmentAction
     data class OnShouldCaptureWorkAreaChange(val shouldCapture: Boolean) : NumeracyAssessmentAction
 
     data class OnShowResponseAlertChange(val showResponseAlert: Boolean) : NumeracyAssessmentAction

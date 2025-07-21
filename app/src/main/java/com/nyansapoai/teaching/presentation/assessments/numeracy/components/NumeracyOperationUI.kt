@@ -30,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -50,14 +51,18 @@ fun NumeracyOperationUI(
     secondNumber: Int,
     operationType: OperationType = OperationType.DIVISION,
     operationOrientation: Orientation = Orientation.Horizontal,
-    onCaptureAnswerContent: (ByteArray) -> Unit = {},
+    onCaptureAnswerContent: (ByteArray) -> Unit = {  },
     shouldCaptureAnswer: Boolean = false,
-    onCaptureWorkAreaContent: (ByteArray) -> Unit = {},
+    onCaptureWorkAreaContent: (ByteArray) -> Unit = {  },
     shouldCaptureWorkArea: Boolean = false,
-    onSubmit: () -> Unit = {  }
+    onCaptureAnswerImageBitmap: (ImageBitmap) -> Unit,
+    onCaptureWorkAreaImageBitmap: (ImageBitmap) -> Unit,
+    onSubmit: () -> Unit = {  },
+    isLoading: Boolean = false,
 ) {
 
     var isEraserMode by remember { mutableStateOf(false) }
+
 
     Box(
         modifier = Modifier
@@ -69,6 +74,7 @@ fun NumeracyOperationUI(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = modifier
         ) {
+            /*
             Text(
                 text = operationType.title,
                 style = MaterialTheme.typography.titleLarge,
@@ -76,7 +82,7 @@ fun NumeracyOperationUI(
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .fillMaxWidth()
-            )
+            )*/
 
             ButtonGroup(
                 overflowIndicator = { menuState ->
@@ -169,7 +175,7 @@ fun NumeracyOperationUI(
                                 )
                         ) {
                             CapturableComposable(
-                                onCapturedByteArray = onCaptureAnswerContent,
+//                                onCapturedByteArray = onCaptureAnswerContent,
                                 shouldCapture = shouldCaptureAnswer,
                                 content = {
                                     AppTouchInput(
@@ -208,8 +214,9 @@ fun NumeracyOperationUI(
                                 )
                         ) {
                             CapturableComposable(
-                                onCapturedByteArray = onCaptureAnswerContent,
-                                shouldCapture = shouldCaptureAnswer,
+//                                onCapturedByteArray = onCaptureAnswerContent,
+//                                shouldCapture = shouldCaptureAnswer,
+                                onCaptured = onCaptureAnswerImageBitmap,
                                 content = {
                                     AppTouchInput(
                                         modifier = Modifier
@@ -238,8 +245,9 @@ fun NumeracyOperationUI(
             ) {
 
                 CapturableComposable(
-                    onCapturedByteArray = onCaptureWorkAreaContent,
-                    shouldCapture = shouldCaptureWorkArea,
+//                    onCapturedByteArray = onCaptureWorkAreaContent,
+//                    shouldCapture = shouldCaptureWorkArea,
+                    onCaptured = onCaptureWorkAreaImageBitmap,
                     content = {
                         AppTouchInput(
                             isEraserMode = isEraserMode,
@@ -253,6 +261,7 @@ fun NumeracyOperationUI(
 
             AppButton(
                 onClick = onSubmit,
+                isLoading = isLoading,
                 modifier = Modifier
                     .padding(12.dp)
             ) {
