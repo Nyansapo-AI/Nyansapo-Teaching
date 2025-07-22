@@ -78,7 +78,7 @@ class SubmitMultipleChoiceResultsWorker(
                 }
             }
 
-            if (allSucceeded) Result.success() else handleRetry(attempt = retryAttempt)
+            if (allSucceeded) Result.success() else Result.failure()
         } catch (e: Exception) {
             Log.e(WORK_NAME, "Exception in doWork", e)
             Result.failure()

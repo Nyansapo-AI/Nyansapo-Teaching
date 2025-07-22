@@ -82,7 +82,7 @@ class LiteracyAssessmentsMonitorWorker(
                 setForeground(createForegroundInfo("Scheduling retry ${retryAttemptCount + 1}..."))
 
                  */
-                handleRetry(attempt = retryAttemptCount)
+                Result.retry()
             }
 
         }catch (e: Exception){
