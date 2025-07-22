@@ -186,6 +186,17 @@ fun LiteracyReadingAssessmentUI(
     }
 
 
+    if (currentIndex >= readingList.size) {
+        Text(
+            text = "No more questions available",
+            style = MaterialTheme.typography.titleMedium,
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .fillMaxWidth()
+        )
+        return
+    }
+
     val context = LocalContext.current
 
     val appAudioRecorder = koinInject<AppAudioRecorder>()
@@ -231,9 +242,6 @@ fun LiteracyReadingAssessmentUI(
         }
     }
 
-    if (readingList.isEmpty()){
-        return
-    }
 
 
     Column(

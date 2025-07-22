@@ -248,7 +248,7 @@ fun LiteracyScreen(
                     LiteracyAssessmentLevel.MULTIPLE_CHOICE -> {
                         MultichoiceQuestionsUI(
                             currentIndex = state.currentIndex,
-                            story = state.assessmentContent?.storys[0] ?: "",
+                            story = state.assessmentContent?.storys[0]   ?: "",
                             questionsList = state.assessmentContent?.questionsData ?: emptyList(),
                             selectedChoice = state.selectedChoice,
                             onSelectedChoiceChange = {

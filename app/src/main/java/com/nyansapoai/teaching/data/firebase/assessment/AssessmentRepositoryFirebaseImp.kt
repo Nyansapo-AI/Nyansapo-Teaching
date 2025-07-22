@@ -85,7 +85,11 @@ class AssessmentRepositoryFirebaseImp(
                     batch.set(resultDocRef, mapOf(
                         "assessmentId" to newAssessment.id,
                         "student_id" to student.id,
-                        type to null
+                        "student_name" to student.name,
+                        "student_first_name" to student.first_name,
+                        "student_last_name" to student.last_name,
+                        "student_grade" to student.grade,
+//                        type to null
                     ))
                 }
 

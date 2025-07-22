@@ -37,7 +37,7 @@ data class BottomNavigationItem(
             BottomNavigationItem(
                 title = "Attendance",
                 icon = R.drawable.attendance,
-                screen = { AppComingSoon() },
+                screen = { ParagraphResultItem() },
             ),
 
             BottomNavigationItem(

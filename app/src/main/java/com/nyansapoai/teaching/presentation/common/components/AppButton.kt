@@ -33,7 +33,11 @@ fun AppButton(
         enabled = enabled,
         shape = shape ?: ButtonDefaults.shape,
         colors = colors,
-        onClick = onClick,
+        onClick = {
+            if (!isLoading) {
+                onClick()
+            }
+        },
         modifier = modifier
             .height(height),
     ) {

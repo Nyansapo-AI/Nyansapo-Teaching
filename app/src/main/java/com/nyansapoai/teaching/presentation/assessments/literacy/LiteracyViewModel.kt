@@ -117,8 +117,7 @@ class LiteracyViewModel(
             }
 
             is LiteracyAction.OnSubmitMultipleChoiceResponse -> {
-                onSubmitStoryAssessment(
-                )
+                onSubmitStoryAssessment()
             }
             is LiteracyAction.SetSelectedChoice -> {
                 _state.update {
@@ -471,6 +470,11 @@ class LiteracyViewModel(
             )
 
         }
+    }
+
+
+    private fun onSubmitCountMatchAssessment() {
+
     }
 
     private fun submitLiteracyAssessment(

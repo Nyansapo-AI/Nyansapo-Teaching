@@ -5,7 +5,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -14,12 +16,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyOperations
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.numeracyAssessmentData
+import com.nyansapoai.teaching.presentation.assessments.literacy.components.LiteracyReadingAssessmentUI
 import com.nyansapoai.teaching.presentation.assessments.numeracy.components.NumeracyAssessmentLevel
 import com.nyansapoai.teaching.presentation.assessments.numeracy.components.NumeracyContent
+import com.nyansapoai.teaching.presentation.assessments.numeracy.components.NumeracyCountAndMatch
+import com.nyansapoai.teaching.presentation.assessments.numeracy.components.NumeracyOperationContainerUI
 import com.nyansapoai.teaching.presentation.common.animations.AppLottieAnimations
+import com.nyansapoai.teaching.presentation.common.components.AppSimulateNavigation
 import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
 
@@ -65,13 +74,118 @@ fun NumeracyAssessmentScreen(
             .fillMaxSize()
     ) { innerPadding  ->
 
+        if (state.numeracyAssessmentContent == null) {
+            Text(
+                text = "No Questions available",
+                style = MaterialTheme.typography.titleMedium,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(12.dp),
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.error
+            )
+            return@Scaffold
+        }
+
+        AppSimulateNavigation(
+            targetState = state.numeracyLevel,
+            modifier = Modifier
+                .padding(innerPadding)
+        ){
+            when(state.numeracyLevel) {
+                NumeracyAssessmentLevel.COUNT_MATCH -> {
+                    NumeracyCountAndMatch(
+                        countList = state.numeracyAssessmentContent.countAndMatchNumbersList,
+                        currentIndex = state.currentIndex,
+                        onSelectCount = { count ->
+                            onAction(
+                                NumeracyAssessmentAction.OnCountMatchAnswerChange(countMatchAnswer = count)
+                            )
+                        },
+                        selectedCount = state.countMatchAnswer,
+                        onSubmit = {
+                            onAction.invoke(
+                                NumeracyAssessmentAction.OnSubmitCountMatch(
+                                    countMatch = emptyList(),
+                                    assessmentId = assessmentId,
+                                    studentId = studentId,
+                                    onSuccess = {}
+                                )
+                            )
+                        }
+                    )
+                }
+                NumeracyAssessmentLevel.ADDITION ,
+                NumeracyAssessmentLevel.SUBTRACTION ,
+                NumeracyAssessmentLevel.MULTIPLICATION,
+                NumeracyAssessmentLevel.DIVISION -> {
+                    NumeracyOperationContainerUI(
+                        numeracyOperationList = emptyList(),
+                        currentIndex = state.currentIndex,
+                        answerImageBitmap = state.answerImageBitmap,
+                        onChangeAnswerBitmap = { imageBitmap ->
+                            onAction.invoke(
+                                NumeracyAssessmentAction.OnAnswerImageBitmapChange(imageBitmap = imageBitmap)
+                            )
+                        } ,
+                        onAnswerFilePathChange = {path ->
+                            onAction.invoke(
+                                NumeracyAssessmentAction.OnAnswerImageFilePathChange(path = path)
+                            )
+                        },
+                        workAreaImageBitmap = state.workAreaImageBitmap,
+                        onChangeWorkOutImageBitmap = { imageBitmap ->
+                            onAction.invoke(
+                                NumeracyAssessmentAction.OnWorkAreaImageBitmapChange(imageBitmap = imageBitmap)
+                            )
+                        },
+                        onWorkOutFilePathChange = { path ->
+                            onAction.invoke(
+                                NumeracyAssessmentAction.OnWorkAreaImageFilePathChange(path = path)
+                            )
+                        },
+                        isSubmitting = state.isSubmitting,
+                        changeIsSubmitting = {isSubmitting ->
+                            onAction.invoke(
+                                NumeracyAssessmentAction.OnIsSubmittingChange(isSubmitting = isSubmitting)
+                            )
+                        },
+                        isLoading = state.isLoading,
+                        onConfirmSubmit = {
+                            onAction.invoke(
+                                NumeracyAssessmentAction.OnSubmitNumeracyOperations(
+                                    operationList = emptyList(),
+                                    assessmentId = assessmentId,
+                                    studentId = studentId,
+                                    onSuccess = {}
+                                )
+                            )
+                        }
+                    )
+                }
+                NumeracyAssessmentLevel.NUMBER_RECOGNITION -> {
+                    /*
+                    LiteracyReadingAssessmentUI(
+
+                    )
+
+                     */
+                }
+                NumeracyAssessmentLevel.WORD_PROBLEM -> {}
+            }
+
+        }
+
+        /*
         AnimatedContent(
             targetState = isLoading,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
 
-        ) { loading ->
+        )
+        { loading ->
             when(loading) {
                 true -> {
                     AppLottieAnimations(
@@ -314,6 +428,8 @@ fun NumeracyAssessmentScreen(
                 }
             }
         }
+
+         */
 
     }
 

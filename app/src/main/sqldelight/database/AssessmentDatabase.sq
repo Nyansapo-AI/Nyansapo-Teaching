@@ -85,8 +85,8 @@ SET isCompleted = ?
 WHERE assessmentId = ? AND studentId = ?;
 
 getCompletedAssessments:
-SELECT * FROM CompleteAssessmentEntity;
--- WHERE isCompleted = 1;
+SELECT * FROM CompleteAssessmentEntity
+WHERE assessmentId = ?;
 
 getCompletedAssessmentsByAssessment:
 SELECT * FROM CompleteAssessmentEntity

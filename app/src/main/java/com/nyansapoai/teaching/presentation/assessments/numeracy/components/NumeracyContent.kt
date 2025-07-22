@@ -46,11 +46,13 @@ fun NumeracyContent(
     onReadAnswerImage: () -> Unit = {},
 ) {
 
+    /*
     AnimatedContent(
         targetState = isLoading,
         modifier = modifier
             .fillMaxSize(),
-    ) { loading ->
+    )
+    { loading ->
         when(loading){
             true -> {
                 AppCircularLoading()
@@ -203,6 +205,8 @@ fun NumeracyContent(
             }
         }
     }
+
+     */
 
 
 
