@@ -7,7 +7,6 @@ import com.google.firebase.firestore.toObject
 import com.nyansapoai.teaching.data.remote.assessment.AssessmentRepository
 import com.nyansapoai.teaching.domain.models.assessments.Assessment
 import com.nyansapoai.teaching.domain.models.assessments.CompletedAssessment
-import com.nyansapoai.teaching.domain.models.assessments.RemoteCompletedAssessment
 import com.nyansapoai.teaching.domain.models.assessments.literacy.MultipleChoicesResult
 import com.nyansapoai.teaching.domain.models.assessments.literacy.ReadingAssessmentMetadata
 import com.nyansapoai.teaching.domain.models.assessments.literacy.ReadingAssessmentResult
@@ -41,7 +40,8 @@ class AssessmentRepositoryFirebaseImp(
         type: String,
         startLevel: String,
         assessmentNumber: Int,
-        assignedStudents: List<NyansapoStudent>
+        assignedStudents: List<NyansapoStudent>,
+        schoolId: String
     ): Results<Unit> {
         val deferred = CompletableDeferred<Results<Unit>>()
 
@@ -53,6 +53,10 @@ class AssessmentRepositoryFirebaseImp(
             .document("entID")
             .collection("results")
             .document("wordProblems")
+
+        if (schoolId.isEmpty()){
+            deferred.complete(Results.error(msg = "School ID cannot be null or empty"))
+        }
 
 
 
@@ -84,12 +88,12 @@ class AssessmentRepositoryFirebaseImp(
 
                     batch.set(resultDocRef, mapOf(
                         "assessmentId" to newAssessment.id,
+                        "school_id" to schoolId,
                         "student_id" to student.id,
                         "student_name" to student.name,
                         "student_first_name" to student.first_name,
                         "student_last_name" to student.last_name,
                         "student_grade" to student.grade,
-//                        type to null
                     ))
                 }
 

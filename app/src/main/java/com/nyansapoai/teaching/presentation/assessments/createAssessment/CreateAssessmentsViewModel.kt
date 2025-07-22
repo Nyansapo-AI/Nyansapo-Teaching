@@ -10,6 +10,7 @@ import com.nyansapoai.teaching.data.remote.user.UserRepository
 import com.nyansapoai.teaching.domain.models.students.NyansapoStudent
 import com.nyansapoai.teaching.presentation.common.snackbar.SnackBarHandler
 import com.nyansapoai.teaching.presentation.common.snackbar.SnackBarItem
+import com.nyansapoai.teaching.presentation.schools.SchoolViewModel
 import com.nyansapoai.teaching.utils.ResultStatus
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -104,7 +105,8 @@ class CreateAssessmentsViewModel(
                     type = _state.value.type,
                     startLevel = _state.value.startLevel,
                     assessmentNumber = _state.value.assessmentNumber,
-                    assignedStudents = _state.value.assignedStudents
+                    assignedStudents = _state.value.assignedStudents,
+                    schoolId = _state.value.localSchoolInfo?.schoolUId ?: ""
                 )
             }
 
@@ -131,7 +133,8 @@ class CreateAssessmentsViewModel(
         type: String,
         startLevel: String,
         assessmentNumber: Int,
-        assignedStudents: List<NyansapoStudent>
+        assignedStudents: List<NyansapoStudent>,
+        schoolId: String,
     ) {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
@@ -141,7 +144,8 @@ class CreateAssessmentsViewModel(
                 type = type,
                 startLevel = startLevel,
                 assessmentNumber = assessmentNumber,
-                assignedStudents = assignedStudents
+                assignedStudents = assignedStudents,
+                schoolId = schoolId
             )
 
             when (result.status){
