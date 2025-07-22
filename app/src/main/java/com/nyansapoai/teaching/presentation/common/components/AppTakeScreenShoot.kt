@@ -59,10 +59,22 @@ fun CapturableComposable(
                         }
                         drawLayer(graphicsLayer = graphicsLayer)
 
-                        coroutineScope.launch(Dispatchers.IO) {
-                            val bitmap = graphicsLayer.toImageBitmap()
+                        if (shouldCapture) {
+                            coroutineScope.launch(Dispatchers.IO) {
+                                val bitmap = graphicsLayer.toImageBitmap()
 
-                            onCaptured(bitmap)
+                                onCaptured(bitmap)
+
+                                val file = bitmap.saveToImageFile(
+                                    context = context,
+                                    filename = null
+                                )
+
+                                file?.let { file ->
+                                    Log.d("CapturedImage", "Image saved to: ${file.absolutePath}")
+                                    onCapturedByteArray(file.readBytes())
+                                }
+                            }
                         }
 
                         /*
