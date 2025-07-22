@@ -56,6 +56,9 @@ class AssessmentRepositoryFirebaseImp(
 
         if (schoolId.isEmpty()){
             deferred.complete(Results.error(msg = "School ID cannot be null or empty"))
+            return withContext(Dispatchers.IO) {
+                deferred.await()
+            }
         }
 
 
