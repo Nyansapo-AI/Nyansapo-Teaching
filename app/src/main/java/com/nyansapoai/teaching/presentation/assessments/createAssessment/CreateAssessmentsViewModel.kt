@@ -107,7 +107,9 @@ class CreateAssessmentsViewModel(
                     startLevel = _state.value.startLevel,
                     assessmentNumber = _state.value.assessmentNumber,
                     assignedStudents = _state.value.assignedStudents,
-                    schoolId = _state.value.localSchoolInfo?.schoolUId ?: ""
+                    schoolId = _state.value.localSchoolInfo?.schoolUId ?: "",
+                    projectId = _state.value.localSchoolInfo?.projectUId ?: "",
+                    organizationId = _state.value.localSchoolInfo?.organizationUid ?: ""
                 )
             }
 
@@ -136,6 +138,8 @@ class CreateAssessmentsViewModel(
         assessmentNumber: Int,
         assignedStudents: List<NyansapoStudent>,
         schoolId: String,
+        organizationId: String,
+        projectId: Stringgi
     ) {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
@@ -146,7 +150,9 @@ class CreateAssessmentsViewModel(
                 startLevel = startLevel,
                 assessmentNumber = assessmentNumber,
                 assignedStudents = assignedStudents,
-                schoolId = schoolId
+                schoolId = schoolId,
+                organizationId = organizationId,
+                projectId = projectId
             )
 
             when (result.status){

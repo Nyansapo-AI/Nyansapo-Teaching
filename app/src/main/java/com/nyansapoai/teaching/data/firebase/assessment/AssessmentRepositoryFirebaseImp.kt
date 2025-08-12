@@ -48,14 +48,6 @@ class AssessmentRepositoryFirebaseImp(
         val deferred = CompletableDeferred<Results<Unit>>()
 
 
-        val resultRef = firebaseDb
-            .collection("assessments")
-            .document("assessmentId")
-            .collection("students")
-            .document("entID")
-            .collection("results")
-            .document("wordProblems")
-
         if (schoolId.isEmpty()){
             deferred.complete(Results.error(msg = "School ID cannot be null or empty"))
         }
@@ -69,7 +61,10 @@ class AssessmentRepositoryFirebaseImp(
             type = type,
             start_level = startLevel,
             assessmentNumber = assessmentNumber,
-            assigned_students = assignedStudents
+            assigned_students = assignedStudents,
+            school_id = schoolId,
+            organization_id = organizationId,
+            project_id = projectId
         )
 
 

@@ -295,7 +295,8 @@ fun IndividualAssessmentScreen(
                                                 return@TextButton
                                             }
                                             Text(
-                                                text = student.baseline?:"Start",
+//                                                text = student.baseline?:"Start",
+                                                text = "Start",
                                                 style = MaterialTheme.typography.bodyMedium,
                                                 color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.7f),
                                                 modifier = Modifier

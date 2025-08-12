@@ -11,5 +11,7 @@ data class Assessment(
     val assessmentNumber: Int = 0,
     val school_id: String = "",
     val level_distribution: List<AssessmentLevelDistribution> = emptyList(),
-    val assigned_students: List<NyansapoStudent> = emptyList()
+    val assigned_students: List<NyansapoStudent> = emptyList(),
+    val organization_id: String = "",
+    val project_id: String = ""
 )

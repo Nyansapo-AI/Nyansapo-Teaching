@@ -76,7 +76,8 @@ fun SchoolScreen(
                 onAction.invoke(SchoolAction.OnShowSchoolSelector(show = false))
             },
             sheetState = rememberModalBottomSheetState()
-        ) {
+        )
+        {
             LazyColumn(
                 modifier = Modifier
                     .padding(vertical = 16.dp, horizontal = 12.dp)
