@@ -18,10 +18,12 @@ interface  AssessmentRepository {
         startLevel: String,
         assessmentNumber: Int,
         assignedStudents: List<NyansapoStudent>,
-        schoolId: String,
+        schoolId: String = "",
+        organizationId: String = "",
+        projectId: String = ""
     ): Results<Unit>
 
-    suspend fun getAssessments(): Flow<List<Assessment>>
+    suspend fun getAssessments(schoolId: String = ""): Flow<List<Assessment>>
 
     suspend fun getAssessmentById(assessmentId: String): Flow<Results<Assessment>>
 

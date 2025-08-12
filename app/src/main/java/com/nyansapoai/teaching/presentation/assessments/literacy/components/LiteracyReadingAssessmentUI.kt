@@ -1,6 +1,7 @@
 package com.nyansapoai.teaching.presentation.assessments.literacy.components
 
 import android.os.Build
+import android.util.Log
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -223,7 +224,6 @@ fun LiteracyReadingAssessmentUI(
                 "audio_recording_${Clock.System.now().epochSeconds}.wav"
             ).also { file ->
                 appAudioRecorder.start(outputFile = file)
-
                 audioFile = file
 
             }
@@ -231,9 +231,9 @@ fun LiteracyReadingAssessmentUI(
             delay(1000)
             appAudioRecorder.stop()
             audioFile?.let {
-
                 when {
                     !isLoading -> {
+                        Log.d("AudioFile", "Audio file path: ${it.absolutePath}")
                         onAudioPathChange(it.absolutePath)
                         audioFile = null
                     }

@@ -41,7 +41,9 @@ class AssessmentRepositoryFirebaseImp(
         startLevel: String,
         assessmentNumber: Int,
         assignedStudents: List<NyansapoStudent>,
-        schoolId: String
+        schoolId: String,
+        organizationId: String,
+        projectId: String
     ): Results<Unit> {
         val deferred = CompletableDeferred<Results<Unit>>()
 
@@ -56,9 +58,6 @@ class AssessmentRepositoryFirebaseImp(
 
         if (schoolId.isEmpty()){
             deferred.complete(Results.error(msg = "School ID cannot be null or empty"))
-            return withContext(Dispatchers.IO) {
-                deferred.await()
-            }
         }
 
 
@@ -120,8 +119,9 @@ class AssessmentRepositoryFirebaseImp(
         }
     }
 
-    override suspend fun getAssessments(): Flow<List<Assessment>> = callbackFlow {
+    override suspend fun getAssessments(schoolId: String): Flow<List<Assessment>> = callbackFlow {
         val snapshotListener = firebaseDb.collection(assessmentCollection)
+            .whereEqualTo("school_id", schoolId)
             .addSnapshotListener { snapshot, e ->
                 if (e != null) {
                     Log.w("getAssessments", "Listen failed.", e)

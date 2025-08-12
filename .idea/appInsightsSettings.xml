@@ -29,17 +29,14 @@
                   <option name="projectNumber" value="510141847161" />
                 </ConnectionSetting>
               </option>
-              <option name="signal" value="SIGNAL_UNSPECIFIED" />
-              <option name="timeIntervalDays" value="NINETY_DAYS" />
-              <option name="versions">
+              <option name="failureTypes">
                 <list>
-                  <VersionSetting>
-                    <option name="buildVersion" value="1" />
-                    <option name="displayName" value="1.1 (1)" />
-                    <option name="displayVersion" value="1.1" />
-                  </VersionSetting>
+                  <option value="FATAL" />
+                  <option value="NON_FATAL" />
                 </list>
               </option>
+              <option name="signal" value="SIGNAL_UNSPECIFIED" />
+              <option name="timeIntervalDays" value="NINETY_DAYS" />
               <option name="visibilityType" value="ALL" />
             </InsightsFilterSettings>
           </value>

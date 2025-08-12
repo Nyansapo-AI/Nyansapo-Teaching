@@ -38,10 +38,9 @@ class EvaluateReadingAssessmentWorker(
             val assessmentId = inputData.getString("assessment_id") ?: return Result.failure()
             val studentId = inputData.getString("student_id") ?: return Result.failure()
 
-//            val audioBytes = File(audioFilePath).readBytes()
             val audioBytes = readAudioFile(audioFilePath) ?: return Result.failure()
 
-            val audioUrl = mediaRepository.saveAudio(audioByteArray = audioBytes).data ?: return handleRetry(attempt = retryAttempt)
+            val audioUrl = mediaRepository.saveAudio(audioByteArray = audioBytes).data ?: return Result.retry()
 
             val transcription = artificialIntelligenceRepository.getTextFromAudio(audioByteArray = audioBytes).first().data?.DisplayText ?: ""
 
