@@ -139,7 +139,7 @@ class CreateAssessmentsViewModel(
         assignedStudents: List<NyansapoStudent>,
         schoolId: String,
         organizationId: String,
-        projectId: Stringgi
+        projectId: String
     ) {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }

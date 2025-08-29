@@ -59,7 +59,6 @@ class SQLDelightDataSourceImp(
             .mapToList(Dispatchers.IO)
             .map { pendingResults -> pendingResults.map { it.toPendingReadingAssessmentResult() } }
             .flowOn(Dispatchers.IO)
-
     }
 
     override suspend fun markResultsAsSubmitted(

@@ -51,13 +51,12 @@ class FirebaseMediaRepositoryImpl(
         val deferred = CompletableDeferred<Results<String>>()
 
         firebaseStorage.reference.child(folder)
-            .child("audio_${audioByteArray.take(7).hashCode()}")
+            .child("audio_${audioByteArray.take(8).hashCode()}_${System.currentTimeMillis()}")
             .putBytes(audioByteArray)
             .addOnFailureListener {
                 deferred.complete(Results.error(msg = it.message ?: "Error uploading audio"))
             }
             .addOnSuccessListener { taskSnapshot ->
-
                 taskSnapshot.storage.downloadUrl
                     .addOnSuccessListener { uri ->
                         uri?.let {

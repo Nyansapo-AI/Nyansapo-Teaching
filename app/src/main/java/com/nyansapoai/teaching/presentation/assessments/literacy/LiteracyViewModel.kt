@@ -33,7 +33,6 @@ class LiteracyViewModel(
     private val assessmentRepository: AssessmentRepository,
     private val artificialIntelligenceRepository: ArtificialIntelligenceRepository,
     private val mediaRepository: MediaRepository,
-//    private val appContext: Context,
     private val localDataSource: LocalDataSource,
     private val workManager: WorkManager
 ) : ViewModel() {
@@ -186,6 +185,7 @@ class LiteracyViewModel(
 
             val constraints = Constraints.Builder()
                 .setRequiredNetworkType(NetworkType.CONNECTED)
+                .setRequiresStorageNotLow(true)
                 .build()
 
             val tag = "assessment_${assessmentId}_${studentId}"
@@ -245,8 +245,8 @@ class LiteracyViewModel(
         val currentAssessmentContentList =when(_state.value.currentAssessmentLevel){
             LiteracyAssessmentLevel.LETTER_RECOGNITION -> _state.value.assessmentContent?.letters?.take(5) ?: emptyList()
             LiteracyAssessmentLevel.WORD -> _state.value.assessmentContent?.words?.take(5) ?: emptyList()
-            LiteracyAssessmentLevel.PARAGRAPH -> _state.value.assessmentContent?.paragraphs?.take(1) ?: emptyList()
-            LiteracyAssessmentLevel.STORY -> _state.value.assessmentContent?.storys[0]?.split(".") ?: emptyList()
+            LiteracyAssessmentLevel.PARAGRAPH -> _state.value.assessmentContent?.paragraphs[0]?.split(".") ?: emptyList()
+            LiteracyAssessmentLevel.STORY -> _state.value.assessmentContent?.storys[0]?.trim()?.split(".") ?: emptyList()
             LiteracyAssessmentLevel.MULTIPLE_CHOICE -> emptyList()
             LiteracyAssessmentLevel.COMPLETED -> emptyList()
         }
@@ -473,10 +473,6 @@ class LiteracyViewModel(
     }
 
 
-    private fun onSubmitCountMatchAssessment() {
-
-    }
-
     private fun submitLiteracyAssessment(
         assessmentId: String,
         studentId: String,
@@ -502,6 +498,7 @@ class LiteracyViewModel(
 
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
+            .setRequiresStorageNotLow(true)
             .build()
 
 

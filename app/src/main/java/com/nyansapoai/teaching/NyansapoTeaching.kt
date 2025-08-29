@@ -22,7 +22,7 @@ class NyansapoTeaching: Application(){
         startKoin {
             androidLogger()
             androidContext(this@NyansapoTeaching)
-            modules(appModules)
+            modules(    appModules)
         }
     }
 }

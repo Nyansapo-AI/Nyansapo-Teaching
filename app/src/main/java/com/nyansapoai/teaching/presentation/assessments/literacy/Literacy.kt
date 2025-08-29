@@ -166,13 +166,12 @@ fun LiteracyScreen(
                                 )
                             }
                         )
-
                     }
 
                     LiteracyAssessmentLevel.PARAGRAPH -> {
                         LiteracyReadingAssessmentUI(
                             modifier = Modifier,
-                            readingList = state.assessmentContent?.paragraphs?.take(1) ?: emptyList(),
+                            readingList = state.assessmentContent?.paragraphs[0]?.split(".")?: emptyList(),
                             currentIndex = state.currentIndex,
                             showInstructions = state.showInstructions,
                             onShowInstructionsChange = {
@@ -182,6 +181,7 @@ fun LiteracyScreen(
                             instructionTitle = "Read the paragraph",
                             fontSize = 40.sp,
                             showContent = state.showContent,
+                            showQuestionNumber = false,
                             onShowContentChange = {
                                 onAction(SetShowContent(it))
                             },
@@ -210,7 +210,7 @@ fun LiteracyScreen(
 
                         LiteracyReadingAssessmentUI(
                             modifier = Modifier,
-                            readingList = state.assessmentContent?.storys[0]?.split(".") ?: emptyList(),
+                            readingList = state.assessmentContent?.storys[0]?.trim()?.split(".") ?: emptyList(),
                             currentIndex = state.currentIndex,
                             showInstructions = state.showInstructions,
                             onShowInstructionsChange = {
