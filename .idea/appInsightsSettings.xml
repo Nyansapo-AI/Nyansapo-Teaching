@@ -21,6 +21,14 @@
         <entry key="Firebase Crashlytics">
           <value>
             <InsightsFilterSettings>
+              <option name="connection">
+                <ConnectionSetting>
+                  <option name="appId" value="com.nyansapoai.teaching" />
+                  <option name="mobileSdkAppId" value="1:510141847161:android:2aa6f634dd960209c4e6a8" />
+                  <option name="projectId" value="nyansapo-ai-v2" />
+                  <option name="projectNumber" value="510141847161" />
+                </ConnectionSetting>
+              </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />
               <option name="timeIntervalDays" value="THIRTY_DAYS" />
               <option name="visibilityType" value="ALL" />

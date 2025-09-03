@@ -8,8 +8,6 @@ import com.nyansapoai.teaching.data.local.LocalDataSource
 import com.nyansapoai.teaching.data.remote.ai.ArtificialIntelligenceRepository
 import com.nyansapoai.teaching.data.remote.media.MediaRepository
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.compareResponseStrings
-import com.nyansapoai.teaching.presentation.assessments.numeracy.workers.EvaluateNumeracyArithmeticOperationWorker.Companion.MAX_RETRIES
-import com.nyansapoai.teaching.presentation.assessments.numeracy.workers.EvaluateNumeracyArithmeticOperationWorker.Companion.WORK_NAME
 import com.nyansapoai.teaching.presentation.common.media.MediaUtils
 import kotlinx.coroutines.flow.first
 import kotlinx.datetime.Clock
@@ -33,6 +31,7 @@ class EvaluateReadingAssessmentWorker(
             Log.d("Worker", "Running")
 
             val audioFilePath = inputData.getString("audioFilePath") ?: return Result.failure()
+            val round = inputData.getInt("round", defaultValue = 0)
             val content = inputData.getString("content") ?: return Result.failure()
             val type = inputData.getString("type") ?: return Result.failure()
             val assessmentId = inputData.getString("assessment_id") ?: return Result.failure()
@@ -40,8 +39,14 @@ class EvaluateReadingAssessmentWorker(
 
             val audioBytes = readAudioFile(audioFilePath) ?: return Result.failure()
 
-            val audioUrl = mediaRepository.saveAudio(audioByteArray = audioBytes).data ?: return Result.retry()
+            val audioUrl = mediaRepository.saveAudio(
+                audioByteArray = audioBytes,
+                fileName = "audio_${assessmentId}_${studentId}_${round}_${type}_${content.replace(" ", "%20")}.wav"
+            ).data ?: return Result.retry()
 
+            Log.d("test audio file","audio url: $audioUrl")
+
+            /*
             val transcription = artificialIntelligenceRepository.getTextFromAudio(audioByteArray = audioBytes).first().data?.DisplayText ?: ""
 
             val comparison = compareResponseStrings(
@@ -50,14 +55,16 @@ class EvaluateReadingAssessmentWorker(
                 similarity = 0.9
             )
 
+             */
+
             localDataSource.insertPendingReadingResult(
                 assessmentId = assessmentId,
                 studentId = studentId,
                 type = type,
                 audioUrl = audioUrl,
                 content = content,
-                transcript = transcription,
-                passed = comparison.isMatch,
+                transcript = "",
+                passed = false,
                 timestamp = Clock.System.now().epochSeconds.toInt(),
                 isPending = true,
             )

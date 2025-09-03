@@ -1,5 +1,6 @@
 package com.nyansapoai.teaching.presentation.assessments.literacy
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.Constraints
@@ -30,9 +31,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class LiteracyViewModel(
-    private val assessmentRepository: AssessmentRepository,
-    private val artificialIntelligenceRepository: ArtificialIntelligenceRepository,
-    private val mediaRepository: MediaRepository,
     private val localDataSource: LocalDataSource,
     private val workManager: WorkManager
 ) : ViewModel() {
@@ -157,10 +155,11 @@ class LiteracyViewModel(
         audioFilePath: String?,
         content: String,
         type: String,
+        round: Int,
         onSuccess: () -> Unit
     ){
 
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
 
             if (assessmentId.isNullOrEmpty() || studentId.isNullOrEmpty() || audioFilePath.isNullOrEmpty()) {
                 _state.update {
@@ -180,7 +179,8 @@ class LiteracyViewModel(
                 "content" to content,
                 "type" to type,
                 "assessment_id" to assessmentId,
-                "student_id" to studentId
+                "student_id" to studentId,
+                "round" to round
             )
 
             val constraints = Constraints.Builder()
@@ -241,7 +241,6 @@ class LiteracyViewModel(
     }
 
     fun onSubmitReadingAssessment(){
-
         val currentAssessmentContentList =when(_state.value.currentAssessmentLevel){
             LiteracyAssessmentLevel.LETTER_RECOGNITION -> _state.value.assessmentContent?.letters?.take(5) ?: emptyList()
             LiteracyAssessmentLevel.WORD -> _state.value.assessmentContent?.words?.take(5) ?: emptyList()
@@ -252,13 +251,13 @@ class LiteracyViewModel(
         }
 
         currentAssessmentContentList?.let {
-
             evaluateReadingAssessmentWithWorkManager(
                 assessmentId = _state.value.assessmentId ?: return@let,
                 studentId = _state.value.studentId ?: return@let,
                 content = currentAssessmentContentList[_state.value.currentIndex],
                 type = _state.value.currentAssessmentLevel.label,
                 audioFilePath = _state.value.audioFilePath,
+                round = _state.value.round,
                 onSuccess = {
                     when{
                         _state.value.currentIndex == currentAssessmentContentList.size - 1 -> {
@@ -277,14 +276,17 @@ class LiteracyViewModel(
                                     currentAssessmentLevelIndex = nextIndex,
                                     currentAssessmentLevel = nextLevel,
                                     currentIndex = 0,
+                                    round = it.round +1,
                                     message = null
                                 )
                             }
                         }
+
                         else -> {
                             _state.update {
                                 it.copy(
                                     currentIndex = it.currentIndex + 1,
+                                    round = it.round +1,
                                     showInstructions = true,
                                     showContent = false,
                                     audioByteArray = null,
@@ -305,7 +307,6 @@ class LiteracyViewModel(
                     error = "No assessment content available."
                 )
             }
-
         }
     }
 

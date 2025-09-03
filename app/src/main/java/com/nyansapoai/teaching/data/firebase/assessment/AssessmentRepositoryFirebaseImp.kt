@@ -478,6 +478,14 @@ class AssessmentRepositoryFirebaseImp(
         }
     }
 
+    override suspend fun addReadingAssessmentResult(
+        assessmentId: String,
+        studentID: String,
+        readingAssessment: ReadingAssessmentResult
+    ): Results<String> {
+        TODO("Not yet implemented")
+    }
+
     override suspend fun assessMultipleChoiceQuestions(
         assessmentId: String,
         studentID: String,
@@ -592,8 +600,8 @@ class AssessmentRepositoryFirebaseImp(
         val metadata = (map["metadata"] as? Map<String, Any>)?.let { metadataMap ->
             ReadingAssessmentMetadata(
                 audio_url = metadataMap["audio_url"] as? String ?: "",
-                passed = metadataMap["passed"] as? Boolean ?: false,
-                transcript = metadataMap["transcript"] as? String ?: ""
+//                passed = metadataMap["passed"] as? Boolean ?: false,
+//                transcript = metadataMap["transcript"] as? String ?: ""
             )
         }
 
@@ -604,22 +612,6 @@ class AssessmentRepositoryFirebaseImp(
         )
     }
 
-    private fun convertReadingAssessmentResultToMap(result: ReadingAssessmentResult): Map<String, Any> {
-        val map = mutableMapOf<String, Any>(
-            "type" to result.type,
-            "content" to result.content
-        )
-
-        result.metadata?.let { metadata ->
-            map["metadata"] = mapOf(
-                "audio_url" to metadata.audio_url,
-                "passed" to metadata.passed,
-                "transcript" to metadata.transcript
-            )
-        }
-
-        return map
-    }
 
 
 

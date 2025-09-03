@@ -27,12 +27,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.nyansapoai.teaching.navController
 import com.nyansapoai.teaching.presentation.assessments.components.HasCompletedAssessment
 import com.nyansapoai.teaching.presentation.assessments.literacy.LiteracyAction.*
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.LiteracyAssessmentLevel
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.LiteracyReadingAssessmentUI
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.MultichoiceQuestionsUI
 import com.nyansapoai.teaching.presentation.common.components.AppSimulateNavigation
+import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -72,7 +74,9 @@ fun LiteracyScreen(
     }
 
     LaunchedEffect(state.currentAssessmentLevel == LiteracyAssessmentLevel.COMPLETED) {
-        onAction.invoke(LiteracyAction.OnSubmitLiteracyResults(assessmentId = assessmentId, studentId = studentId))
+        onAction.invoke(OnSubmitLiteracyResults(assessmentId = assessmentId, studentId = studentId))
+//        delay(3000)
+//        navController.popBackStack()
     }
 
     Scaffold(

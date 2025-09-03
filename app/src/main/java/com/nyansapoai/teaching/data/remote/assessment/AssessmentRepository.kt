@@ -60,6 +60,12 @@ interface  AssessmentRepository {
         readingAssessmentResults: List<ReadingAssessmentResult>
     ): Results<String>
 
+    suspend fun addReadingAssessmentResult(
+        assessmentId: String,
+        studentID: String,
+        readingAssessment: ReadingAssessmentResult
+    ): Results<String>
+
     suspend fun assessMultipleChoiceQuestions(
         assessmentId: String,
         studentID: String,

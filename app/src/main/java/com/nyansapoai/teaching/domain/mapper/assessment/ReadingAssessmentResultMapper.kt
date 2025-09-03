@@ -10,8 +10,6 @@ fun PendingReadingResult.toReadingAssessmentResult() : ReadingAssessmentResult {
         content = content,
         metadata = ReadingAssessmentMetadata(
             audio_url = audioUrl,
-            passed = passed.toInt() == 1,
-            transcript = transcript
         )
     )
 }
