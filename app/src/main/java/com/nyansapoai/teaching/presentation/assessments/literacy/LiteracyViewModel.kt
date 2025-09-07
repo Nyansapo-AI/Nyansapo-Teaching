@@ -533,9 +533,9 @@ class LiteracyViewModel(
                 request = readingMonitorRequest
             )
             .then(multipleChoicesMonitorRequest)
-            .then(submitReadingResultsRequest)
+//            .then(submitReadingResultsRequest)
             .then(submitMultipleChoicesResultsRequest)
-            .then(markLiteracyAssessmentRequest)
+//            .then(markLiteracyAssessmentRequest)
             .enqueue()
     }
 
