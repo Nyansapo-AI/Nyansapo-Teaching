@@ -27,7 +27,9 @@ navigationCompose = "2.9.0"
     googleGmsGoogleServices = "4.4.2"
     firebaseAnalytics = "22.4.0"
 navigationTesting = "2.9.0"
+riveAndroid = "10.4.1"
 roomRuntime = "2.7.2"
+startupRuntime = "1.2.0"
 workRuntimeKtx = "2.10.2"
     sqlDelight = "2.1.0"
     googleFirebaseAppdistribution = "5.1.1"
@@ -43,6 +45,7 @@ androidx-media3-ui = { module = "androidx.media3:media3-ui", version.ref = "medi
 androidx-media3-ui-compose = { module = "androidx.media3:media3-ui-compose", version.ref = "media3Exoplayer" }
 androidx-navigation-testing = { module = "androidx.navigation:navigation-testing", version.ref = "navigationTesting" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomRuntime" }
+androidx-startup-runtime = { module = "androidx.startup:startup-runtime", version.ref = "startupRuntime" }
 androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntimeKtx" }
 client-sdk = { module = "com.microsoft.cognitiveservices.speech:client-sdk", version.ref = "clientSdk" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coilCompose" }
@@ -90,6 +93,8 @@ ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "k
 lottie-compose = { module = "com.airbnb.android:lottie-compose", version.ref = "lottieCompose" }
 material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
 
+
+rive-android = { module = "app.rive:rive-android", version.ref = "riveAndroid" }
     sqlDelight-coroutine = { module = "app.cash.sqldelight:coroutines-extensions", version.ref = "sqlDelight" }
 
     [plugins]

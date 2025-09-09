@@ -33,7 +33,7 @@ android {
         minSdk = 24
         targetSdk = 35
         versionCode = 1
-        versionName = "1.7.0"
+        versionName = "1.8.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -174,5 +174,9 @@ dependencies {
     //SQLDelight
     implementation(libs.android.driver)
     implementation(libs.sqlDelight.coroutine)
+
+    //rive
+    implementation(libs.rive.android)
+    implementation(libs.androidx.startup.runtime)
 
 }
