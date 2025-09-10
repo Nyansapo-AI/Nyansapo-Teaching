@@ -26,7 +26,11 @@ class NyansapoTeaching: Application(){
 
          */
 
-//        Rive.init(this@NyansapoTeaching)
+        /*
+        AppInitializer.getInstance(this@NyansapoTeaching)
+            .initializeComponent(RiveInitializer::class.java)
+
+         */
 
         auth = Firebase.auth
 

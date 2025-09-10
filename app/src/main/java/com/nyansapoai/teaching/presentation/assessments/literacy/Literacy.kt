@@ -27,6 +27,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.nyansapoai.teaching.R
 import com.nyansapoai.teaching.navController
 import com.nyansapoai.teaching.presentation.assessments.components.HasCompletedAssessment
 import com.nyansapoai.teaching.presentation.assessments.literacy.LiteracyAction.*
@@ -112,6 +113,7 @@ fun LiteracyScreen(
                             title = "Letter",
                             fontSize = 120.sp,
                             showContent = state.showContent,
+                            instructionAudio = R.raw.read_letter,
                             onShowContentChange = {
                                 onAction(SetShowContent(it))
                             },
@@ -149,6 +151,7 @@ fun LiteracyScreen(
                             instructionTitle = "Read the word",
                             fontSize = 80.sp,
                             showContent = state.showContent,
+                            instructionAudio = R.raw.read_word,
                             onShowContentChange = {
                                 onAction(SetShowContent(it))
                             },
@@ -183,6 +186,7 @@ fun LiteracyScreen(
                             },
                             title = "Paragraphs",
                             instructionTitle = "Read the paragraph",
+                            instructionAudio = R.raw.read_sentence,
                             fontSize = 40.sp,
                             showContent = state.showContent,
                             showQuestionNumber = false,
@@ -222,6 +226,7 @@ fun LiteracyScreen(
                             },
                             title = "Reading Story",
                             instructionTitle = "Read the sentence",
+                            instructionAudio = R.raw.read_sentence,
                             fontSize = 40.sp,
                             showQuestionNumber = true,
                             showContent = state.showContent,
