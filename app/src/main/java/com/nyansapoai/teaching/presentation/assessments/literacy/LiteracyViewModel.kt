@@ -275,6 +275,7 @@ class LiteracyViewModel(
                                 it.copy(
                                     currentAssessmentLevelIndex = nextIndex,
                                     currentAssessmentLevel = nextLevel,
+                                    showInstructions = true,
                                     currentIndex = 0,
                                     round = it.round +1,
                                     message = null
@@ -287,7 +288,6 @@ class LiteracyViewModel(
                                 it.copy(
                                     currentIndex = it.currentIndex + 1,
                                     round = it.round +1,
-                                    showInstructions = true,
                                     showContent = false,
                                     audioByteArray = null,
                                     audioFilePath = null,
