@@ -1,9 +1,7 @@
 package com.nyansapoai.teaching
 
 import android.app.Application
-import androidx.startup.AppInitializer
-import app.rive.runtime.kotlin.RiveInitializer
-import app.rive.runtime.kotlin.core.Rive
+import coil3.util.Logger
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
@@ -19,18 +17,6 @@ class NyansapoTeaching: Application(){
 
     override fun onCreate() {
         super.onCreate()
-
-        /*
-        AppInitializer.getInstance(this@NyansapoTeaching)
-            .initializeComponent(RiveInitializer::class.java)
-
-         */
-
-        /*
-        AppInitializer.getInstance(this@NyansapoTeaching)
-            .initializeComponent(RiveInitializer::class.java)
-
-         */
 
         auth = Firebase.auth
 
