@@ -215,10 +215,9 @@ fun LiteracyScreen(
                     }
 
                     LiteracyAssessmentLevel.STORY -> {
-
                         LiteracyReadingAssessmentUI(
                             modifier = Modifier,
-                            readingList = state.assessmentContent?.storys[0]?.trim()?.split(".") ?: emptyList(),
+                            readingList = state.assessmentContent?.storys[0]?.story?.trim()?.split(".") ?: emptyList(),
                             currentIndex = state.currentIndex,
                             showInstructions = state.showInstructions,
                             onShowInstructionsChange = {
@@ -251,14 +250,13 @@ fun LiteracyScreen(
                                 )
                             }
                         )
-
                     }
 
                     LiteracyAssessmentLevel.MULTIPLE_CHOICE -> {
                         MultichoiceQuestionsUI(
                             currentIndex = state.currentIndex,
-                            story = state.assessmentContent?.storys[0]   ?: "",
-                            questionsList = state.assessmentContent?.questionsData ?: emptyList(),
+                            story = state.assessmentContent?.storys[0]?.story  ?: "",
+                            questionsList = state.assessmentContent?.storys[0]?.questionsData ?: emptyList(),
                             selectedChoice = state.selectedChoice,
                             onSelectedChoiceChange = {
                                 onAction(SetSelectedChoice(it))

@@ -245,7 +245,7 @@ class LiteracyViewModel(
             LiteracyAssessmentLevel.LETTER_RECOGNITION -> _state.value.assessmentContent?.letters?.take(5) ?: emptyList()
             LiteracyAssessmentLevel.WORD -> _state.value.assessmentContent?.words?.take(5) ?: emptyList()
             LiteracyAssessmentLevel.PARAGRAPH -> _state.value.assessmentContent?.paragraphs[0]?.split(".") ?: emptyList()
-            LiteracyAssessmentLevel.STORY -> _state.value.assessmentContent?.storys[0]?.trim()?.split(".") ?: emptyList()
+            LiteracyAssessmentLevel.STORY -> _state.value.assessmentContent?.storys[0]?.story?.trim()?.split(".") ?: emptyList()
             LiteracyAssessmentLevel.MULTIPLE_CHOICE -> emptyList()
             LiteracyAssessmentLevel.COMPLETED -> emptyList()
         }
@@ -278,7 +278,9 @@ class LiteracyViewModel(
                                     showInstructions = true,
                                     currentIndex = 0,
                                     round = it.round +1,
-                                    message = null
+                                    message = null,
+                                    audioByteArray = null,
+                                    audioFilePath = null,
                                 )
                             }
                         }
@@ -400,7 +402,7 @@ class LiteracyViewModel(
     fun onSubmitStoryAssessment() {
 
         val contentList = when(_state.value.currentAssessmentLevel){
-            LiteracyAssessmentLevel.MULTIPLE_CHOICE -> _state.value.assessmentContent?.questionsData ?: emptyList()
+            LiteracyAssessmentLevel.MULTIPLE_CHOICE -> _state.value.assessmentContent?.storys[0]?.questionsData ?: emptyList()
             else -> emptyList()
         }
 
