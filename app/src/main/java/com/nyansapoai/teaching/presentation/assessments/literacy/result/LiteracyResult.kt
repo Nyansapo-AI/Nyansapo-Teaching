@@ -22,6 +22,5 @@ fun LiteracyResultScreen(
     state: LiteracyResultState,
     onAction: (LiteracyResultAction) -> Unit,
 ) {
-
-
+    
 }

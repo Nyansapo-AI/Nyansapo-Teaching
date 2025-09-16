@@ -20,12 +20,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.nyansapoai.teaching.R
 
-@Preview(showBackground = true,)
+@Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun CharResultItem(
     modifier: Modifier = Modifier,
-    isCorrect: Boolean = false,
-    char: String = "a",
+    isCorrect: Boolean = true,
+    char: String = "paragraph",
     onClick: () -> Unit = {  }
 ) {
 

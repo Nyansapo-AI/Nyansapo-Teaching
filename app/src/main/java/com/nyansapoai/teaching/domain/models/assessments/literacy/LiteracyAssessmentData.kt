@@ -15,12 +15,19 @@ data class QuestionData(
 )
 
 @Serializable
+data class StoryData(
+    val story: String,
+    val questionsData: List<QuestionData>
+)
+
+@Serializable
 data class LiteracyAssessmentData(
     val letters: List<String>,
     val words: List<String>,
     val paragraphs: List<String>,
     val storys: List<String>,
     val questionsData: List<QuestionData>
+
 )
 
 
@@ -380,6 +387,93 @@ val literacyAssessmentContent = listOf(
                         " Maria wants to plant trees because she likes birds. ",
                         " Maria wants to plant trees because she wants to sell maize at the market. ",
                         " Maria wants to plant trees because she wants to sell them at the market. "
+                    )
+                )
+            )
+        )
+    ),
+
+    //Dignitas
+    LiteracyAssessmentData(
+        letters = listOf("a, 'f", "s", "b", "y"),
+        words = listOf("bag", "rat", "nose", "rope", "dress"),
+        paragraphs = listOf(
+            "Mary and Ali were playing \n" +
+                    "a game. They were sitting \n" +
+                    "at a small table. Pipo, their \n" +
+                    "pet dog, was lying on the \n" +
+                    "floor next to them. Mary \n" +
+                    "won the game and \n" +
+                    "jumped up and down with \n" +
+                    "joy. Pipo barked in pain \n" +
+                    "and Mary felt bad.",
+        ),
+        storys = listOf(
+            "Tina was playing in the garden. She found a little box by a tree. Tina\n" +
+                    "picked it up and opened it. The box was filled with colourful pencils.\n" +
+                    "She took the box home and showed it to her mother. Tina’s mother told\n" +
+                    "her, \"Tina, you should try and find the owner of the box”. Tina went\n" +
+                    "back to the garden. She saw a boy standing by the tree. He looked\n" +
+                    "sad. Tina showed him the box. The boy’s face lit up with a smile."
+        ),
+        questionsData = listOf(
+            QuestionData(
+                question = "Where was Tina playing?",
+                multipleChoices = MultipleChoices(
+                    correctChoices = listOf(
+                        "",
+                        ""
+                    ),
+                    wrongChoices = listOf(
+                        "",
+                        "",
+                        "",
+                        ""
+                    )
+                )
+            ),
+            QuestionData(
+                question = "What did Tina find?",
+                multipleChoices = MultipleChoices(
+                    correctChoices = listOf(
+                        "",
+                        ""
+                    ),
+                    wrongChoices = listOf(
+                        "",
+                        "",
+                        "",
+                        ""
+                    )
+                )
+            ),
+            QuestionData(
+                question = "Who was near the tree where Tina found the box?",
+                multipleChoices = MultipleChoices(
+                    correctChoices = listOf(
+                        "",
+                        ""
+                    ),
+                    wrongChoices = listOf(
+                        "",
+                        "",
+                        "",
+                        ""
+                    )
+                )
+            ),
+            QuestionData(
+                question = "Why do you think the boy’s face lit up with a smile?",
+                multipleChoices = MultipleChoices(
+                    correctChoices = listOf(
+                        "",
+                        ""
+                    ),
+                    wrongChoices = listOf(
+                        "",
+                        "",
+                        "",
+                        ""
                     )
                 )
             )
