@@ -33,20 +33,11 @@ fun CapturableComposable(
     val graphicsLayer = rememberGraphicsLayer()
 
     // Request permissions to write and read external storage
-    var permissionGranted by remember { mutableStateOf(true) }
+    var permissionGranted by remember { mutableStateOf(false) }
 
-    /*
-    RequestAppPermissions(
-        permissionsArray = arrayOf(
-            android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
-            android.Manifest.permission.READ_EXTERNAL_STORAGE,
-        ),
-        onSuccess = {
-            permissionGranted = true
-        },
 
-        )
-    */
+
+
 
     if (permissionGranted){
         Box(

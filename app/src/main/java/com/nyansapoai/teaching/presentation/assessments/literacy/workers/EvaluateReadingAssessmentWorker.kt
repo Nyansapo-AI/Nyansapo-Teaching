@@ -9,6 +9,7 @@ import com.nyansapoai.teaching.data.remote.ai.ArtificialIntelligenceRepository
 import com.nyansapoai.teaching.data.remote.media.MediaRepository
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.compareResponseStrings
 import com.nyansapoai.teaching.presentation.common.media.MediaUtils
+import io.ktor.client.plugins.logging.Logging
 import kotlinx.coroutines.flow.first
 import kotlinx.datetime.Clock
 import org.koin.core.component.KoinComponent
@@ -27,7 +28,6 @@ class EvaluateReadingAssessmentWorker(
 
     override suspend fun doWork(): Result {
         return try {
-            val retryAttempt = runAttemptCount
             Log.d("Worker", "Running")
 
             val audioFilePath = inputData.getString("audioFilePath") ?: return Result.failure()
@@ -44,30 +44,7 @@ class EvaluateReadingAssessmentWorker(
                 fileName = "audio_${assessmentId}_${studentId}_${round}_${type}_${content.replace(" ", "%20")}.wav"
             ).data ?: return Result.retry()
 
-            Log.d("test audio file","audio url: $audioUrl")
-
-            /*
-            val transcription = artificialIntelligenceRepository.getTextFromAudio(audioByteArray = audioBytes).first().data?.DisplayText ?: ""
-
-            val comparison = compareResponseStrings(
-                expected = content,
-                actual = transcription,
-                similarity = 0.9
-            )
-
-             */
-
-            localDataSource.insertPendingReadingResult(
-                assessmentId = assessmentId,
-                studentId = studentId,
-                type = type,
-                audioUrl = audioUrl,
-                content = content,
-                transcript = "",
-                passed = false,
-                timestamp = Clock.System.now().epochSeconds.toInt(),
-                isPending = true,
-            )
+            Log.d("Worker", "Audio uploaded: $audioUrl")
 
             MediaUtils.cleanUpMediaFile(path = audioFilePath)
 
@@ -80,17 +57,6 @@ class EvaluateReadingAssessmentWorker(
             Result.failure()
         }
     }
-
-    private fun handleRetry(attempt: Int): Result {
-        return if (attempt >= MAX_RETRIES) {
-            Log.e(WORK_NAME, "Max retries reached")
-            Result.failure()
-        } else {
-            Log.d(WORK_NAME, "Scheduling retry ${attempt + 1}")
-            Result.retry()
-        }
-    }
-
 
     private fun readAudioFile(path: String): ByteArray? {
         return try {

@@ -30,7 +30,6 @@ data class NumeracyAssessmentState(
     val answerInt: Int? = null,
     val showResponseAlert: Boolean = false,
 
-//    val numeracyAssessmentContent: Results<NumeracyAssessmentContent> = Results.success(data =numeracyAssessmentData.numeracyAssessmentContentList[0] ),
     val numeracyAssessmentContent: NumeracyAssessmentContent? = numeracyAssessmentData.numeracyAssessmentContentList[0],
 
     val countAndMatchResults: MutableList<CountMatch> = mutableListOf(),
@@ -39,12 +38,6 @@ data class NumeracyAssessmentState(
     val wordProblem: NumeracyWordProblem? = null,
 
     val currentIndex: Int = 0,
-    val countMatchIndex: Int = 0,
-    val additionIndex: Int = 0,
-    val subtractionIndex: Int = 0,
-    val multiplicationIndex: Int = 0,
-    val divisionIndex: Int = 0,
-    val numberRecognitionIndex: Int = 0,
     val hasCompletedAssessment: Boolean = false,
 
     val numeracyLevel: NumeracyAssessmentLevel = NumeracyAssessmentLevel.COUNT_MATCH,

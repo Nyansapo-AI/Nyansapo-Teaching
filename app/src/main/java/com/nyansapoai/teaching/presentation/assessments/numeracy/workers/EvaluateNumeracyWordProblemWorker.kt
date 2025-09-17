@@ -29,7 +29,6 @@ class EvaluateNumeracyWordProblemWorker(
     private val mediaRepository: MediaRepository by inject()
 
     override suspend fun doWork(): Result {
-        val retryAttempt = runAttemptCount
         try {
             /**
              * get the input data from the worker parameters
@@ -37,21 +36,21 @@ class EvaluateNumeracyWordProblemWorker(
             val assessmentId = inputData.getString(ASSESSMENT_ID) ?: return Result.failure()
             val studentId = inputData.getString(STUDENT_ID) ?: return Result.failure()
             val question = inputData.getString(QUESTION) ?: return Result.failure()
-            val expectedAnswer = inputData.getInt(EXPECTED_ANSWER, 0) ?: return Result.failure()
+            val expectedAnswer = inputData.getInt(EXPECTED_ANSWER, 0)
             val answerImagePath = inputData.getString(ANSWER_IMAGE_PATH) ?: return Result.failure()
             val workoutImagePath = inputData.getString(WORKOUT_IMAGE_PATH) ?: return Result.failure()
 
             /**
              * Read the answer and work area image files.
              */
-            val answerImageBytes = MediaUtils.readImageFileByteArray(answerImagePath) ?: return handleRetry(attempt = retryAttempt)
-            val workoutImageBytes = MediaUtils.readImageFileByteArray(workoutImagePath) ?: return handleRetry(attempt = retryAttempt)
+            val answerImageBytes = MediaUtils.readImageFileByteArray(answerImagePath) ?: return Result.retry()
+            val workoutImageBytes = MediaUtils.readImageFileByteArray(workoutImagePath) ?: return Result.retry()
 
             /**
              * Send the images to storage and get their media uri.
              */
-            val answerImageUrl = mediaRepository.saveImage(imageByteArray = answerImageBytes).data ?: return handleRetry(attempt = retryAttempt)
-            val workoutImageUrl = mediaRepository.saveImage(imageByteArray = workoutImageBytes).data ?: return handleRetry(attempt = retryAttempt)
+            val answerImageUrl = mediaRepository.saveImage(imageByteArray = answerImageBytes).data ?: return Result.retry()
+            val workoutImageUrl = mediaRepository.saveImage(imageByteArray = workoutImageBytes).data ?: return Result.retry()
 
             /**
              * Use AI to get the answer from the image.

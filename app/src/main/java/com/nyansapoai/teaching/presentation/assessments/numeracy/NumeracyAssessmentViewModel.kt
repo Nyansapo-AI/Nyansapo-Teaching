@@ -230,37 +230,6 @@ class NumeracyAssessmentViewModel(
                 }
 
             }
-            is NumeracyAssessmentAction.OnAdditionIndexChange -> {
-                _state.value = _state.value.copy(
-                    additionIndex = action.index
-                )
-            }
-            is NumeracyAssessmentAction.OnCountMachIndexChange -> {
-                _state.value = _state.value.copy(
-                    countMatchIndex = action.index
-                )
-                println("Count match index updated: ${_state.value.countMatchIndex}")
-            }
-            is NumeracyAssessmentAction.OnDivisionIndexChange -> {
-                _state.value = _state.value.copy(
-                    divisionIndex = action.index
-                )
-            }
-            is NumeracyAssessmentAction.OnMultiplicationIndexChange -> {
-                _state.value = _state.value.copy(
-                    multiplicationIndex = action.index
-                )
-            }
-            is NumeracyAssessmentAction.OnNumberRecognitionIndexChange -> {
-                _state.value = _state.value.copy(
-                    numberRecognitionIndex = action.index
-                )
-            }
-            is NumeracyAssessmentAction.OnSubtractionIndexChange -> {
-                _state.value = _state.value.copy(
-                    subtractionIndex = action.index
-                )
-            }
 
             is NumeracyAssessmentAction.OnNumeracyLevelChange -> {
                 _state.value = _state.value.copy(
@@ -297,14 +266,6 @@ class NumeracyAssessmentViewModel(
                             println("Firebase storage success: ${response.data}")
 
                             if (response.data == null){
-                                /*
-                                _state.value = _state.value.copy(
-                                    showResponseAlert = true,
-                                    shouldCaptureAnswer = false,
-                                    shouldCaptureWorkArea = false,
-                                    response = null,
-                                    responseError = "No data in vision recognition response, try again"
-                                )*/
                                 return@launch
                             }
 
@@ -383,7 +344,6 @@ class NumeracyAssessmentViewModel(
             }
         }
     }
-
 
     private val _answerImageByteArrayState = MutableStateFlow<Results<VisionRecognition>>(Results.initial())
     val answerImageByteArrayState = _answerImageByteArrayState.asStateFlow()

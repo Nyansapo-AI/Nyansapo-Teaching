@@ -74,15 +74,6 @@ fun NumeracyOperationUI(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = modifier
         ) {
-            /*
-            Text(
-                text = operationType.title,
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
-            )*/
 
             ButtonGroup(
                 overflowIndicator = { menuState ->
@@ -175,7 +166,6 @@ fun NumeracyOperationUI(
                                 )
                         ) {
                             CapturableComposable(
-//                                onCapturedByteArray = onCaptureAnswerContent,
                                 shouldCapture = shouldCaptureAnswer,
                                 content = {
                                     AppTouchInput(
@@ -214,8 +204,6 @@ fun NumeracyOperationUI(
                                 )
                         ) {
                             CapturableComposable(
-//                                onCapturedByteArray = onCaptureAnswerContent,
-//                                shouldCapture = shouldCaptureAnswer,
                                 onCaptured = onCaptureAnswerImageBitmap,
                                 content = {
                                     AppTouchInput(
@@ -253,7 +241,6 @@ fun NumeracyOperationUI(
                             isEraserMode = isEraserMode,
                             brushColor = Color.Green
                         )
-
                     }
                 )
 
