@@ -10,15 +10,8 @@ import com.nyansapoai.teaching.domain.models.assessments.numeracy.numeracyAssess
 import com.nyansapoai.teaching.presentation.assessments.numeracy.components.NumeracyAssessmentLevel
 
 data class NumeracyAssessmentState(
-    val shouldCaptureAnswer: Boolean = false,
-//    val shouldCaptureWorkArea: Boolean = false,
-//    val answerImageByteArray: ByteArray? = null,
-//    val workAreaImageByteArray: ByteArray? = null,
 
-//    val answerImageBitmap: ImageBitmap? = null,
-//    val workAreaImageBitmap: ImageBitmap? = null,
-//    val isSubmitting: Boolean = false,
-
+    val numeracyAssessmentContent: NumeracyAssessmentContent? = numeracyAssessmentData.numeracyAssessmentContentList[0],
     val isLoading: Boolean = false,
     val currentIndex: Int = 0,
 
@@ -27,18 +20,16 @@ data class NumeracyAssessmentState(
     val countAndMatchResults: MutableList<CountMatch> = mutableListOf(),
 
 
-    val answerUri: String? = null,
-    val response: Int? = null,
+    val shouldCaptureAnswer: Boolean = false,
     val error: String? = null,
-    val answerString: String? = null,
+    val showResponseAlert: Boolean = false,
     val answerFilePath: String? = null,
     val workAreaFilePath: String? = null,
     val answerInt: Int? = null,
-    val showResponseAlert: Boolean = false,
-    val numeracyAssessmentContent: NumeracyAssessmentContent? = numeracyAssessmentData.numeracyAssessmentContentList[0],
 
     val numberRecognitionResults: MutableList<NumeracyNumberRecognition> = mutableListOf(),
     val arithmeticOperationResults: MutableList<NumeracyArithmeticOperation> = mutableListOf(),
+    val wordProblemResults: MutableList<NumeracyWordProblem> = mutableListOf(),
     val wordProblem: NumeracyWordProblem? = null,
 
     val currentRoundIndex: Int = 0,

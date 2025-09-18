@@ -162,6 +162,7 @@ fun NumeracyOperationUI(
                         ) {
                             ScreenshotComposable(
                                 shouldCapture = shouldCapture,
+                                fileName = "answer_area",
                                 onFilePathChange = {path ->
                                     onAnswerFilePathChange(path)
                                 },
@@ -203,8 +204,9 @@ fun NumeracyOperationUI(
                         ) {
                             ScreenshotComposable(
                                 shouldCapture = shouldCapture,
+                                fileName = "answer_area",
                                 onFilePathChange = {path ->
-                                    onWorkAreaFilePathChange(path)
+                                    onAnswerFilePathChange(path)
                                 },
                                 content = {
                                     AppTouchInput(
@@ -235,8 +237,9 @@ fun NumeracyOperationUI(
 
                 ScreenshotComposable(
                     shouldCapture =  shouldCapture,
+                    fileName = "work_area",
                     onFilePathChange = {path ->
-                        onAnswerFilePathChange(path)
+                        onWorkAreaFilePathChange(path)
                     },
                     content = {
                         AppTouchInput(
@@ -255,13 +258,12 @@ fun NumeracyOperationUI(
                     .padding(12.dp)
             ) {
                 Text(
-                    text = "Next",
+//                    text = if(shouldCapture) "Next." else "Submit Answer",
+                    text = "Submit Answer",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
                 )
             }
-
-
         }
     }
 

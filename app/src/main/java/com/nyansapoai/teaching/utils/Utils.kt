@@ -119,7 +119,7 @@ object Utils {
             Bitmap.CompressFormat.WEBP -> ".webp"
             else -> ".png"
         }
-        val actualFilename = filename ?: "IMG_$timeStamp$extension"
+        val actualFilename = filename.let { "IMG_$filename$timeStamp$extension"  } ?: "IMG_$timeStamp$extension"
 
         // Get the directory for the app's private pictures directory
         val storageDir = context.getExternalFilesDir(null) ?: context.filesDir

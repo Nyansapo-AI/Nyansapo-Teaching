@@ -14,6 +14,7 @@ import com.nyansapoai.teaching.presentation.assessments.literacy.components.comp
 import com.nyansapoai.teaching.presentation.common.media.MediaUtils
 import com.nyansapoai.teaching.utils.ResultStatus
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
@@ -64,15 +65,19 @@ class EvaluateNumeracyArithmeticOperationWorker(
             /**
              * Extract text from the answer image using AI.
              */
-            val transcriptionResponse = withContext(Dispatchers.IO) {
-                artificialIntelligenceRepository.textExtractionFromImage(request = GetTextFromImageRequestDTO(url = answerImageUrl)).last()
-            }
+            val transcriptionResponse = artificialIntelligenceRepository.textExtractionFromImage(request = GetTextFromImageRequestDTO(url = answerImageUrl)).first()
+
             val studentAnswer = when(transcriptionResponse.status){
                 ResultStatus.SUCCESS -> { transcriptionResponse.data?.response}
-                else-> {
-                    null
+                ResultStatus.INITIAL,
+                ResultStatus.LOADING -> return Result.retry()
+                ResultStatus.ERROR -> {
+                    println("EvaluateNumeracyOperationWorker: Error extracting text from image: ${transcriptionResponse.message}")
+                    return Result.failure()
                 }
             }
+
+            println("EvaluateNumeracyOperationWorker: Expected Answer: $expectAnswer, Student Answer: $studentAnswer")
 
             /**
              * Compare the expected answer with the student's answer.

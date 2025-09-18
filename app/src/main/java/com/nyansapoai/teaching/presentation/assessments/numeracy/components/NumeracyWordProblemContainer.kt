@@ -1,53 +1,42 @@
 package com.nyansapoai.teaching.presentation.assessments.numeracy.components
 
-import android.util.Log
-import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyOperations
-import com.nyansapoai.teaching.presentation.assessments.numeracy.NumeracyAssessmentAction
 import com.nyansapoai.teaching.presentation.common.components.AppLinearProgressIndicator
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NumeracyOperationContainerUI(
+fun NumeracyWordProblemContainer(
     modifier: Modifier = Modifier,
-    numeracyOperationList: List<NumeracyOperations> = emptyList(),
+    wordProblemList: List<String>,
     currentIndex: Int = 0,
     onAnswerFilePathChange: (String) -> Unit,
     onWorkOutFilePathChange: (String) -> Unit,
     shouldCapture: Boolean,
-    isLoading: Boolean = false,
     onIsSubmittingChange: (Boolean) -> Unit,
     onSubmit: () -> Unit = {  },
-    )
-{
+) {
 
     LaunchedEffect(shouldCapture) {
         onSubmit.invoke()
-        Log.d("NumeracyOperationContainer", "NumeracyOperationContainerUI: shouldCapture = $shouldCapture")
     }
 
-
-    if (numeracyOperationList.isEmpty()){
+    if (wordProblemList.isEmpty()){
         Text(
             text= "Questions are not available",
             style = MaterialTheme.typography.titleMedium,
@@ -58,7 +47,7 @@ fun NumeracyOperationContainerUI(
         return
     }
 
-    if (currentIndex >= numeracyOperationList.size) {
+    if (currentIndex >= wordProblemList.size) {
         Text(
             text = "No more questions available",
             style = MaterialTheme.typography.titleMedium,
@@ -69,35 +58,25 @@ fun NumeracyOperationContainerUI(
         return
     }
 
-    val numeracyOperation = numeracyOperationList[currentIndex]
-    val orientation = when(numeracyOperation.operationType){
-        OperationType.ADDITION ,
-        OperationType.SUBTRACTION -> Orientation.Vertical
-        OperationType.MULTIPLICATION,
-        OperationType.DIVISION -> Orientation.Horizontal
-    }
-
     var progress by remember {
         mutableFloatStateOf(0f)
     }
 
     LaunchedEffect(currentIndex) {
-        progress = if (currentIndex < numeracyOperationList.size) {
-            (currentIndex + 1).toFloat() / numeracyOperationList.size.toFloat()
+        progress = if (currentIndex < wordProblemList.size) {
+            (currentIndex + 1).toFloat() / wordProblemList.size.toFloat()
         } else {
             1f
         }
     }
 
-
-    LazyColumn (
+    LazyColumn(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(40.dp),
         modifier = modifier
             .widthIn(max = 700.dp)
             .padding(16.dp),
     ) {
-
         item {
             Column(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -106,7 +85,7 @@ fun NumeracyOperationContainerUI(
             )
             {
                 Text(
-                    text = "Question ${currentIndex + 1}/${numeracyOperationList.size}",
+                    text = "Question ${currentIndex + 1}/${wordProblemList.size}",
                     style = MaterialTheme.typography.titleMedium,
                 )
 
@@ -117,23 +96,24 @@ fun NumeracyOperationContainerUI(
         }
 
         item {
-            NumeracyOperationUI(
-                firstNumber = numeracyOperation.firstNumber,
-                secondNumber = numeracyOperation.secondNumber,
-                operationType = numeracyOperation.operationType ,
-                operationOrientation = orientation,
+            NumeracyWordProblem(
+                title = "Word Problem",
+                wordProblem = wordProblemList[currentIndex],
+                shouldCaptureAnswer = shouldCapture,
+                onAnswerImageFilePathChange = { path ->
+                    onAnswerFilePathChange(path)
+                },
+                onWorkAreaImageFilePathChange = {path ->
+                    onWorkOutFilePathChange(path)
+                },
                 onSubmit = {
                     onIsSubmittingChange(true)
                 },
-                isLoading = isLoading,
-                shouldCapture = shouldCapture,
-                onAnswerFilePathChange = onAnswerFilePathChange,
-                onWorkAreaFilePathChange = onWorkOutFilePathChange
+                modifier = modifier
             )
-
         }
-
     }
+
 
 
 }

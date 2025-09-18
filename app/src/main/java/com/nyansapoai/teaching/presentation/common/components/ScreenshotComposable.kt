@@ -18,6 +18,7 @@ fun ScreenshotComposable(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
     onFilePathChange: (String) -> Unit = {},
+    fileName: String? = null,
     shouldCapture: Boolean = false
 ) {
 
@@ -41,7 +42,7 @@ fun ScreenshotComposable(
 
                             val file = bitmap.saveToImageFile(
                                 context = context,
-                                filename = null
+                                filename = fileName
                             )
 
                             file?.let { file ->

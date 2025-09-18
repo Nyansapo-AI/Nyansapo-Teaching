@@ -14,12 +14,10 @@ import com.nyansapoai.teaching.data.remote.assessment.AssessmentRepository
 import com.nyansapoai.teaching.data.remote.media.MediaRepository
 import com.nyansapoai.teaching.domain.models.ai.VisionRecognition
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.CountMatch
-import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyWordProblem
 import com.nyansapoai.teaching.presentation.assessments.components.checkAnswer
-import com.nyansapoai.teaching.presentation.assessments.literacy.workers.EvaluateReadingAssessmentWorker
 import com.nyansapoai.teaching.presentation.assessments.numeracy.components.NumeracyAssessmentLevel
 import com.nyansapoai.teaching.presentation.assessments.numeracy.workers.EvaluateNumeracyArithmeticOperationWorker
-import com.nyansapoai.teaching.utils.ResultStatus
+import com.nyansapoai.teaching.presentation.assessments.numeracy.workers.EvaluateNumeracyWordProblemWorker
 import com.nyansapoai.teaching.utils.Results
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -30,8 +28,6 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.update
-import kotlin.text.compareTo
-import kotlin.text.get
 
 class NumeracyAssessmentViewModel(
     private val artificialIntelligenceRepository: ArtificialIntelligenceRepository,
@@ -224,22 +220,11 @@ class NumeracyAssessmentViewModel(
             }
             is NumeracyAssessmentAction.OnSubmitWordProblem -> {
 
-                if (_state.value.wordProblem == null) {
-                    _state.value = _state.value.copy(
-                        showResponseAlert = true,
-                        error = "Word problem is required."
-                    )
-                    return
-                }
-
-                if (_state.value.wordProblem != null){
-                    submitNumeracyWordProblem(
-                        assessmentId = action.assessmentId,
-                        studentId = action.studentId,
-                        wordProblem = _state.value.wordProblem!!,
-                        onSuccess = action.onSuccess
-                    )
-                }
+                submitNumeracyWordProblem(
+                    assessmentId = action.assessmentId,
+                    studentId = action.studentId,
+                    onSuccess = action.onSuccess
+                )
 
             }
             is NumeracyAssessmentAction.OnNumeracyLevelChange -> {
@@ -491,6 +476,7 @@ class NumeracyAssessmentViewModel(
         studentId: String,
         onSuccess: () -> Unit
     ) {
+
         val arithmeticContent = when (_state.value.numeracyLevel) {
             NumeracyAssessmentLevel.ADDITION -> _state.value.numeracyAssessmentContent?.additions
             NumeracyAssessmentLevel.SUBTRACTION -> _state.value.numeracyAssessmentContent?.subtractions
@@ -569,10 +555,10 @@ class NumeracyAssessmentViewModel(
         onFailure: () -> Unit
     ){
         viewModelScope.launch(Dispatchers.IO) {
-            if (assessmentId.isNullOrEmpty() || studentId.isNullOrEmpty() || answerImagePath.isNullOrEmpty()){
+            if (assessmentId.isNullOrEmpty() || studentId.isNullOrEmpty() || answerImagePath.isNullOrEmpty() || workoutImagePath.isNullOrEmpty()) {
                 println("Assessment ID, Student ID, or Answer Image Path is null or empty.")
 
-                println("assessmentId: $assessmentId, studentId: $studentId, answerImagePath: $answerImagePath")
+                println("assessmentId: $assessmentId, studentId: $studentId, answerImagePath: $answerImagePath, workoutImagePath: $workoutImagePath")
                 onFailure.invoke()
                 return@launch
             }
@@ -597,7 +583,7 @@ class NumeracyAssessmentViewModel(
 
             val tag = "assessment_${assessmentId}_${studentId}"
 
-            val request = OneTimeWorkRequestBuilder<EvaluateReadingAssessmentWorker>()
+            val request = OneTimeWorkRequestBuilder<EvaluateNumeracyArithmeticOperationWorker>()
                 .setInputData(workData)
                 .setConstraints(constraints = constraints)
                 .addTag(tag = tag)
@@ -624,28 +610,125 @@ class NumeracyAssessmentViewModel(
     private fun submitNumeracyWordProblem(
         assessmentId: String,
         studentId: String,
-        wordProblem: NumeracyWordProblem,
         onSuccess: () -> Unit = {}
     ) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val result = assessmentRepository.assessNumeracyWordProblem(
-                wordProblem = wordProblem,
-                studentID = studentId,
-                assessmentId = assessmentId
-            )
+        if (_state.value.numeracyLevel != NumeracyAssessmentLevel.WORD_PROBLEM){
+            return
+        }
 
-            when(result.status){
-                ResultStatus.INITIAL ,
-                ResultStatus.LOADING -> {}
-                ResultStatus.SUCCESS -> {
-                    onSuccess.invoke()
+        val wordproblems = _state.value.numeracyAssessmentContent?.wordProblems ?: return
+
+        val currentIndex = _state.value.currentIndex
+        if (currentIndex !in wordproblems.indices ) return
+
+        val currentWordProblem = wordproblems[currentIndex]
+
+        evaluateNumeracyWordProblemWithWorkManager(
+            assessmentId = assessmentId,
+            studentId = studentId,
+            question = currentWordProblem.problem,
+            expectedAnswer = currentWordProblem.answer,
+            answerImagePath = _state.value.answerFilePath,
+            workoutImagePath = _state.value.workAreaFilePath,
+            onSuccess = {
+                _state.update { state ->
+                    if (currentIndex >= wordproblems.size - 1) {
+                        state.copy(
+                            currentIndex = 0,
+                            answerFilePath = null,
+                            shouldCaptureAnswer = false,
+                            workAreaFilePath = null,
+                            isLoading = false,
+                            hasCompletedAssessment = true
+                        )
+                    } else {
+                        state.copy(
+                            shouldCaptureAnswer = false,
+                            currentIndex = state.currentIndex + 1,
+                            answerFilePath = null,
+                            workAreaFilePath = null,
+                            isLoading = false,
+                        )
+                    }
                 }
-                ResultStatus.ERROR -> {
-                    println("can not add word problem")
+                onSuccess()
+            },
+            onFailure = {
+                _state.update {
+                    it.copy(
+                        isLoading = false,
+                        shouldCaptureAnswer = false,
+                    )
                 }
             }
-        }
+        )
     }
+
+
+    private fun evaluateNumeracyWordProblemWithWorkManager(
+        assessmentId: String?,
+        studentId: String?,
+        question: String?,
+        expectedAnswer: Int,
+        answerImagePath: String?,
+        workoutImagePath: String?,
+        onSuccess: () -> Unit,
+        onFailure: () -> Unit
+    ){
+        viewModelScope.launch(Dispatchers.IO) {
+            if (assessmentId.isNullOrEmpty() || studentId.isNullOrEmpty() || answerImagePath.isNullOrEmpty() || workoutImagePath.isNullOrEmpty()) {
+                println("Assessment ID, Student ID, or Answer Image Path is null or empty.")
+
+                println("assessmentId: $assessmentId, studentId: $studentId, answerImagePath: $answerImagePath, workoutImagePath: $workoutImagePath")
+                onFailure.invoke()
+                return@launch
+
+            }
+
+            _state.update { it.copy(isLoading = true) }
+
+            val workData = workDataOf(
+                EvaluateNumeracyWordProblemWorker.ASSESSMENT_ID to assessmentId,
+                EvaluateNumeracyWordProblemWorker.STUDENT_ID to studentId,
+                EvaluateNumeracyWordProblemWorker.QUESTION to question,
+                EvaluateNumeracyWordProblemWorker.EXPECTED_ANSWER to expectedAnswer,
+                EvaluateNumeracyWordProblemWorker.ANSWER_IMAGE_PATH to answerImagePath,
+                EvaluateNumeracyWordProblemWorker.WORKOUT_IMAGE_PATH to workoutImagePath,
+            )
+
+            val constraints = Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .setRequiresStorageNotLow(true)
+                .build()
+
+            val tag = "assessment_${assessmentId}_${studentId}"
+
+            val request = OneTimeWorkRequestBuilder<EvaluateNumeracyWordProblemWorker>()
+                .setInputData(workData)
+                .setConstraints(constraints = constraints)
+                .addTag(tag = tag)
+                .build()
+
+            val uniqueWorkName = "reading_assessment_${assessmentId}_${studentId}_${System.currentTimeMillis()}"
+
+            workManager
+                .enqueueUniqueWork(
+                    uniqueWorkName = uniqueWorkName,
+                    ExistingWorkPolicy.REPLACE,
+                    request = request
+                )
+
+            delay(1000)
+
+            _state.update { it.copy(isLoading = false)}
+            onSuccess.invoke()
+
+
+        }
+
+
+    }
+
 
 
 }

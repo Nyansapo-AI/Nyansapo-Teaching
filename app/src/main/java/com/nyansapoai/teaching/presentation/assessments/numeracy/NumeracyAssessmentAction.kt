@@ -1,11 +1,9 @@
 package com.nyansapoai.teaching.presentation.assessments.numeracy
 
-import androidx.compose.ui.graphics.ImageBitmap
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.CountMatch
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyArithmeticOperation
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyNumberRecognition
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyOperations
-import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyWordProblem
 import com.nyansapoai.teaching.presentation.assessments.numeracy.components.NumeracyAssessmentLevel
 
 sealed interface NumeracyAssessmentAction {
@@ -28,7 +26,7 @@ sealed interface NumeracyAssessmentAction {
     data class OnSubmitCountMatch(val countMatch: List<CountMatch>, val assessmentId: String = "", val studentId: String = "", val onSuccess: () -> Unit): NumeracyAssessmentAction
     data class OnSubmitNumeracyOperations(val operationList: List<NumeracyArithmeticOperation>, val assessmentId: String = "", val studentId: String = "", val onSuccess: () -> Unit): NumeracyAssessmentAction
     data class OnSubmitNumberRecognition(val numberRecognitionList: List<NumeracyNumberRecognition>, val assessmentId: String = "", val studentId: String = "", val onSuccess: () -> Unit): NumeracyAssessmentAction
-    data class OnSubmitWordProblem(val wordProblem: NumeracyWordProblem, val assessmentId: String = "", val studentId: String = "", val onSuccess: () -> Unit): NumeracyAssessmentAction
+    data class OnSubmitWordProblem(val assessmentId: String = "", val studentId: String = "", val onSuccess: () -> Unit): NumeracyAssessmentAction
     data class OnNumeracyLevelChange(val numeracyLevel: NumeracyAssessmentLevel): NumeracyAssessmentAction
     data object OnSubmitAnswer : NumeracyAssessmentAction
     data object OnClearAnswer : NumeracyAssessmentAction

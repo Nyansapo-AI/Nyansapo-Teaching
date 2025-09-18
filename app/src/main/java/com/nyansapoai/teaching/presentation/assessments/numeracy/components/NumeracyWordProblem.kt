@@ -44,11 +44,10 @@ fun NumeracyWordProblem(
     modifier: Modifier = Modifier,
     title: String = "Word Problem",
     wordProblem: String = "A farmer has 12 apples. He gives 3 apples to his friend. How many apples does he have left?",
-    onCaptureWorkAreaContent: (ByteArray) -> Unit = {},
-    shouldCaptureWorkArea: Boolean = false,
     shouldCaptureAnswer: Boolean = false,
-    onCaptureAnswerContent: (ByteArray) -> Unit = {},
-    onSubmit: () -> Unit
+    onAnswerImageFilePathChange: (String) -> Unit,
+    onWorkAreaImageFilePathChange: (String) -> Unit,
+    onSubmit: () -> Unit = { },
     ) {
 
     var isEraserMode by remember { mutableStateOf(false) }
@@ -183,7 +182,10 @@ fun NumeracyWordProblem(
                         )
                 ) {
                     ScreenshotComposable(
-//                        onCapturedByteArray = onCaptureAnswerContent,
+                        onFilePathChange = {path ->
+                            onAnswerImageFilePathChange(path)
+                        },
+                        fileName = "answer_area",
                         shouldCapture = shouldCaptureAnswer,
                         content = {
                             AppTouchInput(
@@ -220,8 +222,11 @@ fun NumeracyWordProblem(
                 ) {
 
                     ScreenshotComposable(
-//                        onCapturedByteArray = onCaptureWorkAreaContent,
-                        shouldCapture = shouldCaptureWorkArea,
+                        shouldCapture = shouldCaptureAnswer,
+                        fileName = "work_area",
+                        onFilePathChange = { path ->
+                            onWorkAreaImageFilePathChange(path)
+                        },
                         content = {
                             AppTouchInput(
                                 isEraserMode = isEraserMode,
@@ -234,7 +239,8 @@ fun NumeracyWordProblem(
 
             AppButton(
                 onClick = onSubmit,
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFC107)),                modifier = Modifier
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFC107)),
+                modifier = Modifier
                     .padding(16.dp)
             ) {
                 Text(
