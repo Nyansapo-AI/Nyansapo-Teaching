@@ -1,10 +1,17 @@
 package com.nyansapoai.teaching.presentation.assessments.numeracy
 
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.foundation.layout.Column
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -20,14 +27,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyOperations
-import com.nyansapoai.teaching.domain.models.assessments.numeracy.numeracyAssessmentData
-import com.nyansapoai.teaching.presentation.assessments.literacy.components.LiteracyReadingAssessmentUI
 import com.nyansapoai.teaching.presentation.assessments.numeracy.components.NumeracyAssessmentLevel
-import com.nyansapoai.teaching.presentation.assessments.numeracy.components.NumeracyContent
 import com.nyansapoai.teaching.presentation.assessments.numeracy.components.NumeracyCountAndMatch
 import com.nyansapoai.teaching.presentation.assessments.numeracy.components.NumeracyOperationContainerUI
-import com.nyansapoai.teaching.presentation.common.animations.AppLottieAnimations
 import com.nyansapoai.teaching.presentation.common.components.AppSimulateNavigation
 import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
@@ -61,14 +63,6 @@ fun NumeracyAssessmentScreen(
     assessmentId: String
 ) {
 
-
-    var isLoading by remember { mutableStateOf(true) }
-
-    LaunchedEffect(true) {
-        delay(3000)
-        isLoading = false
-    }
-
     Scaffold(
         modifier = modifier
             .fillMaxSize()
@@ -85,6 +79,34 @@ fun NumeracyAssessmentScreen(
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.error
             )
+            return@Scaffold
+        }
+
+
+        if (state.isLoading){
+            AnimatedVisibility(
+                visible = state.isLoading,
+                enter = scaleIn() + fadeIn(),
+                exit = scaleOut() + fadeOut(),
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(MaterialTheme.colorScheme.background.copy(alpha = 0.8f))
+                ) {
+                    LinearProgressIndicator(
+                        color = MaterialTheme.colorScheme.secondary,
+                        trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                        modifier = Modifier
+                            .height(8.dp)
+                            .width(200.dp),
+                    )
+
+                }
+            }
             return@Scaffold
         }
 
@@ -120,24 +142,22 @@ fun NumeracyAssessmentScreen(
                 NumeracyAssessmentLevel.SUBTRACTION ,
                 NumeracyAssessmentLevel.MULTIPLICATION,
                 NumeracyAssessmentLevel.DIVISION -> {
+
+                    val operationList = when(state.numeracyLevel) {
+                        NumeracyAssessmentLevel.ADDITION -> state.numeracyAssessmentContent.additions
+                        NumeracyAssessmentLevel.SUBTRACTION -> state.numeracyAssessmentContent.subtractions
+                        NumeracyAssessmentLevel.MULTIPLICATION -> state.numeracyAssessmentContent.multiplications
+                        NumeracyAssessmentLevel.DIVISION -> state.numeracyAssessmentContent.divisions
+                        else -> emptyList()
+                    }
+
+
                     NumeracyOperationContainerUI(
-                        numeracyOperationList = emptyList(),
+                        numeracyOperationList = operationList,
                         currentIndex = state.currentIndex,
-                        answerImageBitmap = state.answerImageBitmap,
-                        onChangeAnswerBitmap = { imageBitmap ->
-                            onAction.invoke(
-                                NumeracyAssessmentAction.OnAnswerImageBitmapChange(imageBitmap = imageBitmap)
-                            )
-                        } ,
                         onAnswerFilePathChange = {path ->
                             onAction.invoke(
                                 NumeracyAssessmentAction.OnAnswerImageFilePathChange(path = path)
-                            )
-                        },
-                        workAreaImageBitmap = state.workAreaImageBitmap,
-                        onChangeWorkOutImageBitmap = { imageBitmap ->
-                            onAction.invoke(
-                                NumeracyAssessmentAction.OnWorkAreaImageBitmapChange(imageBitmap = imageBitmap)
                             )
                         },
                         onWorkOutFilePathChange = { path ->
@@ -145,14 +165,9 @@ fun NumeracyAssessmentScreen(
                                 NumeracyAssessmentAction.OnWorkAreaImageFilePathChange(path = path)
                             )
                         },
-                        isSubmitting = state.isSubmitting,
-                        changeIsSubmitting = {isSubmitting ->
-                            onAction.invoke(
-                                NumeracyAssessmentAction.OnIsSubmittingChange(isSubmitting = isSubmitting)
-                            )
-                        },
                         isLoading = state.isLoading,
-                        onConfirmSubmit = {
+                        shouldCapture = state.shouldCaptureAnswer,
+                        onSubmit = {
                             onAction.invoke(
                                 NumeracyAssessmentAction.OnSubmitNumeracyOperations(
                                     operationList = emptyList(),

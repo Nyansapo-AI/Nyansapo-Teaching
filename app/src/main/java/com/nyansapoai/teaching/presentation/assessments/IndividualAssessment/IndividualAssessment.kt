@@ -225,7 +225,7 @@ fun IndividualAssessmentScreen(
                                         .padding(horizontal = 12.dp)
                                         .clickable(
                                             onClick = {
-                                                if (student.id in state.completedAssessments.map { it.student_id } || student.baseline != "beginner"){
+                                                if (student.id in state.completedAssessments.map { it.student_id }){
                                                     Toast.makeText(context, "${student.first_name} ${student.last_name} has already done the assessment", Toast.LENGTH_SHORT).show()
                                                     return@clickable
                                                 }
@@ -281,7 +281,7 @@ fun IndividualAssessmentScreen(
                                             ),
                                         ) {
 
-                                            if  (student.id in state.completedAssessments.map { it.student_id } || student.baseline != "beginner"){
+                                            if  (student.id in state.completedAssessments.map { it.student_id }){
                                                 Image(
                                                     painter = painterResource(R.drawable.done_3_),
                                                     contentDescription = "has completed the assessment",

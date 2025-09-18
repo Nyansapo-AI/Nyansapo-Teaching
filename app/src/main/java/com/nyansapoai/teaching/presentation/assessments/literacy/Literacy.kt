@@ -306,8 +306,6 @@ fun LiteracyScreen(
                     )
 
                 }
-
-
             }
 
             AnimatedVisibility(

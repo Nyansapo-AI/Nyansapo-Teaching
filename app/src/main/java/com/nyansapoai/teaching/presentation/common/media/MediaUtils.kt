@@ -7,8 +7,20 @@ object MediaUtils {
     const val TAG = "Media Utils"
 
     fun readImageFileByteArray(path: String): ByteArray? {
+
+        if (path.isEmpty()) {
+            return null
+        }
+
+        val file = File(path)
+
+        if (!file.exists()){
+            Log.e(TAG,"File does not exist at path: $path")
+            return null
+        }
+
         return try {
-            File(path).readBytes().also {
+            file.readBytes().also {
                 Log.d(TAG, "read byte successful: $path")
             }
         }catch (e: Exception){

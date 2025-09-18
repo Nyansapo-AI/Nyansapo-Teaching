@@ -30,6 +30,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nyansapoai.teaching.R
 import com.nyansapoai.teaching.navController
 import com.nyansapoai.teaching.presentation.assessments.components.AssessmentItem
+import com.nyansapoai.teaching.presentation.assessments.components.AssessmentItemBasic
 import com.nyansapoai.teaching.presentation.common.components.AppCircularLoading
 import com.nyansapoai.teaching.navigation.CreateAssessmentsPage
 import com.nyansapoai.teaching.navigation.IndividualAssessmentPage
@@ -143,7 +144,7 @@ fun AssessmentsScreen(
                                 .padding(vertical = 8.dp)
                         ) {
                             items(items =assessments, key = {it.id}, ) { assessment ->
-                                AssessmentItem(
+                                AssessmentItemBasic(
                                     assessment = assessment,
                                     onClick = {
                                         navController.navigate(IndividualAssessmentPage(

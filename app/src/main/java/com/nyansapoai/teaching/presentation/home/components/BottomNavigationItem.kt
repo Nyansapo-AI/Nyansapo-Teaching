@@ -1,15 +1,11 @@
 package com.nyansapoai.teaching.presentation.home.components
 
 import androidx.annotation.DrawableRes
-import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import com.nyansapoai.teaching.R
 import com.nyansapoai.teaching.presentation.assessments.AssessmentsRoot
-import com.nyansapoai.teaching.presentation.common.animations.RiveAnimation
-import com.nyansapoai.teaching.presentation.schools.CampRoot
 import com.nyansapoai.teaching.presentation.common.components.AppComingSoon
+import com.nyansapoai.teaching.presentation.schools.CampRoot
 import com.nyansapoai.teaching.presentation.students.StudentsRoot
 
 data class BottomNavigationItem(

@@ -106,7 +106,7 @@ object Utils {
         context: Context,
         filename: String? = null,
         format: Bitmap.CompressFormat = Bitmap.CompressFormat.PNG,
-        quality: Int = 90
+        quality: Int = 100
     ): File? {
         // Convert ImageBitmap to ByteArray
         val byteArray = this.toByteArray(format, quality)

@@ -1,5 +1,7 @@
 package com.nyansapoai.teaching.presentation.assessments.createAssessment
 
+import com.nyansapoai.teaching.domain.models.assessments.numeracy.numeracyAssessmentData
+import com.nyansapoai.teaching.domain.models.assessments.literacy.literacyAssessmentContent
 import com.nyansapoai.teaching.domain.models.school.LocalSchoolInfo
 import com.nyansapoai.teaching.domain.models.students.NyansapoStudent
 
@@ -8,7 +10,7 @@ data class CreateAssessmentsState(
     val type: String = "",
     val startLevel: String = "",
     val isManager: Boolean = false,
-    val assessmentNumber: Int = 5,
+    val assessmentNumber: Int = 8,
     val error: String? = null,
     val localSchoolInfo: LocalSchoolInfo? = null,
     val assignedStudents: List<NyansapoStudent> = emptyList(),
@@ -41,7 +43,8 @@ data class CreateAssessmentsState(
     ),
 
     val selectedStartingLevel : List<String> = emptyList(),
-    val assessmentNumberList: List<Int> = listOf(5),
+//    val assessmentNumberList: List<Int> = if (type == "Numeracy") listOf(numeracyAssessmentData.numeracyAssessmentContentList.size) else listOf(literacyAssessmentContent.size),
+    val assessmentNumberList: List<Int> = if (type == "Numeracy") listOf(8) else listOf(8),
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
     val successMessage: String? = null

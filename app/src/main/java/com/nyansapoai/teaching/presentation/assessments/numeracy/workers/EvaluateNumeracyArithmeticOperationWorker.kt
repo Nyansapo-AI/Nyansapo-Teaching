@@ -35,7 +35,6 @@ class EvaluateNumeracyArithmeticOperationWorker(
 
     override suspend fun doWork(): Result {
 
-        val retryAttempt = runAttemptCount
 
         try {
             /**
@@ -59,8 +58,8 @@ class EvaluateNumeracyArithmeticOperationWorker(
             /**
              * Send the images to storage and get their media uri.
              */
-            val answerImageUrl = mediaRepository.saveImage(imageByteArray = answerImageBytes).data ?: return handleRetry(attempt = retryAttempt)
-            val workoutImageUri = mediaRepository.saveImage(imageByteArray = workoutImageByte).data ?: return handleRetry(attempt = retryAttempt)
+            val answerImageUrl = mediaRepository.saveImage(imageByteArray = answerImageBytes).data ?: return Result.retry()
+            val workoutImageUri = mediaRepository.saveImage(imageByteArray = workoutImageByte).data ?: return Result.retry()
 
             /**
              * Extract text from the answer image using AI.
@@ -114,17 +113,7 @@ class EvaluateNumeracyArithmeticOperationWorker(
 
         }catch (e:Exception){
             Log.e(WORK_NAME, "Error evaluating numeracy operation: ${e.message}", e)
-            return handleRetry(attempt = retryAttempt)
-        }
-    }
-
-    private fun handleRetry(attempt: Int): Result {
-        return if (attempt >= MAX_RETRIES) {
-            Log.e(WORK_NAME, "Max retries reached")
-            Result.failure()
-        } else {
-            Log.d(WORK_NAME, "Scheduling retry ${attempt + 1}")
-            Result.retry()
+            return Result.failure()
         }
     }
 

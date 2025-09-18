@@ -11,16 +11,22 @@ import com.nyansapoai.teaching.presentation.assessments.numeracy.components.Nume
 
 data class NumeracyAssessmentState(
     val shouldCaptureAnswer: Boolean = false,
-    val shouldCaptureWorkArea: Boolean = false,
-    val answerImageByteArray: ByteArray? = null,
-    val workAreaImageByteArray: ByteArray? = null,
+//    val shouldCaptureWorkArea: Boolean = false,
+//    val answerImageByteArray: ByteArray? = null,
+//    val workAreaImageByteArray: ByteArray? = null,
 
-    val answerImageBitmap: ImageBitmap? = null,
-    val workAreaImageBitmap: ImageBitmap? = null,
-    val isSubmitting: Boolean = false,
+//    val answerImageBitmap: ImageBitmap? = null,
+//    val workAreaImageBitmap: ImageBitmap? = null,
+//    val isSubmitting: Boolean = false,
+
+    val isLoading: Boolean = false,
+    val currentIndex: Int = 0,
+
 
     val countMatchAnswer: Int? = null,
-    val isLoading: Boolean = false,
+    val countAndMatchResults: MutableList<CountMatch> = mutableListOf(),
+
+
     val answerUri: String? = null,
     val response: Int? = null,
     val error: String? = null,
@@ -29,18 +35,16 @@ data class NumeracyAssessmentState(
     val workAreaFilePath: String? = null,
     val answerInt: Int? = null,
     val showResponseAlert: Boolean = false,
-
     val numeracyAssessmentContent: NumeracyAssessmentContent? = numeracyAssessmentData.numeracyAssessmentContentList[0],
 
-    val countAndMatchResults: MutableList<CountMatch> = mutableListOf(),
     val numberRecognitionResults: MutableList<NumeracyNumberRecognition> = mutableListOf(),
     val arithmeticOperationResults: MutableList<NumeracyArithmeticOperation> = mutableListOf(),
     val wordProblem: NumeracyWordProblem? = null,
 
-    val currentIndex: Int = 0,
+    val currentRoundIndex: Int = 0,
     val hasCompletedAssessment: Boolean = false,
 
-    val numeracyLevel: NumeracyAssessmentLevel = NumeracyAssessmentLevel.COUNT_MATCH,
+    val numeracyLevel: NumeracyAssessmentLevel = NumeracyAssessmentLevel.ADDITION,
     val numeracyAssessmentFlow: List<NumeracyAssessmentLevel> = listOf(
         NumeracyAssessmentLevel.COUNT_MATCH,
         NumeracyAssessmentLevel.NUMBER_RECOGNITION,

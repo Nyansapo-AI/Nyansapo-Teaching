@@ -59,8 +59,19 @@ class EvaluateReadingAssessmentWorker(
     }
 
     private fun readAudioFile(path: String): ByteArray? {
+
+        if (path.isEmpty()) {
+            return null
+        }
+
+        val file = File(path)
+
+        if (!file.exists()){
+            return null
+        }
+
         return try {
-            File(path).readBytes().also {
+            file.readBytes().also {
                 Log.d("EvaluateReadingAssessmentWorker", "Read ${it.size} bytes from audio file")
             }
         } catch (e: Exception) {

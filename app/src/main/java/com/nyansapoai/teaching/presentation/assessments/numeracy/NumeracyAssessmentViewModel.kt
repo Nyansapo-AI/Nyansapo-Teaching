@@ -1,34 +1,44 @@
 package com.nyansapoai.teaching.presentation.assessments.numeracy
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.work.Constraints
+import androidx.work.ExistingWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.workDataOf
+import com.nyansapoai.teaching.data.local.LocalDataSource
 import com.nyansapoai.teaching.data.remote.ai.ArtificialIntelligenceRepository
 import com.nyansapoai.teaching.data.remote.assessment.AssessmentRepository
 import com.nyansapoai.teaching.data.remote.media.MediaRepository
-import com.nyansapoai.teaching.domain.dto.ai.GetTextFromImageRequestDTO
 import com.nyansapoai.teaching.domain.models.ai.VisionRecognition
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.CountMatch
-import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyArithmeticOperation
-import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyOperationMetadata
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyWordProblem
 import com.nyansapoai.teaching.presentation.assessments.components.checkAnswer
+import com.nyansapoai.teaching.presentation.assessments.literacy.workers.EvaluateReadingAssessmentWorker
+import com.nyansapoai.teaching.presentation.assessments.numeracy.components.NumeracyAssessmentLevel
+import com.nyansapoai.teaching.presentation.assessments.numeracy.workers.EvaluateNumeracyArithmeticOperationWorker
 import com.nyansapoai.teaching.utils.ResultStatus
 import com.nyansapoai.teaching.utils.Results
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.update
+import kotlin.text.compareTo
+import kotlin.text.get
 
 class NumeracyAssessmentViewModel(
     private val artificialIntelligenceRepository: ArtificialIntelligenceRepository,
     private val assessmentRepository: AssessmentRepository,
-    private val mediaRepository: MediaRepository
+    private val mediaRepository: MediaRepository,
+    private val localDataSource: LocalDataSource,
+    private val workManager: WorkManager
 ) : ViewModel() {
 
     private var hasLoadedInitialData = false
@@ -51,6 +61,7 @@ class NumeracyAssessmentViewModel(
 
     fun onAction(action: NumeracyAssessmentAction) {
         when (action) {
+            /*
             is NumeracyAssessmentAction.OnCaptureAnswer -> {
                 println("Captured answer image: ${action.imageByteArray.size} bytes")
                 _state.value = _state.value.copy(
@@ -63,40 +74,41 @@ class NumeracyAssessmentViewModel(
                 _state.value = _state.value.copy(
                     workAreaImageByteArray = action.imageByteArray,
                 )
-            }
+            }*/
+
             NumeracyAssessmentAction.OnClearAnswer -> {
                 _state.value = _state.value.copy(
-                    answerImageByteArray = null,
+//                    answerImageByteArray = null,
+                    answerFilePath = null,
+                    workAreaFilePath = null,
                     shouldCaptureAnswer = false
                 )
             }
             NumeracyAssessmentAction.OnClearWorkArea -> {
                 _state.value = _state.value.copy(
-                    workAreaImageByteArray = null,
-                    shouldCaptureWorkArea = false
+//                    workAreaImageByteArray = null,
+//                    shouldCaptureWorkArea = false
                 )
             }
             is NumeracyAssessmentAction.OnIsSubmittingChange -> {
-                if (_state.value.answerImageBitmap != null) {
-                    _state.update { it.copy(error = "Please write your answer.") }
-                    return
+                _state.update {
+                    it.copy(
+                        shouldCaptureAnswer = action.isSubmitting
+                    )
                 }
-
-                _state.value = _state.value.copy(
-                    isSubmitting = action.isSubmitting
-                )
             }
+            /*
             is NumeracyAssessmentAction.OnShouldCaptureWorkAreaChange -> {
                 _state.value = _state.value.copy(
                     shouldCaptureWorkArea = action.shouldCapture
                 )
-            }
+            }*/
             NumeracyAssessmentAction.OnSubmitAnswer -> {
-                submitAnswer()
+//                submitAnswer()
             }
-
             is NumeracyAssessmentAction.OnAddArithmeticOperation -> {
 
+                /*
                 viewModelScope.launch(Dispatchers.IO) {
                     Log.d("NumeracyAssessmentViewModel", "Processing arithmetic operation: ${action.numeracyOperations}")
 
@@ -137,8 +149,8 @@ class NumeracyAssessmentViewModel(
                             arithmeticOperationResults = _state.value.arithmeticOperationResults.apply {
                                 add(arithmeticOperation)
                             },
-                            answerImageByteArray = null,
-                            workAreaImageByteArray = null,
+//                            answerImageByteArray = null,
+//                            workAreaImageByteArray = null,
                             shouldCaptureAnswer = false,
                             shouldCaptureWorkArea = false,
                             showResponseAlert = false,
@@ -158,10 +170,11 @@ class NumeracyAssessmentViewModel(
                         )
                     }
                 }
+
+                 */
             }
-
+            /*
             is NumeracyAssessmentAction.OnAddCountMatch -> {
-
                 if (_state.value.countMatchAnswer == null) {
                     _state.value = _state.value.copy(
                         showResponseAlert = true,
@@ -193,11 +206,11 @@ class NumeracyAssessmentViewModel(
                 _state.update { it.copy(isLoading = false,countMatchAnswer = null,  ) }
 
             }
+            */
             is NumeracyAssessmentAction.OnSubmitCountMatch -> {
                 submitCountAndMatch(
                     assessmentId = action.assessmentId,
                     studentId = action.studentId,
-                    countMatchList = _state.value.countAndMatchResults,
                     onSuccess = action.onSuccess
                 )
             }
@@ -206,7 +219,6 @@ class NumeracyAssessmentViewModel(
                 submitNumeracyArithmeticOperations(
                     assessmentId = action.assessmentId,
                     studentId = action.studentId,
-                    operationList = _state.value.arithmeticOperationResults,
                     onSuccess = action.onSuccess
                 )
             }
@@ -230,20 +242,18 @@ class NumeracyAssessmentViewModel(
                 }
 
             }
-
             is NumeracyAssessmentAction.OnNumeracyLevelChange -> {
                 _state.value = _state.value.copy(
                     numeracyLevel = action.numeracyLevel
                 )
             }
-
             is NumeracyAssessmentAction.OnAddNumberRecognition -> TODO()
             is NumeracyAssessmentAction.OnShowResponseAlertChange -> {
                 _state.update { it.copy(
                     showResponseAlert = action.showResponseAlert
                 ) }
             }
-
+            /*
             is NumeracyAssessmentAction.OnReadAnswerImage -> {
                 _state.value = _state.value.copy(
                     shouldCaptureAnswer = true
@@ -321,6 +331,7 @@ class NumeracyAssessmentViewModel(
                 }
 
             }
+            */
 
             is NumeracyAssessmentAction.OnCountMatchAnswerChange -> {
                 _state.value = _state.value.copy(
@@ -330,15 +341,19 @@ class NumeracyAssessmentViewModel(
                 println("Count match answer updated: ${_state.value.countMatchAnswer}")
             }
 
+            /*
             is NumeracyAssessmentAction.OnAnswerImageBitmapChange -> {
                 _state.update { it.copy(answerImageBitmap = action.imageBitmap) }
-            }
+            }*/
             is NumeracyAssessmentAction.OnAnswerImageFilePathChange -> {
                 _state.update { it.copy(answerFilePath = action.path) }
             }
+            /*
             is NumeracyAssessmentAction.OnWorkAreaImageBitmapChange -> {
                 _state.update { it.copy(workAreaImageBitmap = action.imageBitmap) }
             }
+
+             */
             is NumeracyAssessmentAction.OnWorkAreaImageFilePathChange -> {
                 _state.update { it.copy(workAreaFilePath = action.path) }
             }
@@ -351,6 +366,7 @@ class NumeracyAssessmentViewModel(
     private val _workAreaImageByteArrayState = MutableStateFlow<Results<VisionRecognition>>(Results.initial())
     val workAreaImageByteArrayState = _workAreaImageByteArrayState.asStateFlow()
 
+    /*
     private fun submitAnswer() {
         _state.value = _state.value.copy(
             shouldCaptureAnswer = true,
@@ -385,69 +401,223 @@ class NumeracyAssessmentViewModel(
         }
     }
 
+     */
+
+
+
+
+
     private fun submitCountAndMatch(
         assessmentId: String,
         studentId: String,
-        countMatchList: List<CountMatch>,
         onSuccess: () -> Unit
     ) {
-        if (countMatchList.isEmpty()) {
-            println("No count and match results to submit.")
+
+        _state.update { it.copy(isLoading = true) }
+
+        if (_state.value.numeracyLevel != NumeracyAssessmentLevel.COUNT_MATCH){
             return
         }
 
-        viewModelScope.launch(Dispatchers.IO) {
-            val result = assessmentRepository.assessNumeracyCountAndMatch(
-                countAndMatchList = countMatchList,
-                studentID = studentId,
-                assessmentId = assessmentId
-            )
+        val countMatchList = _state.value.numeracyAssessmentContent?.countAndMatchNumbersList ?: emptyList()
 
-            when(result.status){
-                ResultStatus.INITIAL ,
-                ResultStatus.LOADING -> {}
-                ResultStatus.SUCCESS -> {
-                    onSuccess.invoke()
+        if (countMatchList.isEmpty()){
+            return
+        }
+
+
+
+        when{
+            _state.value.currentIndex == countMatchList.size - 1 -> {
+                _state.update {
+                    it.copy(
+                        countAndMatchResults = _state.value.countAndMatchResults.apply { add(
+                            CountMatch(
+                                expected_number = countMatchList[it.currentIndex],
+                                student_count = _state.value.countMatchAnswer ?: 0,
+                                passed = checkAnswer(
+                                    answer = _state.value.countMatchAnswer ?: 0,
+                                    correctAnswer = countMatchList[it.currentIndex]
+                                )
+                            )
+                        )}
+                    )
                 }
-                ResultStatus.ERROR -> {
-                    println("can not add count and match")
+
+                viewModelScope.launch {
+                    localDataSource.insertPendingCountMatch(
+                        assessmentId = assessmentId,
+                        studentId = studentId,
+                        countList = _state.value.countAndMatchResults.toList(),
+
+                    )
                 }
+
+                _state.update { it.copy(
+                    currentIndex = 0,
+                    countMatchAnswer = null,
+                    isLoading = false,
+                    numeracyLevel = NumeracyAssessmentLevel.ADDITION,
+                ) }
             }
+            else -> {
+                _state.update {
+                    it.copy(
+                        countAndMatchResults = _state.value.countAndMatchResults.apply { add(
+                            CountMatch(
+                                expected_number = countMatchList[it.currentIndex],
+                                student_count = _state.value.countMatchAnswer ?: 0,
+                                passed = checkAnswer(
+                                    answer = _state.value.countMatchAnswer ?: 0,
+                                    correctAnswer = countMatchList[it.currentIndex]
+                                )
+                            )
+                        )},
+                    )
+                }
 
+                _state.update { it.copy(
+                    currentIndex = it.currentIndex + 1,
+                    countMatchAnswer = null,
+                    isLoading = false,
+                ) }
 
+            }
         }
     }
 
     private fun submitNumeracyArithmeticOperations(
         assessmentId: String,
         studentId: String,
-        operationList: List<NumeracyArithmeticOperation>,
-        onSuccess: () -> Unit = {}
-    ){
-        if (operationList.isEmpty()){
-            return
+        onSuccess: () -> Unit
+    ) {
+        val arithmeticContent = when (_state.value.numeracyLevel) {
+            NumeracyAssessmentLevel.ADDITION -> _state.value.numeracyAssessmentContent?.additions
+            NumeracyAssessmentLevel.SUBTRACTION -> _state.value.numeracyAssessmentContent?.subtractions
+            NumeracyAssessmentLevel.MULTIPLICATION -> _state.value.numeracyAssessmentContent?.multiplications
+            NumeracyAssessmentLevel.DIVISION -> _state.value.numeracyAssessmentContent?.divisions
+            else -> null
+        } ?: return
+
+        val currentIndex = _state.value.currentIndex
+        if (currentIndex !in arithmeticContent.indices) return
+
+        fun getNextLevel(level: NumeracyAssessmentLevel): NumeracyAssessmentLevel? = when (level) {
+            NumeracyAssessmentLevel.ADDITION -> NumeracyAssessmentLevel.SUBTRACTION
+            NumeracyAssessmentLevel.SUBTRACTION -> NumeracyAssessmentLevel.MULTIPLICATION
+            NumeracyAssessmentLevel.MULTIPLICATION -> NumeracyAssessmentLevel.DIVISION
+            NumeracyAssessmentLevel.DIVISION -> NumeracyAssessmentLevel.WORD_PROBLEM
+            else -> null
         }
 
-        viewModelScope.launch {
-            val result = assessmentRepository.assessNumeracyArithmeticOperations(
-                assessmentId = assessmentId,
-                studentID = studentId,
-                arithmeticOperations = operationList,
-            )
+        val currentOperation = arithmeticContent[currentIndex]
 
-            when(result.status){
-                ResultStatus.INITIAL ,
-                ResultStatus.LOADING -> {}
-                ResultStatus.SUCCESS -> {
-                    onSuccess.invoke()
+        evaluateNumeracyArithmeticOperationWithWorkManager(
+            assessmentId = assessmentId,
+            studentId = studentId,
+            operationType = currentOperation.operationType.name,
+            operationNumber1 = currentOperation.firstNumber,
+            operationNumber2 = currentOperation.secondNumber,
+            expectAnswer = currentOperation.answer,
+            answerImagePath = _state.value.answerFilePath,
+            workoutImagePath = _state.value.workAreaFilePath,
+            onFailure = {
+                _state.update {
+                    it.copy(
+                        isLoading = false,
+                        shouldCaptureAnswer = false,
+                    )
                 }
-                ResultStatus.ERROR -> {
-                    println("can not add operation arithmetic")
+            },
+            onSuccess = {
+                _state.update { state ->
+                    if (currentIndex >= arithmeticContent.size - 1) {
+                        state.copy(
+                            currentIndex = 0,
+                            answerFilePath = null,
+                            shouldCaptureAnswer = false,
+                            workAreaFilePath = null,
+                            isLoading = false,
+                            numeracyLevel = getNextLevel(state.numeracyLevel) ?: state.numeracyLevel,
+                        )
+                    } else {
+                        state.copy(
+                            shouldCaptureAnswer = false,
+                            currentIndex = state.currentIndex + 1,
+                            answerFilePath = null,
+                            workAreaFilePath = null,
+                            isLoading = false,
+                        )
+                    }
                 }
+                onSuccess()
+            }
+        )
+    }
+
+
+    private fun evaluateNumeracyArithmeticOperationWithWorkManager(
+        assessmentId: String?,
+        studentId: String?,
+        operationType: String,
+        operationNumber1: Int,
+        operationNumber2: Int,
+        expectAnswer: Int,
+        answerImagePath: String?,
+        workoutImagePath: String?,
+        onSuccess: () -> Unit,
+        onFailure: () -> Unit
+    ){
+        viewModelScope.launch(Dispatchers.IO) {
+            if (assessmentId.isNullOrEmpty() || studentId.isNullOrEmpty() || answerImagePath.isNullOrEmpty()){
+                println("Assessment ID, Student ID, or Answer Image Path is null or empty.")
+
+                println("assessmentId: $assessmentId, studentId: $studentId, answerImagePath: $answerImagePath")
+                onFailure.invoke()
+                return@launch
             }
 
+            _state.update { it.copy(isLoading = true) }
 
+            val workData = workDataOf(
+                EvaluateNumeracyArithmeticOperationWorker.ASSESSMENT_ID to assessmentId,
+                EvaluateNumeracyArithmeticOperationWorker.STUDENT_ID to studentId,
+                EvaluateNumeracyArithmeticOperationWorker.OPERATION_TYPE to operationType,
+                EvaluateNumeracyArithmeticOperationWorker.OPERATION_NUMBER1 to operationNumber1,
+                EvaluateNumeracyArithmeticOperationWorker.OPERATION_NUMBER2 to operationNumber2,
+                EvaluateNumeracyArithmeticOperationWorker.EXPECTED_ANSWER to expectAnswer,
+                EvaluateNumeracyArithmeticOperationWorker.ANSWER_IMAGE_PATH to answerImagePath,
+                EvaluateNumeracyArithmeticOperationWorker.WORKOUT_IMAGE_PATH to workoutImagePath,
+            )
+
+            val constraints = Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .setRequiresStorageNotLow(true)
+                .build()
+
+            val tag = "assessment_${assessmentId}_${studentId}"
+
+            val request = OneTimeWorkRequestBuilder<EvaluateReadingAssessmentWorker>()
+                .setInputData(workData)
+                .setConstraints(constraints = constraints)
+                .addTag(tag = tag)
+                .build()
+
+            val uniqueWorkName = "reading_assessment_${assessmentId}_${studentId}_${System.currentTimeMillis()}"
+
+            workManager
+                .enqueueUniqueWork(
+                    uniqueWorkName = uniqueWorkName,
+                    ExistingWorkPolicy.REPLACE,
+                    request = request
+                )
+
+            delay(1000)
+
+            _state.update { it.copy(isLoading = false)}
+            onSuccess.invoke()
         }
+
     }
 
 

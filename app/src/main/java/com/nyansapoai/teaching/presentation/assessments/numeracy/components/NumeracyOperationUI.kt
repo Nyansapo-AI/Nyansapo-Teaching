@@ -30,16 +30,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nyansapoai.teaching.R
 import com.nyansapoai.teaching.presentation.common.components.AppButton
 import com.nyansapoai.teaching.presentation.common.components.AppTouchInput
-import com.nyansapoai.teaching.presentation.common.components.CapturableComposable
+import com.nyansapoai.teaching.presentation.common.components.ScreenshotComposable
 
 
 
@@ -51,18 +50,14 @@ fun NumeracyOperationUI(
     secondNumber: Int,
     operationType: OperationType = OperationType.DIVISION,
     operationOrientation: Orientation = Orientation.Horizontal,
-    onCaptureAnswerContent: (ByteArray) -> Unit = {  },
-    shouldCaptureAnswer: Boolean = false,
-    onCaptureWorkAreaContent: (ByteArray) -> Unit = {  },
-    shouldCaptureWorkArea: Boolean = false,
-    onCaptureAnswerImageBitmap: (ImageBitmap) -> Unit,
-    onCaptureWorkAreaImageBitmap: (ImageBitmap) -> Unit,
-    onSubmit: () -> Unit = {  },
+    onAnswerFilePathChange: (String) -> Unit,
+    onWorkAreaFilePathChange: (String) -> Unit,
+    shouldCapture: Boolean,
+    onSubmit: () -> Unit,
     isLoading: Boolean = false,
 ) {
 
     var isEraserMode by remember { mutableStateOf(false) }
-
 
     Box(
         modifier = Modifier
@@ -165,8 +160,11 @@ fun NumeracyOperationUI(
                                     color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f)
                                 )
                         ) {
-                            CapturableComposable(
-                                shouldCapture = shouldCaptureAnswer,
+                            ScreenshotComposable(
+                                shouldCapture = shouldCapture,
+                                onFilePathChange = {path ->
+                                    onAnswerFilePathChange(path)
+                                },
                                 content = {
                                     AppTouchInput(
                                         modifier = Modifier
@@ -203,8 +201,11 @@ fun NumeracyOperationUI(
                                     color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f)
                                 )
                         ) {
-                            CapturableComposable(
-                                onCaptured = onCaptureAnswerImageBitmap,
+                            ScreenshotComposable(
+                                shouldCapture = shouldCapture,
+                                onFilePathChange = {path ->
+                                    onWorkAreaFilePathChange(path)
+                                },
                                 content = {
                                     AppTouchInput(
                                         modifier = Modifier
@@ -224,7 +225,7 @@ fun NumeracyOperationUI(
             Box(
                 modifier = Modifier
                     .widthIn(max = 420.dp, min = 100.dp)
-                    .heightIn(min = 300.dp, max = 400.dp)
+                    .heightIn(min = 300.dp, max = 320.dp)
                     .padding(horizontal = 12.dp)
                     .border(
                         width = 2.dp,
@@ -232,10 +233,11 @@ fun NumeracyOperationUI(
                     )
             ) {
 
-                CapturableComposable(
-//                    onCapturedByteArray = onCaptureWorkAreaContent,
-//                    shouldCapture = shouldCaptureWorkArea,
-                    onCaptured = onCaptureWorkAreaImageBitmap,
+                ScreenshotComposable(
+                    shouldCapture =  shouldCapture,
+                    onFilePathChange = {path ->
+                        onAnswerFilePathChange(path)
+                    },
                     content = {
                         AppTouchInput(
                             isEraserMode = isEraserMode,
@@ -361,7 +363,7 @@ enum class OperationType(
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun NumeracyAdditionPreview() {
-    NumeracyOperation(
+    NumeracyOperationUI(
         firstNumber = 5,
         secondNumber = 1234342,
         modifier = Modifier.fillMaxWidth()

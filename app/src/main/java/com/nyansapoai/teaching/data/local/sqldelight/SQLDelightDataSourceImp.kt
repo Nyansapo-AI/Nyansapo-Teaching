@@ -15,6 +15,7 @@ import com.nyansapoai.teaching.domain.mapper.school.toLocalSchoolInfo
 import com.nyansapoai.teaching.domain.models.assessments.CompletedAssessment
 import com.nyansapoai.teaching.domain.models.assessments.literacy.PendingMultipleChoicesResult
 import com.nyansapoai.teaching.domain.models.assessments.literacy.PendingReadingAssessmentResult
+import com.nyansapoai.teaching.domain.models.assessments.numeracy.CountMatch
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyArithmeticOperation
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyWordProblem
 import kotlinx.coroutines.Dispatchers
@@ -299,5 +300,47 @@ class SQLDelightDataSourceImp(
         studentId: String
     ) {
         assessmentQueries.clearPendingNumeracyWordProblemResults(assessmentId, studentId)
+    }
+
+    override suspend fun insertPendingCountMatch(
+        assessmentId: String,
+        studentId: String,
+        countList: List<CountMatch>
+    ) {
+        assessmentQueries.transaction {
+            countList.forEach { countMatch ->
+                assessmentQueries.insertPendingCountAndMatchResult(
+                    assessmentId = assessmentId,
+                    studentId = studentId,
+                    expectedNumber = countMatch.expected_number?.toLong() ?: 0,
+                    studentAnswer = countMatch.student_count?.toLong() ?: 0,
+                    passed = if (countMatch.passed == true) 1L else 0L,
+                )
+            }
+        }
+    }
+
+    override suspend fun getPendingCountMatches(
+        assessmentId: String,
+        studentId: String
+    ): Flow<List<CountMatch>> {
+        return assessmentQueries.getPendingCountAndMatchResults(assessmentId = assessmentId, studentId = studentId)
+            .asFlow()
+            .mapToList(Dispatchers.IO)
+            .map { pendingResults -> pendingResults.map {
+                CountMatch(
+                    expected_number = it.expectedNumber.toInt(),
+                    student_count = it.studentAnswer?.toInt(),
+                    passed = it.passed == 1L,
+                )
+            } }
+            .flowOn(Dispatchers.IO)
+    }
+
+    override suspend fun clearPendingCountMatches(
+        assessmentId: String,
+        studentId: String
+    ) {
+        assessmentQueries.clearPendingCountAndMatchResults(assessmentId, studentId)
     }
 }

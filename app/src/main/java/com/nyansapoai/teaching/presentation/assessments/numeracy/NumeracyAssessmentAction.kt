@@ -9,18 +9,20 @@ import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyWordPr
 import com.nyansapoai.teaching.presentation.assessments.numeracy.components.NumeracyAssessmentLevel
 
 sealed interface NumeracyAssessmentAction {
-    data class OnCaptureAnswer(val imageByteArray: ByteArray) : NumeracyAssessmentAction
-    data class OnCaptureWorkArea(val imageByteArray: ByteArray) : NumeracyAssessmentAction
-    data class OnAnswerImageBitmapChange(val imageBitmap: ImageBitmap?) : NumeracyAssessmentAction
-    data class OnWorkAreaImageBitmapChange(val imageBitmap: ImageBitmap?) : NumeracyAssessmentAction
+//    data class OnCaptureAnswer(val imageByteArray: ByteArray) : NumeracyAssessmentAction
+//    data class OnCaptureWorkArea(val imageByteArray: ByteArray) : NumeracyAssessmentAction
+//    data class OnAnswerImageBitmapChange(val imageBitmap: ImageBitmap?) : NumeracyAssessmentAction
+//    data class OnWorkAreaImageBitmapChange(val imageBitmap: ImageBitmap?) : NumeracyAssessmentAction
     data class OnAnswerImageFilePathChange(val path: String) : NumeracyAssessmentAction
     data class OnWorkAreaImageFilePathChange(val path: String) : NumeracyAssessmentAction
     data class OnIsSubmittingChange(val isSubmitting: Boolean) : NumeracyAssessmentAction
+    /*
     data class OnShouldCaptureWorkAreaChange(val shouldCapture: Boolean) : NumeracyAssessmentAction
+    */
     data class OnShowResponseAlertChange(val showResponseAlert: Boolean) : NumeracyAssessmentAction
     data class OnCountMatchAnswerChange(val countMatchAnswer: Int) : NumeracyAssessmentAction
-    data class OnReadAnswerImage(val imageByteArray: ByteArray?) : NumeracyAssessmentAction
-    data class OnAddCountMatch(val countMatch: Int, val onSuccess: () -> Unit) : NumeracyAssessmentAction
+//    data class OnReadAnswerImage(val imageByteArray: ByteArray?) : NumeracyAssessmentAction
+//    data class OnAddCountMatch(val countMatch: Int, val onSuccess: () -> Unit) : NumeracyAssessmentAction
     data class OnAddArithmeticOperation(val numeracyOperations: NumeracyOperations, val onSuccess: () -> Unit) : NumeracyAssessmentAction
     data class OnAddNumberRecognition(val numberRecognition: NumeracyNumberRecognition, val onSuccess: () -> Unit): NumeracyAssessmentAction
     data class OnSubmitCountMatch(val countMatch: List<CountMatch>, val assessmentId: String = "", val studentId: String = "", val onSuccess: () -> Unit): NumeracyAssessmentAction
