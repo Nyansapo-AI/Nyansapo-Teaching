@@ -1,6 +1,5 @@
 package com.nyansapoai.teaching.presentation.assessments.numeracy
 
-import androidx.compose.ui.graphics.ImageBitmap
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.CountMatch
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyArithmeticOperation
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyAssessmentContent
@@ -14,6 +13,7 @@ data class NumeracyAssessmentState(
     val numeracyAssessmentContent: NumeracyAssessmentContent? = numeracyAssessmentData.numeracyAssessmentContentList[0],
     val isLoading: Boolean = false,
     val currentIndex: Int = 0,
+    val numeracyArithmeticOperationRound: Int = 0,
 
     val countMatchAnswer: Int? = null,
     val countAndMatchResults: MutableList<CountMatch> = mutableListOf(),
@@ -37,7 +37,7 @@ data class NumeracyAssessmentState(
     val currentRoundIndex: Int = 0,
     val hasCompletedAssessment: Boolean = false,
 
-    val numeracyLevel: NumeracyAssessmentLevel = NumeracyAssessmentLevel.NUMBER_RECOGNITION,
+    val numeracyLevel: NumeracyAssessmentLevel = NumeracyAssessmentLevel.COUNT_MATCH,
     val numeracyAssessmentFlow: List<NumeracyAssessmentLevel> = listOf(
         NumeracyAssessmentLevel.COUNT_MATCH,
         NumeracyAssessmentLevel.NUMBER_RECOGNITION,
@@ -46,6 +46,5 @@ data class NumeracyAssessmentState(
         NumeracyAssessmentLevel.MULTIPLICATION,
         NumeracyAssessmentLevel.DIVISION,
         NumeracyAssessmentLevel.WORD_PROBLEM,
-//        NumeracyAssessmentLevel.
     )
 )

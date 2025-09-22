@@ -9,7 +9,7 @@ import com.nyansapoai.teaching.utils.ResultStatus
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-class EvaluateNumeracyReadingAssessmentWorker(
+class UploadNumeracyReadingAssessmentAudioWorker(
     appContext: Context,
     params: WorkerParameters
 ): CoroutineWorker(appContext, params), KoinComponent {

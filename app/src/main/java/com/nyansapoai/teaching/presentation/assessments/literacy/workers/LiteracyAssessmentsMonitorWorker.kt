@@ -12,8 +12,6 @@ import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.nyansapoai.teaching.R
 import com.nyansapoai.teaching.data.local.LocalDataSource
-import com.nyansapoai.teaching.presentation.assessments.numeracy.workers.EvaluateNumeracyArithmeticOperationWorker.Companion.MAX_RETRIES
-import com.nyansapoai.teaching.presentation.assessments.numeracy.workers.EvaluateNumeracyArithmeticOperationWorker.Companion.WORK_NAME
 import kotlinx.coroutines.flow.first
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject

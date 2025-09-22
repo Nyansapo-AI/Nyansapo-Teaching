@@ -230,7 +230,14 @@ fun NumeracyAssessmentScreen(
                         },
                         audioFilePath = state.audioFilePath,
                         response = null,
-                        onSubmit = {}
+                        onSubmit = {
+                            onAction.invoke(
+                                NumeracyAssessmentAction.OnSubmitNumberRecognition(
+                                    assessmentId = assessmentId,
+                                    studentId = studentId,
+                                )
+                            )
+                        }
                     )
                 }
                 NumeracyAssessmentLevel.WORD_PROBLEM -> {
@@ -259,8 +266,9 @@ fun NumeracyAssessmentScreen(
                             onAction.invoke(
                                 OnSubmitWordProblem(
                                     assessmentId = assessmentId,
-                                    studentId = studentId
-                                ) {}
+                                    studentId = studentId,
+                                    onSuccess = {}
+                                )
                             )
                         }
                     )

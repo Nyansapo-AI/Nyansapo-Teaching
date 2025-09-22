@@ -217,7 +217,6 @@ class LiteracyViewModel(
             _state.update {
                 it.copy(
                     isLoading = false,
-//                    message = "Assessment content submitted for evaluation"
                 )
             }
 

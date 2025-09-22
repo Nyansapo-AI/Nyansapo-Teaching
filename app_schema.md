@@ -287,7 +287,7 @@
         } 
     ], 
 
-    "word_problem" : { 
+    "word_problem" : [ { 
     
         "question" : "string", 
         
@@ -302,7 +302,8 @@
             "transcript": "number"
         
         } 
-    
+    }
+    ]   
     } 
 
 }
