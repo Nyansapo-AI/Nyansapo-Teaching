@@ -8,9 +8,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface ArtificialIntelligenceRepository {
     suspend fun recognizeImage(imageByteArray: ByteArray): Flow<Results<VisionRecognition>>
-
     suspend fun textExtractionFromImage(request: GetTextFromImageRequestDTO): Flow<Results<VisionRecognition>>
-
     suspend fun getTextFromAudio(audioByteArray: ByteArray): Flow<Results<SpeechRecognition>>
 
 }

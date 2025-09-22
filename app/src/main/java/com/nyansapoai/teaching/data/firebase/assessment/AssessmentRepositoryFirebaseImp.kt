@@ -270,7 +270,7 @@ class AssessmentRepositoryFirebaseImp(
     override suspend fun assessNumeracyWordProblem(
         assessmentId: String,
         studentID: String,
-        wordProblem: NumeracyWordProblem
+        wordProblemList: List<NumeracyWordProblem>
     ): Results<String> {
 
         val deferred = CompletableDeferred<Results<String>>()
@@ -284,7 +284,7 @@ class AssessmentRepositoryFirebaseImp(
                     "assessmentId" to assessmentId,
                     "student_id" to studentID,
                     "numeracy_results" to mapOf(
-                        "word_problem" to wordProblem
+                        "word_problems" to wordProblemList
                     )
                 )
             )

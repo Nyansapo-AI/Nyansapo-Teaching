@@ -18,6 +18,9 @@ import com.nyansapoai.teaching.presentation.assessments.components.checkAnswer
 import com.nyansapoai.teaching.presentation.assessments.numeracy.components.NumeracyAssessmentLevel
 import com.nyansapoai.teaching.presentation.assessments.numeracy.workers.EvaluateNumeracyArithmeticOperationWorker
 import com.nyansapoai.teaching.presentation.assessments.numeracy.workers.EvaluateNumeracyWordProblemWorker
+import com.nyansapoai.teaching.presentation.assessments.numeracy.workers.SubmitNumeracyArithmeticOperationResultsWorker
+import com.nyansapoai.teaching.presentation.assessments.numeracy.workers.SubmitNumeracyCountAndMatchResultWorker
+import com.nyansapoai.teaching.presentation.assessments.numeracy.workers.SubmitNumeracyWordProblemResultsWorker
 import com.nyansapoai.teaching.utils.Results
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -57,24 +60,8 @@ class NumeracyAssessmentViewModel(
 
     fun onAction(action: NumeracyAssessmentAction) {
         when (action) {
-            /*
-            is NumeracyAssessmentAction.OnCaptureAnswer -> {
-                println("Captured answer image: ${action.imageByteArray.size} bytes")
-                _state.value = _state.value.copy(
-                    answerImageByteArray = action.imageByteArray,
-//                    shouldCaptureAnswer = false
-                )
-            }
-            is NumeracyAssessmentAction.OnCaptureWorkArea -> {
-                println("Captured work area image: ${action.imageByteArray.size} bytes")
-                _state.value = _state.value.copy(
-                    workAreaImageByteArray = action.imageByteArray,
-                )
-            }*/
-
             NumeracyAssessmentAction.OnClearAnswer -> {
                 _state.value = _state.value.copy(
-//                    answerImageByteArray = null,
                     answerFilePath = null,
                     workAreaFilePath = null,
                     shouldCaptureAnswer = false
@@ -93,12 +80,6 @@ class NumeracyAssessmentViewModel(
                     )
                 }
             }
-            /*
-            is NumeracyAssessmentAction.OnShouldCaptureWorkAreaChange -> {
-                _state.value = _state.value.copy(
-                    shouldCaptureWorkArea = action.shouldCapture
-                )
-            }*/
             NumeracyAssessmentAction.OnSubmitAnswer -> {
 //                submitAnswer()
             }
@@ -169,40 +150,6 @@ class NumeracyAssessmentViewModel(
 
                  */
             }
-            /*
-            is NumeracyAssessmentAction.OnAddCountMatch -> {
-                if (_state.value.countMatchAnswer == null) {
-                    _state.value = _state.value.copy(
-                        showResponseAlert = true,
-                        error = "Count match answer is required."
-                    )
-                    return
-                }
-
-
-                val countMatchItem = CountMatch(
-                    type = "Count and Match",
-                    expected_number = action.countMatch,
-                    student_count = _state.value.countMatchAnswer,
-                    passed = checkAnswer(
-                        answer = _state.value.countMatchAnswer,
-                        correctAnswer = action.countMatch
-                    )
-                )
-
-                _state.value = _state.value.copy(
-                    countAndMatchResults = _state.value.countAndMatchResults.apply { add(countMatchItem) },
-                    isLoading = true,
-                    showResponseAlert = false,
-                    error = null
-                )
-
-                action.onSuccess.invoke()
-
-                _state.update { it.copy(isLoading = false,countMatchAnswer = null,  ) }
-
-            }
-            */
             is NumeracyAssessmentAction.OnSubmitCountMatch -> {
                 submitCountAndMatch(
                     assessmentId = action.assessmentId,
@@ -238,86 +185,6 @@ class NumeracyAssessmentViewModel(
                     showResponseAlert = action.showResponseAlert
                 ) }
             }
-            /*
-            is NumeracyAssessmentAction.OnReadAnswerImage -> {
-                _state.value = _state.value.copy(
-                    shouldCaptureAnswer = true
-                )
-
-                if (_state.value.answerImageByteArray == null) {
-                    println("No answer image to read.")
-                    return
-                }
-
-                viewModelScope.launch(Dispatchers.IO) {
-                    val response = mediaRepository.saveImage(imageByteArray = _state.value.answerImageByteArray!!)
-
-                    when(response.status){
-                        ResultStatus.INITIAL ,
-                        ResultStatus.LOADING -> {
-                            println("Firebase storage is loading...")
-                        }
-                        ResultStatus.SUCCESS -> {
-                            println("Firebase storage success: ${response.data}")
-
-                            if (response.data == null){
-                                return@launch
-                            }
-
-                            try {
-                                artificialIntelligenceRepository.textExtractionFromImage(request = GetTextFromImageRequestDTO(url = response.data ))
-                                    .catch { e ->
-                                        _state.value = _state.value.copy(
-                                            showResponseAlert = true,
-                                            shouldCaptureAnswer = false,
-                                            shouldCaptureWorkArea = false,
-                                            response = null,
-                                            error = e.message ?: "Error recognizing the answer image",
-                                        )
-                                    }
-                                    .collect { result ->
-
-                                        println("Vision recognition result: $result")
-
-                                        result.data?.let {
-                                            _state.value = _state.value.copy(
-                                                answerUri = result.data.url,
-                                                answerInt = result.data.response,
-                                                response = result.data.response,
-                                                showResponseAlert = true,
-                                                error = null
-                                            )
-
-                                        } ?: run {
-                                            _state.value = _state.value.copy(
-                                                showResponseAlert = true,
-                                                shouldCaptureAnswer = false,
-                                                shouldCaptureWorkArea = false,
-                                                response = null,
-                                                error = "No data in vision recognition response, try again"
-                                            )
-                                        }
-                                    }
-                            } catch (e: Exception) {
-                                _state.value = _state.value.copy(
-                                    showResponseAlert = true,
-                                    shouldCaptureAnswer = false,
-                                    shouldCaptureWorkArea = false,
-                                    response = null,
-                                    error = e.message ?: "Error processing the answer image"
-                                )
-                            }
-
-                        }
-                        ResultStatus.ERROR -> {
-                            println("Firebase storage error: ${response.message}")
-                        }
-                    }
-                }
-
-            }
-            */
-
             is NumeracyAssessmentAction.OnCountMatchAnswerChange -> {
                 _state.value = _state.value.copy(
                     countMatchAnswer = action.countMatchAnswer
@@ -325,71 +192,29 @@ class NumeracyAssessmentViewModel(
 
                 println("Count match answer updated: ${_state.value.countMatchAnswer}")
             }
-
-            /*
-            is NumeracyAssessmentAction.OnAnswerImageBitmapChange -> {
-                _state.update { it.copy(answerImageBitmap = action.imageBitmap) }
-            }*/
             is NumeracyAssessmentAction.OnAnswerImageFilePathChange -> {
                 _state.update { it.copy(answerFilePath = action.path) }
             }
-            /*
-            is NumeracyAssessmentAction.OnWorkAreaImageBitmapChange -> {
-                _state.update { it.copy(workAreaImageBitmap = action.imageBitmap) }
-            }
-
-             */
             is NumeracyAssessmentAction.OnWorkAreaImageFilePathChange -> {
                 _state.update { it.copy(workAreaFilePath = action.path) }
             }
-        }
-    }
-
-    private val _answerImageByteArrayState = MutableStateFlow<Results<VisionRecognition>>(Results.initial())
-    val answerImageByteArrayState = _answerImageByteArrayState.asStateFlow()
-
-    private val _workAreaImageByteArrayState = MutableStateFlow<Results<VisionRecognition>>(Results.initial())
-    val workAreaImageByteArrayState = _workAreaImageByteArrayState.asStateFlow()
-
-    /*
-    private fun submitAnswer() {
-        _state.value = _state.value.copy(
-            shouldCaptureAnswer = true,
-            shouldCaptureWorkArea = true
-        )
-
-        if  (_state.value.workAreaImageByteArray == null) {
-            println("No answer image captured.")
-            return
-        }
-
-        _state.value.workAreaImageByteArray?.let { imageByteArray ->
-            viewModelScope.launch() {
-                artificialIntelligenceRepository.recognizeImage(imageByteArray = imageByteArray )
-                    .catch {  _workAreaImageByteArrayState.value = Results.error(msg = it.message ?: "Error  recognizing the answer") }
-                    .collect { answer ->
-                        _workAreaImageByteArrayState.value = answer
-                    }
+            is NumeracyAssessmentAction.SubmitNumeracyAssessmentResults -> {
+                submitNumeracyAssessment(
+                    assessmentId = action.assessmentId,
+                    studentId = action.studentId,
+                )
             }
-        }
-
-
-        _state.value.answerImageByteArray?.let { imageByteArray ->
-            viewModelScope.launch(Dispatchers.IO) {
-                artificialIntelligenceRepository.recognizeImage(imageByteArray = imageByteArray )
-                    .catch {  _answerImageByteArrayState.value = Results.error(msg = it.message ?: "Error  recognizing the work area") }
-                    .collect { workArea ->
-                        _answerImageByteArrayState.value = workArea
-
-                    }
+            is NumeracyAssessmentAction.OnAudioFilePathChange -> {
+                _state.update { it.copy(audioFilePath = action.audioFilePath) }
+            }
+            is NumeracyAssessmentAction.OnShowContentChange -> {
+                _state.update { it.copy(showContent = action.showContent) }
+            }
+            is NumeracyAssessmentAction.OnShowInstructionChange -> {
+                _state.update { it.copy(showInstruction = action.showInstruction) }
             }
         }
     }
-
-     */
-
-
-
 
 
     private fun submitCountAndMatch(
@@ -725,10 +550,45 @@ class NumeracyAssessmentViewModel(
 
 
         }
-
-
     }
 
+    private fun submitNumeracyAssessment(
+        assessmentId: String,
+        studentId: String,
+    ){
+        val workData = workDataOf(
+            "assessment_id" to assessmentId,
+            "student_id" to studentId,
+        )
 
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
 
+        val submitNumeracyArithmeticOperationsResult = OneTimeWorkRequestBuilder<SubmitNumeracyArithmeticOperationResultsWorker>()
+            .setInputData(workData)
+            .setConstraints(constraints = constraints)
+            .build()
+
+        val submitNumeracyCountMatchResults = OneTimeWorkRequestBuilder<SubmitNumeracyCountAndMatchResultWorker>()
+            .setInputData(workData)
+            .setConstraints(constraints = constraints)
+            .build()
+
+        val submitNumeracyWordProblemResults = OneTimeWorkRequestBuilder<SubmitNumeracyWordProblemResultsWorker>()
+            .setInputData(workData)
+            .setConstraints(constraints = constraints)
+            .build()
+        
+        workManager
+            .beginUniqueWork(
+                uniqueWorkName = "submit_numeracy_assessment_${assessmentId}_${studentId}",
+                existingWorkPolicy = ExistingWorkPolicy.REPLACE,
+                request = submitNumeracyCountMatchResults,
+            )
+            .then(submitNumeracyArithmeticOperationsResult)
+            .then(submitNumeracyWordProblemResults)
+            .enqueue()
+
+    }
 }

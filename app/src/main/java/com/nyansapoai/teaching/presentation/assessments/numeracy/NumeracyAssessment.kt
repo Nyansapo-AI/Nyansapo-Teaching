@@ -20,11 +20,16 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.OffsetEffect
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.nyansapoai.teaching.R
 import com.nyansapoai.teaching.presentation.assessments.components.HasCompletedAssessment
+import com.nyansapoai.teaching.presentation.assessments.literacy.components.LiteracyReadingAssessmentUI
+import com.nyansapoai.teaching.presentation.assessments.numeracy.NumeracyAssessmentAction.*
 import com.nyansapoai.teaching.presentation.assessments.numeracy.components.NumeracyAssessmentLevel
 import com.nyansapoai.teaching.presentation.assessments.numeracy.components.NumeracyCountAndMatch
 import com.nyansapoai.teaching.presentation.assessments.numeracy.components.NumeracyOperationContainerUI
@@ -61,9 +66,18 @@ fun NumeracyAssessmentScreen(
     assessmentId: String
 ) {
 
-    LaunchedEffect(state) {
-        println("NumeracyAssessmentScreen State: ${state.shouldCaptureAnswer}")
+    LaunchedEffect(state.hasCompletedAssessment) {
+        if (state.hasCompletedAssessment) {
+            onAction(
+                SubmitNumeracyAssessmentResults(
+                    assessmentId = assessmentId,
+                    studentId = studentId
+                )
+            )
+        }
     }
+
+
 
     Scaffold(
         modifier = modifier
@@ -130,13 +144,13 @@ fun NumeracyAssessmentScreen(
                         currentIndex = state.currentIndex,
                         onSelectCount = { count ->
                             onAction(
-                                NumeracyAssessmentAction.OnCountMatchAnswerChange(countMatchAnswer = count)
+                                OnCountMatchAnswerChange(countMatchAnswer = count)
                             )
                         },
                         selectedCount = state.countMatchAnswer,
                         onSubmit = {
                             onAction.invoke(
-                                NumeracyAssessmentAction.OnSubmitCountMatch(
+                                OnSubmitCountMatch(
                                     countMatch = emptyList(),
                                     assessmentId = assessmentId,
                                     studentId = studentId,
@@ -164,24 +178,24 @@ fun NumeracyAssessmentScreen(
                         currentIndex = state.currentIndex,
                         onAnswerFilePathChange = {path ->
                             onAction.invoke(
-                                NumeracyAssessmentAction.OnAnswerImageFilePathChange(path = path)
+                                OnAnswerImageFilePathChange(path = path)
                             )
                         },
                         onWorkOutFilePathChange = { path ->
                             onAction.invoke(
-                                NumeracyAssessmentAction.OnWorkAreaImageFilePathChange(path = path)
+                                OnWorkAreaImageFilePathChange(path = path)
                             )
                         },
                         isLoading = state.isLoading,
                         shouldCapture = state.shouldCaptureAnswer,
                         onIsSubmittingChange = {
                             onAction.invoke(
-                                NumeracyAssessmentAction.OnIsSubmittingChange(isSubmitting = it)
+                                OnIsSubmittingChange(isSubmitting = it)
                             )
                         },
                         onSubmit = {
                             onAction.invoke(
-                                NumeracyAssessmentAction.OnSubmitNumeracyOperations(
+                                OnSubmitNumeracyOperations(
                                     operationList = emptyList(),
                                     assessmentId = assessmentId,
                                     studentId = studentId,
@@ -192,12 +206,32 @@ fun NumeracyAssessmentScreen(
                     )
                 }
                 NumeracyAssessmentLevel.NUMBER_RECOGNITION -> {
-                    /*
                     LiteracyReadingAssessmentUI(
-
+                        readingList = state.numeracyAssessmentContent.numberRecognitionList.map { it.toString() },
+                        currentIndex = state.currentIndex,
+                        showInstructions = state.showInstruction,
+                        onShowInstructionsChange = { instructionsVisible ->
+                            onAction.invoke(OnShowInstructionChange(instructionsVisible))
+                        },
+                        title = "Read Numbers",
+                        showContent = state.showContent,
+                        onShowContentChange = { contentVisible ->
+                            onAction.invoke(OnShowContentChange(contentVisible))
+                        },
+                        isLoading = state.isLoading,
+                        fontSize = 96.sp,
+                        instructionAudio = R.raw.read_number,
+                        instructionTitle = "Read the number",
+                        instructionDescription = "Read the number shown in the screen",
+                        showQuestionNumber = true,
+                        onAudioByteArrayChange = {},
+                        onAudioPathChange = { filePath ->
+                            onAction.invoke(OnAudioFilePathChange(filePath))
+                        },
+                        audioFilePath = state.audioFilePath,
+                        response = null,
+                        onSubmit = {}
                     )
-
-                     */
                 }
                 NumeracyAssessmentLevel.WORD_PROBLEM -> {
                     val wordProblemList = state.numeracyAssessmentContent.wordProblems.map { it.problem }
@@ -207,23 +241,23 @@ fun NumeracyAssessmentScreen(
                         currentIndex = state.currentIndex,
                         onAnswerFilePathChange = { path ->
                             onAction.invoke(
-                                NumeracyAssessmentAction.OnAnswerImageFilePathChange(path = path)
+                                OnAnswerImageFilePathChange(path = path)
                             )
                         },
                         onWorkOutFilePathChange = { path ->
                             onAction.invoke(
-                                NumeracyAssessmentAction.OnWorkAreaImageFilePathChange(path = path)
+                                OnWorkAreaImageFilePathChange(path = path)
                             )
                         },
                         shouldCapture = state.shouldCaptureAnswer,
                         onIsSubmittingChange = {
                             onAction.invoke(
-                                NumeracyAssessmentAction.OnIsSubmittingChange(isSubmitting = it)
+                                OnIsSubmittingChange(isSubmitting = it)
                             )
                         },
                         onSubmit = {
                             onAction.invoke(
-                                NumeracyAssessmentAction.OnSubmitWordProblem(
+                                OnSubmitWordProblem(
                                     assessmentId = assessmentId,
                                     studentId = studentId
                                 ) {}

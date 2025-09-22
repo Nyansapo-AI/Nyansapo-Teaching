@@ -7,11 +7,8 @@ import androidx.work.WorkerParameters
 import com.nyansapoai.teaching.data.local.LocalDataSource
 import com.nyansapoai.teaching.data.remote.ai.ArtificialIntelligenceRepository
 import com.nyansapoai.teaching.data.remote.media.MediaRepository
-import com.nyansapoai.teaching.presentation.assessments.literacy.components.compareResponseStrings
 import com.nyansapoai.teaching.presentation.common.media.MediaUtils
-import io.ktor.client.plugins.logging.Logging
-import kotlinx.coroutines.flow.first
-import kotlinx.datetime.Clock
+import com.nyansapoai.teaching.utils.ResultStatus
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.io.File
@@ -39,14 +36,25 @@ class EvaluateReadingAssessmentWorker(
 
             val audioBytes = readAudioFile(audioFilePath) ?: return Result.failure()
 
-            val audioUrl = mediaRepository.saveAudio(
+            val audioUrlResponse = mediaRepository.saveAudio(
                 audioByteArray = audioBytes,
                 fileName = "audio_${assessmentId}_${studentId}_${round}_${type}_${content.replace(" ", "%20")}.wav"
-            ).data ?: return Result.retry()
+            )
 
-            Log.d("Worker", "Audio uploaded: $audioUrl")
+            Log.d("Worker", "Audio uploaded: $audioUrlResponse")
 
-            MediaUtils.cleanUpMediaFile(path = audioFilePath)
+            when(audioUrlResponse.status){
+                ResultStatus.INITIAL,
+                ResultStatus.LOADING ,
+                ResultStatus.ERROR -> {
+                    Log.d("Worker", "Audio upload failed or in invalid state: ${audioUrlResponse.message}")
+                    return Result.retry()
+                }
+                ResultStatus.SUCCESS -> {
+                    MediaUtils.cleanUpMediaFile(path = audioFilePath)
+                }
+            }
+
 
             Log.d("Worker", "Running Successful")
             Result.success()

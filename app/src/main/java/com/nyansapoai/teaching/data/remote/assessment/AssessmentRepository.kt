@@ -50,7 +50,7 @@ interface  AssessmentRepository {
     suspend fun assessNumeracyWordProblem(
         assessmentId: String,
         studentID: String,
-        wordProblem: NumeracyWordProblem
+        wordProblemList: List<NumeracyWordProblem>
     ): Results<String>
 
 

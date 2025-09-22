@@ -7,11 +7,9 @@ object MediaUtils {
     const val TAG = "Media Utils"
 
     fun readImageFileByteArray(path: String): ByteArray? {
-
         if (path.isEmpty()) {
             return null
         }
-
         val file = File(path)
 
         if (!file.exists()){

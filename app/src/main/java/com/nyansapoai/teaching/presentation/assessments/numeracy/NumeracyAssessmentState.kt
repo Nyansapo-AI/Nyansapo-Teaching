@@ -15,10 +15,12 @@ data class NumeracyAssessmentState(
     val isLoading: Boolean = false,
     val currentIndex: Int = 0,
 
-
     val countMatchAnswer: Int? = null,
     val countAndMatchResults: MutableList<CountMatch> = mutableListOf(),
 
+    val showInstruction: Boolean = true,
+    val audioFilePath: String? = null,
+    val showContent: Boolean = false,
 
     val shouldCaptureAnswer: Boolean = false,
     val error: String? = null,
@@ -35,7 +37,7 @@ data class NumeracyAssessmentState(
     val currentRoundIndex: Int = 0,
     val hasCompletedAssessment: Boolean = false,
 
-    val numeracyLevel: NumeracyAssessmentLevel = NumeracyAssessmentLevel.ADDITION,
+    val numeracyLevel: NumeracyAssessmentLevel = NumeracyAssessmentLevel.NUMBER_RECOGNITION,
     val numeracyAssessmentFlow: List<NumeracyAssessmentLevel> = listOf(
         NumeracyAssessmentLevel.COUNT_MATCH,
         NumeracyAssessmentLevel.NUMBER_RECOGNITION,
@@ -44,5 +46,6 @@ data class NumeracyAssessmentState(
         NumeracyAssessmentLevel.MULTIPLICATION,
         NumeracyAssessmentLevel.DIVISION,
         NumeracyAssessmentLevel.WORD_PROBLEM,
+//        NumeracyAssessmentLevel.
     )
 )
