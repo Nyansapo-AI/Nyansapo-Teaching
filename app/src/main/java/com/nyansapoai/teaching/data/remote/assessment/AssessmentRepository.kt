@@ -18,10 +18,12 @@ interface  AssessmentRepository {
         startLevel: String,
         assessmentNumber: Int,
         assignedStudents: List<NyansapoStudent>,
-        schoolId: String,
+        schoolId: String = "",
+        organizationId: String = "",
+        projectId: String = ""
     ): Results<Unit>
 
-    suspend fun getAssessments(): Flow<List<Assessment>>
+    suspend fun getAssessments(schoolId: String = ""): Flow<List<Assessment>>
 
     suspend fun getAssessmentById(assessmentId: String): Flow<Results<Assessment>>
 
@@ -48,7 +50,7 @@ interface  AssessmentRepository {
     suspend fun assessNumeracyWordProblem(
         assessmentId: String,
         studentID: String,
-        wordProblem: NumeracyWordProblem
+        wordProblemList: List<NumeracyWordProblem>
     ): Results<String>
 
 
@@ -56,6 +58,12 @@ interface  AssessmentRepository {
         assessmentId: String,
         studentID: String,
         readingAssessmentResults: List<ReadingAssessmentResult>
+    ): Results<String>
+
+    suspend fun addReadingAssessmentResult(
+        assessmentId: String,
+        studentID: String,
+        readingAssessment: ReadingAssessmentResult
     ): Results<String>
 
     suspend fun assessMultipleChoiceQuestions(

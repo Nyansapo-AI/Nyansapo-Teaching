@@ -45,7 +45,7 @@ fun generateComparisonText(
                 SpanStyle(
                     color = Color(0xFFFF0000),
                     fontWeight = FontWeight.Bold,
-                    textDecoration = TextDecoration.Underline
+//                    textDecoration = TextDecoration.Underline
                 )
             }
 

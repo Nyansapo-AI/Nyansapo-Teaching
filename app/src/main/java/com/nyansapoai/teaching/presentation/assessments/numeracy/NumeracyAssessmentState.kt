@@ -1,6 +1,5 @@
 package com.nyansapoai.teaching.presentation.assessments.numeracy
 
-import androidx.compose.ui.graphics.ImageBitmap
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.CountMatch
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyArithmeticOperation
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyAssessmentContent
@@ -10,41 +9,32 @@ import com.nyansapoai.teaching.domain.models.assessments.numeracy.numeracyAssess
 import com.nyansapoai.teaching.presentation.assessments.numeracy.components.NumeracyAssessmentLevel
 
 data class NumeracyAssessmentState(
-    val shouldCaptureAnswer: Boolean = false,
-    val shouldCaptureWorkArea: Boolean = false,
-    val answerImageByteArray: ByteArray? = null,
-    val workAreaImageByteArray: ByteArray? = null,
 
-    val answerImageBitmap: ImageBitmap? = null,
-    val workAreaImageBitmap: ImageBitmap? = null,
-    val isSubmitting: Boolean = false,
+    val numeracyAssessmentContent: NumeracyAssessmentContent? = numeracyAssessmentData.numeracyAssessmentContentList[0],
+    val isLoading: Boolean = false,
+    val currentIndex: Int = 0,
+    val numeracyArithmeticOperationRound: Int = 0,
 
     val countMatchAnswer: Int? = null,
-    val isLoading: Boolean = false,
-    val answerUri: String? = null,
-    val response: Int? = null,
+    val countAndMatchResults: MutableList<CountMatch> = mutableListOf(),
+
+    val showInstruction: Boolean = true,
+    val audioFilePath: String? = null,
+    val showContent: Boolean = false,
+
+    val shouldCaptureAnswer: Boolean = false,
     val error: String? = null,
-    val answerString: String? = null,
+    val showResponseAlert: Boolean = false,
     val answerFilePath: String? = null,
     val workAreaFilePath: String? = null,
     val answerInt: Int? = null,
-    val showResponseAlert: Boolean = false,
 
-//    val numeracyAssessmentContent: Results<NumeracyAssessmentContent> = Results.success(data =numeracyAssessmentData.numeracyAssessmentContentList[0] ),
-    val numeracyAssessmentContent: NumeracyAssessmentContent? = numeracyAssessmentData.numeracyAssessmentContentList[0],
-
-    val countAndMatchResults: MutableList<CountMatch> = mutableListOf(),
     val numberRecognitionResults: MutableList<NumeracyNumberRecognition> = mutableListOf(),
     val arithmeticOperationResults: MutableList<NumeracyArithmeticOperation> = mutableListOf(),
+    val wordProblemResults: MutableList<NumeracyWordProblem> = mutableListOf(),
     val wordProblem: NumeracyWordProblem? = null,
 
-    val currentIndex: Int = 0,
-    val countMatchIndex: Int = 0,
-    val additionIndex: Int = 0,
-    val subtractionIndex: Int = 0,
-    val multiplicationIndex: Int = 0,
-    val divisionIndex: Int = 0,
-    val numberRecognitionIndex: Int = 0,
+    val currentRoundIndex: Int = 0,
     val hasCompletedAssessment: Boolean = false,
 
     val numeracyLevel: NumeracyAssessmentLevel = NumeracyAssessmentLevel.COUNT_MATCH,

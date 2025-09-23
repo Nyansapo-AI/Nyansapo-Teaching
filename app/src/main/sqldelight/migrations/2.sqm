@@ -1,0 +1,9 @@
+CREATE TABLE  PendingCountAndMatchResultEntity(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    assessmentId TEXT NOT NULL,
+    studentId TEXT NOT NULL,
+    expectedNumber INTEGER NOT NULL,
+    studentAnswer INTEGER,
+    passed INTEGER NOT NULL,
+    isPending INTEGER NOT NULL DEFAULT 1
+);

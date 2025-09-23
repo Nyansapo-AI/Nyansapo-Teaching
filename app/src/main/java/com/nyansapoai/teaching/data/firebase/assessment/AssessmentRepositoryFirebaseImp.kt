@@ -41,24 +41,15 @@ class AssessmentRepositoryFirebaseImp(
         startLevel: String,
         assessmentNumber: Int,
         assignedStudents: List<NyansapoStudent>,
-        schoolId: String
+        schoolId: String,
+        organizationId: String,
+        projectId: String
     ): Results<Unit> {
         val deferred = CompletableDeferred<Results<Unit>>()
 
 
-        val resultRef = firebaseDb
-            .collection("assessments")
-            .document("assessmentId")
-            .collection("students")
-            .document("entID")
-            .collection("results")
-            .document("wordProblems")
-
         if (schoolId.isEmpty()){
             deferred.complete(Results.error(msg = "School ID cannot be null or empty"))
-            return withContext(Dispatchers.IO) {
-                deferred.await()
-            }
         }
 
 
@@ -70,7 +61,10 @@ class AssessmentRepositoryFirebaseImp(
             type = type,
             start_level = startLevel,
             assessmentNumber = assessmentNumber,
-            assigned_students = assignedStudents
+            assigned_students = assignedStudents,
+            school_id = schoolId,
+            organization_id = organizationId,
+            project_id = projectId
         )
 
 
@@ -120,8 +114,9 @@ class AssessmentRepositoryFirebaseImp(
         }
     }
 
-    override suspend fun getAssessments(): Flow<List<Assessment>> = callbackFlow {
+    override suspend fun getAssessments(schoolId: String): Flow<List<Assessment>> = callbackFlow {
         val snapshotListener = firebaseDb.collection(assessmentCollection)
+            .whereEqualTo("school_id", schoolId)
             .addSnapshotListener { snapshot, e ->
                 if (e != null) {
                     Log.w("getAssessments", "Listen failed.", e)
@@ -275,7 +270,7 @@ class AssessmentRepositoryFirebaseImp(
     override suspend fun assessNumeracyWordProblem(
         assessmentId: String,
         studentID: String,
-        wordProblem: NumeracyWordProblem
+        wordProblemList: List<NumeracyWordProblem>
     ): Results<String> {
 
         val deferred = CompletableDeferred<Results<String>>()
@@ -289,7 +284,7 @@ class AssessmentRepositoryFirebaseImp(
                     "assessmentId" to assessmentId,
                     "student_id" to studentID,
                     "numeracy_results" to mapOf(
-                        "word_problem" to wordProblem
+                        "word_problems" to wordProblemList
                     )
                 )
             )
@@ -483,6 +478,14 @@ class AssessmentRepositoryFirebaseImp(
         }
     }
 
+    override suspend fun addReadingAssessmentResult(
+        assessmentId: String,
+        studentID: String,
+        readingAssessment: ReadingAssessmentResult
+    ): Results<String> {
+        TODO("Not yet implemented")
+    }
+
     override suspend fun assessMultipleChoiceQuestions(
         assessmentId: String,
         studentID: String,
@@ -597,8 +600,8 @@ class AssessmentRepositoryFirebaseImp(
         val metadata = (map["metadata"] as? Map<String, Any>)?.let { metadataMap ->
             ReadingAssessmentMetadata(
                 audio_url = metadataMap["audio_url"] as? String ?: "",
-                passed = metadataMap["passed"] as? Boolean ?: false,
-                transcript = metadataMap["transcript"] as? String ?: ""
+//                passed = metadataMap["passed"] as? Boolean ?: false,
+//                transcript = metadataMap["transcript"] as? String ?: ""
             )
         }
 
@@ -609,22 +612,6 @@ class AssessmentRepositoryFirebaseImp(
         )
     }
 
-    private fun convertReadingAssessmentResultToMap(result: ReadingAssessmentResult): Map<String, Any> {
-        val map = mutableMapOf<String, Any>(
-            "type" to result.type,
-            "content" to result.content
-        )
-
-        result.metadata?.let { metadata ->
-            map["metadata"] = mapOf(
-                "audio_url" to metadata.audio_url,
-                "passed" to metadata.passed,
-                "transcript" to metadata.transcript
-            )
-        }
-
-        return map
-    }
 
 
 

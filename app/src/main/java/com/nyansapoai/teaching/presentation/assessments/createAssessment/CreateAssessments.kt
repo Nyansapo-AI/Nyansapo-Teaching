@@ -1,5 +1,6 @@
 package com.nyansapoai.teaching.presentation.assessments.createAssessment
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -45,6 +46,10 @@ fun CreateAssessmentsRoot() {
     val viewModel = koinViewModel<CreateAssessmentsViewModel>()
     val state by viewModel.state.collectAsStateWithLifecycle()
 
+    LaunchedEffect(true) {
+        viewModel.fetchCurrentUserDetails()
+    }
+
     CreateAssessmentsScreen(
         state = state,
         onAction = viewModel::onAction
@@ -59,6 +64,7 @@ fun CreateAssessmentsScreen(
     onAction: (CreateAssessmentsAction) -> Unit,
 ) {
 
+
     LaunchedEffect(state.selectedGrade , state.localSchoolInfo) {
         onAction.invoke(
             CreateAssessmentsAction.OnFetchStudents(
@@ -68,6 +74,7 @@ fun CreateAssessmentsScreen(
                 grade = state.selectedGrade
             )
         )
+        Log.d("CreateAssessmentsScreen", "Fetching students for school info: ${state.localSchoolInfo}")
     }
 
     Scaffold(

@@ -27,12 +27,15 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.nyansapoai.teaching.R
+import com.nyansapoai.teaching.navController
 import com.nyansapoai.teaching.presentation.assessments.components.HasCompletedAssessment
 import com.nyansapoai.teaching.presentation.assessments.literacy.LiteracyAction.*
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.LiteracyAssessmentLevel
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.LiteracyReadingAssessmentUI
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.MultichoiceQuestionsUI
 import com.nyansapoai.teaching.presentation.common.components.AppSimulateNavigation
+import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -72,7 +75,9 @@ fun LiteracyScreen(
     }
 
     LaunchedEffect(state.currentAssessmentLevel == LiteracyAssessmentLevel.COMPLETED) {
-        onAction.invoke(LiteracyAction.OnSubmitLiteracyResults(assessmentId = assessmentId, studentId = studentId))
+        onAction.invoke(OnSubmitLiteracyResults(assessmentId = assessmentId, studentId = studentId))
+//        delay(3000)
+//        navController.popBackStack()
     }
 
     Scaffold(
@@ -108,6 +113,7 @@ fun LiteracyScreen(
                             title = "Letter",
                             fontSize = 120.sp,
                             showContent = state.showContent,
+                            instructionAudio = R.raw.read_letter,
                             onShowContentChange = {
                                 onAction(SetShowContent(it))
                             },
@@ -145,6 +151,7 @@ fun LiteracyScreen(
                             instructionTitle = "Read the word",
                             fontSize = 80.sp,
                             showContent = state.showContent,
+                            instructionAudio = R.raw.read_word,
                             onShowContentChange = {
                                 onAction(SetShowContent(it))
                             },
@@ -166,13 +173,12 @@ fun LiteracyScreen(
                                 )
                             }
                         )
-
                     }
 
                     LiteracyAssessmentLevel.PARAGRAPH -> {
                         LiteracyReadingAssessmentUI(
                             modifier = Modifier,
-                            readingList = state.assessmentContent?.paragraphs?.take(1) ?: emptyList(),
+                            readingList = state.assessmentContent?.paragraphs[0]?.split(".")?: emptyList(),
                             currentIndex = state.currentIndex,
                             showInstructions = state.showInstructions,
                             onShowInstructionsChange = {
@@ -180,8 +186,10 @@ fun LiteracyScreen(
                             },
                             title = "Paragraphs",
                             instructionTitle = "Read the paragraph",
+                            instructionAudio = R.raw.read_sentence,
                             fontSize = 40.sp,
                             showContent = state.showContent,
+                            showQuestionNumber = false,
                             onShowContentChange = {
                                 onAction(SetShowContent(it))
                             },
@@ -207,10 +215,9 @@ fun LiteracyScreen(
                     }
 
                     LiteracyAssessmentLevel.STORY -> {
-
                         LiteracyReadingAssessmentUI(
                             modifier = Modifier,
-                            readingList = state.assessmentContent?.storys[0]?.split(".") ?: emptyList(),
+                            readingList = state.assessmentContent?.storys[0]?.story?.trim()?.split(".") ?: emptyList(),
                             currentIndex = state.currentIndex,
                             showInstructions = state.showInstructions,
                             onShowInstructionsChange = {
@@ -218,6 +225,7 @@ fun LiteracyScreen(
                             },
                             title = "Reading Story",
                             instructionTitle = "Read the sentence",
+                            instructionAudio = R.raw.read_sentence,
                             fontSize = 40.sp,
                             showQuestionNumber = true,
                             showContent = state.showContent,
@@ -242,14 +250,13 @@ fun LiteracyScreen(
                                 )
                             }
                         )
-
                     }
 
                     LiteracyAssessmentLevel.MULTIPLE_CHOICE -> {
                         MultichoiceQuestionsUI(
                             currentIndex = state.currentIndex,
-                            story = state.assessmentContent?.storys[0]   ?: "",
-                            questionsList = state.assessmentContent?.questionsData ?: emptyList(),
+                            story = state.assessmentContent?.storys[0]?.story  ?: "",
+                            questionsList = state.assessmentContent?.storys[0]?.questionsData ?: emptyList(),
                             selectedChoice = state.selectedChoice,
                             onSelectedChoiceChange = {
                                 onAction(SetSelectedChoice(it))
@@ -299,8 +306,6 @@ fun LiteracyScreen(
                     )
 
                 }
-
-
             }
 
             AnimatedVisibility(

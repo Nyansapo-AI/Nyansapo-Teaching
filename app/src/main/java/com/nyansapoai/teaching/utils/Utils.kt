@@ -106,7 +106,7 @@ object Utils {
         context: Context,
         filename: String? = null,
         format: Bitmap.CompressFormat = Bitmap.CompressFormat.PNG,
-        quality: Int = 90
+        quality: Int = 100
     ): File? {
         // Convert ImageBitmap to ByteArray
         val byteArray = this.toByteArray(format, quality)
@@ -119,7 +119,7 @@ object Utils {
             Bitmap.CompressFormat.WEBP -> ".webp"
             else -> ".png"
         }
-        val actualFilename = filename ?: "IMG_$timeStamp$extension"
+        val actualFilename = filename.let { "IMG_$filename$timeStamp$extension"  } ?: "IMG_$timeStamp$extension"
 
         // Get the directory for the app's private pictures directory
         val storageDir = context.getExternalFilesDir(null) ?: context.filesDir

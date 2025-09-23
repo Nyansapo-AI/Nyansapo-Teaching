@@ -1,8 +1,13 @@
 package com.nyansapoai.teaching.presentation.assessments.literacy.components
 
 import android.os.Build
+import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -31,6 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -39,8 +45,10 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
+import androidx.compose.ui.zIndex
 import com.nyansapoai.teaching.R
 import com.nyansapoai.teaching.navController
+import com.nyansapoai.teaching.presentation.common.animations.RiveAnimation
 import com.nyansapoai.teaching.presentation.common.audio.play.AudioPlayer
 import com.nyansapoai.teaching.presentation.common.audio.record.AppAudioRecorder
 import com.nyansapoai.teaching.presentation.common.components.AppButton
@@ -69,7 +77,7 @@ fun LiteracyReadingAssessmentUI(
     showContent: Boolean,
     onShowContentChange: (Boolean) -> Unit,
     isLoading: Boolean,
-    instructionAudio: Int = R.raw.reading_assessment_default_instructions,
+    instructionAudio: Int = R.raw.read_letter,
     instructionTitle: String = "Read the letter",
     instructionDescription: String = "Hold the box to record your voice saying the letter.",
     showQuestionNumber: Boolean = true,
@@ -223,7 +231,6 @@ fun LiteracyReadingAssessmentUI(
                 "audio_recording_${Clock.System.now().epochSeconds}.wav"
             ).also { file ->
                 appAudioRecorder.start(outputFile = file)
-
                 audioFile = file
 
             }
@@ -231,9 +238,9 @@ fun LiteracyReadingAssessmentUI(
             delay(1000)
             appAudioRecorder.stop()
             audioFile?.let {
-
                 when {
                     !isLoading -> {
+                        Log.d("AudioFile", "Audio file path: ${it.absolutePath}")
                         onAudioPathChange(it.absolutePath)
                         audioFile = null
                     }
@@ -333,7 +340,25 @@ fun LiteracyReadingAssessmentUI(
                     instructionsTitle = instructionTitle,
                     instructionsDescription = instructionDescription,
                     instructionAudio = instructionAudio,
+                    onChangeShow = {  show -> onShowInstructionsChange(show) },
                     content = {
+
+                        AnimatedVisibility(
+                            visible = showInstructions,
+                            enter = fadeIn(),
+                            exit = fadeOut(),
+                            modifier = Modifier
+                                .zIndex(1.0f)
+                                .clickable(
+                                    onClick = { onShowInstructionsChange(false) }
+                                )
+                        ) {
+                            RiveAnimation(
+                                animation = R.raw.pointer,
+                                modifier = Modifier
+                            )
+                        }
+
                         Box(
                             contentAlignment = Alignment.Center,
                             modifier = Modifier
@@ -341,6 +366,7 @@ fun LiteracyReadingAssessmentUI(
                                 .fillMaxWidth()
                                 .clip(RoundedCornerShape(5))
                                 .background(boxColor)
+                                .zIndex(0.9f)
                                 .pointerInput(Unit) {
                                     detectTapGestures(
                                         onTap = {
@@ -354,6 +380,7 @@ fun LiteracyReadingAssessmentUI(
                                     )
                                 }
                         ) {
+
                             Text(
                                 text = if (showContent) {
                                     if (currentIndex < readingList.size) {

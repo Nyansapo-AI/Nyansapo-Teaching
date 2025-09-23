@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import com.nyansapoai.teaching.data.local.LocalDataSource
 import com.nyansapoai.teaching.data.remote.assessment.AssessmentRepository
 import com.nyansapoai.teaching.utils.Results
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.catch
@@ -17,6 +16,7 @@ import kotlinx.coroutines.launch
 
 class AssessmentsViewModel(
     private val assessmentsRepository: AssessmentRepository,
+    private val localDataSource: LocalDataSource
 ) : ViewModel() {
 
     private var hasLoadedInitialData = false
@@ -26,7 +26,9 @@ class AssessmentsViewModel(
         .onStart {
             if (!hasLoadedInitialData) {
                 /** Load initial data here **/
-                fetchAssessments()
+                getLocalSchoolInfo()
+
+//                fetchAssessments()
                 hasLoadedInitialData = true
             }
         }
@@ -41,13 +43,31 @@ class AssessmentsViewModel(
             is AssessmentsAction.OnGetCompletedAssessments -> {
 
             }
+
+            is AssessmentsAction.FetchAssessments -> {
+                fetchAssessments(schoolId = action.schoolId)
+            }
         }
     }
 
-    private fun fetchAssessments() {
+
+    private fun getLocalSchoolInfo() {
+        viewModelScope.launch {
+            localDataSource.getSavedCurrentSchoolInfo()
+                .catch { e ->
+                    Log.e("AssessmentsViewModel", "Error fetching local school info: ${e.message}")
+                }
+                .collect { localSchoolInfo ->
+                    Log.d("AssessmentsViewModel", "Fetched local school info: ${localSchoolInfo}")
+                    _state.value = _state.value.copy(localSchoolInfo = localSchoolInfo)
+                }
+        }
+    }
+
+    private fun fetchAssessments(schoolId: String = "") {
         viewModelScope.launch {
             _state.update { it.copy(assessmentListState = Results.loading()) }
-            assessmentsRepository.getAssessments()
+            assessmentsRepository.getAssessments(schoolId = schoolId)
                 .catch { e ->
                     Log.e("AssessmentsViewModel", "Error fetching assessments: ${e.message}")
                     _state.value = _state.value.copy(

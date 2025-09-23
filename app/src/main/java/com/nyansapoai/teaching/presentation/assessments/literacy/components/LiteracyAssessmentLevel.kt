@@ -3,7 +3,7 @@ package com.nyansapoai.teaching.presentation.assessments.literacy.components
 enum class LiteracyAssessmentLevel(
     val label: String
 ) {
-    LETTER_RECOGNITION("Letter Recognition"),
+    LETTER_RECOGNITION("Letter"),
     WORD("Word"),
     PARAGRAPH("Paragraph"),
     STORY("Story"),

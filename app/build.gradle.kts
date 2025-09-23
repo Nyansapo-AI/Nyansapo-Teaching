@@ -33,7 +33,7 @@ android {
         minSdk = 24
         targetSdk = 35
         versionCode = 1
-        versionName = "1.4"
+        versionName = "1.8.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -68,8 +68,6 @@ android {
                 "AZURE_SPEECH_SUBSCRIPTION_KEY",
                 localProperties.getProperty("AZURE_SPEECH_SUBSCRIPTION_KEY")
             )
-
-
         }
     }
     compileOptions {
@@ -176,5 +174,9 @@ dependencies {
     //SQLDelight
     implementation(libs.android.driver)
     implementation(libs.sqlDelight.coroutine)
+
+    //rive
+    implementation(libs.rive.android)
+    implementation(libs.androidx.startup.runtime)
 
 }

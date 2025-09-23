@@ -75,7 +75,7 @@ class SubmitReadingAssessmentWorker(
                 }
             }
 
-            if (allSucceeded) Result.success() else handleRetry(attempt = retryAttempt)
+            if (allSucceeded) Result.success() else Result.retry()
         } catch (e: Exception) {
             Log.e("SubmitReadingAssessmentWorker", "Exception in doWork", e)
             Result.failure()

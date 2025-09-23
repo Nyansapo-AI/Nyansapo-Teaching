@@ -1,69 +1,50 @@
 package com.nyansapoai.teaching.presentation.assessments.numeracy.components
 
+import android.util.Log
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyOperations
+import com.nyansapoai.teaching.presentation.assessments.numeracy.NumeracyAssessmentAction
 import com.nyansapoai.teaching.presentation.common.components.AppLinearProgressIndicator
-import com.nyansapoai.teaching.utils.Utils.saveToImageFile
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NumeracyOperationContainerUI(
     modifier: Modifier = Modifier,
-    numeracyOperationList: List<NumeracyOperations>,
-    currentIndex: Int,
-    answerImageBitmap: ImageBitmap?,
-    onChangeAnswerBitmap: (ImageBitmap) -> Unit,
+    numeracyOperationList: List<NumeracyOperations> = emptyList(),
+    currentIndex: Int = 0,
     onAnswerFilePathChange: (String) -> Unit,
-    workAreaImageBitmap: ImageBitmap? ,
-    onChangeWorkOutImageBitmap: (ImageBitmap) -> Unit,
-    onWorkOutFilePathChange: (String) -> Unit = {},
-    isSubmitting: Boolean = false,
-    changeIsSubmitting: (Boolean) -> Unit = {  },
+    onWorkOutFilePathChange: (String) -> Unit,
+    shouldCapture: Boolean,
     isLoading: Boolean = false,
-    onConfirmSubmit: () -> Unit = {  },
-    ) {
+    onIsSubmittingChange: (Boolean) -> Unit,
+    onSubmit: () -> Unit = {  },
+    )
+{
 
-    val context = LocalContext.current
-
-    LaunchedEffect(isSubmitting) {
-        answerImageBitmap?.let { imageBitmap ->
-            imageBitmap.saveToImageFile(
-                context = context,
-                filename = null
-            ).also { file ->
-                file?.let { onAnswerFilePathChange(file.absolutePath)  }
-            }
-        }
-
-        workAreaImageBitmap?.let { imageBitmap ->
-            imageBitmap.saveToImageFile(
-                context = context,
-                filename = null
-            ).also { file ->
-                file?.let { onWorkOutFilePathChange(file.absolutePath)  }
-            }
-        }
-        onConfirmSubmit.invoke()
+    LaunchedEffect(shouldCapture) {
+        onSubmit.invoke()
+        Log.d("NumeracyOperationContainer", "NumeracyOperationContainerUI: shouldCapture = $shouldCapture")
     }
-
 
 
     if (numeracyOperationList.isEmpty()){
@@ -109,42 +90,49 @@ fun NumeracyOperationContainerUI(
     }
 
 
-    Column(
+    LazyColumn (
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(40.dp),
         modifier = modifier
             .widthIn(max = 700.dp)
             .padding(16.dp),
     ) {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            modifier = Modifier
-                .fillMaxWidth()
-        )
-        {
-            Text(
-                text = "Question ${currentIndex + 1}/${numeracyOperationList.size}",
-                style = MaterialTheme.typography.titleMedium,
-            )
 
-            AppLinearProgressIndicator(
-                progress = progress
+        item {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
             )
+            {
+                Text(
+                    text = "Question ${currentIndex + 1}/${numeracyOperationList.size}",
+                    style = MaterialTheme.typography.titleMedium,
+                )
+
+                AppLinearProgressIndicator(
+                    progress = progress
+                )
+            }
         }
 
-        NumeracyOperationUI(
-            firstNumber = numeracyOperation.firstNumber,
-            secondNumber = numeracyOperation.secondNumber,
-            operationType = numeracyOperation.operationType ,
-            operationOrientation = orientation,
-//            shouldCaptureWorkArea = TODO(),
-            onSubmit = {
-                changeIsSubmitting(true)
-            },
-            isLoading = isLoading,
-            onCaptureAnswerImageBitmap = onChangeAnswerBitmap,
-            onCaptureWorkAreaImageBitmap = onChangeWorkOutImageBitmap
-        )
+        item {
+            NumeracyOperationUI(
+                firstNumber = numeracyOperation.firstNumber,
+                secondNumber = numeracyOperation.secondNumber,
+                operationType = numeracyOperation.operationType ,
+                operationOrientation = orientation,
+                onSubmit = {
+                    onIsSubmittingChange(true)
+                },
+                isLoading = isLoading,
+                shouldCapture = shouldCapture,
+                onAnswerFilePathChange = onAnswerFilePathChange,
+                onWorkAreaFilePathChange = onWorkOutFilePathChange
+            )
+
+        }
+
     }
 
 

@@ -281,7 +281,7 @@ fun IndividualAssessmentScreen(
                                             ),
                                         ) {
 
-                                            if (student.id in state.completedAssessments.map { it.student_id }){
+                                            if  (student.id in state.completedAssessments.map { it.student_id }){
                                                 Image(
                                                     painter = painterResource(R.drawable.done_3_),
                                                     contentDescription = "has completed the assessment",
@@ -295,7 +295,8 @@ fun IndividualAssessmentScreen(
                                                 return@TextButton
                                             }
                                             Text(
-                                                text = student.baseline?:"Start",
+//                                                text = student.baseline?:"Start",
+                                                text = "Start",
                                                 style = MaterialTheme.typography.bodyMedium,
                                                 color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.7f),
                                                 modifier = Modifier

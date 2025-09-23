@@ -17,6 +17,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,6 +30,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nyansapoai.teaching.R
 import com.nyansapoai.teaching.navController
 import com.nyansapoai.teaching.presentation.assessments.components.AssessmentItem
+import com.nyansapoai.teaching.presentation.assessments.components.AssessmentItemBasic
 import com.nyansapoai.teaching.presentation.common.components.AppCircularLoading
 import com.nyansapoai.teaching.navigation.CreateAssessmentsPage
 import com.nyansapoai.teaching.navigation.IndividualAssessmentPage
@@ -53,6 +55,11 @@ fun AssessmentsScreen(
     onAction: (AssessmentsAction) -> Unit,
 ) {
 
+    LaunchedEffect(state.localSchoolInfo) {
+        state.localSchoolInfo?.let { schoolInfo ->
+            onAction(AssessmentsAction.FetchAssessments(schoolId = schoolInfo.schoolUId))
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -137,7 +144,7 @@ fun AssessmentsScreen(
                                 .padding(vertical = 8.dp)
                         ) {
                             items(items =assessments, key = {it.id}, ) { assessment ->
-                                AssessmentItem(
+                                AssessmentItemBasic(
                                     assessment = assessment,
                                     onClick = {
                                         navController.navigate(IndividualAssessmentPage(

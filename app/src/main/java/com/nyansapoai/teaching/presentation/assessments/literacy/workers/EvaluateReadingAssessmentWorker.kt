@@ -7,12 +7,8 @@ import androidx.work.WorkerParameters
 import com.nyansapoai.teaching.data.local.LocalDataSource
 import com.nyansapoai.teaching.data.remote.ai.ArtificialIntelligenceRepository
 import com.nyansapoai.teaching.data.remote.media.MediaRepository
-import com.nyansapoai.teaching.presentation.assessments.literacy.components.compareResponseStrings
-import com.nyansapoai.teaching.presentation.assessments.numeracy.workers.EvaluateNumeracyArithmeticOperationWorker.Companion.MAX_RETRIES
-import com.nyansapoai.teaching.presentation.assessments.numeracy.workers.EvaluateNumeracyArithmeticOperationWorker.Companion.WORK_NAME
 import com.nyansapoai.teaching.presentation.common.media.MediaUtils
-import kotlinx.coroutines.flow.first
-import kotlinx.datetime.Clock
+import com.nyansapoai.teaching.utils.ResultStatus
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.io.File
@@ -29,41 +25,36 @@ class EvaluateReadingAssessmentWorker(
 
     override suspend fun doWork(): Result {
         return try {
-            val retryAttempt = runAttemptCount
             Log.d("Worker", "Running")
 
             val audioFilePath = inputData.getString("audioFilePath") ?: return Result.failure()
+            val round = inputData.getInt("round", defaultValue = 0)
             val content = inputData.getString("content") ?: return Result.failure()
             val type = inputData.getString("type") ?: return Result.failure()
             val assessmentId = inputData.getString("assessment_id") ?: return Result.failure()
             val studentId = inputData.getString("student_id") ?: return Result.failure()
 
-//            val audioBytes = File(audioFilePath).readBytes()
             val audioBytes = readAudioFile(audioFilePath) ?: return Result.failure()
 
-            val audioUrl = mediaRepository.saveAudio(audioByteArray = audioBytes).data ?: return handleRetry(attempt = retryAttempt)
-
-            val transcription = artificialIntelligenceRepository.getTextFromAudio(audioByteArray = audioBytes).first().data?.DisplayText ?: ""
-
-            val comparison = compareResponseStrings(
-                expected = content,
-                actual = transcription,
-                similarity = 0.9
+            val audioUrlResponse = mediaRepository.saveAudio(
+                audioByteArray = audioBytes,
+                fileName = "audio_${assessmentId}_${studentId}_${round}_${type}_${content.replace(" ", "%20")}.wav"
             )
 
-            localDataSource.insertPendingReadingResult(
-                assessmentId = assessmentId,
-                studentId = studentId,
-                type = type,
-                audioUrl = audioUrl,
-                content = content,
-                transcript = transcription,
-                passed = comparison.isMatch,
-                timestamp = Clock.System.now().epochSeconds.toInt(),
-                isPending = true,
-            )
+            Log.d("Worker", "Audio uploaded: $audioUrlResponse")
 
-            MediaUtils.cleanUpMediaFile(path = audioFilePath)
+            when(audioUrlResponse.status){
+                ResultStatus.INITIAL,
+                ResultStatus.LOADING ,
+                ResultStatus.ERROR -> {
+                    Log.d("Worker", "Audio upload failed or in invalid state: ${audioUrlResponse.message}")
+                    return Result.retry()
+                }
+                ResultStatus.SUCCESS -> {
+                    MediaUtils.cleanUpMediaFile(path = audioFilePath)
+                }
+            }
+
 
             Log.d("Worker", "Running Successful")
             Result.success()
@@ -75,20 +66,20 @@ class EvaluateReadingAssessmentWorker(
         }
     }
 
-    private fun handleRetry(attempt: Int): Result {
-        return if (attempt >= MAX_RETRIES) {
-            Log.e(WORK_NAME, "Max retries reached")
-            Result.failure()
-        } else {
-            Log.d(WORK_NAME, "Scheduling retry ${attempt + 1}")
-            Result.retry()
-        }
-    }
-
-
     private fun readAudioFile(path: String): ByteArray? {
+
+        if (path.isEmpty()) {
+            return null
+        }
+
+        val file = File(path)
+
+        if (!file.exists()){
+            return null
+        }
+
         return try {
-            File(path).readBytes().also {
+            file.readBytes().also {
                 Log.d("EvaluateReadingAssessmentWorker", "Read ${it.size} bytes from audio file")
             }
         } catch (e: Exception) {

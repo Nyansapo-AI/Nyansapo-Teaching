@@ -4,6 +4,7 @@ import com.nyansapoai.teaching.domain.models.school.LocalSchoolInfo
 import com.nyansapoai.teaching.domain.models.assessments.CompletedAssessment
 import com.nyansapoai.teaching.domain.models.assessments.literacy.PendingMultipleChoicesResult
 import com.nyansapoai.teaching.domain.models.assessments.literacy.PendingReadingAssessmentResult
+import com.nyansapoai.teaching.domain.models.assessments.numeracy.CountMatch
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyArithmeticOperation
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyWordProblem
 import kotlinx.coroutines.flow.Flow
@@ -59,5 +60,11 @@ interface LocalDataSource {
     ): Flow<List<NumeracyWordProblem>>
 
     suspend fun clearPendingNumeracyWordProblems(assessmentId: String, studentId: String)
+
+    suspend fun insertPendingCountMatch(assessmentId: String, studentId: String, countList: List<CountMatch>)
+
+    suspend fun getPendingCountMatches(assessmentId: String, studentId: String): Flow<List<CountMatch>>
+
+    suspend fun clearPendingCountMatches(assessmentId: String, studentId: String)
 
 }

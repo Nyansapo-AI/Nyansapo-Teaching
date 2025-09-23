@@ -30,16 +30,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nyansapoai.teaching.R
 import com.nyansapoai.teaching.presentation.common.components.AppButton
 import com.nyansapoai.teaching.presentation.common.components.AppTouchInput
-import com.nyansapoai.teaching.presentation.common.components.CapturableComposable
+import com.nyansapoai.teaching.presentation.common.components.ScreenshotComposable
 
 
 
@@ -51,18 +50,14 @@ fun NumeracyOperationUI(
     secondNumber: Int,
     operationType: OperationType = OperationType.DIVISION,
     operationOrientation: Orientation = Orientation.Horizontal,
-    onCaptureAnswerContent: (ByteArray) -> Unit = {  },
-    shouldCaptureAnswer: Boolean = false,
-    onCaptureWorkAreaContent: (ByteArray) -> Unit = {  },
-    shouldCaptureWorkArea: Boolean = false,
-    onCaptureAnswerImageBitmap: (ImageBitmap) -> Unit,
-    onCaptureWorkAreaImageBitmap: (ImageBitmap) -> Unit,
-    onSubmit: () -> Unit = {  },
+    onAnswerFilePathChange: (String) -> Unit,
+    onWorkAreaFilePathChange: (String) -> Unit,
+    shouldCapture: Boolean,
+    onSubmit: () -> Unit,
     isLoading: Boolean = false,
 ) {
 
     var isEraserMode by remember { mutableStateOf(false) }
-
 
     Box(
         modifier = Modifier
@@ -74,15 +69,6 @@ fun NumeracyOperationUI(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = modifier
         ) {
-            /*
-            Text(
-                text = operationType.title,
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
-            )*/
 
             ButtonGroup(
                 overflowIndicator = { menuState ->
@@ -168,15 +154,18 @@ fun NumeracyOperationUI(
                             modifier = Modifier
                                 .widthIn(max = 300.dp, min = 100.dp)
                                 .heightIn(min = 100.dp, max = 150.dp)
-                                .background(MaterialTheme.colorScheme.tertiary)
+                                .background(MaterialTheme.colorScheme.background)
                                 .border(
                                     width = 2.dp,
                                     color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f)
                                 )
                         ) {
-                            CapturableComposable(
-//                                onCapturedByteArray = onCaptureAnswerContent,
-                                shouldCapture = shouldCaptureAnswer,
+                            ScreenshotComposable(
+                                shouldCapture = shouldCapture,
+                                fileName = "answer_area",
+                                onFilePathChange = {path ->
+                                    onAnswerFilePathChange(path)
+                                },
                                 content = {
                                     AppTouchInput(
                                         modifier = Modifier
@@ -207,16 +196,18 @@ fun NumeracyOperationUI(
                             modifier = Modifier
                                 .widthIn(max = 200.dp, min = 100.dp)
                                 .heightIn(min = 100.dp, max = 150.dp)
-                                .background(MaterialTheme.colorScheme.tertiary)
+                                .background(MaterialTheme.colorScheme.background)
                                 .border(
                                     width = 2.dp,
                                     color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f)
                                 )
                         ) {
-                            CapturableComposable(
-//                                onCapturedByteArray = onCaptureAnswerContent,
-//                                shouldCapture = shouldCaptureAnswer,
-                                onCaptured = onCaptureAnswerImageBitmap,
+                            ScreenshotComposable(
+                                shouldCapture = shouldCapture,
+                                fileName = "answer_area",
+                                onFilePathChange = {path ->
+                                    onAnswerFilePathChange(path)
+                                },
                                 content = {
                                     AppTouchInput(
                                         modifier = Modifier
@@ -236,7 +227,7 @@ fun NumeracyOperationUI(
             Box(
                 modifier = Modifier
                     .widthIn(max = 420.dp, min = 100.dp)
-                    .heightIn(min = 300.dp, max = 400.dp)
+                    .heightIn(min = 300.dp, max = 320.dp)
                     .padding(horizontal = 12.dp)
                     .border(
                         width = 2.dp,
@@ -244,16 +235,17 @@ fun NumeracyOperationUI(
                     )
             ) {
 
-                CapturableComposable(
-//                    onCapturedByteArray = onCaptureWorkAreaContent,
-//                    shouldCapture = shouldCaptureWorkArea,
-                    onCaptured = onCaptureWorkAreaImageBitmap,
+                ScreenshotComposable(
+                    shouldCapture =  shouldCapture,
+                    fileName = "work_area",
+                    onFilePathChange = {path ->
+                        onWorkAreaFilePathChange(path)
+                    },
                     content = {
                         AppTouchInput(
                             isEraserMode = isEraserMode,
                             brushColor = Color.Green
                         )
-
                     }
                 )
 
@@ -266,13 +258,12 @@ fun NumeracyOperationUI(
                     .padding(12.dp)
             ) {
                 Text(
-                    text = "Next",
+//                    text = if(shouldCapture) "Next." else "Submit Answer",
+                    text = "Submit Answer",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
                 )
             }
-
-
         }
     }
 
@@ -374,7 +365,7 @@ enum class OperationType(
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun NumeracyAdditionPreview() {
-    NumeracyOperation(
+    NumeracyOperationUI(
         firstNumber = 5,
         secondNumber = 1234342,
         modifier = Modifier.fillMaxWidth()

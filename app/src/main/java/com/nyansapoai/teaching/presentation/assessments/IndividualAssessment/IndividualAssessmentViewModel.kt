@@ -79,7 +79,7 @@ class IndividualAssessmentViewModel(
             localDataSource.fetchCompletedAssessments(assessmentId = assessmentId)
                 .catch { e ->
                     Log.e("AssessmentsViewModel", "Error fetching completed assessments: ${e.message}")
-                    _state.update { it.copy(completedAssessments = emptyList()) }
+//                    _state.update { it.copy(completedAssessments = emptyList()) }
                 }
                 .collect { completedAssessments ->
                     Log.d("AssessmentsViewModel", "Fetched completed assessments: ${completedAssessments}")

@@ -10,10 +10,10 @@ import com.nyansapoai.teaching.data.remote.user.UserRepository
 import com.nyansapoai.teaching.domain.models.students.NyansapoStudent
 import com.nyansapoai.teaching.presentation.common.snackbar.SnackBarHandler
 import com.nyansapoai.teaching.presentation.common.snackbar.SnackBarItem
-import com.nyansapoai.teaching.presentation.schools.SchoolViewModel
 import com.nyansapoai.teaching.utils.ResultStatus
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.onStart
@@ -44,6 +44,7 @@ class CreateAssessmentsViewModel(
             localSchoolInfo = schoolInfo,
             isManager = true
         )
+//        Log.d(TAG, "Current school info: ${schoolInfo?.schoolUId}, User: ${user}")
     }
         .onStart {
             _state.update { it.copy(isLoading = true) }
@@ -106,7 +107,9 @@ class CreateAssessmentsViewModel(
                     startLevel = _state.value.startLevel,
                     assessmentNumber = _state.value.assessmentNumber,
                     assignedStudents = _state.value.assignedStudents,
-                    schoolId = _state.value.localSchoolInfo?.schoolUId ?: ""
+                    schoolId = _state.value.localSchoolInfo?.schoolUId ?: "",
+                    projectId = _state.value.localSchoolInfo?.projectUId ?: "",
+                    organizationId = _state.value.localSchoolInfo?.organizationUid ?: ""
                 )
             }
 
@@ -135,6 +138,8 @@ class CreateAssessmentsViewModel(
         assessmentNumber: Int,
         assignedStudents: List<NyansapoStudent>,
         schoolId: String,
+        organizationId: String,
+        projectId: String
     ) {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
@@ -145,7 +150,9 @@ class CreateAssessmentsViewModel(
                 startLevel = startLevel,
                 assessmentNumber = assessmentNumber,
                 assignedStudents = assignedStudents,
-                schoolId = schoolId
+                schoolId = schoolId,
+                organizationId = organizationId,
+                projectId = projectId
             )
 
             when (result.status){
@@ -234,6 +241,21 @@ class CreateAssessmentsViewModel(
                     }
                 }
             }
+        }
+    }
+
+
+    fun fetchCurrentUserDetails(){
+        viewModelScope.launch {
+            localDataSource.getSavedCurrentSchoolInfo()
+                .catch {  }
+                .collect { data ->
+                    _state.update {
+                        it.copy(
+                            localSchoolInfo = data
+                        )
+                    }
+                }
         }
     }
 

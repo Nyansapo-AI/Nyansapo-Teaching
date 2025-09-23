@@ -1,5 +1,6 @@
 package com.nyansapoai.teaching.presentation.assessments.literacy
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.Constraints
@@ -30,10 +31,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class LiteracyViewModel(
-    private val assessmentRepository: AssessmentRepository,
-    private val artificialIntelligenceRepository: ArtificialIntelligenceRepository,
-    private val mediaRepository: MediaRepository,
-//    private val appContext: Context,
     private val localDataSource: LocalDataSource,
     private val workManager: WorkManager
 ) : ViewModel() {
@@ -158,10 +155,11 @@ class LiteracyViewModel(
         audioFilePath: String?,
         content: String,
         type: String,
+        round: Int,
         onSuccess: () -> Unit
     ){
 
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
 
             if (assessmentId.isNullOrEmpty() || studentId.isNullOrEmpty() || audioFilePath.isNullOrEmpty()) {
                 _state.update {
@@ -181,11 +179,13 @@ class LiteracyViewModel(
                 "content" to content,
                 "type" to type,
                 "assessment_id" to assessmentId,
-                "student_id" to studentId
+                "student_id" to studentId,
+                "round" to round
             )
 
             val constraints = Constraints.Builder()
                 .setRequiredNetworkType(NetworkType.CONNECTED)
+                .setRequiresStorageNotLow(true)
                 .build()
 
             val tag = "assessment_${assessmentId}_${studentId}"
@@ -217,7 +217,6 @@ class LiteracyViewModel(
             _state.update {
                 it.copy(
                     isLoading = false,
-//                    message = "Assessment content submitted for evaluation"
                 )
             }
 
@@ -241,24 +240,23 @@ class LiteracyViewModel(
     }
 
     fun onSubmitReadingAssessment(){
-
         val currentAssessmentContentList =when(_state.value.currentAssessmentLevel){
             LiteracyAssessmentLevel.LETTER_RECOGNITION -> _state.value.assessmentContent?.letters?.take(5) ?: emptyList()
             LiteracyAssessmentLevel.WORD -> _state.value.assessmentContent?.words?.take(5) ?: emptyList()
-            LiteracyAssessmentLevel.PARAGRAPH -> _state.value.assessmentContent?.paragraphs?.take(1) ?: emptyList()
-            LiteracyAssessmentLevel.STORY -> _state.value.assessmentContent?.storys[0]?.split(".") ?: emptyList()
+            LiteracyAssessmentLevel.PARAGRAPH -> _state.value.assessmentContent?.paragraphs[0]?.split(".") ?: emptyList()
+            LiteracyAssessmentLevel.STORY -> _state.value.assessmentContent?.storys[0]?.story?.trim()?.split(".") ?: emptyList()
             LiteracyAssessmentLevel.MULTIPLE_CHOICE -> emptyList()
             LiteracyAssessmentLevel.COMPLETED -> emptyList()
         }
 
         currentAssessmentContentList?.let {
-
             evaluateReadingAssessmentWithWorkManager(
                 assessmentId = _state.value.assessmentId ?: return@let,
                 studentId = _state.value.studentId ?: return@let,
                 content = currentAssessmentContentList[_state.value.currentIndex],
                 type = _state.value.currentAssessmentLevel.label,
                 audioFilePath = _state.value.audioFilePath,
+                round = _state.value.round,
                 onSuccess = {
                     when{
                         _state.value.currentIndex == currentAssessmentContentList.size - 1 -> {
@@ -276,16 +274,21 @@ class LiteracyViewModel(
                                 it.copy(
                                     currentAssessmentLevelIndex = nextIndex,
                                     currentAssessmentLevel = nextLevel,
+                                    showInstructions = true,
                                     currentIndex = 0,
-                                    message = null
+                                    round = it.round +1,
+                                    message = null,
+                                    audioByteArray = null,
+                                    audioFilePath = null,
                                 )
                             }
                         }
+
                         else -> {
                             _state.update {
                                 it.copy(
                                     currentIndex = it.currentIndex + 1,
-                                    showInstructions = true,
+                                    round = it.round +1,
                                     showContent = false,
                                     audioByteArray = null,
                                     audioFilePath = null,
@@ -305,7 +308,6 @@ class LiteracyViewModel(
                     error = "No assessment content available."
                 )
             }
-
         }
     }
 
@@ -386,7 +388,7 @@ class LiteracyViewModel(
             _state.update {
                 it.copy(
                     isLoading = false,
-                    message = "Assessment content submitted for evaluation"
+
                 )
             }
 
@@ -399,7 +401,7 @@ class LiteracyViewModel(
     fun onSubmitStoryAssessment() {
 
         val contentList = when(_state.value.currentAssessmentLevel){
-            LiteracyAssessmentLevel.MULTIPLE_CHOICE -> _state.value.assessmentContent?.questionsData ?: emptyList()
+            LiteracyAssessmentLevel.MULTIPLE_CHOICE -> _state.value.assessmentContent?.storys[0]?.questionsData ?: emptyList()
             else -> emptyList()
         }
 
@@ -473,10 +475,6 @@ class LiteracyViewModel(
     }
 
 
-    private fun onSubmitCountMatchAssessment() {
-
-    }
-
     private fun submitLiteracyAssessment(
         assessmentId: String,
         studentId: String,
@@ -502,6 +500,7 @@ class LiteracyViewModel(
 
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
+            .setRequiresStorageNotLow(true)
             .build()
 
 
@@ -535,9 +534,7 @@ class LiteracyViewModel(
                 request = readingMonitorRequest
             )
             .then(multipleChoicesMonitorRequest)
-            .then(submitReadingResultsRequest)
             .then(submitMultipleChoicesResultsRequest)
-            .then(markLiteracyAssessmentRequest)
             .enqueue()
     }
 

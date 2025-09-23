@@ -38,6 +38,7 @@ data class LiteracyState(
         LiteracyAssessmentLevel.MULTIPLE_CHOICE,
         LiteracyAssessmentLevel.COMPLETED
     ),
+    val round: Int = 0,
 
     val multipleChoiceQuestionsResult: MutableList<MultipleChoicesResult> = mutableListOf(),
 

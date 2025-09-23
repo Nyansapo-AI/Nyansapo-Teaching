@@ -32,12 +32,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.nyansapoai.teaching.R
 import com.nyansapoai.teaching.presentation.common.components.AppButton
 import com.nyansapoai.teaching.presentation.common.components.AppTouchInput
-import com.nyansapoai.teaching.presentation.common.components.CapturableComposable
+import com.nyansapoai.teaching.presentation.common.components.ScreenshotComposable
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -45,11 +44,10 @@ fun NumeracyWordProblem(
     modifier: Modifier = Modifier,
     title: String = "Word Problem",
     wordProblem: String = "A farmer has 12 apples. He gives 3 apples to his friend. How many apples does he have left?",
-    onCaptureWorkAreaContent: (ByteArray) -> Unit = {},
-    shouldCaptureWorkArea: Boolean = false,
     shouldCaptureAnswer: Boolean = false,
-    onCaptureAnswerContent: (ByteArray) -> Unit = {},
-    onSubmit: () -> Unit
+    onAnswerImageFilePathChange: (String) -> Unit,
+    onWorkAreaImageFilePathChange: (String) -> Unit,
+    onSubmit: () -> Unit = { },
     ) {
 
     var isEraserMode by remember { mutableStateOf(false) }
@@ -183,8 +181,11 @@ fun NumeracyWordProblem(
                             color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f)
                         )
                 ) {
-                    CapturableComposable(
-                        onCapturedByteArray = onCaptureAnswerContent,
+                    ScreenshotComposable(
+                        onFilePathChange = {path ->
+                            onAnswerImageFilePathChange(path)
+                        },
+                        fileName = "answer_area",
                         shouldCapture = shouldCaptureAnswer,
                         content = {
                             AppTouchInput(
@@ -220,9 +221,12 @@ fun NumeracyWordProblem(
                         )
                 ) {
 
-                    CapturableComposable(
-                        onCapturedByteArray = onCaptureWorkAreaContent,
-                        shouldCapture = shouldCaptureWorkArea,
+                    ScreenshotComposable(
+                        shouldCapture = shouldCaptureAnswer,
+                        fileName = "work_area",
+                        onFilePathChange = { path ->
+                            onWorkAreaImageFilePathChange(path)
+                        },
                         content = {
                             AppTouchInput(
                                 isEraserMode = isEraserMode,
@@ -235,7 +239,8 @@ fun NumeracyWordProblem(
 
             AppButton(
                 onClick = onSubmit,
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFC107)),                modifier = Modifier
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFC107)),
+                modifier = Modifier
                     .padding(16.dp)
             ) {
                 Text(

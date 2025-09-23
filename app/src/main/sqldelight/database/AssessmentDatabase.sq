@@ -165,3 +165,25 @@ SELECT * FROM PendingNumeracyWordProblemResultEntity WHERE assessmentId = ? AND 
 clearPendingNumeracyWordProblemResults:
 DELETE FROM PendingNumeracyWordProblemResultEntity
 WHERE assessmentId = ? AND studentId = ?;
+
+CREATE TABLE PendingCountAndMatchResultEntity(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    assessmentId TEXT NOT NULL,
+    studentId TEXT NOT NULL,
+    expectedNumber INTEGER NOT NULL,
+    studentAnswer INTEGER,
+    passed INTEGER NOT NULL,
+    isPending INTEGER NOT NULL DEFAULT 1
+);
+
+
+insertPendingCountAndMatchResult:
+INSERT INTO PendingCountAndMatchResultEntity(assessmentId, studentId, expectedNumber, studentAnswer, passed)
+VALUES (?, ?, ?, ?, ?);
+
+getPendingCountAndMatchResults:
+SELECT * FROM PendingCountAndMatchResultEntity WHERE assessmentId = ? AND studentId = ?;
+
+clearPendingCountAndMatchResults:
+DELETE FROM PendingCountAndMatchResultEntity
+WHERE assessmentId = ? AND studentId = ?;

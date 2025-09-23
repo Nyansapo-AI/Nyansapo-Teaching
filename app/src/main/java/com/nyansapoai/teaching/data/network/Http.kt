@@ -67,7 +67,7 @@ class Http() {
                             println(message)
                         }
                     }
-                level = LogLevel.INFO
+                level = LogLevel.ALL
 
                 sanitizeHeader {  header -> header == "Ocp-Apim-Subscription-Key" }
             }

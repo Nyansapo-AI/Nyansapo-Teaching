@@ -187,6 +187,61 @@ val numeracyAssessmentData = NumeracyAssessmentData(
                     5
                 )
             )
+        ),
+
+        //Dignitas
+        NumeracyAssessmentContent(
+            countAndMatchNumbersList = listOf(
+                // N1, N2 (count/match objects → represented as sample numbers)
+                3, 4, 5, 6, 7
+            ),
+            numberRecognitionList = listOf(
+                // N6–N12
+                0, 9, 8, 2, 30, 48, 97, 84, 22
+            ),
+            additions = listOf(
+                NumeracyOperations(
+                    firstNumber = 3,
+                    secondNumber = 4,
+                    answer = 7,
+                    operationType = OperationType.ADDITION
+                ),
+                NumeracyOperations(
+                    firstNumber = 5,
+                    secondNumber = 4,
+                    answer = 9,
+                    operationType = OperationType.ADDITION
+                )
+            ),
+            subtractions = listOf(
+                NumeracyOperations(
+                    firstNumber = 8,
+                    secondNumber = 2,
+                    answer = 6,
+                    operationType = OperationType.SUBTRACTION
+                ),
+                NumeracyOperations(
+                    firstNumber = 7,
+                    secondNumber = 2,
+                    answer = 5,
+                    operationType = OperationType.SUBTRACTION
+                )
+            ),
+            multiplications = emptyList(),
+            divisions = emptyList(),
+            wordProblems = listOf(
+                WordProblem(
+                    problem = "5 balls plus 4 balls = ?",
+                    answer = 9
+                ),
+                WordProblem(
+                    problem = "7 cups take away 2 cups = ?",
+                    answer = 5
+                )
+            )
         )
+
+
     )
 )
+

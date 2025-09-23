@@ -40,7 +40,7 @@ import com.nyansapoai.teaching.presentation.common.components.AppLinearProgressI
 @Composable
 fun NumeracyCountAndMatch(
     modifier: Modifier = Modifier,
-    count: Int = 10,
+//    count: Int = 10,
     countList: List<Int> = listOf(1, 2, 6, 7),
     currentIndex: Int = 0,
     onSelectCount: (Int) -> Unit = { /* Handle count selection */ },
@@ -57,9 +57,10 @@ fun NumeracyCountAndMatch(
                 .fillMaxWidth()
                 .padding(12.dp)
         )
-
         return
     }
+
+    val count = countList.getOrNull(currentIndex) ?: countList[0]
 
     var progress by remember {
         mutableFloatStateOf(0f)
@@ -73,7 +74,14 @@ fun NumeracyCountAndMatch(
         }
     }
 
-    val options by remember { mutableStateOf(generateOptionsWithCorrectAnswer(correctNumber = countList[currentIndex])) } // Randomly select 4 unique numbers from 1 to 10
+    var optionsList by remember {
+        mutableStateOf(generateOptionsWithCorrectAnswer(correctNumber = count))
+    }
+
+    LaunchedEffect(currentIndex) {
+        optionsList = generateOptionsWithCorrectAnswer(correctNumber = countList[currentIndex])
+    }
+
 
     Box(
         modifier =modifier
@@ -135,7 +143,7 @@ fun NumeracyCountAndMatch(
                         itemVerticalAlignment = Alignment.CenterVertically,
                         maxItemsInEachRow = 5
                     ) {
-                        repeat(countList[currentIndex]) { index ->
+                        repeat(count) { index ->
                             CountItem()
                         }
                     }
@@ -149,26 +157,26 @@ fun NumeracyCountAndMatch(
                     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                         Row(horizontalArrangement = Arrangement.spacedBy(20.dp)) {
                             OptionButton(
-                                number = options[0],
-                                onClick = { onSelectCount(options[0]) },
-                                isSelected = selectedCount == options[0]
+                                number = optionsList[0],
+                                onClick = { onSelectCount(optionsList[0]) },
+                                isSelected = selectedCount == optionsList[0]
                             )
                             OptionButton(
-                                number = options[1],
-                                onClick = { onSelectCount(options[1]) },
-                                isSelected = selectedCount == options[1]
+                                number = optionsList[1],
+                                onClick = { onSelectCount(optionsList[1]) },
+                                isSelected = selectedCount == optionsList[1]
                             )
                         }
                         Row(horizontalArrangement = Arrangement.spacedBy(20.dp)) {
                             OptionButton(
-                                number = options[2],
-                                onClick = { onSelectCount(options[2]) },
-                                isSelected = selectedCount == options[2]
+                                number = optionsList[2],
+                                onClick = { onSelectCount(optionsList[2]) },
+                                isSelected = selectedCount == optionsList[2]
                             )
                             OptionButton(
-                                number = options[3],
-                                onClick = { onSelectCount(options[3]) },
-                                isSelected = selectedCount == options[3]
+                                number = optionsList[3],
+                                onClick = { onSelectCount(optionsList[3]) },
+                                isSelected = selectedCount == optionsList[3]
                             )
                         }
                     }
@@ -184,6 +192,7 @@ fun NumeracyCountAndMatch(
 
         AppButton(
             onClick = onSubmit,
+            enabled = selectedCount != null,
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFC107)),
             modifier = Modifier
                 .align(Alignment.BottomCenter)
@@ -208,7 +217,6 @@ fun OptionButton(
     number: Int,
     onClick: () -> Unit,
     isSelected: Boolean = false,
-
 ) {
     Button(
         onClick = onClick,
