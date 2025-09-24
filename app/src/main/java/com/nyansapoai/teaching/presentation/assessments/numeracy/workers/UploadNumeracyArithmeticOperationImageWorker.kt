@@ -56,8 +56,8 @@ class UploadNumeracyArithmeticOperationImageWorker(
 
             val workoutImageByteArray = MediaUtils.readImageFileByteArray(path = workoutImageFilePath) ?: return Result.failure()
 
-            val uploadWorkoutImageResponse = mediaRepository.saveAudio(
-                audioByteArray = workoutImageByteArray,
+            val uploadWorkoutImageResponse = mediaRepository.saveImage(
+                imageByteArray = workoutImageByteArray,
                 fileName = "image_workArea_${assessmentId}_${studentId}_${round}_${operationNumber1}_${operationType}_${operationNumber2}_${expectedAnswer}_workout.wav"
             )
 

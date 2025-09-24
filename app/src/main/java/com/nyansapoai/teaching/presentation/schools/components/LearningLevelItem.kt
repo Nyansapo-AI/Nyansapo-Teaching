@@ -29,11 +29,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.nyansapoai.teaching.presentation.schools.LearningLevelDescription
 import com.nyansapoai.teaching.presentation.schools.Level
+import com.nyansapoai.teaching.ui.theme.lightPrimary
 
 @Composable
 fun LearningLevelItem(
@@ -44,7 +46,7 @@ fun LearningLevelItem(
 
     ElevatedCard(
         colors = CardDefaults.outlinedCardColors(
-            containerColor = MaterialTheme.colorScheme.primary
+            containerColor = lightPrimary
         ),
         elevation = CardDefaults.cardElevation(
             defaultElevation = 12.dp
@@ -54,7 +56,7 @@ fun LearningLevelItem(
                 containerWidth = size.width
             }
             .heightIn(min = 200.dp)
-            .widthIn(max = 360.dp)
+            .widthIn(max = 400.dp)
     ) {
         Column(
             verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -62,7 +64,9 @@ fun LearningLevelItem(
         ) {
             Text(
                 text = levelDescription.type,
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onBackground
             )
 
             Box(modifier = Modifier.fillMaxWidth()) {
@@ -74,11 +78,12 @@ fun LearningLevelItem(
                                 contentAlignment = Alignment.Center,
                                 modifier = Modifier
                                     .background(level.color)
-                                    .height(20.dp)
+                                    .height(28.dp)
                             ) {
                                 Text(
                                     text = level.value.toString(),
-                                    style = MaterialTheme.typography.bodySmall,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = FontWeight.Bold,
                                     color = contentColorFor(level.color),
                                     modifier = Modifier.padding(horizontal = 4.dp)
                                 )

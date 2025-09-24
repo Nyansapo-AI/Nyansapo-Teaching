@@ -27,6 +27,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -236,20 +237,51 @@ fun SchoolScreen(
 
 
         item{
-            Text(
-                text = "School Assessment Results",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
+            Column(
                 modifier = Modifier
-                    .padding(horizontal = 12.dp, vertical = 8.dp)
-            )
-        }
-        item{
-            AppComingSoon(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(400.dp)
-            )
+                    .padding(horizontal = 12.dp)
+            ) {
+                Text(
+                    text = "School Assessment Results",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier
+                )
+
+                Spacer(Modifier.padding(12.dp))
+
+
+                LearningLevelItem(
+                    levelDescription = LearningLevelDescription(
+                        type = "Literacy",
+                        totalStudents = 15,
+                        data = listOf(
+                            Level("Letters", 1, Color.Blue),
+                            Level("Words", 2, Color.Cyan),
+                            Level("Sentence", 3, Color.Green),
+                            Level("Paragraph", 4, Color(0xFFC8DF47)),
+                            Level("Story", 5, Color.Magenta),
+                        )
+                    )
+                )
+
+                Spacer(Modifier.padding(12.dp))
+
+                LearningLevelItem(
+                    levelDescription = LearningLevelDescription(
+                        type = "Numeracy",
+                        totalStudents = 21,
+                        data = listOf(
+                            Level("Number Recognition", 1, Color.Blue),
+                            Level("Counting", 2, Color.Cyan),
+                            Level("Addition", 3, Color.Green),
+                            Level("Subtraction", 4, Color(0xFFC8DF47)),
+                            Level("Multiplication", 5, Color.Magenta),
+                            Level("Division", 6, Color.Yellow),
+                        )
+                    )
+                )
+            }
         }
 
 
