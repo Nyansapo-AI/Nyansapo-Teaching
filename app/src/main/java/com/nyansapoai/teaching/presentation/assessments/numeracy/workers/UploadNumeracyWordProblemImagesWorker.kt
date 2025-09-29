@@ -53,6 +53,7 @@ class UploadNumeracyWordProblemImagesWorker(
 
             val uploadWorkoutImageResponse = mediaRepository.saveAudio(
                 audioByteArray = workoutImageByteArray,
+                folder = "Nyansapo_Teaching_Numeracy_Assessment_test_workout_Images",
                 fileName = "image_workout_${assessmentId}_${studentId}_${round}_wordProblem_${question}_${expectedAnswer}.wav"
             )
 

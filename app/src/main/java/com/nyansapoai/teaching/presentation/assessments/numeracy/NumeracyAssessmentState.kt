@@ -37,7 +37,7 @@ data class NumeracyAssessmentState(
     val currentRoundIndex: Int = 0,
     val hasCompletedAssessment: Boolean = false,
 
-    val numeracyLevel: NumeracyAssessmentLevel = NumeracyAssessmentLevel.COUNT_MATCH,
+    val numeracyLevel: NumeracyAssessmentLevel = NumeracyAssessmentLevel.NUMBER_RECOGNITION,
     val numeracyAssessmentFlow: List<NumeracyAssessmentLevel> = listOf(
         NumeracyAssessmentLevel.COUNT_MATCH,
         NumeracyAssessmentLevel.NUMBER_RECOGNITION,

@@ -27,7 +27,7 @@ class AndroidAppAudioRecorder(
         val bufferSize = AudioRecord.getMinBufferSize(sampleRate, channelConfig, audioFormat)
 
         audioRecord = AudioRecord(
-            MediaRecorder.AudioSource.MIC,
+            MediaRecorder.AudioSource.DEFAULT,
             sampleRate,
             channelConfig,
             audioFormat,

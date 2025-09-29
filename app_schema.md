@@ -240,7 +240,7 @@
     
     ], 
 
-    "number_recognition" : [ 
+    "number_recognition" : [
     
         {
             "type": "string", //number_recognition 
@@ -256,7 +256,7 @@
                 "transcript": "number"
             }
         }
-    
+  
     ], 
 
  
@@ -275,7 +275,7 @@
             
             "operations_number2" : "number", 
             
-            "metadata" : { 
+            "metadata" : {  
             
                 "screenshot_url": "string", 
                 

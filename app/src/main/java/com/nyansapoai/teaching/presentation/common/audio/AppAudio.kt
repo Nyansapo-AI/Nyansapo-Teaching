@@ -23,6 +23,7 @@ fun AppAudio(
 ) {
     var isPermissionGranted by remember { mutableStateOf(false) }
 
+    /*
     RequestAppPermissions(
         permissionsArray = arrayOf(
             android.Manifest.permission.READ_EXTERNAL_STORAGE
@@ -30,7 +31,7 @@ fun AppAudio(
         onSuccess = {
             isPermissionGranted = true
         },
-    )
+    )*/
 
 
     val context = LocalContext.current
@@ -46,7 +47,6 @@ fun AppAudio(
     }
 
     DisposableEffect(Unit) {
-
         onDispose {
             mediaPlayer?.release()
         }

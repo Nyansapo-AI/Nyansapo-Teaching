@@ -26,6 +26,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -250,6 +251,15 @@ fun LiteracyReadingAssessmentUI(
     }
 
 
+    DisposableEffect(Unit) {
+        onDispose {
+            appAudioRecorder.stop()
+            audioPlayer.stop()
+            audioFile = null
+        }
+    }
+
+
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -290,6 +300,7 @@ fun LiteracyReadingAssessmentUI(
                 ),
                 onClick = {
                     onShowInstructionsChange(!showInstructions)
+
                     audioFile?.let {
                         audioPlayer.playFile(it)
                     } ?: run {
@@ -297,7 +308,8 @@ fun LiteracyReadingAssessmentUI(
                         // Handle case where audio file is not available
                     }
                 }
-            ) {
+            )
+            {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -315,7 +327,6 @@ fun LiteracyReadingAssessmentUI(
                     )
                 }
             }
-
         }
 
         Box(
