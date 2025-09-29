@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
@@ -94,6 +95,7 @@ fun NumeracyOperationContainerUI(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(40.dp),
         modifier = modifier
+            .fillMaxSize()
             .widthIn(max = 700.dp)
             .padding(16.dp),
     ) {

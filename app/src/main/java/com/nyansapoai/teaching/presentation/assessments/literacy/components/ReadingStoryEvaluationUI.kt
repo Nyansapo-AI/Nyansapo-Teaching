@@ -68,6 +68,7 @@ fun ReadingStoryEvaluationUI(
     instructionAudio: Int = R.raw.read_letter,
     isLoading: Boolean = false,
     onShowInstructionsChange: (Boolean) -> Unit = {},
+    audioFilePath: String? = null,
     onAudioPathChange: (String) -> Unit = {},
     onSubmit: () -> Unit = {},
     storySentencesList: List<String> =
@@ -84,37 +85,45 @@ fun ReadingStoryEvaluationUI(
     var audioFilePathList by remember { mutableStateOf<List<String>>(emptyList()) }
 
 
-    LaunchedEffect(currentIndex) {
-        appAudioRecorder.stop()
+    var isRecording by remember { mutableStateOf(false) }
 
-        audioFile?.let {
-            when {
-                !isLoading -> {
-                    Log.d("AudioFile", "Audio file path: ${it.absolutePath}")
-                    onAudioPathChange(it.absolutePath)
-                    audioFilePathList = audioFilePathList + it.absolutePath
-                    audioFile = null
-                }
-            }
-        }
-
-        if (!showInstructions){
-            File(
+    LaunchedEffect(currentIndex, showInstructions) {
+        if (!showInstructions && !isRecording) {
+            val file = File(
                 context.filesDir,
                 "audio_recording_${Clock.System.now().epochSeconds}.wav"
-            ).also { file ->
+            )
+            try {
                 appAudioRecorder.start(outputFile = file)
                 audioFile = file
+                isRecording = true
+            } catch (e: Exception) {
+                Log.e("AudioFile", "Failed to start recording: ${e.message}")
+            }
+        } else if (showInstructions && isRecording) {
+            try {
+                appAudioRecorder.stop()
+                isRecording = false
+                audioFile?.let {
+                    onAudioPathChange(it.absolutePath)
+                    audioFilePathList = audioFilePathList + it.absolutePath
+//                    audioFile = null
+                }
+            } catch (e: Exception) {
+                Log.e("AudioFile", "Failed to stop recording: ${e.message}")
             }
         }
-
-
     }
 
     DisposableEffect(Unit) {
         onDispose {
-            appAudioRecorder.stop()
+            try {
+                appAudioRecorder.stop()
+            } catch (e: Exception) {
+                Log.e("AudioFile", "Failed to stop recording on dispose: ${e.message}")
+            }
             audioFile = null
+            isRecording = false
         }
     }
 
@@ -304,7 +313,15 @@ fun ReadingStoryEvaluationUI(
                             contentColor = MaterialTheme.colorScheme.onSecondary
                         ),
                         onClick = {
-                            onSubmit.invoke()
+
+                            appAudioRecorder.stop()
+                            isRecording = false
+                            audioFile?.let {
+                                onAudioPathChange(it.absolutePath)
+                                audioFilePathList = audioFilePathList + it.absolutePath
+                                audioFile = null
+                                onSubmit.invoke()
+                            }
                         },
                         modifier = Modifier
                     ) {
@@ -324,6 +341,7 @@ fun ReadingStoryEvaluationUI(
                     instructionsTitle = "Read the sentence",
                     index = 0,
                     onChangeShow = { show -> onShowInstructionsChange(show) },
+                    instructionAudio = instructionAudio,
                     instructionsDescription = "Read the sentence in yellow",
                     modifier = Modifier
                 ) {

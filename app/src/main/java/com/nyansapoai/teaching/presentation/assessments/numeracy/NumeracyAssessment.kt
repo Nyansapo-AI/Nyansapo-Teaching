@@ -136,6 +136,7 @@ fun NumeracyAssessmentScreen(
             targetState = state.numeracyLevel,
             modifier = Modifier
                 .padding(innerPadding)
+                .fillMaxSize()
         ){
             when(state.numeracyLevel) {
                 NumeracyAssessmentLevel.COUNT_MATCH -> {
