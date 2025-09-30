@@ -177,6 +177,7 @@ fun LiteracyScreen(
                     }
 
                     LiteracyAssessmentLevel.PARAGRAPH -> {
+                        /*
                         LiteracyReadingAssessmentUI(
                             modifier = Modifier,
                             readingList = state.assessmentContent?.paragraphs[0]?.split(".")?: emptyList(),
@@ -211,7 +212,29 @@ fun LiteracyScreen(
                                     )
                                 )
                             }
+                        )*/
+
+                        ReadingStoryEvaluationUI(
+                            currentIndex = state.currentIndex,
+                            title = "Read the Paragraph",
+                            storyTitle = null,
+                            showInstructions = state.showInstructions,
+                            instructionAudio = R.raw.read_sentence,
+                            isLoading = state.isLoading,
+                            audioFilePath = state.audioFilePath,
+                            onShowInstructionsChange = { show -> onAction(SetShowInstructions(show)) },
+                            onAudioPathChange = { path -> onAction(SetAudioFilePath(audioFilePath = path)) },
+                            onSubmit = {
+                                onAction.invoke(
+                                    OnSubmitResponse(
+                                        assessmentId = assessmentId,
+                                        studentId = studentId
+                                    )
+                                )
+                            },
+                            storySentencesList = state.assessmentContent?.paragraphs[0]?.split(".")?: emptyList()
                         )
+
 
                     }
 

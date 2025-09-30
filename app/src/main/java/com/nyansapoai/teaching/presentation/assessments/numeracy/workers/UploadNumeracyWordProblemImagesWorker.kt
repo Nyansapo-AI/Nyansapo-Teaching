@@ -33,7 +33,8 @@ class UploadNumeracyWordProblemImagesWorker(
 
             val uploadAnswerImageResponse = mediaRepository.saveImage(
                 imageByteArray = answerImageByteArray,
-                fileName = "image_answer_${assessmentId}_${studentId}_${round}_wordProblem_${question}_${expectedAnswer}.wav"
+                folder = "Word_Problem_Image",
+                fileName = "word_problem_${assessmentId}_${studentId}_${question.replace(" ", "%20")}_${expectedAnswer}.wav"
             )
 
             when(uploadAnswerImageResponse.status){

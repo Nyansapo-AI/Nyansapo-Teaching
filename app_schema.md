@@ -35,7 +35,7 @@
           "distribution" : [
             {
               "learning_level": "string",
-              "value" : "float"
+              "value" : "float",
             }
           ]
         }
@@ -172,11 +172,7 @@
           "competence": "number?" 
     
         } 
-    
   ]
-
- 
-
 } 
 ```
 

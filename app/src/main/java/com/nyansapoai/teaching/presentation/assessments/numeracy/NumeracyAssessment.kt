@@ -100,7 +100,11 @@ fun NumeracyAssessmentScreen(
 
 
         if (state.hasCompletedAssessment){
-            HasCompletedAssessment()
+            HasCompletedAssessment(
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .fillMaxSize()
+            )
             return@Scaffold
         }
 
@@ -174,9 +178,18 @@ fun NumeracyAssessmentScreen(
                         else -> emptyList()
                     }
 
+                    val title = when(state.numeracyLevel) {
+                        NumeracyAssessmentLevel.ADDITION -> "Addition"
+                        NumeracyAssessmentLevel.SUBTRACTION -> "Subtraction"
+                        NumeracyAssessmentLevel.MULTIPLICATION -> "Multiplication"
+                        NumeracyAssessmentLevel.DIVISION -> "Division"
+                        else -> ""
+                    }
+
                     NumeracyOperationContainerUI(
                         numeracyOperationList = operationList,
                         currentIndex = state.currentIndex,
+                        title = title,
                         onAnswerFilePathChange = {path ->
                             onAction.invoke(
                                 OnAnswerImageFilePathChange(path = path)

@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
+import kotlin.text.set
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -170,22 +171,23 @@ class AssessmentRepositoryFirebaseImp(
         assessmentId: String,
         studentID: String,
         countAndMatchList: List<CountMatch>
-    ): Results<String> {
+    ): Results<String> = withContext(Dispatchers.IO) {
         val deferred = CompletableDeferred<Results<String>>()
-
-        firebaseDb.collection(assessmentCollection)
+        val docRef = firebaseDb.collection(assessmentCollection)
             .document(assessmentId)
             .collection("assessments-results")
-            .document(assessmentId+"_$studentID")
-            .set(
-                mapOf(
-                    "assessmentId" to assessmentId,
-                    "student_id" to studentID,
-                    "numeracy_results" to mapOf(
-                        "count_and_match" to countAndMatchList
-                    )
+            .document("${assessmentId}_$studentID")
+
+        docRef.set(
+            mapOf(
+                "assessmentId" to assessmentId,
+                "student_id" to studentID,
+                "numeracy_results" to mapOf(
+                    "count_and_match" to countAndMatchList
                 )
-            )
+            ),
+            SetOptions.merge()
+        )
             .addOnSuccessListener {
                 Log.d("AssessmentRepositoryFirebaseImp", "Assessment submitted count and match successfully")
                 deferred.complete(Results.success(data = "Assessment submitted successfully"))
@@ -195,11 +197,9 @@ class AssessmentRepositoryFirebaseImp(
                 deferred.complete(Results.error(msg = "Failed to submit assessment: ${it.message}"))
             }
 
-
-        return withContext(Dispatchers.IO) {
-            deferred.await()
-        }
+        deferred.await()
     }
+
 
     override suspend fun assessNumeracyNumberRecognition(
         assessmentId: String,
@@ -279,7 +279,7 @@ class AssessmentRepositoryFirebaseImp(
             .document(assessmentId)
             .collection("assessments-results")
             .document(assessmentId+"_$studentID")
-            .set(
+            .update(
                 mapOf(
                     "assessmentId" to assessmentId,
                     "student_id" to studentID,

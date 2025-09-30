@@ -295,10 +295,11 @@ fun ReadingStoryEvaluationUI(
             ) {
 
                 AppShowInstructions(
-                    showInstructions = showInstructions,
+                    showInstructions = false,
                     instructionsTitle = "Next Sentence",
                     onChangeShow = { show -> onShowInstructionsChange(show) },
                     index = 1,
+                    instructionAudio = R.raw.click_the_button_to_move_to_the_next_sentence,
                     instructionsDescription = "click to move to the next sentence",
                     modifier = Modifier
                         .align(Alignment.BottomEnd)
@@ -341,14 +342,17 @@ fun ReadingStoryEvaluationUI(
                     instructionsTitle = "Read the sentence",
                     index = 0,
                     onChangeShow = { show -> onShowInstructionsChange(show) },
-                    instructionAudio = instructionAudio,
+                    instructionAudio = R.raw.read_the_sentence_in_yellow,
                     instructionsDescription = "Read the sentence in yellow",
                     modifier = Modifier
+                        .fillMaxSize()
                 ) {
                     LazyColumn(
                         state = listState,
                         verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier
+                            .fillMaxWidth()
                     ) {
                         itemsIndexed(
                             items = storySentencesList
@@ -368,7 +372,8 @@ fun ReadingStoryEvaluationUI(
                                         color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f)
                                     )
                                 },
-                                modifier = Modifier.align(Alignment.Center)
+                                modifier = Modifier
+                                    .align(Alignment.Center)
                             )
                         }
                     }
