@@ -349,7 +349,7 @@ class NumeracyAssessmentViewModel(
             studentId = studentId,
             round = currentIndex + 1,
             content = currentNumberRecognition.toString(),
-            type = "number_recognition",
+            type = "numberRecognition",
             audioFilePath = _state.value.audioFilePath,
             onSuccess = {
                 _state.update { state ->

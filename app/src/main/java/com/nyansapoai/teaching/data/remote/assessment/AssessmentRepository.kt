@@ -2,6 +2,7 @@ package com.nyansapoai.teaching.data.remote.assessment
 
 import com.nyansapoai.teaching.domain.models.assessments.Assessment
 import com.nyansapoai.teaching.domain.models.assessments.CompletedAssessment
+import com.nyansapoai.teaching.domain.models.assessments.literacy.LiteracyAssessmentResults
 import com.nyansapoai.teaching.domain.models.assessments.literacy.MultipleChoicesResult
 import com.nyansapoai.teaching.domain.models.assessments.literacy.ReadingAssessmentResult
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.CountMatch
@@ -75,4 +76,6 @@ interface  AssessmentRepository {
     suspend fun markLiteracyAssessmentAsComplete(assessmentId: String, studentId: String): Results<String>
 
     fun getCompletedAssessments(assessmentId: String): Flow<Results<List<CompletedAssessment>>>
+
+    fun fetchLiteracyAssessmentResults(assessmentId: String, studentId: String): Flow<Results<LiteracyAssessmentResults>>
 }

@@ -17,7 +17,7 @@ activityCompose = "1.10.1"
     koinAndroid = "4.0.2"
     koinAndroidxCompose = "4.0.0"
     koinTestJunit4 = "4.0.0"
-composeBom = "2025.06.00"
+composeBom = "2025.09.01"
     lottieCompose = "6.1.0"
 material = "1.12.0"
 material3 = "1.4.0-alpha15"
@@ -33,6 +33,7 @@ startupRuntime = "1.2.0"
 workRuntimeKtx = "2.10.2"
     sqlDelight = "2.1.0"
     googleFirebaseAppdistribution = "5.1.1"
+    kizitonwose-calendar = "2.9.0"
 
 
 
@@ -79,6 +80,7 @@ kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
     firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics", version.ref = "firebaseAnalytics" }
 ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktor" }
+    kizitonwose-calendar = { module = "com.kizitonwose.calendar:compose", version.ref = "kizitonwose-calendar" }
 
     ktor-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
     ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }

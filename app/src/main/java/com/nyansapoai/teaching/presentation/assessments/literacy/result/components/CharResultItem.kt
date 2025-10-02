@@ -51,11 +51,11 @@ fun CharResultItem(
             modifier = Modifier
                 .padding(8.dp)
                 .border(
-                    width = 4.dp,
+                    width = 2.dp,
                     color = color,
                     shape = RoundedCornerShape(8.dp)
                 )
-                .padding(16.dp)
+                .padding(8.dp)
                 .zIndex(0.8f)
                 .clickable(
                     onClick = onClick,
@@ -63,7 +63,7 @@ fun CharResultItem(
         ) {
             Text(
                 text = char,
-                style = MaterialTheme.typography.headlineLarge,
+                style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold,
                 color = color,
                 modifier = Modifier

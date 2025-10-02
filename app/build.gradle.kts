@@ -179,4 +179,8 @@ dependencies {
     implementation(libs.rive.android)
     implementation(libs.androidx.startup.runtime)
 
+    //calendar
+//    implementation("com.kizitonwose.calendar:compose:2.9.0")
+    implementation(libs.kizitonwose.calendar)
+
 }

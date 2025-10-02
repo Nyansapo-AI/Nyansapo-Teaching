@@ -31,8 +31,8 @@ fun ParagraphResultItem(
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
-            .padding(8.dp)
-            .padding(16.dp)
+            .padding(4.dp)
+//            .padding(16.dp)
             .zIndex(0.8f)
             .clickable(
                 onClick = onClick,

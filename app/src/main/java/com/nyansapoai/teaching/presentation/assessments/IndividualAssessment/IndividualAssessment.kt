@@ -49,6 +49,7 @@ import com.nyansapoai.teaching.presentation.schools.LearningLevelDescription
 import com.nyansapoai.teaching.presentation.schools.components.LearningLevelItem
 import com.nyansapoai.teaching.presentation.common.components.AppCircularLoading
 import com.nyansapoai.teaching.navigation.ConductAssessmentPage
+import com.nyansapoai.teaching.navigation.LiteracyResultsPage
 import com.nyansapoai.teaching.presentation.onboarding.components.OptionsItemUI
 import com.nyansapoai.teaching.utils.ResultStatus
 import org.koin.androidx.compose.koinViewModel
@@ -265,16 +266,29 @@ fun IndividualAssessmentScreen(
 
                                                 if (student.id in state.completedAssessments.map { it.student_id }){
                                                     Toast.makeText(context, "${student.first_name} ${student.last_name} has already done the assessment", Toast.LENGTH_SHORT).show()
+
+
                                                     return@TextButton
                                                 }
 
 
+                                                navController.navigate(
+                                                    LiteracyResultsPage(
+                                                        assessmentId = assessment.id,
+                                                        studentId = student.id
+                                                    )
+                                                )
+
+
+                                                /*
                                                 navController.navigate(ConductAssessmentPage(
                                                     assessmentId = assessment.id,
                                                     studentId = student.id,
                                                     assessmentType = assessment.type,
                                                     assessmentNo = assessment.assessmentNumber
-                                                ))
+                                                ))*/
+
+
                                             },
                                             colors = ButtonDefaults.textButtonColors(
                                                 contentColor = MaterialTheme.colorScheme.onBackground,

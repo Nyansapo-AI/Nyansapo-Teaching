@@ -38,6 +38,7 @@ class UploadNumeracyArithmeticOperationImageWorker(
 
             val uploadAnswerImageResponse = mediaRepository.saveImage(
                 imageByteArray = answerImageByteArray,
+                folder = "Nyansapo_Teaching_Numeracy_Assessment_test_Images",
                 fileName = "image_answer_${assessmentId}_${studentId}_${round}_${operationNumber1}_${operationType}_${operationNumber2}_${expectedAnswer}.wav"
             )
 
