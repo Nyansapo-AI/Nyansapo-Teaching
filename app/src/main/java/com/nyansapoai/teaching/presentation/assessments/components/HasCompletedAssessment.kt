@@ -39,7 +39,7 @@ fun HasCompletedAssessment(modifier: Modifier = Modifier) {
                 fontWeight = FontWeight.ExtraBold,
                 color = MaterialTheme.colorScheme.secondary,
                 textAlign = TextAlign.Center,
-                modifier = modifier,
+                modifier = Modifier,
             )
 
             Text(
@@ -47,7 +47,7 @@ fun HasCompletedAssessment(modifier: Modifier = Modifier) {
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Medium,
                 textAlign = TextAlign.Center,
-                modifier = modifier,
+                modifier = Modifier,
             )
         }
 

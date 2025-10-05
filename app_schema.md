@@ -112,17 +112,14 @@
           "date": "string",                              
         
           "students": [ 
-        
                 { 
             
                     "id": "string", 
-            
                     "name": "string", 
-            
+                    "grade": "string",
                     "attendance": "boolean"
             
                 } 
-        
           ]
         } 
 

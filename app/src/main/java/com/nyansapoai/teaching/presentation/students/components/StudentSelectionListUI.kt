@@ -44,7 +44,6 @@ fun StudentSelectionListUI(
         modifier = modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-//            .padding(16.dp)
 
     ) {
         stickyHeader {

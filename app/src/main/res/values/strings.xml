@@ -46,5 +46,10 @@
     <!--Assessment -->
     <string name="assessment">Assessment</string>
     <string name="add_assessment">Add Assessment</string>
+    <string name="assessment_result">Assessment Result</string>
+
+    <!--Attendance -->
+    <string name="attendance">Attendance</string>
+    <string name="take_attendance">Take Attendance</string>
 
 </resources>
