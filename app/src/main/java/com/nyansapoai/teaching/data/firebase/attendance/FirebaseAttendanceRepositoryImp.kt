@@ -6,6 +6,7 @@ import com.nyansapoai.teaching.data.remote.attendance.AttendanceRepository
 import com.nyansapoai.teaching.domain.models.attendance.AttendanceRecord
 import com.nyansapoai.teaching.utils.Results
 import kotlinx.coroutines.tasks.await
+import kotlin.text.set
 
 class FirebaseAttendanceRepositoryImp(
     private val firebaseDb: FirebaseFirestore
@@ -51,14 +52,19 @@ class FirebaseAttendanceRepositoryImp(
         }
     }
 
-    override suspend fun submitAttendanceData(attendanceRecord: AttendanceRecord): Results<Unit> {
+    override suspend fun submitAttendanceData(
+        attendanceRecord: AttendanceRecord,
+        organizationId: String,
+        projectId: String,
+        schoolId: String
+    ): Results<Unit> {
         return try {
             val documentRef = firebaseDb.collection(ORGANIZATION_COLLECTION)
-                .document(/* organizationId */) // You need to provide organizationId
+                .document(organizationId)
                 .collection(PROJECTS_COLLECTION)
-                .document(/* projectId */) // You need to provide projectId
+                .document(projectId)
                 .collection(SCHOOLS_COLLECTION)
-                .document(/* schoolId */) // You need to provide schoolId
+                .document(schoolId)
                 .collection(ATTENDANCE_COLLECTION)
                 .document(attendanceRecord.date)
 

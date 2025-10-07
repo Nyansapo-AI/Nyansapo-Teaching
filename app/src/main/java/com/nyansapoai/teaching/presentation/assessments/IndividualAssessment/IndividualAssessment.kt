@@ -235,7 +235,8 @@ fun IndividualAssessmentScreen(
                                                     assessmentId = assessment.id,
                                                     studentId = student.id,
                                                     assessmentType = assessment.type,
-                                                    assessmentNo = assessment.assessmentNumber
+                                                    assessmentNo = assessment.assessmentNumber,
+                                                    studentName = student.first_name + " " + student.last_name
                                                 ))
                                             }
                                         )

@@ -24,6 +24,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -44,7 +45,8 @@ fun LiteracyRoot(
     modifier: Modifier = Modifier,
     assessmentId: String,
     studentId: String,
-    assessmentNo: Int
+    assessmentNo: Int,
+    studentName: String
 ) {
 
     val viewModel = koinViewModel<LiteracyViewModel>()
@@ -58,6 +60,7 @@ fun LiteracyRoot(
         state = state,
         assessmentId = assessmentId,
         studentId = studentId,
+        studentName = studentName,
         onAction = viewModel::onAction
     )
 }
@@ -68,6 +71,7 @@ fun LiteracyScreen(
     state: LiteracyState,
     assessmentId: String,
     studentId: String,
+    studentName: String,
     onAction: (LiteracyAction) -> Unit = {},
 ) {
 
@@ -82,7 +86,21 @@ fun LiteracyScreen(
     }
 
     Scaffold(
-        
+
+        /*
+        topBar = {
+            Text(
+                text = studentName,
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.secondary,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(12.dp),
+            )
+        }
+
+         */
     ) { innerPadding ->
         Box(
             contentAlignment = Alignment.Center,

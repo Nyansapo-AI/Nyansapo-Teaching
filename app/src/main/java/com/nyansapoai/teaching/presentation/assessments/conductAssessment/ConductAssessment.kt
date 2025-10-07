@@ -12,7 +12,8 @@ fun ConductAssessmentRoot(
     assessmentId: String,
     assessmentType: String,
     studentId: String,
-    assessmentNo: Int
+    assessmentNo: Int,
+    studentName: String
 ) {
 
     val viewModel = koinViewModel<ConductAssessmentViewModel>()
@@ -24,7 +25,8 @@ fun ConductAssessmentRoot(
         assessmentId = assessmentId,
         studentId = studentId,
         assessmentType = assessmentType,
-        assessmentNo = assessmentNo
+        assessmentNo = assessmentNo,
+        studentName = studentName
     )
 
 }
@@ -35,6 +37,7 @@ fun ConductAssessmentScreen(
     studentId: String,
     assessmentType: String,
     assessmentNo: Int,
+    studentName: String,
     state: ConductAssessmentState,
     onAction: (ConductAssessmentAction) -> Unit,
 ) {
@@ -43,7 +46,8 @@ fun ConductAssessmentScreen(
             LiteracyRoot(
                 assessmentId = assessmentId,
                 studentId = studentId,
-                assessmentNo = assessmentNo
+                assessmentNo = assessmentNo,
+                studentName = studentName
             )
         }
         "Numeracy" -> {

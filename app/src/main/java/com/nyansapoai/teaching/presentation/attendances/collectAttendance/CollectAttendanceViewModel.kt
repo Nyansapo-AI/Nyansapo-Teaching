@@ -31,6 +31,9 @@ class CollectAttendanceViewModel(
     private val _state = MutableStateFlow(CollectAttendanceState())
     val state = _state
         .onStart {
+            Log.d("Attendance Data", "attendance collect attendance viewmodel school info: $collectAttendanceRouteArgs")
+
+
             fetchSchoolDetails(
                 organizationId = collectAttendanceRouteArgs.organizationId,
                 projectId = collectAttendanceRouteArgs.projectId,
@@ -63,28 +66,32 @@ class CollectAttendanceViewModel(
                     _state.update { state ->
                     // Filter students by the selected grade or show all if grade is null
                     val filteredStudents = if (action.grade != null) {
-                        state.studentList.filter { it.grade == action.grade }
+                        state.studentAttendanceList.filter { it.grade == action.grade }.toMutableList()
                     } else {
-                        state.studentList
+                        state.studentAttendanceList
                     }
 
-                    // Create attendance records from filtered students
-                    val attendanceList = filteredStudents.map { student ->
-                        StudentAttendance(
-                            id = student.id,
-                            name = student.name,
-                            grade = student.grade,
-                            attendance = false  // Default to not present
-                        )
-                    }.toMutableList()
+
+                        Log.d("Collect Attendance", "Selected grade: ${state.studentAttendanceList}")
+                        Log.d("Collect Attendance", "Selected grade: ${state.studentList}")
+
 
                     state.copy(
-                        studentAttendanceList = attendanceList,
+                        studentAttendanceList = filteredStudents,
                         selectedGrade = action.grade
                     )
                 }
             }
-            is CollectAttendanceAction.OnSubmitAttendance -> TODO()
+            is CollectAttendanceAction.OnSubmitAttendance -> {
+                submitAttendance(
+                    organizationId = collectAttendanceRouteArgs.organizationId,
+                    projectId = collectAttendanceRouteArgs.projectId,
+                    schoolId = collectAttendanceRouteArgs.schoolId,
+                    date = collectAttendanceRouteArgs.date,
+                    attendanceList = state.value.studentAttendanceList,
+                    onSuccess = {action.onSuccess}
+                )
+            }
         }
     }
 
@@ -114,7 +121,15 @@ class CollectAttendanceViewModel(
                     Log.d("Collect Attendance", "Fetched school students: ${schoolData.data?.size ?: 0} students")
                     _state.update {
                         it.copy(
-                            studentList = schoolData.data ?: emptyList(),
+//                            studentList = schoolData.data ?: emptyList(),
+                            studentAttendanceList = schoolData.data?.map { student ->
+                                StudentAttendance(
+                                    id = student.id,
+                                    name = student.first_name + " " + student.last_name,
+                                    grade = student.grade,
+                                    attendance = false
+                                )
+                            }?.toMutableList() ?: mutableListOf(),
                             isLoading = false,
                             error = null
                         )
@@ -137,7 +152,9 @@ class CollectAttendanceViewModel(
         organizationId: String,
         projectId: String,
         schoolId: String,
-        attendanceList: List<StudentAttendance>
+        date: String,
+        attendanceList: List<StudentAttendance>,
+        onSuccess: () -> Unit = { }
     ) {
         if (organizationId.isEmpty() || projectId.isEmpty() || schoolId.isEmpty()) {
             _state.update { it.copy(error = "Invalid school identifiers", isLoading = false) }
@@ -147,8 +164,13 @@ class CollectAttendanceViewModel(
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
             val response = attendancesRepository.submitAttendanceData(
+                organizationId = organizationId,
+                projectId = projectId,
+                schoolId = schoolId,
                 attendanceRecord = AttendanceRecord(
-                )
+                    date = date,
+                    students = attendanceList
+                ),
             )
 
             when(response.status){
@@ -164,6 +186,8 @@ class CollectAttendanceViewModel(
                             error = null
                         )
                     }
+
+                    onSuccess.invoke()
                 }
                 ResultStatus.ERROR -> {
                     Log.w("Collect Attendance", "Error submitting attendance: ${response.message}")

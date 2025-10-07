@@ -11,5 +11,5 @@ interface AttendanceRepository {
         schoolId: String,
     ): Results<AttendanceRecord>
 
-    suspend fun submitAttendanceData(attendanceRecord: AttendanceRecord): Results<Unit>
+    suspend fun submitAttendanceData(attendanceRecord: AttendanceRecord, organizationId: String,projectId: String, schoolId: String ): Results<Unit>
 }
