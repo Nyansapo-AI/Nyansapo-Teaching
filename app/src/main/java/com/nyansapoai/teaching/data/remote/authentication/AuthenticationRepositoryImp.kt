@@ -12,4 +12,8 @@ class AuthenticationRepositoryImp(
 ): AuthenticationRepository {
     override suspend fun signInWithPhoneNumber(request: SignInWithPhoneNumberDTO) {
     }
+
+    override suspend fun signOut() {
+        auth.signOut()
+    }
 }

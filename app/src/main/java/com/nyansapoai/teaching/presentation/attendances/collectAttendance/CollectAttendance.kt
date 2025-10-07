@@ -33,6 +33,9 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun CollectAttendanceRoot(
     date: String,
+    schoolId: String,
+    organizationId: String,
+    projectId: String,
 ) {
 
     val viewModel = koinViewModel<CollectAttendanceViewModel>()
@@ -40,7 +43,8 @@ fun CollectAttendanceRoot(
 
     CollectAttendanceScreen(
         state = state,
-        onAction = viewModel::onAction
+        onAction = viewModel::onAction,
+        date = date
     )
 }
 
@@ -48,12 +52,21 @@ fun CollectAttendanceRoot(
 fun CollectAttendanceScreen(
     state: CollectAttendanceState,
     onAction: (CollectAttendanceAction) -> Unit,
+    date: String
 ) {
     Scaffold(
+        topBar = {
+            Text(
+                text = date,
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold,
+            )
+        },
         modifier = Modifier
             .padding(horizontal = 12.dp)
     ) { innerPadding ->
         CollectAttendanceContent(
+            studentList = state.studentList,
             modifier = Modifier
                 .padding(innerPadding)
         )
@@ -66,6 +79,7 @@ fun CollectAttendanceScreen(
 @Composable
 fun CollectAttendanceContent(
     modifier: Modifier = Modifier,
+    studentList: List<NyansapoStudent> = emptyList()
 ) {
     Box {
         Column(
@@ -83,22 +97,15 @@ fun CollectAttendanceContent(
             )
 
             StudentSelectionListUI(
-                studentList = List(20) {
-                    NyansapoStudent(
-                        id = it.toString(),
-                        first_name = "FirstName$it",
-                        last_name = "LastName$it",
-                    )
-                },
+                studentList = studentList,
                 studentItemContent = { student ->
                     StudentAttendanceItem(
                         student = student,
-                        isSelected = false
+                        isSelected = false,
+                        onClick = {}
                     )
-
                 }
             )
-
             Spacer(modifier = Modifier.height(70.dp))
 
 
@@ -109,7 +116,6 @@ fun CollectAttendanceContent(
             onClick = { /*TODO*/ },
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-//                .padding(16.dp)
         ) {
             Text(
                 text = "Submit Attendance",
@@ -153,7 +159,6 @@ fun StudentAttendanceItem(
                 unselectedColor = MaterialTheme.colorScheme.onSurfaceVariant
             ),
             modifier = Modifier
-
         )
     }
 }

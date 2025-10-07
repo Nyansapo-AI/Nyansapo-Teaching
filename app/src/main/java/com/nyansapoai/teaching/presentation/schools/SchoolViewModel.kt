@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nyansapoai.teaching.data.local.LocalDataSource
+import com.nyansapoai.teaching.data.remote.authentication.AuthenticationRepository
 import com.nyansapoai.teaching.data.remote.school.SchoolRepository
 import com.nyansapoai.teaching.data.remote.user.UserRepository
 import com.nyansapoai.teaching.utils.ResultStatus
@@ -22,7 +23,8 @@ import kotlinx.datetime.toLocalDateTime
 class SchoolViewModel(
     private val userRepository: UserRepository,
     private val schoolRepository: SchoolRepository,
-    private val localDataSource: LocalDataSource
+    private val localDataSource: LocalDataSource,
+    private val authenticationRepository: AuthenticationRepository
 ) : ViewModel() {
 
     private val TAG = "SchoolViewModel"
@@ -67,6 +69,11 @@ class SchoolViewModel(
                 )
             }
             is SchoolAction.OnSelectSchool -> {}
+            SchoolAction.SignOut -> {
+                viewModelScope.launch {
+                    authenticationRepository.signOut()
+                }
+            }
         }
     }
 

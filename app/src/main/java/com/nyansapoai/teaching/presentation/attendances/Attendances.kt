@@ -92,7 +92,14 @@ fun AttendancesScreen(
             ) {
                 AppButton(
                     onClick = {
-                        navController.navigate(CollectAttendancePage(date = state.currentWeekDay?: "" ))
+                        navController.navigate(
+                            CollectAttendancePage(
+                                date = state.currentWeekDay ?: "",
+                                schoolId = state.localSchoolInfo?.schoolUId ?: "",
+                                organizationId = state.localSchoolInfo?.organizationUid ?: "",
+                                projectId = state.localSchoolInfo?.projectUId ?: ""
+                            )
+                        )
                     },
                     modifier = Modifier
                         .align(Alignment.TopCenter)

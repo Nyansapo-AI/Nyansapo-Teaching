@@ -116,7 +116,7 @@
             
                     "id": "string", 
                     "name": "string", 
-                    "grade": "string",
+                    "grade": "number",
                     "attendance": "boolean"
             
                 } 

@@ -111,6 +111,20 @@ fun SchoolScreen(
                         text = school.name
                     )
                 }
+
+                item {
+                    TextButton(
+                        onClick = {}
+                    ) {
+                        Text(
+                            text = "Sign out",
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
+
+                }
+
             }
         }
 

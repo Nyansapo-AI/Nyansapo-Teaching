@@ -7,6 +7,7 @@ import com.google.firebase.storage.FirebaseStorage
 import com.nyansapoai.teaching.Database
 import com.nyansapoai.teaching.data.azure.ai.AzureArtificialIntelligenceRepositoryImp
 import com.nyansapoai.teaching.data.firebase.assessment.AssessmentRepositoryFirebaseImp
+import com.nyansapoai.teaching.data.firebase.attendance.FirebaseAttendanceRepositoryImp
 import com.nyansapoai.teaching.data.firebase.media.FirebaseMediaRepositoryImpl
 import com.nyansapoai.teaching.data.firebase.schools.SchoolRepositoryFirebaseImp
 import com.nyansapoai.teaching.data.firebase.students.StudentsRepositoryFirebaseImp
@@ -18,6 +19,7 @@ import com.nyansapoai.teaching.data.network.ApiHelper
 import com.nyansapoai.teaching.data.remote.ai.ArtificialIntelligenceRepository
 import com.nyansapoai.teaching.data.remote.ai.OnlineArtificialIntelligenceRepositoryImp
 import com.nyansapoai.teaching.data.remote.assessment.AssessmentRepository
+import com.nyansapoai.teaching.data.remote.attendance.AttendanceRepository
 import com.nyansapoai.teaching.data.remote.authentication.AuthenticationRepository
 import com.nyansapoai.teaching.data.remote.authentication.AuthenticationRepositoryImp
 import com.nyansapoai.teaching.data.remote.media.MediaRepository
@@ -167,6 +169,12 @@ val appModules = module {
 
     single<StudentsRepository> {
         StudentsRepositoryFirebaseImp(
+            firebaseDb = get(),
+        )
+    }
+
+    single<AttendanceRepository> {
+        FirebaseAttendanceRepositoryImp(
             firebaseDb = get(),
         )
     }

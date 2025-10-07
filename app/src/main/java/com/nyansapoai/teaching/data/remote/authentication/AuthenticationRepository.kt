@@ -4,4 +4,6 @@ import com.nyansapoai.teaching.domain.dto.SignInWithPhoneNumberDTO
 
 interface AuthenticationRepository {
     suspend fun signInWithPhoneNumber(request: SignInWithPhoneNumberDTO)
+
+    suspend fun signOut()
 }

@@ -122,7 +122,12 @@ fun Navigation(){
 
             composable<CollectAttendancePage> {
                 val args = it.toRoute<CollectAttendancePage>()
-                 CollectAttendanceRoot(date = args.date)
+                 CollectAttendanceRoot(
+                     date = args.date,
+                     schoolId = args.schoolId,
+                     organizationId = args.organizationId,
+                     projectId = args.projectId
+                 )
             }
 
         }

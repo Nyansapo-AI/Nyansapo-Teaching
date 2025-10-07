@@ -40,5 +40,8 @@ data class LiteracyResultsPage(
 
 @Serializable
 data class CollectAttendancePage(
-    val date: String
+    val date: String,
+    val schoolId: String,
+    val organizationId: String,
+    val projectId: String,
 )
