@@ -38,6 +38,7 @@ class UploadNumeracyArithmeticOperationImageWorker(
 
             val uploadAnswerImageResponse = mediaRepository.saveImage(
                 imageByteArray = answerImageByteArray,
+                folder = "Nyansapo_Teaching_Numeracy_Assessment_test_Images",
                 fileName = "image_answer_${assessmentId}_${studentId}_${round}_${operationNumber1}_${operationType}_${operationNumber2}_${expectedAnswer}.wav"
             )
 
@@ -56,8 +57,9 @@ class UploadNumeracyArithmeticOperationImageWorker(
 
             val workoutImageByteArray = MediaUtils.readImageFileByteArray(path = workoutImageFilePath) ?: return Result.failure()
 
-            val uploadWorkoutImageResponse = mediaRepository.saveAudio(
-                audioByteArray = workoutImageByteArray,
+            val uploadWorkoutImageResponse = mediaRepository.saveImage(
+                imageByteArray = workoutImageByteArray,
+                folder = "Nyansapo_Teaching_Numeracy_Assessment_test_workout_Images",
                 fileName = "image_workArea_${assessmentId}_${studentId}_${round}_${operationNumber1}_${operationType}_${operationNumber2}_${expectedAnswer}_workout.wav"
             )
 

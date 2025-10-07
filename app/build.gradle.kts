@@ -30,10 +30,10 @@ android {
 
     defaultConfig {
         applicationId = "com.nyansapoai.teaching"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 35
         versionCode = 1
-        versionName = "1.8.0"
+        versionName = "1.9.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -178,5 +178,9 @@ dependencies {
     //rive
     implementation(libs.rive.android)
     implementation(libs.androidx.startup.runtime)
+
+    //calendar
+//    implementation("com.kizitonwose.calendar:compose:2.9.0")
+    implementation(libs.kizitonwose.calendar)
 
 }

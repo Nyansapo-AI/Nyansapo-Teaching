@@ -84,17 +84,6 @@ class SubmitMultipleChoiceResultsWorker(
             Result.failure()
         }
     }
-
-    private fun handleRetry(attempt: Int): Result {
-        return if (attempt >= MAX_RETRIES) {
-            Log.e(WORK_NAME, "Max retries reached")
-            Result.failure()
-        } else {
-            Log.d(WORK_NAME, "Scheduling retry ${attempt + 1}")
-            Result.retry()
-        }
-    }
-
     companion object {
         const val WORK_NAME = "SubmitMultipleChoiceResultsWorker"
         const val MAX_RETRIES = 4

@@ -93,52 +93,8 @@ class LiteracyAssessmentsMonitorWorker(
         }
     }
 
-    private fun handleRetry(attempt: Int): Result {
-        return if (attempt >= MAX_RETRIES) {
-            Log.e(WORK_NAME, "Max retries reached")
-            Result.failure()
-        } else {
-            Log.d(WORK_NAME, "Scheduling retry ${attempt + 1}")
-            Result.retry()
-        }
-    }
-
-    /*
-    private fun createNotificationChannel(notificationManager: NotificationManager) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                CHANNEL_ID,
-                "Progress Notifications",
-                NotificationManager.IMPORTANCE_LOW
-            ).apply {
-                description = "Shows progress of background tasks"
-            }
-            notificationManager.createNotificationChannel(channel)
-        }
-    }
-
-    private fun createForegroundInfo(message: String): ForegroundInfo {
-        val notification = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
-            .setContentTitle("Background Task")
-            .setContentText(message)
-            .setSmallIcon(R.drawable.nyansapo_ai_icon_small)
-            .setOngoing(true)
-            .build()
 
 
-        // Specify foreground service type when creating ForegroundInfo
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) { // Android 14+
-            ForegroundInfo(
-                NOTIFICATION_ID,
-                notification,
-                2 // ForegroundServiceType.DATA_SYNC
-            )
-        } else {
-            ForegroundInfo(NOTIFICATION_ID, notification)
-        }
-
-//        return  ForegroundInfo(NOTIFICATION_ID, notification)
-    }*/
 
     companion object {
         const val MAX_RETRIES = 4

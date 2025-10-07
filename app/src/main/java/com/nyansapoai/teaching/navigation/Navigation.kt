@@ -24,6 +24,8 @@ import com.nyansapoai.teaching.navController
 import com.nyansapoai.teaching.presentation.assessments.IndividualAssessment.IndividualAssessmentRoot
 import com.nyansapoai.teaching.presentation.assessments.conductAssessment.ConductAssessmentRoot
 import com.nyansapoai.teaching.presentation.assessments.createAssessment.CreateAssessmentsRoot
+import com.nyansapoai.teaching.presentation.assessments.literacy.result.LiteracyResultRoot
+import com.nyansapoai.teaching.presentation.attendances.collectAttendance.CollectAttendanceRoot
 import com.nyansapoai.teaching.presentation.authentication.otp.OTPRoot
 import com.nyansapoai.teaching.presentation.authentication.signIn.SignInRoot
 import com.nyansapoai.teaching.presentation.common.snackbar.SnackBarContent
@@ -111,6 +113,21 @@ fun Navigation(){
             composable<ConductAssessmentPage> {
                 val args = it.toRoute<ConductAssessmentPage>()
                  ConductAssessmentRoot(assessmentId = args.assessmentId, studentId = args.studentId, assessmentType = args.assessmentType, assessmentNo = args.assessmentNo)
+            }
+
+            composable<LiteracyResultsPage> {
+                val args = it.toRoute<LiteracyResultsPage>()
+                LiteracyResultRoot(assessmentId = args.assessmentId, studentId = args.studentId)
+            }
+
+            composable<CollectAttendancePage> {
+                val args = it.toRoute<CollectAttendancePage>()
+                 CollectAttendanceRoot(
+                     date = args.date,
+                     schoolId = args.schoolId,
+                     organizationId = args.organizationId,
+                     projectId = args.projectId
+                 )
             }
 
         }

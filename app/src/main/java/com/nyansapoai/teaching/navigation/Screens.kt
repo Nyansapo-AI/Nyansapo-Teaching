@@ -31,3 +31,17 @@ data class ConductAssessmentPage(
     val studentId: String,
     val assessmentNo: Int
 )
+
+@Serializable
+data class LiteracyResultsPage(
+    val assessmentId: String,
+    val studentId: String,
+)
+
+@Serializable
+data class CollectAttendancePage(
+    val date: String,
+    val schoolId: String,
+    val organizationId: String,
+    val projectId: String,
+)

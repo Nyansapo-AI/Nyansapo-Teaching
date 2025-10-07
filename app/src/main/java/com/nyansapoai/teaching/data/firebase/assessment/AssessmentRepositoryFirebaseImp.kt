@@ -7,6 +7,7 @@ import com.google.firebase.firestore.toObject
 import com.nyansapoai.teaching.data.remote.assessment.AssessmentRepository
 import com.nyansapoai.teaching.domain.models.assessments.Assessment
 import com.nyansapoai.teaching.domain.models.assessments.CompletedAssessment
+import com.nyansapoai.teaching.domain.models.assessments.literacy.LiteracyAssessmentResults
 import com.nyansapoai.teaching.domain.models.assessments.literacy.MultipleChoicesResult
 import com.nyansapoai.teaching.domain.models.assessments.literacy.ReadingAssessmentMetadata
 import com.nyansapoai.teaching.domain.models.assessments.literacy.ReadingAssessmentResult
@@ -170,22 +171,23 @@ class AssessmentRepositoryFirebaseImp(
         assessmentId: String,
         studentID: String,
         countAndMatchList: List<CountMatch>
-    ): Results<String> {
+    ): Results<String> = withContext(Dispatchers.IO) {
         val deferred = CompletableDeferred<Results<String>>()
-
-        firebaseDb.collection(assessmentCollection)
+        val docRef = firebaseDb.collection(assessmentCollection)
             .document(assessmentId)
             .collection("assessments-results")
-            .document(assessmentId+"_$studentID")
-            .set(
-                mapOf(
-                    "assessmentId" to assessmentId,
-                    "student_id" to studentID,
-                    "numeracy_results" to mapOf(
-                        "count_and_match" to countAndMatchList
-                    )
+            .document("${assessmentId}_$studentID")
+
+        docRef.set(
+            mapOf(
+                "assessmentId" to assessmentId,
+                "student_id" to studentID,
+                "numeracy_results" to mapOf(
+                    "count_and_match" to countAndMatchList
                 )
-            )
+            ),
+            SetOptions.merge()
+        )
             .addOnSuccessListener {
                 Log.d("AssessmentRepositoryFirebaseImp", "Assessment submitted count and match successfully")
                 deferred.complete(Results.success(data = "Assessment submitted successfully"))
@@ -195,11 +197,9 @@ class AssessmentRepositoryFirebaseImp(
                 deferred.complete(Results.error(msg = "Failed to submit assessment: ${it.message}"))
             }
 
-
-        return withContext(Dispatchers.IO) {
-            deferred.await()
-        }
+        deferred.await()
     }
+
 
     override suspend fun assessNumeracyNumberRecognition(
         assessmentId: String,
@@ -279,7 +279,7 @@ class AssessmentRepositoryFirebaseImp(
             .document(assessmentId)
             .collection("assessments-results")
             .document(assessmentId+"_$studentID")
-            .set(
+            .update(
                 mapOf(
                     "assessmentId" to assessmentId,
                     "student_id" to studentID,
@@ -419,6 +419,70 @@ class AssessmentRepositoryFirebaseImp(
             Log.e("AssessmentRepo", "Exception in getCompletedAssessments: ${e.message}", e)
             trySend(Results.error(msg = "Error accessing assessments: ${e.message}"))
             close(e)
+        }
+    }
+
+    override fun fetchLiteracyAssessmentResults(
+        assessmentId: String,
+        studentId: String
+    ): Flow<Results<LiteracyAssessmentResults>> {
+        return callbackFlow {
+            if (assessmentId.isBlank() || studentId.isBlank()) {
+                Log.w("AssessmentRepo", "Invalid assessment ID or student ID provided")
+                trySend(Results.error(msg = "Invalid assessment ID or student ID provided"))
+                close()
+                return@callbackFlow
+            }
+
+            try {
+                val documentId = "${assessmentId}_$studentId"
+                val path = "$assessmentCollection/$assessmentId/$assessmentResultsCollection/$documentId"
+                Log.d("AssessmentRepo", "Fetching literacy results from: $path")
+
+                val snapshotListener = firebaseDb.collection(assessmentCollection)
+                    .document(assessmentId)
+                    .collection(assessmentResultsCollection)
+                    .document(documentId)
+                    .addSnapshotListener { snapshot, error ->
+                        if (error != null) {
+                            Log.e("AssessmentRepo", "Error fetching literacy results: ${error.message}", error)
+                            trySend(Results.error(msg = error.message ?: "Something went wrong"))
+                            close(error)
+                            return@addSnapshotListener
+                        }
+
+                        if (snapshot != null && snapshot.exists()) {
+                            try {
+
+                                val results = snapshot.toObject<LiteracyAssessmentResults>()
+                                if (results != null) {
+                                    Log.d("AssessmentRepo", "Literacy results fetched successfully, size of reading results: ${snapshot.data}")
+                                    Log.d("AssessmentRepo", "Literacy results fetched successfully, size of multiple choice questions: ${results}")
+
+                                    trySend(Results.success(data = results))
+                                } else {
+                                    Log.w("AssessmentRepo", "No literacy assessment data found")
+
+                                    trySend(Results.error(msg = "No literacy assessment data found"))
+                                }
+                            } catch (e: Exception) {
+                                Log.e("AssessmentRepo", "Error parsing literacy results: ${e.message}", e)
+                                trySend(Results.error(msg = "Error parsing data: ${e.message}"))
+                            }
+                        } else {
+                            Log.w("AssessmentRepo", "Literacy assessment not found for ID: $documentId")
+                            trySend(Results.error(msg = "Literacy assessment not found"))
+                        }
+                    }
+
+                awaitClose {
+                    snapshotListener.remove()
+                }
+            } catch (e: Exception) {
+                Log.e("AssessmentRepo", "Exception in fetchLiteracyAssessmentResults: ${e.message}", e)
+                trySend(Results.error(msg = "Error accessing literacy results: ${e.message}"))
+                close(e)
+            }
         }
     }
 
@@ -611,9 +675,5 @@ class AssessmentRepositoryFirebaseImp(
             metadata = metadata
         )
     }
-
-
-
-
 
 }

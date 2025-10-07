@@ -29,6 +29,7 @@ class UploadNumeracyReadingAssessmentAudioWorker(
 
             val saveAudioResponse = mediaRepository.saveAudio(
                 audioByteArray = audioBytes,
+                folder = "Nyansapo_Teaching_Numeracy_Assessment_test_Audio" ,
                 fileName = "audio_${assessmentId}_${studentId}_${round}_${type}_${content.replace(" ", "%20")}.wav"
             )
 

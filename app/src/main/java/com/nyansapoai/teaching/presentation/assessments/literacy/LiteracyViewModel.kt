@@ -167,6 +167,8 @@ class LiteracyViewModel(
                         error = "Assessment can not be evaluated"
                     )
                 }
+                Log.d("LiteracyViewModel", "AssessmentId or StudentId or AudioFilePath is null or empty")
+                Log.d("LiteracyViewModel", "assessmentId: $assessmentId, studentId: $studentId, audioFilePath: $audioFilePath")
                 return@launch
             }
 

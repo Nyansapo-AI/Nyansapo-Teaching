@@ -34,6 +34,7 @@ import com.nyansapoai.teaching.presentation.assessments.literacy.LiteracyAction.
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.LiteracyAssessmentLevel
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.LiteracyReadingAssessmentUI
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.MultichoiceQuestionsUI
+import com.nyansapoai.teaching.presentation.assessments.literacy.components.ReadingStoryEvaluationUI
 import com.nyansapoai.teaching.presentation.common.components.AppSimulateNavigation
 import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
@@ -176,6 +177,7 @@ fun LiteracyScreen(
                     }
 
                     LiteracyAssessmentLevel.PARAGRAPH -> {
+                        /*
                         LiteracyReadingAssessmentUI(
                             modifier = Modifier,
                             readingList = state.assessmentContent?.paragraphs[0]?.split(".")?: emptyList(),
@@ -210,11 +212,34 @@ fun LiteracyScreen(
                                     )
                                 )
                             }
+                        )*/
+
+                        ReadingStoryEvaluationUI(
+                            currentIndex = state.currentIndex,
+                            title = "Read the Paragraph",
+                            storyTitle = null,
+                            showInstructions = state.showInstructions,
+                            instructionAudio = R.raw.read_sentence,
+                            isLoading = state.isLoading,
+                            audioFilePath = state.audioFilePath,
+                            onShowInstructionsChange = { show -> onAction(SetShowInstructions(show)) },
+                            onAudioPathChange = { path -> onAction(SetAudioFilePath(audioFilePath = path)) },
+                            onSubmit = {
+                                onAction.invoke(
+                                    OnSubmitResponse(
+                                        assessmentId = assessmentId,
+                                        studentId = studentId
+                                    )
+                                )
+                            },
+                            storySentencesList = state.assessmentContent?.paragraphs[0]?.split(".")?: emptyList()
                         )
+
 
                     }
 
                     LiteracyAssessmentLevel.STORY -> {
+                        /*
                         LiteracyReadingAssessmentUI(
                             modifier = Modifier,
                             readingList = state.assessmentContent?.storys[0]?.story?.trim()?.split(".") ?: emptyList(),
@@ -249,6 +274,27 @@ fun LiteracyScreen(
                                     )
                                 )
                             }
+                        )*/
+
+                        ReadingStoryEvaluationUI(
+                            currentIndex = state.currentIndex,
+                            title = "Reading Story",
+                            storyTitle = state.assessmentContent?.storys[0]?.title,
+                            showInstructions = state.showInstructions,
+                            instructionAudio = R.raw.read_sentence,
+                            isLoading = state.isLoading,
+                            audioFilePath = state.audioFilePath,
+                            onShowInstructionsChange = { show -> onAction(SetShowInstructions(show)) },
+                            onAudioPathChange = { path -> onAction(SetAudioFilePath(audioFilePath = path)) },
+                            onSubmit = {
+                                onAction.invoke(
+                                    OnSubmitResponse(
+                                        assessmentId = assessmentId,
+                                        studentId = studentId
+                                    )
+                                )
+                            },
+                            storySentencesList = state.assessmentContent?.storys[0]?.story?.trim()?.split(".") ?: emptyList()
                         )
                     }
 

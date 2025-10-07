@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
@@ -20,6 +21,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyOperations
@@ -31,6 +33,7 @@ import com.nyansapoai.teaching.presentation.common.components.AppLinearProgressI
 fun NumeracyOperationContainerUI(
     modifier: Modifier = Modifier,
     numeracyOperationList: List<NumeracyOperations> = emptyList(),
+    title: String = "Numeracy Operations",
     currentIndex: Int = 0,
     onAnswerFilePathChange: (String) -> Unit,
     onWorkOutFilePathChange: (String) -> Unit,
@@ -94,6 +97,7 @@ fun NumeracyOperationContainerUI(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(40.dp),
         modifier = modifier
+            .fillMaxSize()
             .widthIn(max = 700.dp)
             .padding(16.dp),
     ) {
@@ -105,6 +109,14 @@ fun NumeracyOperationContainerUI(
                     .fillMaxWidth()
             )
             {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                )
+
                 Text(
                     text = "Question ${currentIndex + 1}/${numeracyOperationList.size}",
                     style = MaterialTheme.typography.titleMedium,

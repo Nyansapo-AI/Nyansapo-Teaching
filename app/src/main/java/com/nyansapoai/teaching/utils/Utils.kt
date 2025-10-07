@@ -12,6 +12,7 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
+import java.time.LocalDate
 import java.util.Date
 import java.util.Locale
 
@@ -182,5 +183,11 @@ object Utils {
                 label = "animated int string",
             ).value.toString()
         } ?: number
+    }
+
+    fun formatMonthYear(date: LocalDate): String {
+        val month = date.month.name.lowercase().replaceFirstChar { it.uppercase() }
+        val year = date.year
+        return "$month, $year"
     }
 }

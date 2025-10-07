@@ -7,6 +7,7 @@ import com.google.firebase.storage.FirebaseStorage
 import com.nyansapoai.teaching.Database
 import com.nyansapoai.teaching.data.azure.ai.AzureArtificialIntelligenceRepositoryImp
 import com.nyansapoai.teaching.data.firebase.assessment.AssessmentRepositoryFirebaseImp
+import com.nyansapoai.teaching.data.firebase.attendance.FirebaseAttendanceRepositoryImp
 import com.nyansapoai.teaching.data.firebase.media.FirebaseMediaRepositoryImpl
 import com.nyansapoai.teaching.data.firebase.schools.SchoolRepositoryFirebaseImp
 import com.nyansapoai.teaching.data.firebase.students.StudentsRepositoryFirebaseImp
@@ -18,6 +19,7 @@ import com.nyansapoai.teaching.data.network.ApiHelper
 import com.nyansapoai.teaching.data.remote.ai.ArtificialIntelligenceRepository
 import com.nyansapoai.teaching.data.remote.ai.OnlineArtificialIntelligenceRepositoryImp
 import com.nyansapoai.teaching.data.remote.assessment.AssessmentRepository
+import com.nyansapoai.teaching.data.remote.attendance.AttendanceRepository
 import com.nyansapoai.teaching.data.remote.authentication.AuthenticationRepository
 import com.nyansapoai.teaching.data.remote.authentication.AuthenticationRepositoryImp
 import com.nyansapoai.teaching.data.remote.media.MediaRepository
@@ -37,7 +39,10 @@ import com.nyansapoai.teaching.presentation.assessments.createAssessment.CreateA
 import com.nyansapoai.teaching.presentation.assessments.IndividualAssessment.IndividualAssessmentViewModel
 import com.nyansapoai.teaching.presentation.assessments.conductAssessment.ConductAssessmentViewModel
 import com.nyansapoai.teaching.presentation.assessments.literacy.LiteracyViewModel
+import com.nyansapoai.teaching.presentation.assessments.literacy.result.LiteracyResultViewModel
 import com.nyansapoai.teaching.presentation.assessments.numeracy.NumeracyAssessmentViewModel
+import com.nyansapoai.teaching.presentation.attendances.AttendancesViewModel
+import com.nyansapoai.teaching.presentation.attendances.collectAttendance.CollectAttendanceViewModel
 import com.nyansapoai.teaching.presentation.common.audio.play.AndroidAudioPlayer
 import com.nyansapoai.teaching.presentation.common.audio.play.AudioPlayer
 import com.nyansapoai.teaching.presentation.common.audio.record.AndroidAppAudioRecorder
@@ -62,6 +67,9 @@ val appModules = module {
     viewModelOf(::TextToSpeechViewModel)
     viewModelOf(::LiteracyViewModel)
     viewModelOf(::StudentsViewModel)
+    viewModelOf(::LiteracyResultViewModel)
+    viewModelOf(::AttendancesViewModel)
+    viewModelOf(::CollectAttendanceViewModel)
 
 
 
@@ -161,6 +169,12 @@ val appModules = module {
 
     single<StudentsRepository> {
         StudentsRepositoryFirebaseImp(
+            firebaseDb = get(),
+        )
+    }
+
+    single<AttendanceRepository> {
+        FirebaseAttendanceRepositoryImp(
             firebaseDb = get(),
         )
     }

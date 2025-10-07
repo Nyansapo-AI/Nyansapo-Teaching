@@ -35,7 +35,7 @@
           "distribution" : [
             {
               "learning_level": "string",
-              "value" : "float"
+              "value" : "float",
             }
           ]
         }
@@ -112,17 +112,14 @@
           "date": "string",                              
         
           "students": [ 
-        
                 { 
             
                     "id": "string", 
-            
                     "name": "string", 
-            
+                    "grade": "number",
                     "attendance": "boolean"
             
                 } 
-        
           ]
         } 
 
@@ -172,11 +169,7 @@
           "competence": "number?" 
     
         } 
-    
   ]
-
- 
-
 } 
 ```
 
@@ -240,7 +233,7 @@
     
     ], 
 
-    "number_recognition" : [ 
+    "number_recognition" : [
     
         {
             "type": "string", //number_recognition 
@@ -256,7 +249,7 @@
                 "transcript": "number"
             }
         }
-    
+  
     ], 
 
  
@@ -275,7 +268,7 @@
             
             "operations_number2" : "number", 
             
-            "metadata" : { 
+            "metadata" : {  
             
                 "screenshot_url": "string", 
                 
