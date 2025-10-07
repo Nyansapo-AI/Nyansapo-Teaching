@@ -1,6 +1,7 @@
 package com.nyansapoai.teaching.presentation.attendances
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -92,6 +93,8 @@ fun AttendancesScreen(
             ) {
                 AppButton(
                     onClick = {
+                        Log.d("Attendance Data", "attendance school info: ${state.localSchoolInfo}")
+
                         navController.navigate(
                             CollectAttendancePage(
                                 date = state.currentWeekDay ?: "",

@@ -8,7 +8,7 @@ data class CollectAttendanceState(
     val studentAttendanceList: MutableList<StudentAttendance>  = studentList.map { student ->
         StudentAttendance(
                 id = student.id,
-                name = student.name,
+                name = student.first_name,
                 grade = student.grade,
                 attendance = false
         )
