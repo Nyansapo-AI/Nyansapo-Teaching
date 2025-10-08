@@ -38,7 +38,7 @@ fun AppCountDown(
 
     LaunchedEffect(timeLeft) {
         if (timeLeft > 0) {
-            delay(1000L)
+            delay(1200L)
             timeLeft--
         } else {
             onFinish()
@@ -54,7 +54,6 @@ fun AppCountDown(
         AnimatedContent(
             targetState = timeLeft,
             transitionSpec = {
-                // Compare the incoming number with the previous number.
                 if (targetState > initialState) {
                     // If the target number is larger, it slides up and fades in
                     // while the initial (smaller) number slides up and fades out.

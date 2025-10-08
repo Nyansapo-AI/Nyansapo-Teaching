@@ -2,20 +2,24 @@ package com.nyansapoai.teaching.presentation.assessments.literacy.components
 
 import android.os.Build
 import android.util.Log
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.BasicAlertDialog
@@ -27,13 +31,16 @@ import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,6 +51,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -51,14 +59,20 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.zIndex
 import com.nyansapoai.teaching.R
 import com.nyansapoai.teaching.navController
+import com.nyansapoai.teaching.presentation.common.animations.AppLottieAnimations
 import com.nyansapoai.teaching.presentation.common.animations.RiveAnimation
+import com.nyansapoai.teaching.presentation.common.audio.AppLocalAudioPlayer
 import com.nyansapoai.teaching.presentation.common.audio.play.AudioPlayer
 import com.nyansapoai.teaching.presentation.common.audio.record.AppAudioRecorder
 import com.nyansapoai.teaching.presentation.common.components.AppButton
+import com.nyansapoai.teaching.presentation.common.components.AppCountDown
 import com.nyansapoai.teaching.presentation.common.components.AppLinearProgressIndicator
 import com.nyansapoai.teaching.presentation.common.components.AppShowInstructions
+import com.nyansapoai.teaching.presentation.common.media.MediaUtils
 import com.nyansapoai.teaching.presentation.common.permissions.RequestAppPermissions
+import com.nyansapoai.teaching.ui.theme.lightPrimary
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import java.io.File
 import kotlin.time.Clock
@@ -90,8 +104,6 @@ fun LiteracyReadingAssessmentUI(
     response: String?,
     onSubmit: () -> Unit,
 ) {
-
-    var isButtonClicked by remember { mutableStateOf(false) }
 
     var allPermissionsAllowed by remember { mutableStateOf(false) }
 
@@ -131,7 +143,6 @@ fun LiteracyReadingAssessmentUI(
             BasicAlertDialog(
                 onDismissRequest = {
                     navController.popBackStack()
-                    isButtonClicked = false
                 },
                 properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),
                 content = {
@@ -168,7 +179,6 @@ fun LiteracyReadingAssessmentUI(
                         AppButton(
                             onClick = {
                                 action.invoke()
-                                isButtonClicked = true
                             }
                         ) {
                             Text(
@@ -393,8 +403,8 @@ fun LiteracyReadingAssessmentUI(
                     instructionsDescription = instructionDescription,
                     instructionAudio = instructionAudio,
                     onChangeShow = {  show -> onShowInstructionsChange(show) },
+                    hasCompletedPlaying = { completed -> if (completed) onShowInstructionsChange(false) },
                     content = {
-
                         AnimatedVisibility(
                             visible = showInstructions,
                             enter = fadeIn(),
@@ -473,6 +483,145 @@ fun LiteracyReadingAssessmentUI(
             )
         }
     }
+
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun PreTestReadingAssessmentUI(
+    modifier: Modifier = Modifier,
+    onStart: () -> Unit = { }
+) {
+
+    val coroutineScope = rememberCoroutineScope()
+
+    var showInstructions by remember { mutableStateOf(true) }
+    var showContent by remember { mutableStateOf(false) }
+    var filePath by remember { mutableStateOf<String?>(null) }
+    var currentIndex by remember { mutableIntStateOf(0) }
+    var showCountDown by remember { mutableStateOf(false) }
+    var showAudioInstructions by remember { mutableStateOf(true) }
+
+
+
+    val readingList  = listOf("A", "B", "Boy", "Cat")
+
+    AnimatedContent(
+        targetState = showAudioInstructions
+    ) { state ->
+        
+        when(state){
+            true -> {
+                Box(
+                    modifier = modifier
+                        .fillMaxSize()
+                        .widthIn(max= 420.dp)
+                ) {
+                    AppLottieAnimations(
+                        resId = R.raw.talking_boy,
+                        modifier = Modifier
+                            .size(300.dp)
+                            .align(Alignment.CenterStart)
+                    )
+
+                    Text(
+                        text = "Let's Practice for the assessment.",
+                        style = MaterialTheme.typography.titleSmall,
+                        color = contentColorFor(lightPrimary),
+                        fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier
+                            .align(Alignment.CenterEnd)
+                            .padding( horizontal =16.dp)
+                            .widthIn(max = 180.dp)
+                            .border(
+                                width = 2.dp,
+                                shape = RoundedCornerShape(8.dp),
+                                color = MaterialTheme.colorScheme.secondary
+                            )
+                            .clip(shape = RoundedCornerShape(8.dp))
+                            .background(lightPrimary)
+                            .padding(16.dp)
+
+                    )
+
+                }
+                AppLocalAudioPlayer(
+                    audio = R.raw.lets_practice_for_the_assessment,
+                    hasFinishedPlaying = {completed ->
+                        coroutineScope.launch {
+                            delay(500)
+                            if (completed) showAudioInstructions = false
+                        }
+                    }
+                )
+
+            }
+            false -> {
+                AnimatedContent(
+                    targetState = showCountDown
+                )
+                { targetState ->
+                    when(targetState){
+                        true -> {
+                            AppCountDown(
+                                seconds = 3,
+                                onFinish = {
+                                    onStart.invoke()
+                                }
+                            )
+
+                            AppLocalAudioPlayer(
+                                audio = R.raw.good_job_get_ready_to_start_the_assessment
+                            )
+                        }
+                        false -> {
+                            LiteracyReadingAssessmentUI(
+                                readingList = readingList ,
+                                currentIndex = currentIndex,
+                                showInstructions = showInstructions,
+                                onShowInstructionsChange = {
+                                    showInstructions = it
+                                },
+                                title = "Practice Reading",
+                                fontSize = 100.sp,
+                                showContent = showContent,
+                                onShowContentChange = {
+                                    showContent = it
+                                },
+                                isLoading = false,
+                                onAudioByteArrayChange = {},
+                                onAudioPathChange = {
+                                    filePath = it
+                                },
+                                audioFilePath = filePath,
+                                response = null,
+                                showQuestionNumber = false,
+                                instructionAudio = R.raw.read_letter,
+                                instructionTitle = "Read the letter",
+                                instructionDescription = "Hold the box to record your voice saying the letter.",
+                                onSubmit = {
+                                    if (currentIndex >= readingList.size - 1){
+                                        showCountDown = true
+                                        return@LiteracyReadingAssessmentUI
+                                    }
+                                    currentIndex ++
+                                    MediaUtils.cleanUpMediaFile(path = filePath ?: return@LiteracyReadingAssessmentUI)
+                                    filePath = null
+
+                                },
+                                modifier = modifier
+                            )
+
+                        }
+                    }
+                }
+
+            }
+        }
+
+    }
+
+
 
 
 }

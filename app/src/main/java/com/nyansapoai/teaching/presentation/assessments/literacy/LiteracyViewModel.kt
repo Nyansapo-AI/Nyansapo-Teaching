@@ -146,6 +146,10 @@ class LiteracyViewModel(
                     studentId = action.studentId
                 )
             }
+
+            LiteracyAction.OnCompletePreTest -> {
+                _state.update { it.copy(currentAssessmentLevel = LiteracyAssessmentLevel.LETTER_RECOGNITION) }
+            }
         }
     }
 
@@ -249,6 +253,7 @@ class LiteracyViewModel(
             LiteracyAssessmentLevel.STORY -> _state.value.assessmentContent?.storys[0]?.story?.trim()?.split(".") ?: emptyList()
             LiteracyAssessmentLevel.MULTIPLE_CHOICE -> emptyList()
             LiteracyAssessmentLevel.COMPLETED -> emptyList()
+            LiteracyAssessmentLevel.PRE_TEST -> emptyList()
         }
 
         currentAssessmentContentList?.let {
