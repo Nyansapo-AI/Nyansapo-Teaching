@@ -22,6 +22,8 @@ import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -274,12 +276,46 @@ fun LiteracyReadingAssessmentUI(
             modifier = Modifier
                 .fillMaxWidth()
         ) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.headlineSmall,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold
+                )
+
+                Column(
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    IconButton(
+                        colors = IconButtonDefaults.iconButtonColors(
+                            containerColor = MaterialTheme.colorScheme.tertiary,
+                            contentColor = MaterialTheme.colorScheme.onTertiary
+                        ),
+                        onClick = {onShowInstructionsChange(!showInstructions)}
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.volume),
+                            contentDescription = "Instructions Icon",
+//                            tint = if (showInstructions) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                    /*
+                    Text(
+                        text = "Tap to hear instructions",
+                        style = MaterialTheme.typography.bodySmall,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                    )
+
+                     */
+                }
+            }
 
 
             if (showQuestionNumber){
@@ -293,6 +329,7 @@ fun LiteracyReadingAssessmentUI(
                 progress = progress
             )
 
+            /*
             TextButton(
                 colors = ButtonDefaults.textButtonColors(
                     containerColor = MaterialTheme.colorScheme.tertiary,
@@ -301,12 +338,14 @@ fun LiteracyReadingAssessmentUI(
                 onClick = {
                     onShowInstructionsChange(!showInstructions)
 
+                    /*
                     audioFile?.let {
                         audioPlayer.playFile(it)
                     } ?: run {
                         println("Audio file not available")
                         // Handle case where audio file is not available
                     }
+                     */
                 }
             )
             {
@@ -327,6 +366,8 @@ fun LiteracyReadingAssessmentUI(
                     )
                 }
             }
+
+             */
         }
 
         Box(

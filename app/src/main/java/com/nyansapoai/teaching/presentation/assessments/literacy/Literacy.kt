@@ -87,7 +87,6 @@ fun LiteracyScreen(
 
     Scaffold(
 
-        /*
         topBar = {
             Text(
                 text = studentName,
@@ -95,12 +94,11 @@ fun LiteracyScreen(
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.secondary,
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(12.dp),
+//                    .fillMaxSize()
+                    .padding(horizontal = 12.dp),
             )
         }
 
-         */
     ) { innerPadding ->
         Box(
             contentAlignment = Alignment.Center,
@@ -126,10 +124,11 @@ fun LiteracyScreen(
                             readingList = state.assessmentContent?.letters?.take(5) ?: emptyList(),
                             currentIndex = state.currentIndex,
                             showInstructions = state.showInstructions,
+                            showQuestionNumber = false,
                             onShowInstructionsChange = {
                                 onAction(SetShowInstructions(it))
                             },
-                            title = "Letter",
+                            title = "Letter Recognition",
                             fontSize = 120.sp,
                             showContent = state.showContent,
                             instructionAudio = R.raw.read_letter,

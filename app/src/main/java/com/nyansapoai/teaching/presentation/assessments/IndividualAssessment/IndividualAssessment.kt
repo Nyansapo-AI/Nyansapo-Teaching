@@ -6,6 +6,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -50,6 +51,7 @@ import com.nyansapoai.teaching.presentation.schools.components.LearningLevelItem
 import com.nyansapoai.teaching.presentation.common.components.AppCircularLoading
 import com.nyansapoai.teaching.navigation.ConductAssessmentPage
 import com.nyansapoai.teaching.navigation.LiteracyResultsPage
+import com.nyansapoai.teaching.presentation.assessments.IndividualAssessment.composables.AssessmentsStatUI
 import com.nyansapoai.teaching.presentation.onboarding.components.OptionsItemUI
 import com.nyansapoai.teaching.utils.ResultStatus
 import org.koin.androidx.compose.koinViewModel
@@ -60,11 +62,6 @@ fun IndividualAssessmentRoot(
 ) {
 
     val viewModel = koinViewModel<IndividualAssessmentViewModel>()
-
-    LaunchedEffect(true) {
-        viewModel.getAssessmentById(assessmentId = assessmentId)
-    }
-
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     IndividualAssessmentScreen(
@@ -125,6 +122,7 @@ fun IndividualAssessmentScreen(
                             modifier = Modifier
                                 .fillMaxSize()
                         ) {
+                            /*
                             item {
                                 state.assessmentState.data.level_distribution.let { assessmentLevelDistributions ->
                                     if (assessmentLevelDistributions.isEmpty()){
@@ -159,19 +157,26 @@ fun IndividualAssessmentScreen(
                                             .widthIn(max = 420.dp),
                                         levelDescription = LearningLevelDescription(state.assessmentState.data.type, totalStudents = state.assessmentState.data.assigned_students.size)
                                     )
-
-
                                 }
+                            }*/
+
+                            item {
+                                AssessmentsStatUI(
+                                    total = state.assessmentState.data.assigned_students.size,
+                                    modifier = Modifier
+                                        .padding(16.dp)
+                                )
                             }
 
                             stickyHeader {
                                 Text(
-                                    text = "Students",
+                                    text = "Learners",
                                     style = MaterialTheme.typography.titleLarge,
                                     fontWeight = FontWeight.ExtraBold,
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(16.dp)
+                                        .background(MaterialTheme.colorScheme.primary)
+                                        .padding(horizontal = 12.dp)
                                 )
                             }
                             item {

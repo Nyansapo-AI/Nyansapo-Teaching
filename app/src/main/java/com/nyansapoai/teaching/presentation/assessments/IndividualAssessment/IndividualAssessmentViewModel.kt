@@ -1,42 +1,46 @@
 package com.nyansapoai.teaching.presentation.assessments.IndividualAssessment
 
 import android.util.Log
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import com.nyansapoai.teaching.data.local.LocalDataSource
 import com.nyansapoai.teaching.data.remote.assessment.AssessmentRepository
+import com.nyansapoai.teaching.navigation.IndividualAssessmentPage
 import com.nyansapoai.teaching.utils.ResultStatus
 import com.nyansapoai.teaching.utils.Results
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class IndividualAssessmentViewModel(
+    savedStateHandle: SavedStateHandle,
     private val assessmentRepository: AssessmentRepository,
-    private val localDataSource: LocalDataSource
-
+    private val localDataSource: LocalDataSource,
 ) : ViewModel() {
 
     private var hasLoadedInitialData = false
 
+    private val assessmentArgs = savedStateHandle.toRoute<IndividualAssessmentPage>()
+
     private val _state = MutableStateFlow(IndividualAssessmentState())
     val state = _state.asStateFlow()
-        /*
         .onStart {
-            if (!hasLoadedInitialData) {
-                /** Load initial data here **/
-                hasLoadedInitialData = true
-            }
+            getAssessmentById(assessmentId = assessmentArgs.assessmentId)
         }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000L),
             initialValue = IndividualAssessmentState()
         )
-         */
+
     fun onAction(action: IndividualAssessmentAction) {
         when (action) {
             is IndividualAssessmentAction.OnGetCompletedAssessments -> {
@@ -56,7 +60,7 @@ class IndividualAssessmentViewModel(
     }
 
 
-    fun getAssessmentById(assessmentId: String) {
+    private fun getAssessmentById(assessmentId: String) {
         viewModelScope.launch {
             _state.update { it.copy(assessmentState = Results.loading()) }
             assessmentRepository.getAssessmentById(assessmentId)
