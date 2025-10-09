@@ -90,7 +90,7 @@ fun SchoolScreen(
                     ) {
                         Icon(
                             painter = painterResource(id = R.drawable.school),
-                            contentDescription = "school",
+                            contentDescription = state.schoolDetails?.name ?: "School",
                             tint = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.3f)
                         )
 
@@ -103,18 +103,26 @@ fun SchoolScreen(
                 }
 
                 item{
-                    Spacer(Modifier.padding(20.dp))
+                    Spacer(Modifier.padding(12.dp))
                 }
 
                 items(items = state.user?.organizations[0]?.projects[0]?.schools ?: emptyList(), key = {it.id}){ school ->
-                    Text(
-                        text = school.name
-                    )
+                    TextButton(
+                        onClick = {
+
+                        }
+                    ) {
+                        Text(
+                            text = school.name
+                        )
+                    }
                 }
 
                 item {
                     TextButton(
-                        onClick = {}
+                        onClick = {
+                            onAction.invoke(SchoolAction.SignOut)
+                        }
                     ) {
                         Text(
                             text = "Sign out",
@@ -271,8 +279,8 @@ fun SchoolScreen(
                         totalStudents = 15,
                         data = listOf(
                             Level("Letters", 1, Color.Blue),
-                            Level("Words", 2, Color.Cyan),
-                            Level("Sentence", 3, Color.Green),
+                            Level("Words", 5, Color.Cyan),
+//                            Level("Sentence", 3, Color.Green),
                             Level("Paragraph", 4, Color(0xFFC8DF47)),
                             Level("Story", 5, Color.Magenta),
                         )
