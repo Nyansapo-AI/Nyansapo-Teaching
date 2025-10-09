@@ -302,9 +302,35 @@ fun ReadingStoryEvaluationUI(
                     instructionAudio = R.raw.click_the_button_to_move_to_the_next_sentence,
                     instructionsDescription = "click to move to the next sentence",
                     modifier = Modifier
-                        .align(Alignment.BottomEnd)
+                        .align(Alignment.BottomCenter)
                         .zIndex(1f)
-                ) {
+                )
+                {
+
+                    AppButton(
+                        enabled = !isLoading && !showInstructions,
+                        onClick = {
+                            appAudioRecorder.stop()
+                            isRecording = false
+                            audioFile?.let {
+                                onAudioPathChange(it.absolutePath)
+                                audioFilePathList = audioFilePathList + it.absolutePath
+                                audioFile = null
+                                onSubmit.invoke()
+                            }
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    ) {
+                        Text(
+                            text = "Next",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+
+
+                    /*
                     IconButton(
                         enabled = !isLoading && !showInstructions,
                         colors = IconButtonDefaults.iconButtonColors(
@@ -331,10 +357,8 @@ fun ReadingStoryEvaluationUI(
                             contentDescription = "Next",
                             tint = MaterialTheme.colorScheme.secondary
                         )
-                    }
+                    }*/
                 }
-
-
 
 
                 AppShowInstructions(

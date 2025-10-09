@@ -7,6 +7,7 @@ import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
@@ -28,6 +29,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -54,10 +57,10 @@ fun NumeracyArithmeticOperationsUI(
     var isEraserMode by remember { mutableStateOf(false) }
 
     Column(
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
-            .fillMaxWidth()
+            .fillMaxSize()
     ) {
         ButtonGroup(
             overflowIndicator = { menuState ->
@@ -157,7 +160,7 @@ fun NumeracyArithmeticOperationsUI(
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier
-                            .align(Alignment.CenterEnd)
+                            .align(Alignment.BottomCenter)
                             .fillMaxWidth()
                     ) {
 
@@ -173,9 +176,44 @@ fun NumeracyArithmeticOperationsUI(
                                 .heightIn(min = 100.dp, max = 150.dp)
                                 .background(MaterialTheme.colorScheme.background)
                                 .border(
-                                    width = 2.dp,
-                                    color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f)
+                                    width = 1.dp,
+//                                    color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f)
+                                    color = Color.White
                                 )
+                                .drawBehind{
+
+                                    val strokeWidth = 6.dp.toPx()
+                                    // Top border
+                                    drawLine(
+                                        color = Color.White,
+                                        start = Offset(0f, 0f),
+                                        end = Offset(size.width, 0f),
+                                        strokeWidth = 10.dp.toPx()
+                                    )
+
+                                    /*
+                                    // Bottom border
+                                    drawLine(
+                                        color = Color.Blue,
+                                        start = Offset(0f, size.height),
+                                        end = Offset(size.width, size.height),
+                                        strokeWidth = 8.dp.toPx()
+                                    )
+                                    // Left border
+                                    drawLine(
+                                        color = Color.Green,
+                                        start = Offset(0f, 0f),
+                                        end = Offset(0f, size.height),
+                                        strokeWidth = 4.dp.toPx()
+                                    )
+                                    // Right border
+                                    drawLine(
+                                        color = Color.Yellow,
+                                        start = Offset(size.width, 0f),
+                                        end = Offset(size.width, size.height),
+                                        strokeWidth = 10.dp.toPx()
+                                    )*/
+                                }
                         ) {
                             ScreenshotComposable(
                                 shouldCapture = shouldCapture,
@@ -197,7 +235,9 @@ fun NumeracyArithmeticOperationsUI(
                 }
             },
             modifier = Modifier
+//                .heightIn(max=500.dp, min = 400.dp)
                 .weight(0.8f)
+//                .fillMaxHeight()
         )
 
         AppButton(

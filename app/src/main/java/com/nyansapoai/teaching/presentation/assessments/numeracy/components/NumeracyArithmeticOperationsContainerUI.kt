@@ -1,6 +1,7 @@
 package com.nyansapoai.teaching.presentation.assessments.numeracy.components
 
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -86,15 +87,40 @@ fun NumeracyArithmeticOperationsContainerUI(
         }
     }
 
-    LazyColumn (
+    Column (
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(40.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
         modifier = modifier
             .fillMaxSize()
             .padding(16.dp),
     )
     {
 
+        Column(
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+        )
+        {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier
+                    .fillMaxWidth()
+            )
+
+            Text(
+                text = "Question ${currentIndex + 1}/${numeracyOperationList.size}",
+                style = MaterialTheme.typography.titleMedium,
+            )
+            AppLinearProgressIndicator(
+                progress = progress
+            )
+        }
+
+
+        /*
         item {
             Column(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -118,8 +144,25 @@ fun NumeracyArithmeticOperationsContainerUI(
                     progress = progress
                 )
             }
-        }
+        }*/
 
+        NumeracyArithmeticOperationsUI(
+            firstNumber = numeracyOperation.firstNumber,
+            secondNumber = numeracyOperation.secondNumber,
+            operationType = numeracyOperation.operationType ,
+            operationOrientation = orientation,
+            onSubmit = {
+                onIsSubmittingChange(true)
+            },
+            isLoading = isLoading,
+            shouldCapture = shouldCapture,
+            onAnswerFilePathChange = onAnswerFilePathChange,
+            onWorkAreaFilePathChange = onWorkOutFilePathChange,
+            modifier = Modifier
+                .background(MaterialTheme.colorScheme.primary)
+        )
+
+        /*
         item {
             NumeracyArithmeticOperationsUI(
                 firstNumber = numeracyOperation.firstNumber,
@@ -134,8 +177,9 @@ fun NumeracyArithmeticOperationsContainerUI(
                 onAnswerFilePathChange = onAnswerFilePathChange,
                 onWorkAreaFilePathChange = onWorkOutFilePathChange
             )
-
         }
+
+         */
 
     }
 }

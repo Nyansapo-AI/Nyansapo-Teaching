@@ -49,7 +49,7 @@ data class BottomNavigationItem(
                 title = "Sessions",
                 icon = R.drawable.sessions,
                 screen = {
-                    NumeracyArithmeticOperationsUI()
+                    AppComingSoon()
                 },
             ),
         )
