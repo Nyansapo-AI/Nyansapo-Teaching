@@ -4,10 +4,10 @@
     <selectionStates>
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DIALOG" />
-        <DropdownSelection timestamp="2025-10-02T06:35:31.771976954Z">
+        <DropdownSelection timestamp="2025-10-08T20:56:42.877326101Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="LocalEmulator" identifier="path=/home/wallace/.android/avd/Pixel_Tablet_API_TiramisuPrivacySandbox.avd" />
+              <DeviceId pluginId="PhysicalDevice" identifier="serial=084362525H006150" />
             </handle>
           </Target>
         </DropdownSelection>
@@ -15,7 +15,7 @@
           <targets>
             <Target type="DEFAULT_BOOT">
               <handle>
-                <DeviceId pluginId="PhysicalDevice" identifier="serial=HA1LQWW0" />
+                <DeviceId pluginId="PhysicalDevice" identifier="serial=084362525H006150" />
               </handle>
             </Target>
             <Target type="DEFAULT_BOOT">

@@ -12,7 +12,7 @@ import com.nyansapoai.teaching.data.local.LocalDataSource
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.CountMatch
 import com.nyansapoai.teaching.presentation.assessments.components.checkAnswer
 import com.nyansapoai.teaching.presentation.assessments.numeracy.components.NumeracyAssessmentLevel
-import com.nyansapoai.teaching.presentation.assessments.numeracy.workers.MarkNumeracyAssessmentAsCompleteWorker
+import com.nyansapoai.teaching.presentation.assessments.numeracy.workers.MarkNumeracyAssessmentAsDoneWorker
 import com.nyansapoai.teaching.presentation.assessments.numeracy.workers.UploadNumeracyWordProblemImagesWorker
 import com.nyansapoai.teaching.presentation.assessments.numeracy.workers.UploadNumeracyArithmeticOperationImageWorker
 import com.nyansapoai.teaching.presentation.assessments.numeracy.workers.SubmitNumeracyCountAndMatchResultWorker
@@ -597,7 +597,7 @@ class NumeracyAssessmentViewModel(
             .setConstraints(constraints = constraints)
             .build()
 
-        val markAsCompleteWork = OneTimeWorkRequestBuilder<MarkNumeracyAssessmentAsCompleteWorker>()
+        val markAsCompleteWork = OneTimeWorkRequestBuilder<MarkNumeracyAssessmentAsDoneWorker>()
             .setInputData(workData)
             .build()
 

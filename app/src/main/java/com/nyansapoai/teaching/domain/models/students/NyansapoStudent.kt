@@ -14,6 +14,7 @@ data class NyansapoStudent(
 //    val lastUpdated: String = "",
     val name: String = "",
     val sex: String = "",
+    val has_done: Boolean = false,
     val first_name: String = "",
     val last_name: String = "",
 )

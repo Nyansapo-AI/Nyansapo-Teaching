@@ -18,6 +18,7 @@ import com.nyansapoai.teaching.presentation.assessments.literacy.components.Lite
 import com.nyansapoai.teaching.presentation.assessments.literacy.workers.EvaluateMultipleChoiceQuestionWorker
 import com.nyansapoai.teaching.presentation.assessments.literacy.workers.EvaluateReadingAssessmentWorker
 import com.nyansapoai.teaching.presentation.assessments.literacy.workers.LiteracyAssessmentsMonitorWorker
+import com.nyansapoai.teaching.presentation.assessments.literacy.workers.MarkAssessmentDoneWorker
 import com.nyansapoai.teaching.presentation.assessments.literacy.workers.MarkLiteracyAssessmentWorker
 import com.nyansapoai.teaching.presentation.assessments.literacy.workers.SubmitMultipleChoiceResultsWorker
 import com.nyansapoai.teaching.presentation.assessments.literacy.workers.SubmitReadingAssessmentWorker
@@ -492,18 +493,6 @@ class LiteracyViewModel(
             "assessment_id" to assessmentId
         )
 
-        val readingWorkData = workDataOf(
-            "assessment_type" to "reading_assessment",
-            "student_id" to studentId,
-            "assessment_id" to assessmentId
-        )
-
-        val mcWorkData = workDataOf(
-            "assessment_type" to "multiple_choices",
-            "student_id" to studentId,
-            "assessment_id" to assessmentId
-        )
-
 
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
@@ -511,37 +500,23 @@ class LiteracyViewModel(
             .build()
 
 
-        val readingMonitorRequest = OneTimeWorkRequestBuilder<LiteracyAssessmentsMonitorWorker>()
-            .setInputData(readingWorkData)
-            .build()
-
-        val multipleChoicesMonitorRequest = OneTimeWorkRequestBuilder<LiteracyAssessmentsMonitorWorker>()
-            .setInputData(mcWorkData)
-            .build()
-
-        val submitReadingResultsRequest = OneTimeWorkRequestBuilder<SubmitReadingAssessmentWorker>()
-            .setInputData(workData)
-            .setConstraints(constraints = constraints)
-            .build()
-
         val submitMultipleChoicesResultsRequest = OneTimeWorkRequestBuilder<SubmitMultipleChoiceResultsWorker>()
             .setInputData(workData)
             .setConstraints(constraints = constraints)
             .build()
 
-        val markLiteracyAssessmentRequest = OneTimeWorkRequestBuilder<MarkLiteracyAssessmentWorker>()
+
+        val markAssessmentDoneRequest = OneTimeWorkRequestBuilder<MarkAssessmentDoneWorker>()
             .setInputData(workData)
-            .setConstraints(constraints = constraints)
             .build()
 
         workManager
             .beginUniqueWork(
                 uniqueWorkName ="complete_assessment_${assessmentId}_${studentId}",
                  existingWorkPolicy =  ExistingWorkPolicy.REPLACE,
-                request = readingMonitorRequest
+                request = submitMultipleChoicesResultsRequest
             )
-            .then(multipleChoicesMonitorRequest)
-            .then(submitMultipleChoicesResultsRequest)
+            .then(markAssessmentDoneRequest)
             .enqueue()
     }
 

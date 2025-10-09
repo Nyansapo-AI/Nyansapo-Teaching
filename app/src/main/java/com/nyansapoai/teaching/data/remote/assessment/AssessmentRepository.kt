@@ -78,4 +78,6 @@ interface  AssessmentRepository {
     fun getCompletedAssessments(assessmentId: String): Flow<Results<List<CompletedAssessment>>>
 
     fun fetchLiteracyAssessmentResults(assessmentId: String, studentId: String): Flow<Results<LiteracyAssessmentResults>>
+
+    suspend fun markAssessmentDone(assessmentId: String, studentId: String): Results<String>
 }

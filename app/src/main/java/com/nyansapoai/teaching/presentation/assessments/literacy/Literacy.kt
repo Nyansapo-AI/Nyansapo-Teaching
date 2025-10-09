@@ -40,6 +40,7 @@ import com.nyansapoai.teaching.presentation.assessments.literacy.components.Read
 import com.nyansapoai.teaching.presentation.common.components.AppSimulateNavigation
 import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
+import kotlin.invoke
 
 @Composable
 fun LiteracyRoot(
@@ -80,11 +81,14 @@ fun LiteracyScreen(
         onAction(LiteracyAction.SetIds(assessmentId = assessmentId, studentId = studentId))
     }
 
-    LaunchedEffect(state.currentAssessmentLevel == LiteracyAssessmentLevel.COMPLETED) {
-        onAction.invoke(OnSubmitLiteracyResults(assessmentId = assessmentId, studentId = studentId))
-//        delay(3000)
-//        navController.popBackStack()
+    LaunchedEffect(state.currentAssessmentLevel) {
+        if (state.currentAssessmentLevel == LiteracyAssessmentLevel.COMPLETED) {
+            onAction.invoke(OnSubmitLiteracyResults(assessmentId = assessmentId, studentId = studentId))
+            delay(3000)
+            navController.popBackStack()
+        }
     }
+
 
     Scaffold(
 
@@ -95,7 +99,6 @@ fun LiteracyScreen(
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.secondary,
                 modifier = Modifier
-//                    .fillMaxSize()
                     .padding(horizontal = 12.dp),
             )
         }

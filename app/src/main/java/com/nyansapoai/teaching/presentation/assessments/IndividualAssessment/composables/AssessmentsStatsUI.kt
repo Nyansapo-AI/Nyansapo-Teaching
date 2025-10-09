@@ -106,7 +106,7 @@ fun AssessmentsStatUI(
 
         ) {
             Text(
-                text = "Has completed",
+                text = "Has done",
                 style = MaterialTheme.typography.bodyMedium.copy(
                     fontWeight = FontWeight.Bold
                 )
@@ -128,7 +128,7 @@ fun AssessmentsStatUI(
 
         ) {
             Text(
-                text = "Has not completed",
+                text = "Has not done",
                 style = MaterialTheme.typography.bodyMedium.copy(
                     fontWeight = FontWeight.Bold
                 )
