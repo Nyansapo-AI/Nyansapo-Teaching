@@ -76,11 +76,14 @@ fun SchoolScreen(
             onDismissRequest = {
                 onAction.invoke(SchoolAction.OnShowSchoolSelector(show = false))
             },
-            sheetState = rememberModalBottomSheetState()
+            sheetState = rememberModalBottomSheetState(),
+            modifier = Modifier
+                .fillMaxWidth()
         )
         {
             LazyColumn(
                 modifier = Modifier
+                    .fillMaxWidth()
                     .padding(vertical = 16.dp, horizontal = 12.dp)
             ) {
                 stickyHeader {

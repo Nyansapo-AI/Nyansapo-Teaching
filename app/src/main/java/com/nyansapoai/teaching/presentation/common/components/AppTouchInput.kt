@@ -43,8 +43,8 @@ fun AppTouchInput(
     modifier: Modifier = Modifier,
     isEraserMode: Boolean = false,
     brushColor: Color = Color.Black,
-
-    ) {
+    )
+{
 
     MultiTouchDrawingCanvas(
         modifier = modifier
