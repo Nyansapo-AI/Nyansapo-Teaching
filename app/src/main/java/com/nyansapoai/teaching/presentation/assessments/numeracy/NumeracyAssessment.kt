@@ -30,6 +30,7 @@ import com.nyansapoai.teaching.R
 import com.nyansapoai.teaching.presentation.assessments.components.HasCompletedAssessment
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.LiteracyReadingAssessmentUI
 import com.nyansapoai.teaching.presentation.assessments.numeracy.NumeracyAssessmentAction.*
+import com.nyansapoai.teaching.presentation.assessments.numeracy.components.NumeracyArithmeticOperationsContainerUI
 import com.nyansapoai.teaching.presentation.assessments.numeracy.components.NumeracyAssessmentLevel
 import com.nyansapoai.teaching.presentation.assessments.numeracy.components.NumeracyCountAndMatch
 import com.nyansapoai.teaching.presentation.assessments.numeracy.components.NumeracyOperationContainerUI
@@ -165,6 +166,46 @@ fun NumeracyAssessmentScreen(
                         }
                     )
                 }
+
+                /*
+                NumeracyAssessmentLevel.ADDITION -> {
+                    NumeracyArithmeticOperationsContainerUI(
+                        numeracyOperationList = state.numeracyAssessmentContent.additions,
+                        currentIndex = state.currentIndex,
+                        title = "Addition",
+                        onAnswerFilePathChange = {path ->
+                            onAction.invoke(
+                                OnAnswerImageFilePathChange(path = path)
+                            )
+                        },
+                        onWorkOutFilePathChange = { path ->
+                            onAction.invoke(
+                                OnWorkAreaImageFilePathChange(path = path)
+                            )
+                        },
+                        isLoading = state.isLoading,
+                        shouldCapture = state.shouldCaptureAnswer,
+                        onIsSubmittingChange = {
+                            onAction.invoke(
+                                OnIsSubmittingChange(isSubmitting = it)
+                            )
+                        },
+                        onSubmit = {
+                            onAction.invoke(
+                                OnSubmitNumeracyOperations(
+                                    operationList = emptyList(),
+                                    assessmentId = assessmentId,
+                                    studentId = studentId,
+                                    onSuccess = {}
+                                )
+                            )
+                        }
+                    )
+
+                }
+                */
+
+
                 NumeracyAssessmentLevel.ADDITION ,
                 NumeracyAssessmentLevel.SUBTRACTION ,
                 NumeracyAssessmentLevel.MULTIPLICATION,
@@ -246,7 +287,7 @@ fun NumeracyAssessmentScreen(
                         response = null,
                         onSubmit = {
                             onAction.invoke(
-                                NumeracyAssessmentAction.OnSubmitNumberRecognition(
+                                OnSubmitNumberRecognition(
                                     assessmentId = assessmentId,
                                     studentId = studentId,
                                 )
@@ -287,6 +328,8 @@ fun NumeracyAssessmentScreen(
                         }
                     )
                 }
+
+
             }
 
         }

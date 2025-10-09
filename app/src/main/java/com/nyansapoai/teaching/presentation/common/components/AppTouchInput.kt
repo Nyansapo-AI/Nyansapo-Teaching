@@ -43,13 +43,14 @@ fun AppTouchInput(
     modifier: Modifier = Modifier,
     isEraserMode: Boolean = false,
     brushColor: Color = Color.Black,
+    backgroundColor: Color = MaterialTheme.colorScheme.tertiary
     )
 {
 
     MultiTouchDrawingCanvas(
         modifier = modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.tertiary),
+            .background(backgroundColor),
         isEraserMode = isEraserMode,
         eraserSize = 60f,
         brushColor = brushColor

@@ -6,6 +6,7 @@ import com.nyansapoai.teaching.R
 import com.nyansapoai.teaching.presentation.assessments.AssessmentsRoot
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.PreTestReadingAssessmentUI
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.ReadingStoryEvaluationUI
+import com.nyansapoai.teaching.presentation.assessments.numeracy.components.NumeracyArithmeticOperationsUI
 import com.nyansapoai.teaching.presentation.attendances.AttendancesRoot
 import com.nyansapoai.teaching.presentation.attendances.WeekContent
 import com.nyansapoai.teaching.presentation.common.components.AppComingSoon
@@ -48,7 +49,7 @@ data class BottomNavigationItem(
                 title = "Sessions",
                 icon = R.drawable.sessions,
                 screen = {
-                    AppComingSoon()
+                    NumeracyArithmeticOperationsUI()
                 },
             ),
         )
