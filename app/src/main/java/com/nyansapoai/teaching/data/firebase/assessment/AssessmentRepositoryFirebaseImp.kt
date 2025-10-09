@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
+import kotlin.text.get
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -483,6 +484,53 @@ class AssessmentRepositoryFirebaseImp(
                 trySend(Results.error(msg = "Error accessing literacy results: ${e.message}"))
                 close(e)
             }
+        }
+    }
+
+    override suspend fun markAssessmentDone(
+        assessmentId: String,
+        studentId: String
+    ): Results<String> {
+        val deferred = CompletableDeferred<Results<String>>()
+
+        firebaseDb.collection(assessmentCollection)
+            .document(assessmentId)
+            .get()
+            .addOnSuccessListener { documentSnapshot ->
+                if (documentSnapshot.exists()) {
+                    val assessment = documentSnapshot.toObject<Assessment>()
+                    assessment?.let {
+                        // Update assigned_students list with has_done=true for the specific student
+                        val updatedStudents = it.assigned_students.map { student ->
+                            if (student.id == studentId) {
+                                // Create updated student with has_done=true
+                                student.copy(has_done = true)
+                            } else {
+                                student
+                            }
+                        }
+
+                        // Update the document with the modified student list
+                        firebaseDb.collection(assessmentCollection)
+                            .document(assessmentId)
+                            .update("assigned_students", updatedStudents)
+                            .addOnSuccessListener {
+                                deferred.complete(Results.success(data = "Assessment marked as done"))
+                            }
+                            .addOnFailureListener { e ->
+                                deferred.complete(Results.error(msg = "Failed to mark assessment as done: ${e.message}"))
+                            }
+                    } ?: deferred.complete(Results.error(msg = "Assessment not found"))
+                } else {
+                    deferred.complete(Results.error(msg = "Assessment not found"))
+                }
+            }
+            .addOnFailureListener { e ->
+                deferred.complete(Results.error(msg = "Failed to retrieve assessment: ${e.message}"))
+            }
+
+        return withContext(Dispatchers.IO) {
+            deferred.await()
         }
     }
 

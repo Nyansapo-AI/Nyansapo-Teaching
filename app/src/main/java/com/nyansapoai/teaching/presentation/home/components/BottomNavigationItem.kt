@@ -4,6 +4,7 @@ import androidx.annotation.DrawableRes
 import androidx.compose.runtime.Composable
 import com.nyansapoai.teaching.R
 import com.nyansapoai.teaching.presentation.assessments.AssessmentsRoot
+import com.nyansapoai.teaching.presentation.assessments.literacy.components.PreTestReadingAssessmentUI
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.ReadingStoryEvaluationUI
 import com.nyansapoai.teaching.presentation.attendances.AttendancesRoot
 import com.nyansapoai.teaching.presentation.attendances.WeekContent
@@ -43,7 +44,6 @@ data class BottomNavigationItem(
                     AttendancesRoot()
                 },
             ),
-
             BottomNavigationItem(
                 title = "Sessions",
                 icon = R.drawable.sessions,

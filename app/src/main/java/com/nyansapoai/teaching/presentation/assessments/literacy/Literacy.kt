@@ -35,10 +35,12 @@ import com.nyansapoai.teaching.presentation.assessments.literacy.LiteracyAction.
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.LiteracyAssessmentLevel
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.LiteracyReadingAssessmentUI
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.MultichoiceQuestionsUI
+import com.nyansapoai.teaching.presentation.assessments.literacy.components.PreTestReadingAssessmentUI
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.ReadingStoryEvaluationUI
 import com.nyansapoai.teaching.presentation.common.components.AppSimulateNavigation
 import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
+import kotlin.invoke
 
 @Composable
 fun LiteracyRoot(
@@ -79,15 +81,17 @@ fun LiteracyScreen(
         onAction(LiteracyAction.SetIds(assessmentId = assessmentId, studentId = studentId))
     }
 
-    LaunchedEffect(state.currentAssessmentLevel == LiteracyAssessmentLevel.COMPLETED) {
-        onAction.invoke(OnSubmitLiteracyResults(assessmentId = assessmentId, studentId = studentId))
-//        delay(3000)
-//        navController.popBackStack()
+    LaunchedEffect(state.currentAssessmentLevel) {
+        if (state.currentAssessmentLevel == LiteracyAssessmentLevel.COMPLETED) {
+            onAction.invoke(OnSubmitLiteracyResults(assessmentId = assessmentId, studentId = studentId))
+            delay(3000)
+            navController.popBackStack()
+        }
     }
+
 
     Scaffold(
 
-        /*
         topBar = {
             Text(
                 text = studentName,
@@ -95,12 +99,10 @@ fun LiteracyScreen(
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.secondary,
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(12.dp),
+                    .padding(horizontal = 12.dp),
             )
         }
 
-         */
     ) { innerPadding ->
         Box(
             contentAlignment = Alignment.Center,
@@ -126,10 +128,11 @@ fun LiteracyScreen(
                             readingList = state.assessmentContent?.letters?.take(5) ?: emptyList(),
                             currentIndex = state.currentIndex,
                             showInstructions = state.showInstructions,
+                            showQuestionNumber = false,
                             onShowInstructionsChange = {
                                 onAction(SetShowInstructions(it))
                             },
-                            title = "Letter",
+                            title = "Letter Recognition",
                             fontSize = 120.sp,
                             showContent = state.showContent,
                             instructionAudio = R.raw.read_letter,
@@ -195,43 +198,6 @@ fun LiteracyScreen(
                     }
 
                     LiteracyAssessmentLevel.PARAGRAPH -> {
-                        /*
-                        LiteracyReadingAssessmentUI(
-                            modifier = Modifier,
-                            readingList = state.assessmentContent?.paragraphs[0]?.split(".")?: emptyList(),
-                            currentIndex = state.currentIndex,
-                            showInstructions = state.showInstructions,
-                            onShowInstructionsChange = {
-                                onAction(SetShowInstructions(it))
-                            },
-                            title = "Paragraphs",
-                            instructionTitle = "Read the paragraph",
-                            instructionAudio = R.raw.read_sentence,
-                            fontSize = 40.sp,
-                            showContent = state.showContent,
-                            showQuestionNumber = false,
-                            onShowContentChange = {
-                                onAction(SetShowContent(it))
-                            },
-                            onAudioByteArrayChange = {
-                                onAction(SetAudioByteArray(it))
-                            },
-                            response = state.response,
-                            isLoading = state.isLoading,
-                            onAudioPathChange = {
-                                onAction(SetAudioFilePath(audioFilePath = it))
-                            },
-                            audioFilePath = state.audioFilePath,
-                            onSubmit = {
-                                onAction(
-                                    OnSubmitResponse(
-                                        assessmentId = assessmentId,
-                                        studentId = studentId
-                                    )
-                                )
-                            }
-                        )*/
-
                         ReadingStoryEvaluationUI(
                             currentIndex = state.currentIndex,
                             title = "Read the Paragraph",
@@ -341,6 +307,14 @@ fun LiteracyScreen(
 
                     LiteracyAssessmentLevel.COMPLETED -> {
                         HasCompletedAssessment()
+                    }
+
+                    LiteracyAssessmentLevel.PRE_TEST -> {
+                        PreTestReadingAssessmentUI(
+                            onStart = {
+                                onAction(OnCompletePreTest)
+                            }
+                        )
                     }
                 }
             }

@@ -14,7 +14,6 @@ data class SchoolState(
     val schoolDetails: DetailedNyansapoSchool? = null,
     val showSchoolSelector: Boolean = false,
     val error: String? = null
-
 )
 
 data class Camp(

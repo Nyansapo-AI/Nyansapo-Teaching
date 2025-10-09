@@ -39,4 +39,6 @@ sealed interface LiteracyAction {
         val assessmentId: String,
         val studentId: String,
     ) : LiteracyAction
+
+    data object OnCompletePreTest : LiteracyAction
 }
