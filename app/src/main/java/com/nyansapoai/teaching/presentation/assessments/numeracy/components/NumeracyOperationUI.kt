@@ -322,7 +322,7 @@ fun HorizontalOperationItem(
         )
         Text(
             text = operationSymbol,
-            style = MaterialTheme.typography.displayLarge,
+            style = MaterialTheme.typography.displayMedium,
             fontWeight = FontWeight.Bold
         )
         Text(
@@ -331,6 +331,13 @@ fun HorizontalOperationItem(
             letterSpacing = 12.sp,
             fontWeight = FontWeight.Bold
         )
+        Text(
+            text = "=",
+            style = MaterialTheme.typography.displayLarge,
+            letterSpacing = 12.sp,
+            fontWeight = FontWeight.Bold
+        )
+
     }
 }
 

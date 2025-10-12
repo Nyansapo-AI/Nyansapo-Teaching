@@ -1,59 +1,37 @@
 package com.nyansapoai.teaching.presentation.common.components
 
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.awaitEachGesture
-import androidx.compose.foundation.gestures.detectDragGestures
-import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.gestures.detectTransformGestures
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Slider
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
-import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.input.pointer.PointerType
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 
 @Composable
 fun AppTouchInput(
     modifier: Modifier = Modifier,
     isEraserMode: Boolean = false,
-    brushColor: Color = Color.Black,
-    backgroundColor: Color = MaterialTheme.colorScheme.tertiary
-    )
+    brushColor: Color = Color.Black
+)
 {
 
     MultiTouchDrawingCanvas(
-        modifier = modifier
-            .fillMaxSize()
-            .background(backgroundColor),
         isEraserMode = isEraserMode,
         eraserSize = 60f,
-        brushColor = brushColor
+        brushColor = brushColor,
+        modifier = modifier
+            .fillMaxSize()
     )
 }
 
@@ -71,7 +49,6 @@ fun MultiTouchDrawingCanvas(
     Canvas(
         modifier = modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.tertiary)
             .pointerInput(isEraserMode) {
                 awaitEachGesture {
                     do {

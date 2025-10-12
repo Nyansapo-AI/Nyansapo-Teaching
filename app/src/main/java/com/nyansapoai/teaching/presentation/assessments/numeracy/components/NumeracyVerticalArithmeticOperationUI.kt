@@ -2,12 +2,9 @@ package com.nyansapoai.teaching.presentation.assessments.numeracy.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
@@ -37,31 +34,32 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.nyansapoai.teaching.R
 import com.nyansapoai.teaching.presentation.common.components.AppButton
+import com.nyansapoai.teaching.presentation.common.components.AppShowInstructions
 import com.nyansapoai.teaching.presentation.common.components.AppTouchInput
 import com.nyansapoai.teaching.presentation.common.components.ScreenshotComposable
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun NumeracyArithmeticOperationsUI(
+fun NumeracyVerticalArithmeticOperationUI(
     modifier: Modifier = Modifier,
     firstNumber: Int = 12,
     secondNumber: Int = 4,
     operationType: OperationType = OperationType.ADDITION,
-    operationOrientation: Orientation = Orientation.Horizontal,
     onAnswerFilePathChange: (String) -> Unit = {},
     onWorkAreaFilePathChange: (String) -> Unit = {},
     shouldCapture: Boolean = false,
     onSubmit: () -> Unit = {},
     isLoading: Boolean = false,
 ) {
-    var isEraserMode by remember { mutableStateOf(false) }
 
+    var isEraserMode by remember { mutableStateOf(false) }
     Column(
         verticalArrangement = Arrangement.spacedBy(4.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
             .fillMaxSize()
-    ) {
+    )
+    {
         ButtonGroup(
             overflowIndicator = { menuState ->
                 FilledIconButton(
@@ -138,7 +136,7 @@ fun NumeracyArithmeticOperationsUI(
 
         ScreenshotComposable(
             shouldCapture = shouldCapture,
-            fileName = "answer_area",
+            fileName = "work_area",
             onFilePathChange = { path ->
                 onWorkAreaFilePathChange(path)
             },
@@ -149,10 +147,10 @@ fun NumeracyArithmeticOperationsUI(
                         .background(MaterialTheme.colorScheme.primary)
                 )
                 {
+
                     AppTouchInput(
                         isEraserMode = isEraserMode,
                         brushColor = Color.Green,
-                        backgroundColor = Color.Transparent,
                         modifier = Modifier
                             .fillMaxSize()
                     )
@@ -170,74 +168,75 @@ fun NumeracyArithmeticOperationsUI(
                             secondNumber = secondNumber
                         )
 
-                        Box(
-                            modifier = Modifier
-                                .widthIn(max = 300.dp, min = 100.dp)
-                                .heightIn(min = 100.dp, max = 150.dp)
-                                .background(MaterialTheme.colorScheme.background)
-                                .border(
-                                    width = 1.dp,
-//                                    color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f)
-                                    color = Color.White
-                                )
-                                .drawBehind{
+                        AppShowInstructions(
+                            instructionAudio = R.raw.write_your_answer_in_the_box,
+                            instructionsTitle = "Answer Box",
+                            instructionsDescription = "Write your answer in the box.",
+                            content = {
+                                Box(
+                                    modifier = Modifier
+                                        .widthIn(max = 300.dp, min = 100.dp)
+                                        .heightIn(min = 100.dp, max = 150.dp)
+                                        .background(MaterialTheme.colorScheme.background)
+                                        .drawBehind{
 
-                                    val strokeWidth = 6.dp.toPx()
-                                    // Top border
-                                    drawLine(
-                                        color = Color.White,
-                                        start = Offset(0f, 0f),
-                                        end = Offset(size.width, 0f),
-                                        strokeWidth = 10.dp.toPx()
-                                    )
+                                            val strokeWidth = 6.dp.toPx()
+                                            // Top border
+                                            drawLine(
+                                                color = Color.White,
+                                                start = Offset(0f, 0f),
+                                                end = Offset(size.width, 0f),
+                                                strokeWidth = 10.dp.toPx()
+                                            )
 
-                                    /*
-                                    // Bottom border
-                                    drawLine(
-                                        color = Color.Blue,
-                                        start = Offset(0f, size.height),
-                                        end = Offset(size.width, size.height),
-                                        strokeWidth = 8.dp.toPx()
+                                            /*
+                                            // Bottom border
+                                            drawLine(
+                                                color = Color.Blue,
+                                                start = Offset(0f, size.height),
+                                                end = Offset(size.width, size.height),
+                                                strokeWidth = 8.dp.toPx()
+                                            )
+                                            // Left border
+                                            drawLine(
+                                                color = Color.Green,
+                                                start = Offset(0f, 0f),
+                                                end = Offset(0f, size.height),
+                                                strokeWidth = 4.dp.toPx()
+                                            )
+                                            // Right border
+                                            drawLine(
+                                                color = Color.Yellow,
+                                                start = Offset(size.width, 0f),
+                                                end = Offset(size.width, size.height),
+                                                strokeWidth = 10.dp.toPx()
+                                            )*/
+                                        }
+                                ) {
+                                    ScreenshotComposable(
+                                        shouldCapture = shouldCapture,
+                                        fileName = "answer_area",
+                                        onFilePathChange = { path ->
+                                            onAnswerFilePathChange(path)
+                                        },
+                                        content = {
+                                            AppTouchInput(
+                                                modifier = Modifier
+                                                    .background(MaterialTheme.colorScheme.tertiary),
+                                                isEraserMode = isEraserMode,
+                                            )
+                                        }
                                     )
-                                    // Left border
-                                    drawLine(
-                                        color = Color.Green,
-                                        start = Offset(0f, 0f),
-                                        end = Offset(0f, size.height),
-                                        strokeWidth = 4.dp.toPx()
-                                    )
-                                    // Right border
-                                    drawLine(
-                                        color = Color.Yellow,
-                                        start = Offset(size.width, 0f),
-                                        end = Offset(size.width, size.height),
-                                        strokeWidth = 10.dp.toPx()
-                                    )*/
                                 }
-                        ) {
-                            ScreenshotComposable(
-                                shouldCapture = shouldCapture,
-                                fileName = "answer_area",
-                                onFilePathChange = { path ->
-                                    onAnswerFilePathChange(path)
-                                },
-                                content = {
-                                    AppTouchInput(
-                                        modifier = Modifier
-                                            .background(MaterialTheme.colorScheme.tertiary),
-                                        isEraserMode = isEraserMode,
-                                    )
-                                }
-                            )
-                        }
+
+                            }
+                        )
                     }
-
                 }
             },
             modifier = Modifier
-//                .heightIn(max=500.dp, min = 400.dp)
-                .weight(0.8f)
-//                .fillMaxHeight()
+                .weight(0.9f)
+                .background(MaterialTheme.colorScheme.primary)
         )
 
         AppButton(
@@ -256,4 +255,5 @@ fun NumeracyArithmeticOperationsUI(
 
 
     }
+
 }

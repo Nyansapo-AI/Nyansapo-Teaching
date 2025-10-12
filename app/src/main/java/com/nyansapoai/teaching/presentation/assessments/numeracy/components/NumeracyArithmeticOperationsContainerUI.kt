@@ -8,8 +8,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -119,67 +117,42 @@ fun NumeracyArithmeticOperationsContainerUI(
             )
         }
 
-
-        /*
-        item {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-            )
-            {
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold,
+        when(orientation){
+            Orientation.Horizontal -> {
+                NumeracyHorizontalArithmeticOperationsUI(
+                    firstNumber = numeracyOperation.firstNumber,
+                    secondNumber = numeracyOperation.secondNumber,
+                    operationType = numeracyOperation.operationType ,
+                    onSubmit = {
+                        onIsSubmittingChange(true)
+                    },
+                    isLoading = isLoading,
+                    shouldCapture = shouldCapture,
+                    onAnswerFilePathChange = onAnswerFilePathChange,
+                    onWorkAreaFilePathChange = onWorkOutFilePathChange,
                     modifier = Modifier
-                        .fillMaxWidth()
-                )
-
-                Text(
-                    text = "Question ${currentIndex + 1}/${numeracyOperationList.size}",
-                    style = MaterialTheme.typography.titleMedium,
-                )
-                AppLinearProgressIndicator(
-                    progress = progress
+                        .background(MaterialTheme.colorScheme.primary)
                 )
             }
-        }*/
+            Orientation.Vertical -> {
+                NumeracyVerticalArithmeticOperationUI(
+                    firstNumber = numeracyOperation.firstNumber,
+                    secondNumber = numeracyOperation.secondNumber,
+                    operationType = numeracyOperation.operationType ,
+                    onSubmit = {
+                        onIsSubmittingChange(true)
+                    },
+                    isLoading = isLoading,
+                    shouldCapture = shouldCapture,
+                    onAnswerFilePathChange = onAnswerFilePathChange,
+                    onWorkAreaFilePathChange = onWorkOutFilePathChange,
+                    modifier = Modifier
+                        .background(MaterialTheme.colorScheme.primary)
+                )
 
-        NumeracyArithmeticOperationsUI(
-            firstNumber = numeracyOperation.firstNumber,
-            secondNumber = numeracyOperation.secondNumber,
-            operationType = numeracyOperation.operationType ,
-            operationOrientation = orientation,
-            onSubmit = {
-                onIsSubmittingChange(true)
-            },
-            isLoading = isLoading,
-            shouldCapture = shouldCapture,
-            onAnswerFilePathChange = onAnswerFilePathChange,
-            onWorkAreaFilePathChange = onWorkOutFilePathChange,
-            modifier = Modifier
-                .background(MaterialTheme.colorScheme.primary)
-        )
-
-        /*
-        item {
-            NumeracyArithmeticOperationsUI(
-                firstNumber = numeracyOperation.firstNumber,
-                secondNumber = numeracyOperation.secondNumber,
-                operationType = numeracyOperation.operationType ,
-                operationOrientation = orientation,
-                onSubmit = {
-                    onIsSubmittingChange(true)
-                },
-                isLoading = isLoading,
-                shouldCapture = shouldCapture,
-                onAnswerFilePathChange = onAnswerFilePathChange,
-                onWorkAreaFilePathChange = onWorkOutFilePathChange
-            )
+            }
         }
 
-         */
 
     }
 }
