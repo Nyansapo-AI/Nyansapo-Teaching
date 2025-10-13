@@ -7,7 +7,10 @@ import com.nyansapoai.teaching.data.local.LocalDataSource
 import com.nyansapoai.teaching.data.remote.authentication.AuthenticationRepository
 import com.nyansapoai.teaching.data.remote.school.SchoolRepository
 import com.nyansapoai.teaching.data.remote.user.UserRepository
+import com.nyansapoai.teaching.navController
+import com.nyansapoai.teaching.navigation.AuthControllerPage
 import com.nyansapoai.teaching.utils.ResultStatus
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
@@ -16,6 +19,7 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -70,8 +74,12 @@ class SchoolViewModel(
             }
             is SchoolAction.OnSelectSchool -> {}
             SchoolAction.SignOut -> {
-                viewModelScope.launch {
-                    authenticationRepository.signOut()
+                signOut()
+            }
+
+            is SchoolAction.OnShowLogOutDialog -> {
+                _state.update {
+                    it.copy(showLogOutDialog = action.show)
                 }
             }
         }
@@ -156,36 +164,20 @@ class SchoolViewModel(
                     }
                 }
             }
+        }
+    }
 
-            /*
-            schoolRepository.getSchoolInfo(
-                organizationId = organizationId,
-                projectId = projectId,
-                schoolId = schoolId
-            )
-                .catch { e ->
-                    Log.e(TAG, "Error fetching school details: ${e.message}")
-                    _state.update { it.copy(error = e.message, isLoading = false) }
-                }
-                .collect { data ->
-                    if (data.data != null) {
-                        _state.update {
-                            it.copy(
-                                schoolDetails = data.data,
-                                isLoading = false,
-                                error = null
-                            )
-                        }
-                    } else {
-                        _state.update {
-                            it.copy(
-                                error = data.message ?: "Failed to load school details",
-                                isLoading = false
-                            )
-                        }
+    private fun signOut() {
+        viewModelScope.launch {
+            authenticationRepository.signOut()
+
+            withContext(Dispatchers.Main) {
+                navController.navigate(AuthControllerPage) {
+                    popUpTo<AuthControllerPage> {
+                        inclusive = true
                     }
                 }
-            */
+            }
         }
     }
 }

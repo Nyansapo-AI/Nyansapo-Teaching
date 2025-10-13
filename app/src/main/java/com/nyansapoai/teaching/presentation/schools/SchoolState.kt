@@ -13,6 +13,7 @@ data class SchoolState(
     val localSchoolInfo: LocalSchoolInfo? = null,
     val schoolDetails: DetailedNyansapoSchool? = null,
     val showSchoolSelector: Boolean = false,
+    val showLogOutDialog: Boolean = false,
     val error: String? = null
 )
 
