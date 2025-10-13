@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.nyansapoai.teaching.data.local.LocalDataSource
 import com.nyansapoai.teaching.data.remote.assessment.AssessmentRepository
+import com.nyansapoai.teaching.domain.models.assessments.Assessment
 import com.nyansapoai.teaching.navigation.IndividualAssessmentPage
 import com.nyansapoai.teaching.utils.ResultStatus
 import com.nyansapoai.teaching.utils.Results
@@ -15,10 +16,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class IndividualAssessmentViewModel(
     savedStateHandle: SavedStateHandle,
@@ -31,15 +34,41 @@ class IndividualAssessmentViewModel(
     private val assessmentArgs = savedStateHandle.toRoute<IndividualAssessmentPage>()
 
     private val _state = MutableStateFlow(IndividualAssessmentState())
+
+    /*
     val state = _state.asStateFlow()
         .onStart {
+            _state.update { it.copy(isLoading = true) }
             getAssessmentById(assessmentId = assessmentArgs.assessmentId)
+            _state.update { it.copy(isLoading = false) }
         }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000L),
             initialValue = IndividualAssessmentState()
         )
+
+     */
+
+
+
+
+
+    val state = combine(
+        _state,
+        assessmentRepository.getAssessmentById(assessmentId = assessmentArgs.assessmentId),
+    ){ state, assessment ->
+        state.copy(
+            assessmentState = assessment,
+            studentsList = state.selectedGrade?.let { assessment.data?.assigned_students?.filter { it.grade == state.selectedGrade } }  ?: assessment.data?.assigned_students ?: emptyList()
+        )
+    }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000L),
+            initialValue = IndividualAssessmentState()
+        )
+
 
     fun onAction(action: IndividualAssessmentAction) {
         when (action) {
@@ -69,13 +98,32 @@ class IndividualAssessmentViewModel(
                 }
                 .collect{ assessment ->
                     Log.d("IndividualAssessmentViewModel", "Fetched assessment: $assessment")
-//                    _state.update { it.copy(assessmentState = assessment) }
-                    _state.value = _state.value.copy(
-                        assessmentState = assessment
-                    )
+
+                    _state.update { it.copy(assessmentState = assessment)  }
                 }
         }
     }
+
+    /*
+    private fun fetchAssessmentById(assessmentId: String): Flow<Results<Assessment>> {
+        /*
+        var result: Results<Assessment> = Results.loading()
+        viewModelScope.launch(Dispatchers.IO) {
+            assessmentRepository.getAssessmentById(assessmentId)
+                .catch { e ->
+                    result = Results.error(msg = e.message ?: "Something went wrong!")
+                }
+                .collect{ assessment ->
+                    Log.d("IndividualAssessmentViewModel", "Fetched assessment: $assessment")
+                    result = assessment
+                }
+        }
+        return result
+
+
+         */
+
+    }*/
 
 
     fun fetchCompletedAssessments(assessmentId: String){

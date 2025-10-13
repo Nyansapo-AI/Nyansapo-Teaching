@@ -495,18 +495,9 @@ class LiteracyViewModel(
             "assessment_id" to assessmentId
         )
 
-
-        val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .setRequiresStorageNotLow(true)
-            .build()
-
-
         val submitMultipleChoicesResultsRequest = OneTimeWorkRequestBuilder<SubmitMultipleChoiceResultsWorker>()
             .setInputData(workData)
-            .setConstraints(constraints = constraints)
             .build()
-
 
         val markAssessmentDoneRequest = OneTimeWorkRequestBuilder<MarkAssessmentDoneWorker>()
             .setInputData(workData)

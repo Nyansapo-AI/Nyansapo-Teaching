@@ -23,6 +23,11 @@ class MarkAssessmentDoneWorker(
             val studentId = inputData.getString("student_id") ?: return Result.failure()
             val assessmentId = inputData.getString("assessment_id") ?: return Result.failure()
 
+            localDataSource.insertCompletedAssessment(
+                studentId = studentId,
+                assessmentId = assessmentId,
+            )
+
             val response = assessmentRepository.markAssessmentDone(assessmentId = assessmentId, studentId = studentId)
 
             if(response.status.name == "SUCCESS"){

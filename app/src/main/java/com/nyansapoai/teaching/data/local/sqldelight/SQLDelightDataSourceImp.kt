@@ -170,7 +170,7 @@ class SQLDelightDataSourceImp(
         assessmentQueries.insertCompleteAssessment(
             assessmentId = assessmentId,
             studentId = studentId,
-            isCompleted = 0
+            isCompleted = 1
         )
     }
 

@@ -136,7 +136,7 @@ fun AssessmentItemBasic(
                 "Literacy" -> "Literacy Icon"
                 else -> "Assessment Icon"
             },
-            alpha = 0.7f,
+            alpha = 0.5f,
             modifier = Modifier
                 .padding(16.dp)
                 .size(60.dp)
@@ -153,7 +153,7 @@ fun AssessmentItemBasic(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(
-                verticalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp),
                 modifier = Modifier.weight(1f)
             )
             {
@@ -179,7 +179,7 @@ fun AssessmentItemBasic(
                 Text(
                     text = assessment.name,
                     style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.onTertiary,
+                    color = MaterialTheme.colorScheme.onPrimary,
                     fontWeight = FontWeight.Bold
                 )
 

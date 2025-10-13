@@ -1,5 +1,6 @@
 package com.nyansapoai.teaching.presentation.assessments.numeracy
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.Constraints
@@ -582,6 +583,9 @@ class NumeracyAssessmentViewModel(
         assessmentId: String,
         studentId: String,
     ){
+
+        Log.d("submitNumeracyAssessment", "submitNumeracyAssessment: $assessmentId, $studentId")
+
         val workData = workDataOf(
             "assessment_id" to assessmentId,
             "student_id" to studentId,
@@ -606,9 +610,9 @@ class NumeracyAssessmentViewModel(
             .beginUniqueWork(
                 uniqueWorkName = "submit_numeracy_assessment_${assessmentId}_${studentId}",
                 existingWorkPolicy = ExistingWorkPolicy.REPLACE,
-                request = submitNumeracyCountMatchResults,
+                request = markAsCompleteWork,
             )
-            .then(markAsCompleteWork)
+            .then(submitNumeracyCountMatchResults)
             .enqueue()
 
     }

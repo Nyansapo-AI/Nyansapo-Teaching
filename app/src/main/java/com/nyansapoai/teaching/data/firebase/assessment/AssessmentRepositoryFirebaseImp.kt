@@ -139,7 +139,7 @@ class AssessmentRepositoryFirebaseImp(
         }
     }
 
-    override suspend fun getAssessmentById(assessmentId: String): Flow<Results<Assessment>> = callbackFlow {
+    override fun getAssessmentById(assessmentId: String): Flow<Results<Assessment>> = callbackFlow {
 
         val snapshotListener = firebaseDb.collection(assessmentCollection)
             .document(assessmentId)

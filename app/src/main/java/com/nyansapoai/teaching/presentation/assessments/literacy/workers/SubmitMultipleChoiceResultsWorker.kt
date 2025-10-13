@@ -20,8 +20,6 @@ class SubmitMultipleChoiceResultsWorker(
     private val assessmentRepository: AssessmentRepository by inject()
 
     override suspend fun doWork(): Result {
-
-        val retryAttempt = runAttemptCount
         val assessmentId = inputData.getString("assessment_id")
         val studentId = inputData.getString("student_id")
 

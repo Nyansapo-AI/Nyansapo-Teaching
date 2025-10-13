@@ -10,7 +10,9 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -70,6 +72,7 @@ fun LiteracyRoot(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LiteracyScreen(
+    modifier: Modifier = Modifier,
     state: LiteracyState,
     assessmentId: String,
     studentId: String,
@@ -101,7 +104,12 @@ fun LiteracyScreen(
                 modifier = Modifier
                     .padding(horizontal = 12.dp),
             )
-        }
+        },
+        modifier = modifier
+            .fillMaxSize()
+            .statusBarsPadding()
+            .navigationBarsPadding()
+
 
     ) { innerPadding ->
         Box(
@@ -224,43 +232,6 @@ fun LiteracyScreen(
                     }
 
                     LiteracyAssessmentLevel.STORY -> {
-                        /*
-                        LiteracyReadingAssessmentUI(
-                            modifier = Modifier,
-                            readingList = state.assessmentContent?.storys[0]?.story?.trim()?.split(".") ?: emptyList(),
-                            currentIndex = state.currentIndex,
-                            showInstructions = state.showInstructions,
-                            onShowInstructionsChange = {
-                                onAction(SetShowInstructions(it))
-                            },
-                            title = "Reading Story",
-                            instructionTitle = "Read the sentence",
-                            instructionAudio = R.raw.read_sentence,
-                            fontSize = 40.sp,
-                            showQuestionNumber = true,
-                            showContent = state.showContent,
-                            onShowContentChange = {
-                                onAction(SetShowContent(it))
-                            },
-                            onAudioByteArrayChange = {
-                                onAction(SetAudioByteArray(it))
-                            },
-                            response = state.response,
-                            isLoading = state.isLoading,
-                            onAudioPathChange = {
-                                onAction(SetAudioFilePath(audioFilePath = it))
-                            },
-                            audioFilePath = state.audioFilePath,
-                            onSubmit = {
-                                onAction(
-                                    OnSubmitResponse(
-                                        assessmentId = assessmentId,
-                                        studentId = studentId
-                                    )
-                                )
-                            }
-                        )*/
-
                         ReadingStoryEvaluationUI(
                             currentIndex = state.currentIndex,
                             title = "Reading Story",
