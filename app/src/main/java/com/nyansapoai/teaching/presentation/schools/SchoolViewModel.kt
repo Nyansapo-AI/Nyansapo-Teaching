@@ -170,7 +170,6 @@ class SchoolViewModel(
     private fun signOut() {
         viewModelScope.launch {
             authenticationRepository.signOut()
-            localDataSource.clearAllData()
 
             withContext(Dispatchers.Main) {
                 navController.navigate(AuthControllerPage) {
