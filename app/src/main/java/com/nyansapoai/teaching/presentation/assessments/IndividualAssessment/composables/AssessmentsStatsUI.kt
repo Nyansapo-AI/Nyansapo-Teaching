@@ -33,7 +33,7 @@ fun AssessmentsStatUI(
     modifier: Modifier = Modifier,
     total: Int = 200,
     completed: Int = 10,
-    title: String = "Assessments Completed"
+    title: String = "Assessments Progress"
 ) {
 
     val balance = total - completed
@@ -44,7 +44,7 @@ fun AssessmentsStatUI(
         modifier = modifier
             .widthIn(min = 120.dp,)
             .clip(RoundedCornerShape(5))
-            .background(lightPrimary)
+            .background(MaterialTheme.colorScheme.tertiary)
             .fillMaxWidth()
             .padding(8.dp)
     )
@@ -74,6 +74,7 @@ fun AssessmentsStatUI(
                 .fillMaxWidth(),
             )
 
+        /*
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -95,8 +96,7 @@ fun AssessmentsStatUI(
                     color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
                 )
             )
-
-        }
+        }*/
 
         Row(
             verticalAlignment = Alignment.CenterVertically,

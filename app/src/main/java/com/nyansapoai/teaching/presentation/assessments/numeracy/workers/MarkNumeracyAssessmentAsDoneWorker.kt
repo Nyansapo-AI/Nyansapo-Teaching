@@ -5,6 +5,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.nyansapoai.teaching.data.local.LocalDataSource
 import com.nyansapoai.teaching.data.remote.assessment.AssessmentRepository
+import com.nyansapoai.teaching.utils.ResultStatus
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -25,18 +26,30 @@ class MarkNumeracyAssessmentAsDoneWorker(
                 return Result.failure()
             }
 
-            localDataSource.completeAssessment(
+            localDataSource.insertCompletedAssessment(
                 studentId = studentId,
                 assessmentId = assessmentId,
-                isCompleted = true
             )
 
-            assessmentRepository.markAssessmentDone(
+
+
+            val response = assessmentRepository.markAssessmentDone(
                 assessmentId = assessmentId,
                 studentId = studentId
             )
 
-            return Result.success()
+            return when(response.status){
+                ResultStatus.INITIAL ,
+                ResultStatus.LOADING ,
+                ResultStatus.ERROR -> {
+                    Result.retry()
+                }
+
+                ResultStatus.SUCCESS -> {
+                    Result.success()
+                }
+            }
+//            return Result.success()
         }catch (e: Exception){
             e.printStackTrace()
             return Result.failure()

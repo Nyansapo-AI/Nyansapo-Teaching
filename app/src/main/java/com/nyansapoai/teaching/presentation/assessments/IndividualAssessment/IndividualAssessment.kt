@@ -2,6 +2,7 @@ package com.nyansapoai.teaching.presentation.assessments.IndividualAssessment
 
 import android.widget.Toast
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
@@ -13,9 +14,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -47,11 +49,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nyansapoai.teaching.R
 import com.nyansapoai.teaching.domain.models.students.NyansapoStudent
 import com.nyansapoai.teaching.navController
-import com.nyansapoai.teaching.presentation.schools.LearningLevelDescription
-import com.nyansapoai.teaching.presentation.schools.components.LearningLevelItem
 import com.nyansapoai.teaching.presentation.common.components.AppCircularLoading
 import com.nyansapoai.teaching.navigation.ConductAssessmentPage
-import com.nyansapoai.teaching.navigation.LiteracyResultsPage
 import com.nyansapoai.teaching.presentation.assessments.IndividualAssessment.composables.AssessmentsStatUI
 import com.nyansapoai.teaching.presentation.onboarding.components.OptionsItemUI
 import com.nyansapoai.teaching.utils.ResultStatus
@@ -76,7 +75,7 @@ fun IndividualAssessmentRoot(
 @Composable
 fun IndividualAssessmentScreen(
     state: IndividualAssessmentState,
-    onAction: (IndividualAssessmentAction) -> Unit,
+    onAction: (IndividualAssessmentAction) -> Unit
 ) {
 
     val context = LocalContext.current
@@ -102,8 +101,19 @@ fun IndividualAssessmentScreen(
                     titleContentColor = MaterialTheme.colorScheme.secondary
                 )
             )
-        }
+        },
+        modifier = Modifier
+            .fillMaxSize()
+            .statusBarsPadding()
+            .navigationBarsPadding()
     ) { innerPadding ->
+
+        AnimatedVisibility(
+            visible = state.isLoading
+        ) {
+            AppCircularLoading()
+        }
+
         AnimatedContent(
             targetState = state.assessmentState.status,
             transitionSpec = { fadeIn() togetherWith fadeOut() } ,
@@ -206,6 +216,7 @@ fun IndividualAssessmentScreen(
                                 }
                             }
 
+
                             item {
                                 if (state.studentsList.isEmpty()){
                                     Text(
@@ -220,7 +231,10 @@ fun IndividualAssessmentScreen(
                             }
 
 
-                            items(items = state.studentsList, key = { it.id }) { student ->
+                            items(
+                                items = state.studentsList.sortedWith(compareBy { !it.has_done }).reversed(),
+                                key = { it.id }
+                            ) { student ->
                                 /*
                                 ElevatedCard(
                                     colors = CardDefaults.outlinedCardColors(

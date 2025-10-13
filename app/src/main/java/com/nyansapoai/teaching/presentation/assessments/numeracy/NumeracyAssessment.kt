@@ -9,7 +9,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -26,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nyansapoai.teaching.R
+import com.nyansapoai.teaching.navController
 import com.nyansapoai.teaching.presentation.assessments.components.HasCompletedAssessment
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.LiteracyReadingAssessmentUI
 import com.nyansapoai.teaching.presentation.assessments.numeracy.NumeracyAssessmentAction.OnAnswerImageFilePathChange
@@ -45,6 +48,7 @@ import com.nyansapoai.teaching.presentation.assessments.numeracy.components.Nume
 import com.nyansapoai.teaching.presentation.assessments.numeracy.components.NumeracyCountAndMatch
 import com.nyansapoai.teaching.presentation.assessments.numeracy.components.NumeracyWordProblemContainer
 import com.nyansapoai.teaching.presentation.common.components.AppSimulateNavigation
+import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -52,6 +56,7 @@ fun NumeracyAssessmentRoot(
     modifier: Modifier = Modifier,
     assessmentId: String,
     studentId: String,
+    studentName: String,
     assessmentNo: Int
 ) {
 
@@ -63,6 +68,7 @@ fun NumeracyAssessmentRoot(
         onAction = viewModel::onAction,
         studentId = studentId,
         assessmentId = assessmentId,
+        studentName = studentName,
         modifier = modifier
     )
 }
@@ -73,7 +79,8 @@ fun NumeracyAssessmentScreen(
     state: NumeracyAssessmentState,
     onAction: (NumeracyAssessmentAction) -> Unit,
     studentId: String,
-    assessmentId: String
+    assessmentId: String,
+    studentName: String
 ) {
 
     LaunchedEffect(state.hasCompletedAssessment) {
@@ -84,14 +91,30 @@ fun NumeracyAssessmentScreen(
                     studentId = studentId
                 )
             )
+
+            delay(4000)
+            navController.popBackStack()
+
         }
     }
 
 
 
     Scaffold(
+        topBar = {
+            Text(
+                text = studentName,
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.secondary,
+                modifier = Modifier
+                    .padding(horizontal = 12.dp),
+            )
+        },
         modifier = modifier
             .fillMaxSize()
+            .statusBarsPadding()
+            .navigationBarsPadding()
     ) { innerPadding  ->
 
         if (state.numeracyAssessmentContent == null) {
@@ -115,11 +138,12 @@ fun NumeracyAssessmentScreen(
                     .padding(innerPadding)
                     .fillMaxSize()
             )
+
             return@Scaffold
         }
 
 
-        if (state.isLoading){
+        if (state.isLoading) {
             AnimatedVisibility(
                 visible = state.isLoading,
                 enter = scaleIn() + fadeIn(),

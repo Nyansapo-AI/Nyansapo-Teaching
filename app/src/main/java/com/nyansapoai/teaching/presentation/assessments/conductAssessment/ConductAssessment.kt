@@ -54,7 +54,8 @@ fun ConductAssessmentScreen(
             NumeracyAssessmentRoot(
                 assessmentId = assessmentId,
                 studentId = studentId,
-                assessmentNo = assessmentNo
+                assessmentNo = assessmentNo,
+                studentName = studentName
             )
         }
         else -> {

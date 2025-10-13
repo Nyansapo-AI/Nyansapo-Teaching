@@ -26,7 +26,7 @@ interface  AssessmentRepository {
 
     suspend fun getAssessments(schoolId: String = ""): Flow<List<Assessment>>
 
-    suspend fun getAssessmentById(assessmentId: String): Flow<Results<Assessment>>
+    fun getAssessmentById(assessmentId: String): Flow<Results<Assessment>>
 
     suspend fun assessNumeracyCountAndMatch(
         assessmentId: String,
