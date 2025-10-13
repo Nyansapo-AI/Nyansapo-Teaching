@@ -216,7 +216,8 @@ fun LiteracyScreen(
                                     )
                                 )
                             },
-                            storySentencesList = state.assessmentContent?.paragraphs[0]?.split(".")?: emptyList()
+//                            storySentencesList = state.assessmentContent?.paragraphs[0]?.split(".")?: emptyList()
+                            storySentencesList = listOf(state.assessmentContent?.paragraphs[0] ?: "")
                         )
 
 
@@ -278,7 +279,8 @@ fun LiteracyScreen(
                                     )
                                 )
                             },
-                            storySentencesList = state.assessmentContent?.storys[0]?.story?.trim()?.split(".") ?: emptyList()
+//                            storySentencesList = state.assessmentContent?.storys[0]?.story?.trim()?.split(".") ?: emptyList()
+                            storySentencesList = listOf(state.assessmentContent?.storys[0]?.story ?: "")
                         )
                     }
 

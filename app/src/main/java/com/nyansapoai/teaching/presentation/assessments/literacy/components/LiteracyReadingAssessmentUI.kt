@@ -70,6 +70,7 @@ import com.nyansapoai.teaching.presentation.common.components.AppLinearProgressI
 import com.nyansapoai.teaching.presentation.common.components.AppShowInstructions
 import com.nyansapoai.teaching.presentation.common.media.MediaUtils
 import com.nyansapoai.teaching.presentation.common.permissions.RequestAppPermissions
+import com.nyansapoai.teaching.ui.theme.abeeZeeFont
 import com.nyansapoai.teaching.ui.theme.lightPrimary
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -453,6 +454,7 @@ fun LiteracyReadingAssessmentUI(
                                 } else "",
                                 style = MaterialTheme.typography.headlineLarge,
                                 color = MaterialTheme.colorScheme.secondary,
+                                fontFamily = abeeZeeFont,
                                 textAlign = TextAlign.Center,
                                 fontWeight = FontWeight.Bold,
                                 fontSize = fontSize,

@@ -30,6 +30,7 @@ import com.nyansapoai.teaching.R
 import com.nyansapoai.teaching.presentation.assessments.components.HasCompletedAssessment
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.LiteracyReadingAssessmentUI
 import com.nyansapoai.teaching.presentation.assessments.numeracy.NumeracyAssessmentAction.*
+import com.nyansapoai.teaching.presentation.assessments.numeracy.components.NumeracyArithmeticOperationsContainerUI
 import com.nyansapoai.teaching.presentation.assessments.numeracy.components.NumeracyAssessmentLevel
 import com.nyansapoai.teaching.presentation.assessments.numeracy.components.NumeracyCountAndMatch
 import com.nyansapoai.teaching.presentation.assessments.numeracy.components.NumeracyOperationContainerUI
@@ -165,6 +166,7 @@ fun NumeracyAssessmentScreen(
                         }
                     )
                 }
+
                 NumeracyAssessmentLevel.ADDITION ,
                 NumeracyAssessmentLevel.SUBTRACTION ,
                 NumeracyAssessmentLevel.MULTIPLICATION,
@@ -186,7 +188,7 @@ fun NumeracyAssessmentScreen(
                         else -> ""
                     }
 
-                    NumeracyOperationContainerUI(
+                    NumeracyArithmeticOperationsContainerUI(
                         numeracyOperationList = operationList,
                         currentIndex = state.currentIndex,
                         title = title,
@@ -246,7 +248,7 @@ fun NumeracyAssessmentScreen(
                         response = null,
                         onSubmit = {
                             onAction.invoke(
-                                NumeracyAssessmentAction.OnSubmitNumberRecognition(
+                                OnSubmitNumberRecognition(
                                     assessmentId = assessmentId,
                                     studentId = studentId,
                                 )
@@ -287,6 +289,8 @@ fun NumeracyAssessmentScreen(
                         }
                     )
                 }
+
+
             }
 
         }

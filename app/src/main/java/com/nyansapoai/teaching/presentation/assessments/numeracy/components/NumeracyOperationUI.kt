@@ -1,5 +1,6 @@
 package com.nyansapoai.teaching.presentation.assessments.numeracy.components
 
+import android.graphics.Paint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -56,20 +57,17 @@ fun NumeracyOperationUI(
     onSubmit: () -> Unit,
     isLoading: Boolean = false,
 ) {
-
     var isEraserMode by remember { mutableStateOf(false) }
-
     Box(
-        modifier = Modifier
+        contentAlignment = Alignment.Center,
+        modifier = modifier
             .fillMaxWidth()
     ){
-
         Column(
             verticalArrangement = Arrangement.spacedBy(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = modifier
+            modifier = Modifier
         ) {
-
             ButtonGroup(
                 overflowIndicator = { menuState ->
                     FilledIconButton(
@@ -258,7 +256,6 @@ fun NumeracyOperationUI(
                     .padding(12.dp)
             ) {
                 Text(
-//                    text = if(shouldCapture) "Next." else "Submit Answer",
                     text = "Submit Answer",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
@@ -325,7 +322,7 @@ fun HorizontalOperationItem(
         )
         Text(
             text = operationSymbol,
-            style = MaterialTheme.typography.displayLarge,
+            style = MaterialTheme.typography.displayMedium,
             fontWeight = FontWeight.Bold
         )
         Text(
@@ -334,6 +331,13 @@ fun HorizontalOperationItem(
             letterSpacing = 12.sp,
             fontWeight = FontWeight.Bold
         )
+        Text(
+            text = "=",
+            style = MaterialTheme.typography.displayLarge,
+            letterSpacing = 12.sp,
+            fontWeight = FontWeight.Bold
+        )
+
     }
 }
 
