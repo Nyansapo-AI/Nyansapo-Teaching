@@ -167,45 +167,6 @@ fun NumeracyAssessmentScreen(
                     )
                 }
 
-                /*
-                NumeracyAssessmentLevel.ADDITION -> {
-                    NumeracyArithmeticOperationsContainerUI(
-                        numeracyOperationList = state.numeracyAssessmentContent.additions,
-                        currentIndex = state.currentIndex,
-                        title = "Addition",
-                        onAnswerFilePathChange = {path ->
-                            onAction.invoke(
-                                OnAnswerImageFilePathChange(path = path)
-                            )
-                        },
-                        onWorkOutFilePathChange = { path ->
-                            onAction.invoke(
-                                OnWorkAreaImageFilePathChange(path = path)
-                            )
-                        },
-                        isLoading = state.isLoading,
-                        shouldCapture = state.shouldCaptureAnswer,
-                        onIsSubmittingChange = {
-                            onAction.invoke(
-                                OnIsSubmittingChange(isSubmitting = it)
-                            )
-                        },
-                        onSubmit = {
-                            onAction.invoke(
-                                OnSubmitNumeracyOperations(
-                                    operationList = emptyList(),
-                                    assessmentId = assessmentId,
-                                    studentId = studentId,
-                                    onSuccess = {}
-                                )
-                            )
-                        }
-                    )
-
-                }
-                */
-
-
                 NumeracyAssessmentLevel.ADDITION ,
                 NumeracyAssessmentLevel.SUBTRACTION ,
                 NumeracyAssessmentLevel.MULTIPLICATION,
@@ -226,40 +187,6 @@ fun NumeracyAssessmentScreen(
                         NumeracyAssessmentLevel.DIVISION -> "Division"
                         else -> ""
                     }
-
-                    /*
-                    NumeracyOperationContainerUI(
-                        numeracyOperationList = operationList,
-                        currentIndex = state.currentIndex,
-                        title = title,
-                        onAnswerFilePathChange = {path ->
-                            onAction.invoke(
-                                OnAnswerImageFilePathChange(path = path)
-                            )
-                        },
-                        onWorkOutFilePathChange = { path ->
-                            onAction.invoke(
-                                OnWorkAreaImageFilePathChange(path = path)
-                            )
-                        },
-                        isLoading = state.isLoading,
-                        shouldCapture = state.shouldCaptureAnswer,
-                        onIsSubmittingChange = {
-                            onAction.invoke(
-                                OnIsSubmittingChange(isSubmitting = it)
-                            )
-                        },
-                        onSubmit = {
-                            onAction.invoke(
-                                OnSubmitNumeracyOperations(
-                                    operationList = emptyList(),
-                                    assessmentId = assessmentId,
-                                    studentId = studentId,
-                                    onSuccess = {}
-                                )
-                            )
-                        }
-                    )*/
 
                     NumeracyArithmeticOperationsContainerUI(
                         numeracyOperationList = operationList,
