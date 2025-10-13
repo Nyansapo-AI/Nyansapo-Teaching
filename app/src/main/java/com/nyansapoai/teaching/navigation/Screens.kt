@@ -10,6 +10,9 @@ data object GetStartedPage
 data object SignInPage
 
 @Serializable
+data object AuthControllerPage
+
+@Serializable
 data class OTPPage(val phoneNumber: String)
 
 @Serializable

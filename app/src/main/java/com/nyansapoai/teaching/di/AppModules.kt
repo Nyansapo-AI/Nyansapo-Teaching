@@ -31,6 +31,7 @@ import org.koin.dsl.module
 import com.nyansapoai.teaching.presentation.onboarding.OnboardingViewModel
 import com.nyansapoai.teaching.presentation.getStarted.GetStartedViewModel
 import com.nyansapoai.teaching.presentation.authentication.signIn.SignInViewModel
+import com.nyansapoai.teaching.presentation.authentication.AuthControllerViewModel
 import com.nyansapoai.teaching.presentation.authentication.otp.OTPViewModel
 import com.nyansapoai.teaching.presentation.home.HomeViewModel
 import com.nyansapoai.teaching.presentation.schools.SchoolViewModel
@@ -54,6 +55,7 @@ import com.nyansapoai.teaching.presentation.students.StudentsViewModel
 val appModules = module {
 
     viewModelOf(::OnboardingViewModel)
+    viewModelOf(::AuthControllerViewModel)
     viewModelOf(::GetStartedViewModel)
     viewModelOf(::SignInViewModel)
     viewModelOf(::OTPViewModel)

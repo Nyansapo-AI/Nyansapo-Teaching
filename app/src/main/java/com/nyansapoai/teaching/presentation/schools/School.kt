@@ -1,6 +1,8 @@
 package com.nyansapoai.teaching.presentation.schools
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -14,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -34,10 +37,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nyansapoai.teaching.R
+import com.nyansapoai.teaching.presentation.common.components.AppAlertDialog
 import com.nyansapoai.teaching.presentation.common.components.AppCardItem
 import com.nyansapoai.teaching.presentation.common.components.AppCircularLoading
 import com.nyansapoai.teaching.presentation.common.components.AppComingSoon
 import com.nyansapoai.teaching.presentation.schools.components.LearningLevelItem
+import com.nyansapoai.teaching.ui.theme.lightPrimary
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -70,9 +75,28 @@ fun SchoolScreen(
     }
 
     AnimatedVisibility(
+        visible = state.showLogOutDialog,
+        enter = fadeIn(),
+        exit = fadeOut()
+    ) {
+        AppAlertDialog(
+            onDismissRequest = { onAction.invoke(SchoolAction.OnShowLogOutDialog(false)) },
+            dialogText = "You are about to sign out. Click confirm to continue.",
+            dialogTitle = "Sign Out",
+//            icon = Icons.Default.Info,
+            onConfirmation = {
+                onAction.invoke(SchoolAction.OnShowLogOutDialog(false))
+                onAction.invoke(SchoolAction.SignOut)
+            },
+        )
+    }
+
+
+    AnimatedVisibility(
         visible = state.showSchoolSelector
     ) {
         ModalBottomSheet(
+            containerColor = lightPrimary,
             onDismissRequest = {
                 onAction.invoke(SchoolAction.OnShowSchoolSelector(show = false))
             },
@@ -111,6 +135,12 @@ fun SchoolScreen(
 
                 items(items = state.user?.organizations[0]?.projects[0]?.schools ?: emptyList(), key = {it.id}){ school ->
                     TextButton(
+                        colors = ButtonColors(
+                            containerColor = MaterialTheme.colorScheme.background,
+                            contentColor = MaterialTheme.colorScheme.onPrimary,
+                            disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                            disabledContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                        ),
                         onClick = {
 
                         }
@@ -124,7 +154,7 @@ fun SchoolScreen(
                 item {
                     TextButton(
                         onClick = {
-                            onAction.invoke(SchoolAction.SignOut)
+                            onAction.invoke(SchoolAction.OnShowLogOutDialog(true))
                         }
                     ) {
                         Text(
@@ -138,7 +168,6 @@ fun SchoolScreen(
 
             }
         }
-
     }
 
     AnimatedVisibility(

@@ -30,6 +30,12 @@ class SQLDelightDataSourceImp(
     private val assessmentQueries = database.assessmentDatabaseQueries
     private val schoolDatabaseQueries = database.schoolDatabaseQueries
 
+    override suspend fun clearAllData() {
+        assessmentQueries.transaction {
+            schoolDatabaseQueries.clearSchoolInfo()
+        }
+    }
+
     override suspend fun insertPendingReadingResult(
         assessmentId: String,
         studentId: String,

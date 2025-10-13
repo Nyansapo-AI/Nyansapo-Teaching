@@ -10,5 +10,7 @@ sealed interface SchoolAction {
         val schoolId: String
     ): SchoolAction
 
+    data class OnShowLogOutDialog(val show: Boolean): SchoolAction
+
     data object SignOut: SchoolAction
 }
