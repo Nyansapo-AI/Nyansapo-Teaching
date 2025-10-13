@@ -37,6 +37,7 @@ import com.nyansapoai.teaching.R
 import com.nyansapoai.teaching.presentation.common.components.AppButton
 import com.nyansapoai.teaching.presentation.common.components.AppTouchInput
 import com.nyansapoai.teaching.presentation.common.components.ScreenshotComposable
+import com.nyansapoai.teaching.ui.theme.abeeZeeFont
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -148,6 +149,7 @@ fun NumeracyWordProblem(
             Text(
                 text = wordProblem,
                 style = MaterialTheme.typography.titleLarge,
+                fontFamily = abeeZeeFont,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .fillMaxWidth()
