@@ -151,6 +151,18 @@ class LiteracyViewModel(
             LiteracyAction.OnCompletePreTest -> {
                 _state.update { it.copy(currentAssessmentLevel = LiteracyAssessmentLevel.LETTER_RECOGNITION) }
             }
+
+            is LiteracyAction.OnShowEndAssessmentDialogChange -> {
+                _state.update {
+                    it.copy(
+                        showEndAssessmentDialog = action.show
+                    )
+                }
+            }
+
+            LiteracyAction.OnEndAssessment -> {
+                endAssessment()
+            }
         }
     }
 
@@ -516,6 +528,15 @@ class LiteracyViewModel(
             )
             .then(submitMultipleChoicesResultsRequest)
             .enqueue()
+    }
+
+
+    private fun endAssessment(){
+        _state.update {
+            it.copy(
+                currentAssessmentLevel = LiteracyAssessmentLevel.COMPLETED
+            )
+        }
     }
 
 }

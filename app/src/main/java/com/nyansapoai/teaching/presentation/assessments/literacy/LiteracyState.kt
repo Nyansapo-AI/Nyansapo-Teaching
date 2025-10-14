@@ -42,5 +42,6 @@ data class LiteracyState(
 
     val multipleChoiceQuestionsResult: MutableList<MultipleChoicesResult> = mutableListOf(),
 
-    val hasCompletedAssessment: Boolean = false
+    val hasCompletedAssessment: Boolean = false,
+    val showEndAssessmentDialog: Boolean = false,
 )

@@ -112,6 +112,14 @@ class NumeracyAssessmentViewModel(
             is NumeracyAssessmentAction.OnShowInstructionChange -> {
                 _state.update { it.copy(showInstruction = action.showInstruction) }
             }
+
+            is NumeracyAssessmentAction.OnShowEndAssessmentDialogChange -> {
+                _state.update { it.copy(showEndAssessmentDialog = action.show) }
+            }
+            NumeracyAssessmentAction.EndAssessment -> {
+                endAssessment()
+            }
+
         }
     }
 
@@ -615,5 +623,13 @@ class NumeracyAssessmentViewModel(
             .then(submitNumeracyCountMatchResults)
             .enqueue()
 
+    }
+
+    private fun endAssessment(){
+        _state.update {
+            it.copy(
+                hasCompletedAssessment = true
+            )
+        }
     }
 }
