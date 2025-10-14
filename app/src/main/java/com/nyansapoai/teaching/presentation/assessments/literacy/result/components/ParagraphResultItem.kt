@@ -42,12 +42,9 @@ fun ParagraphResultItem(
 
         Text(
             text = comparisonText,
-            style = MaterialTheme.typography.headlineLarge,
-            fontWeight = FontWeight.Bold,
+            style = MaterialTheme.typography.titleLarge,
             modifier = Modifier
         )
-
-
     }
 
 }

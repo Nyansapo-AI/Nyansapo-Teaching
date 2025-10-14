@@ -42,6 +42,7 @@ import com.nyansapoai.teaching.presentation.assessments.conductAssessment.Conduc
 import com.nyansapoai.teaching.presentation.assessments.literacy.LiteracyViewModel
 import com.nyansapoai.teaching.presentation.assessments.literacy.result.LiteracyResultViewModel
 import com.nyansapoai.teaching.presentation.assessments.numeracy.NumeracyAssessmentViewModel
+import com.nyansapoai.teaching.presentation.assessments.numeracy.results.NumeracyAssessmentResultViewModel
 import com.nyansapoai.teaching.presentation.attendances.AttendancesViewModel
 import com.nyansapoai.teaching.presentation.attendances.collectAttendance.CollectAttendanceViewModel
 import com.nyansapoai.teaching.presentation.common.audio.play.AndroidAudioPlayer
@@ -70,6 +71,7 @@ val appModules = module {
     viewModelOf(::LiteracyViewModel)
     viewModelOf(::StudentsViewModel)
     viewModelOf(::LiteracyResultViewModel)
+    viewModelOf(::NumeracyAssessmentResultViewModel)
     viewModelOf(::AttendancesViewModel)
     viewModelOf(::CollectAttendanceViewModel)
 

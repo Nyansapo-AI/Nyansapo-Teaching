@@ -39,7 +39,7 @@ fun CharResultItem(
             painter = painterResource(id = image),
             contentDescription = "Correct Answer",
             modifier = Modifier
-                .size(32.dp)
+                .size(24.dp)
                 .align(Alignment.TopEnd)
                 .padding(4.dp)
                 .zIndex(1.0f)
@@ -49,13 +49,13 @@ fun CharResultItem(
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
-                .padding(8.dp)
+                .padding(6.dp)
                 .border(
                     width = 2.dp,
                     color = color,
                     shape = RoundedCornerShape(8.dp)
                 )
-                .padding(8.dp)
+                .padding(vertical =6.dp, horizontal = 12.dp)
                 .zIndex(0.8f)
                 .clickable(
                     onClick = onClick,
@@ -63,9 +63,8 @@ fun CharResultItem(
         ) {
             Text(
                 text = char,
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold,
-                color = color,
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier
             )
         }

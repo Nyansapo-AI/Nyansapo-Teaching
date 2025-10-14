@@ -32,7 +32,7 @@ class LiteracyResultViewModel(
         currentState.copy(
             results = results.data,
             stories = results.data?.literacy_results?.reading_results?.filter { (content, metadata) -> metadata?.type == "Story" } ?: emptyList(),
-            letters = results.data?.literacy_results?.reading_results?.filter { (content, metadata) -> metadata?.type == "Letter Recognition" } ?: emptyList(),
+            letters = results.data?.literacy_results?.reading_results?.filter { (content, metadata) -> metadata?.type == "Letter" } ?: emptyList(),
             words = results.data?.literacy_results?.reading_results?.filter { (content, metadata) -> metadata?.type == "Word" } ?: emptyList(),
             paragraphs = results.data?.literacy_results?.reading_results?.filter { (content, metadata) -> metadata?.type == "Paragraph" } ?: emptyList(),
             multipleChoiceQuestions = results.data?.literacy_results?.multiple_choice_questions ?: emptyList(),

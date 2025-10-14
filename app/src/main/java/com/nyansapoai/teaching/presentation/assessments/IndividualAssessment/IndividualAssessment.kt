@@ -53,6 +53,7 @@ import com.nyansapoai.teaching.domain.models.students.NyansapoStudent
 import com.nyansapoai.teaching.navController
 import com.nyansapoai.teaching.presentation.common.components.AppCircularLoading
 import com.nyansapoai.teaching.navigation.ConductAssessmentPage
+import com.nyansapoai.teaching.navigation.LiteracyResultsPage
 import com.nyansapoai.teaching.presentation.assessments.IndividualAssessment.composables.AssessmentsStatUI
 import com.nyansapoai.teaching.presentation.onboarding.components.OptionsItemUI
 import com.nyansapoai.teaching.utils.ResultStatus
@@ -217,6 +218,14 @@ fun IndividualAssessmentScreen(
                                     hasDone = student.has_done || student.id in state.completedAssessments.map { it.student_id },
                                     doneClick = {
                                         Toast.makeText(context, "${student.first_name} ${student.last_name} has already done the assessment", Toast.LENGTH_SHORT).show()
+
+                                        navController.navigate(
+                                            LiteracyResultsPage(
+                                                assessmentId = assessment.id,
+                                                studentId = student.id,
+//                                                studentName = student.first_name + " " + student.last_name
+                                            )
+                                        )
                                     },
                                     notDoneClick = {
                                         navController.navigate(ConductAssessmentPage(
