@@ -15,17 +15,24 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -39,6 +46,8 @@ import com.nyansapoai.teaching.presentation.assessments.literacy.components.Lite
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.MultichoiceQuestionsUI
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.PreTestReadingAssessmentUI
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.ReadingStoryEvaluationUI
+import com.nyansapoai.teaching.presentation.assessments.numeracy.NumeracyAssessmentAction
+import com.nyansapoai.teaching.presentation.common.components.AppAlertDialog
 import com.nyansapoai.teaching.presentation.common.components.AppSimulateNavigation
 import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
@@ -94,15 +103,61 @@ fun LiteracyScreen(
 
 
     Scaffold(
-
         topBar = {
-            Text(
-                text = studentName,
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.secondary,
-                modifier = Modifier
-                    .padding(horizontal = 12.dp),
+            TopAppBar(
+                navigationIcon = {
+                    IconButton(
+                        onClick = {
+                            navController.popBackStack()
+                        }
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.arrow_back),
+                            tint = MaterialTheme.colorScheme.onPrimary,
+                            contentDescription = "Back",
+                        )
+                    }
+                },
+                title = {
+                    Text(
+                        text = studentName,
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.secondary,
+                        modifier = Modifier
+                    )
+                },
+                actions = {
+                    AnimatedVisibility(
+                        visible = !state.hasCompletedAssessment && state.currentAssessmentLevel != LiteracyAssessmentLevel.PRE_TEST,
+                        enter = fadeIn(),
+                        exit = fadeOut()
+                    ) {
+                        TextButton(
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.error,
+                                contentColor = MaterialTheme.colorScheme.onError
+                            ),
+                            onClick = {
+                                onAction.invoke(LiteracyAction.OnShowEndAssessmentDialogChange(true))
+                            },
+                            modifier = Modifier
+                                .padding(horizontal = 12.dp)
+                        ) {
+                            Text(
+                                text = "End",
+                                style = MaterialTheme.typography.bodyLarge,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier
+                                    .padding(horizontal = 12.dp, vertical = 6.dp),
+                            )
+                        }
+
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                )
             )
         },
         modifier = modifier
@@ -112,6 +167,23 @@ fun LiteracyScreen(
 
 
     ) { innerPadding ->
+
+        AnimatedVisibility(
+            visible = state.showEndAssessmentDialog,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            AppAlertDialog(
+                onDismissRequest = { onAction.invoke(LiteracyAction.OnShowEndAssessmentDialogChange(false)) },
+                dialogText = "You are about to end assessment. Click confirm to continue.",
+                dialogTitle = "End Assessment",
+                onConfirmation = {
+                    onAction.invoke(LiteracyAction.OnShowEndAssessmentDialogChange(false))
+                    onAction.invoke(LiteracyAction.OnEndAssessment)
+                },
+            )
+        }
+
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
@@ -119,11 +191,6 @@ fun LiteracyScreen(
                 .padding(innerPadding)
         ) {
 
-            /*
-            LazyColumn {
-                item {
-                }
-            }*/
 
             AppSimulateNavigation(
                 modifier = Modifier,
@@ -250,7 +317,6 @@ fun LiteracyScreen(
                                     )
                                 )
                             },
-//                            storySentencesList = state.assessmentContent?.storys[0]?.story?.trim()?.split(".") ?: emptyList()
                             storySentencesList = listOf(state.assessmentContent?.storys[0]?.story ?: "")
                         )
                     }

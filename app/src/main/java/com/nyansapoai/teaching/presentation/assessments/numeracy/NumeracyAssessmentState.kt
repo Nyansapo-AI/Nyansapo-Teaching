@@ -46,5 +46,7 @@ data class NumeracyAssessmentState(
         NumeracyAssessmentLevel.MULTIPLICATION,
         NumeracyAssessmentLevel.DIVISION,
         NumeracyAssessmentLevel.WORD_PROBLEM,
-    )
+    ),
+
+    val showEndAssessmentDialog: Boolean = false,
 )

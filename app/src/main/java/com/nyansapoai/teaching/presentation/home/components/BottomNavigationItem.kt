@@ -7,6 +7,7 @@ import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyOperat
 import com.nyansapoai.teaching.presentation.assessments.AssessmentsRoot
 import com.nyansapoai.teaching.presentation.assessments.numeracy.components.NumeracyArithmeticOperationsContainerUI
 import com.nyansapoai.teaching.presentation.assessments.numeracy.components.NumeracyHorizontalArithmeticOperationsUI
+import com.nyansapoai.teaching.presentation.assessments.numeracy.components.NumeracyWordProblem
 import com.nyansapoai.teaching.presentation.assessments.numeracy.components.OperationType
 import com.nyansapoai.teaching.presentation.attendances.AttendancesRoot
 import com.nyansapoai.teaching.presentation.common.components.AppComingSoon

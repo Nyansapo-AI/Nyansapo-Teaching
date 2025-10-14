@@ -6,22 +6,33 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -47,6 +58,7 @@ import com.nyansapoai.teaching.presentation.assessments.numeracy.components.Nume
 import com.nyansapoai.teaching.presentation.assessments.numeracy.components.NumeracyAssessmentLevel
 import com.nyansapoai.teaching.presentation.assessments.numeracy.components.NumeracyCountAndMatch
 import com.nyansapoai.teaching.presentation.assessments.numeracy.components.NumeracyWordProblemContainer
+import com.nyansapoai.teaching.presentation.common.components.AppAlertDialog
 import com.nyansapoai.teaching.presentation.common.components.AppSimulateNavigation
 import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
@@ -73,6 +85,7 @@ fun NumeracyAssessmentRoot(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NumeracyAssessmentScreen(
     modifier: Modifier = Modifier,
@@ -99,16 +112,62 @@ fun NumeracyAssessmentScreen(
     }
 
 
-
     Scaffold(
         topBar = {
-            Text(
-                text = studentName,
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.secondary,
-                modifier = Modifier
-                    .padding(horizontal = 12.dp),
+            TopAppBar(
+                navigationIcon = {
+                    IconButton(
+                        onClick = {
+                            navController.popBackStack()
+                        }
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.arrow_back),
+                            tint = MaterialTheme.colorScheme.onPrimary,
+                            contentDescription = "Back",
+                        )
+                    }
+                },
+                title = {
+                    Text(
+                        text = studentName,
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.secondary,
+                        modifier = Modifier
+                    )
+                },
+                actions = {
+                    AnimatedVisibility(
+                        visible = !state.hasCompletedAssessment,
+                        enter = fadeIn(),
+                        exit = fadeOut()
+                    ) {
+                        TextButton(
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.error,
+                                contentColor = MaterialTheme.colorScheme.onError
+                            ),
+                            onClick = {
+                                onAction.invoke(NumeracyAssessmentAction.OnShowEndAssessmentDialogChange(true))
+                            },
+                            modifier = Modifier
+                                .padding(horizontal = 12.dp)
+                        ) {
+                            Text(
+                                text = "End",
+                                style = MaterialTheme.typography.bodyLarge,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier
+                                    .padding(horizontal = 12.dp, vertical = 6.dp),
+                            )
+                        }
+
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                )
             )
         },
         modifier = modifier
@@ -140,6 +199,23 @@ fun NumeracyAssessmentScreen(
             )
 
             return@Scaffold
+        }
+
+
+        AnimatedVisibility(
+            visible = state.showEndAssessmentDialog,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            AppAlertDialog(
+                onDismissRequest = { onAction.invoke(NumeracyAssessmentAction.OnShowEndAssessmentDialogChange(false)) },
+                dialogText = "You are about to end assessment. Click confirm to continue.",
+                dialogTitle = "End Assessment",
+                onConfirmation = {
+                    onAction.invoke(NumeracyAssessmentAction.OnShowEndAssessmentDialogChange(false))
+                    onAction.invoke(NumeracyAssessmentAction.EndAssessment)
+                },
+            )
         }
 
 

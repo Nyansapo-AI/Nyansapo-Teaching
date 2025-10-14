@@ -151,6 +151,18 @@ class LiteracyViewModel(
             LiteracyAction.OnCompletePreTest -> {
                 _state.update { it.copy(currentAssessmentLevel = LiteracyAssessmentLevel.LETTER_RECOGNITION) }
             }
+
+            is LiteracyAction.OnShowEndAssessmentDialogChange -> {
+                _state.update {
+                    it.copy(
+                        showEndAssessmentDialog = action.show
+                    )
+                }
+            }
+
+            LiteracyAction.OnEndAssessment -> {
+                endAssessment()
+            }
         }
     }
 
@@ -495,8 +507,13 @@ class LiteracyViewModel(
             "assessment_id" to assessmentId
         )
 
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
         val submitMultipleChoicesResultsRequest = OneTimeWorkRequestBuilder<SubmitMultipleChoiceResultsWorker>()
             .setInputData(workData)
+            .setConstraints(constraints = constraints)
             .build()
 
         val markAssessmentDoneRequest = OneTimeWorkRequestBuilder<MarkAssessmentDoneWorker>()
@@ -507,10 +524,19 @@ class LiteracyViewModel(
             .beginUniqueWork(
                 uniqueWorkName ="complete_assessment_${assessmentId}_${studentId}",
                  existingWorkPolicy =  ExistingWorkPolicy.REPLACE,
-                request = submitMultipleChoicesResultsRequest
+                request = markAssessmentDoneRequest
             )
-            .then(markAssessmentDoneRequest)
+            .then(submitMultipleChoicesResultsRequest)
             .enqueue()
+    }
+
+
+    private fun endAssessment(){
+        _state.update {
+            it.copy(
+                currentAssessmentLevel = LiteracyAssessmentLevel.COMPLETED
+            )
+        }
     }
 
 }
