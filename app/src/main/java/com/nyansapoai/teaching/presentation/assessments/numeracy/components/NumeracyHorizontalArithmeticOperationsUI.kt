@@ -210,6 +210,7 @@ fun NumeracyHorizontalArithmeticOperationsUI(
             isLoading = isLoading,
             modifier = Modifier
                 .padding(12.dp)
+                .fillMaxWidth()
         ) {
             Text(
                 text = "Submit Answer",

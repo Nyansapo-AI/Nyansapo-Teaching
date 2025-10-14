@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
@@ -43,7 +44,6 @@ import com.nyansapoai.teaching.ui.theme.abeeZeeFont
 @Composable
 fun NumeracyWordProblem(
     modifier: Modifier = Modifier,
-    title: String = "Word Problem",
     wordProblem: String = "A farmer has 12 apples. He gives 3 apples to his friend. How many apples does he have left?",
     shouldCaptureAnswer: Boolean = false,
     onAnswerImageFilePathChange: (String) -> Unit,
@@ -58,18 +58,10 @@ fun NumeracyWordProblem(
             .fillMaxWidth()
     ){
         Column(
-            verticalArrangement = Arrangement.spacedBy(20.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = modifier
      ) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
-            )
 
 
             ButtonGroup(
@@ -146,104 +138,96 @@ fun NumeracyWordProblem(
                 }
             )
 
-            Text(
-                text = wordProblem,
-                style = MaterialTheme.typography.titleLarge,
-                fontFamily = abeeZeeFont,
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
-            )
 
+            ScreenshotComposable(
+                shouldCapture = shouldCaptureAnswer,
+                fileName = "work_area",
+                onFilePathChange = { path ->
+                    onWorkAreaImageFilePathChange(path)
+                },
+                content = {
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
-
-            ) {
-                Text(
-                    text = "Answer",
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.secondary,
-                    modifier = Modifier
-                )
-
-                Box(
-                    modifier = Modifier
-                        .widthIn(max = 240.dp, min = 100.dp)
-                        .heightIn(min = 100.dp, max = 150.dp)
-                        .background(MaterialTheme.colorScheme.tertiary)
-                        .border(
-                            width = 2.dp,
-                            color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f)
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(MaterialTheme.colorScheme.primary)
+                    )
+                    {
+                        AppTouchInput(
+                            isEraserMode = isEraserMode,
+                            brushColor = Color.Green,
+                            modifier = Modifier
+                                .fillMaxSize()
                         )
-                ) {
-                    ScreenshotComposable(
-                        onFilePathChange = {path ->
-                            onAnswerImageFilePathChange(path)
-                        },
-                        fileName = "answer_area",
-                        shouldCapture = shouldCaptureAnswer,
-                        content = {
-                            AppTouchInput(
+
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = wordProblem,
+                                style = MaterialTheme.typography.titleLarge,
+                                fontFamily = abeeZeeFont,
+                                textAlign = TextAlign.Center,
                                 modifier = Modifier
-                                    .background(MaterialTheme.colorScheme.tertiary),
-                                isEraserMode = isEraserMode,
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp)
                             )
+
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            ) {
+                                Text(
+                                    text = "Answer :",
+                                    style = MaterialTheme.typography.headlineSmall,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.secondary,
+                                    modifier = Modifier
+                                )
+
+                                Box(
+                                    modifier = Modifier
+                                        .widthIn(max = 240.dp, min = 100.dp)
+                                        .heightIn(min = 100.dp, max = 150.dp)
+                                        .background(MaterialTheme.colorScheme.tertiary)
+                                        .border(
+                                            width = 2.dp,
+                                            color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f)
+                                        )
+                                ) {
+                                    ScreenshotComposable(
+                                        onFilePathChange = { path ->
+                                            onAnswerImageFilePathChange(path)
+                                        },
+                                        fileName = "answer_area",
+                                        shouldCapture = shouldCaptureAnswer,
+                                        content = {
+                                            AppTouchInput(
+                                                modifier = Modifier
+                                                    .background(MaterialTheme.colorScheme.tertiary),
+                                                isEraserMode = isEraserMode,
+                                            )
+                                        }
+                                    )
+                                }
+                            }
+
+
                         }
-                    )
-                }
-
-            }
-
-            Column(
-                verticalArrangement = Arrangement.spacedBy(8.dp),
+                    }
+                },
                 modifier = Modifier
-                    .padding(16.dp)
-            ) {
-                Text(
-                    text = "Work Area",
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.secondary
-                )
-
-                Box(
-                    modifier = Modifier
-                        .widthIn(max = 420.dp, min = 100.dp)
-                        .heightIn(min = 300.dp, max = 400.dp)
-                        .border(
-                            width = 2.dp,
-                            color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f)
-                        )
-                ) {
-
-                    ScreenshotComposable(
-                        shouldCapture = shouldCaptureAnswer,
-                        fileName = "work_area",
-                        onFilePathChange = { path ->
-                            onWorkAreaImageFilePathChange(path)
-                        },
-                        content = {
-                            AppTouchInput(
-                                isEraserMode = isEraserMode,
-                                brushColor = Color.Green
-                            )
-                        },
-                    )
-                }
-            }
+                    .weight(0.9f)
+                    .background(MaterialTheme.colorScheme.primary)
+            )
 
             AppButton(
                 onClick = onSubmit,
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFC107)),
                 modifier = Modifier
-                    .padding(16.dp)
+                    .padding(horizontal = 16.dp)
+                    .fillMaxWidth()
             ) {
                 Text(
                     "Submit",

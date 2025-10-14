@@ -26,6 +26,8 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -89,6 +91,19 @@ fun IndividualAssessmentScreen(
     Scaffold(
         topBar = {
             TopAppBar(
+                navigationIcon = {
+                    IconButton(
+                        onClick = {
+                            navController.popBackStack()
+                        }
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.arrow_back),
+                            tint = MaterialTheme.colorScheme.onPrimary,
+                            contentDescription = "Back",
+                        )
+                    }
+                },
                 title = {
                     Text(
                         text = state.assessmentState.data?.name ?: "Unknown Assessment",
@@ -134,44 +149,6 @@ fun IndividualAssessmentScreen(
                             modifier = Modifier
                                 .fillMaxSize()
                         ) {
-                            /*
-                            item {
-                                state.assessmentState.data.level_distribution.let { assessmentLevelDistributions ->
-                                    if (assessmentLevelDistributions.isEmpty()){
-                                        ElevatedCard(
-                                            colors = CardDefaults.outlinedCardColors(
-                                                containerColor = MaterialTheme.colorScheme.tertiary
-                                            ),
-                                            elevation = CardDefaults.cardElevation(
-                                                defaultElevation = 12.dp
-                                            ),
-                                            modifier = Modifier
-                                                .heightIn(max = 200.dp)
-                                                .widthIn(max = 420.dp)
-                                                .padding(12.dp)
-                                        ) {
-                                            Text(
-                                                "no data available yet",
-                                                textAlign = TextAlign.Center,
-                                                style = MaterialTheme.typography.bodyMedium,
-                                                modifier = Modifier
-                                                    .fillMaxWidth()
-                                                    .padding(16.dp)
-                                            )
-                                        }
-                                        return@item
-                                    }
-
-                                    LearningLevelItem(
-                                        modifier = Modifier
-                                            .padding(12.dp)
-                                            .heightIn(min = 200.dp)
-                                            .widthIn(max = 420.dp),
-                                        levelDescription = LearningLevelDescription(state.assessmentState.data.type, totalStudents = state.assessmentState.data.assigned_students.size)
-                                    )
-                                }
-                            }*/
-
                             item {
                                 AssessmentsStatUI(
                                     total = state.assessmentState.data.assigned_students.size,
@@ -235,119 +212,6 @@ fun IndividualAssessmentScreen(
                                 items = state.studentsList.sortedWith(compareBy { !it.has_done }).reversed(),
                                 key = { it.id }
                             ) { student ->
-                                /*
-                                ElevatedCard(
-                                    colors = CardDefaults.outlinedCardColors(
-                                        containerColor = if (student.has_done) Color.Green.copy(alpha = 0.2f) else MaterialTheme.colorScheme.tertiary,
-                                    ),
-                                    elevation = CardDefaults.cardElevation(
-                                        defaultElevation = 12.dp
-                                    ),
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .widthIn(max = 420.dp)
-                                        .padding(horizontal = 12.dp)
-                                        .clickable(
-                                            onClick = {
-                                                if (student.id in state.completedAssessments.map { it.student_id } || student.has_done){
-                                                    Toast.makeText(context, "${student.first_name} ${student.last_name} has already done the assessment", Toast.LENGTH_SHORT).show()
-                                                    return@clickable
-                                                }
-
-                                                navController.navigate(ConductAssessmentPage(
-                                                    assessmentId = assessment.id,
-                                                    studentId = student.id,
-                                                    assessmentType = assessment.type,
-                                                    assessmentNo = assessment.assessmentNumber,
-                                                    studentName = student.first_name + " " + student.last_name
-                                                ))
-                                            }
-                                        )
-                                        .border(
-                                            width = 2.dp,
-                                            color = if (student.id in state.completedAssessments.map { it.student_id })Color.Green else Color.Transparent,
-                                            shape = CardDefaults.elevatedShape
-                                        )
-
-                                )
-                                {
-                                    Row(
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.SpaceBetween,
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(12.dp)
-
-                                    ) {
-                                        Text(
-                                            text = student.name.ifEmpty { "${student.first_name} ${student.last_name}" },
-                                            style = MaterialTheme.typography.titleMedium,
-                                            color = MaterialTheme.colorScheme.onBackground,
-                                            modifier = Modifier
-                                        )
-
-                                        TextButton(
-                                            onClick = {
-
-                                                if (student.id in state.completedAssessments.map { it.student_id } || student.has_done){
-                                                    Toast.makeText(context, "${student.first_name} ${student.last_name} has already done the assessment", Toast.LENGTH_SHORT).show()
-
-                                                    return@TextButton
-                                                }
-
-
-                                                /*
-                                                navController.navigate(
-                                                    LiteracyResultsPage(
-                                                        assessmentId = assessment.id,
-                                                        studentId = student.id
-                                                    )
-                                                )*/
-
-                                                navController.navigate(ConductAssessmentPage(
-                                                    assessmentId = assessment.id,
-                                                    studentId = student.id,
-                                                    assessmentType = assessment.type,
-                                                    assessmentNo = assessment.assessmentNumber,
-                                                    studentName = student.first_name + " " + student.last_name
-                                                ))
-
-
-                                            },
-                                            colors = ButtonDefaults.textButtonColors(
-                                                contentColor = MaterialTheme.colorScheme.onBackground,
-                                            ),
-                                        ) {
-
-                                            if  (student.id in state.completedAssessments.map { it.student_id }){
-                                                Image(
-                                                    painter = painterResource(R.drawable.done_3_),
-                                                    contentDescription = "has completed the assessment",
-                                                    contentScale = ContentScale.Fit,
-                                                    modifier = Modifier
-                                                        .size(40.dp)
-                                                        .graphicsLayer(
-                                                            rotationZ = -0.2f
-                                                        )
-                                                )
-                                                return@TextButton
-                                            }
-                                            Text(
-//                                                text = student.baseline?:"Start",
-                                                text = "Start",
-                                                style = MaterialTheme.typography.bodyMedium,
-                                                color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.7f),
-                                                modifier = Modifier
-//                                                .padding(16.dp)
-//                                                .weight(1f)
-                                            )
-
-                                        }
-
-                                    }
-                                }
-                                */
-
                                 AssignedLearnersItem(
                                     student = student,
                                     hasDone = student.has_done || student.id in state.completedAssessments.map { it.student_id },
