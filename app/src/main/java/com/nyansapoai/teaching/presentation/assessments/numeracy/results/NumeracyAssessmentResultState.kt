@@ -16,6 +16,6 @@ data class NumeracyAssessmentResultState(
     val divisions: List<NumeracyOperationResult> = emptyList(),
     val word_problem: List<WordProblemResult> = emptyList(),
     val number_recognition: List<NumberRecognitionResult> = emptyList(),
+    val selectedNumberRecognition: NumberRecognitionResult? = null,
     val screenshotImage: String? = null,
-    val audioUrl: String? = null,
 )

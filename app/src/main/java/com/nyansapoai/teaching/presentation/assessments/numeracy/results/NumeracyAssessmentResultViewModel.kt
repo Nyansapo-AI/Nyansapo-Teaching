@@ -50,8 +50,9 @@ class NumeracyAssessmentResultViewModel(
                 _state.update { it.copy(screenshotImage = action.imageUrl) }
             }
 
-            is NumeracyAssessmentResultAction.OnSelectAudioUrl -> {
-                _state.update { it.copy(audioUrl = action.audioUrl) }
+
+            is NumeracyAssessmentResultAction.OnSelectedNumeracyRecognitionResult -> {
+                _state.update { it.copy(selectedNumberRecognition = action.numberRecognition) }
             }
         }
     }

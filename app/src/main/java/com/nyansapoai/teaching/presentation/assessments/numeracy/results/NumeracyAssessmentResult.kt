@@ -14,11 +14,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
+import com.nyansapoai.teaching.presentation.assessments.assessmentResult.composable.ReviewAssessmentAudio
 import com.nyansapoai.teaching.presentation.assessments.literacy.result.TitleText
 import com.nyansapoai.teaching.presentation.assessments.literacy.result.components.CharResultItem
 import com.nyansapoai.teaching.presentation.assessments.numeracy.results.composables.NumeracyOperationResultItemUI
 import com.nyansapoai.teaching.presentation.assessments.numeracy.results.composables.NumeracyWordProblemResultItemUI
-import com.nyansapoai.teaching.presentation.common.audio.AndroidNetworkAudioPlayer
+import com.nyansapoai.teaching.presentation.common.audio.AppNetworkAudioPlayer
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -63,14 +64,18 @@ fun NumeracyAssessmentResultScreen(
         }
     }
 
-    if (state.audioUrl != null){
+    if (state.selectedNumberRecognition != null){
         ModalBottomSheet(
             onDismissRequest = {
-                onAction.invoke(NumeracyAssessmentResultAction.OnSelectAudioUrl(audioUrl = null))
+                onAction.invoke(NumeracyAssessmentResultAction.OnSelectedNumeracyRecognitionResult(numberRecognition = null))
             }
         ) {
-            AndroidNetworkAudioPlayer(
-                audioUrl = state.audioUrl
+            ReviewAssessmentAudio(
+                audioUrl = state.selectedNumberRecognition.metadata.audio_url,
+                studentAnswer = state.selectedNumberRecognition.metadata.transcript ?: "No answer",
+                expectedAnswer = state.selectedNumberRecognition.content,
+                transcript = state.selectedNumberRecognition.metadata.transcript ?: "No transcript",
+                passed = state.selectedNumberRecognition.metadata.passed == true,
             )
         }
     }
@@ -120,7 +125,7 @@ fun NumeracyAssessmentResultScreen(
                             char = result.content,
                             isCorrect = result.metadata.passed == true,
                             onClick = {
-                                onAction.invoke(NumeracyAssessmentResultAction.OnSelectAudioUrl(audioUrl = result.metadata.audio_url))
+                                onAction.invoke(NumeracyAssessmentResultAction.OnSelectedNumeracyRecognitionResult(numberRecognition = result))
                             }
                         )
                     }
@@ -152,6 +157,7 @@ fun NumeracyAssessmentResultScreen(
                 }
             }
         }
+
         if (state.subtractions.isNotEmpty()){
             stickyHeader {
                 TitleText(
