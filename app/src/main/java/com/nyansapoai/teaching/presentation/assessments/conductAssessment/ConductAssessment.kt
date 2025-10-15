@@ -59,8 +59,7 @@ fun ConductAssessmentScreen(
             )
         }
         else -> {
-            // Handle unknown assessment type
-            // You can show an error message or navigate to a default screen
+
         }
     }
 

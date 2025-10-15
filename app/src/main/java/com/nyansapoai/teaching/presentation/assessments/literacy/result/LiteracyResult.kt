@@ -10,7 +10,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,11 +24,14 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nyansapoai.teaching.presentation.assessments.literacy.result.components.CharResultItem
 import com.nyansapoai.teaching.presentation.assessments.literacy.result.components.ComprehensionQuestion
 import com.nyansapoai.teaching.presentation.assessments.literacy.result.components.ParagraphResultItem
+import com.nyansapoai.teaching.presentation.assessments.numeracy.results.NumeracyAssessmentResultAction
+import com.nyansapoai.teaching.presentation.common.audio.AndroidNetworkAudioPlayer
 import com.nyansapoai.teaching.ui.theme.lightPrimary
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun LiteracyResultRoot(
+    modifier: Modifier = Modifier,
     assessmentId: String,
     studentId: String,
 ) {
@@ -35,140 +40,160 @@ fun LiteracyResultRoot(
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     LiteracyResultScreen(
+        modifier = modifier,
         state = state,
         onAction = viewModel::onAction
     )
+
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LiteracyResultScreen(
+    modifier: Modifier = Modifier,
     state: LiteracyResultState,
     onAction: (LiteracyResultAction) -> Unit,
 ) {
-    Scaffold(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 16.dp),
 
-    ) { innerPadding ->
-        LazyColumn(
-            modifier = Modifier
-                .padding(innerPadding)
+    if (state.selectedAudioUrl != null){
+        ModalBottomSheet(
+            onDismissRequest = {
+                onAction.invoke(LiteracyResultAction.OnSelectAudioUrl(audioUrl = null))
+            }
         ) {
+            AndroidNetworkAudioPlayer(
+                audioUrl = state.selectedAudioUrl,
+            )
+        }
+    }
 
-            if (state.letters.isNotEmpty()){
-                stickyHeader {
-                    TitleText(
-                        text = "Letters"
-                    )
-                }
+    LazyColumn(
+        modifier = modifier
+    )
+    {
 
-                item {
-                    FlowRow(
+        if (state.letters.isNotEmpty()){
+            stickyHeader {
+                TitleText(
+                    text = "Letters"
+                )
+            }
 
-                    ) {
-                        state.letters.forEach { result ->
-                            CharResultItem(
-                                char = result.content,
-                                isCorrect = result.metadata?.passed ?: false
-                            )
-                        }
+            item {
+                FlowRow(
+
+                ) {
+                    state.letters.forEach { result ->
+                        CharResultItem(
+                            char = result.content,
+                            isCorrect = result.metadata?.passed ?: false,
+                            onClick = {
+                                onAction.invoke(LiteracyResultAction.OnSelectAudioUrl(audioUrl = result.metadata?.audio_url))
+                            }
+                        )
                     }
                 }
-
-                item {
-                    Spacer(modifier = Modifier.height(12.dp))
-                }
-
             }
 
+            item {
+                Spacer(modifier = Modifier.height(12.dp))
+            }
 
-            if (state.words.isNotEmpty()){
-                stickyHeader {
-                    TitleText(
-                        text = "Words"
-                    )
+        }
 
-                }
 
-                item {
-                    FlowRow(
+        if (state.words.isNotEmpty()){
+            stickyHeader {
+                TitleText(
+                    text = "Words"
+                )
+            }
 
-                    ) {
-                        state.words.forEach { result ->
-                            CharResultItem(
-                                char = result.content,
-                                isCorrect = result.metadata?.passed ?: false
-                            )
-                        }
+            item {
+                FlowRow(
+
+                ) {
+                    state.words.forEach { result ->
+                        CharResultItem(
+                            char = result.content,
+                            isCorrect = result.metadata?.passed ?: false,
+                            onClick = {
+                                onAction.invoke(LiteracyResultAction.OnSelectAudioUrl(audioUrl = result.metadata?.audio_url))
+                            }
+                        )
                     }
                 }
-
-                item {
-                    Spacer(modifier = Modifier.height(12.dp))
-                }
-
             }
 
-            if (state.paragraphs.isNotEmpty()){
-                stickyHeader {
-                    TitleText(
-                        text = "Paragraph"
-                    )
-                }
-
-                items(items = state.paragraphs) { result ->
-                    ParagraphResultItem(
-                        expected = result.content,
-                        studentAnswer = result.metadata?.transcript ?: ""
-                    )
-                }
-
-                item {
-                    Spacer(modifier = Modifier.height(12.dp))
-                }
-
+            item {
+                Spacer(modifier = Modifier.height(12.dp))
             }
 
-            if (state.stories.isNotEmpty()){
-                stickyHeader {
-                    TitleText(
-                        text = "Story"
-                    )
-                }
+        }
 
-                items(items = state.stories){ result ->
-                    ParagraphResultItem(
-                        expected = result.content,
-                        studentAnswer = result.metadata?.transcript ?: ""
-                    )
-                }
-
-                item {
-                    Spacer(modifier = Modifier.height(12.dp))
-                }
-
+        if (state.paragraphs.isNotEmpty()){
+            stickyHeader {
+                TitleText(
+                    text = "Paragraph"
+                )
             }
 
-            if (state.multipleChoiceQuestions.isNotEmpty()){
-                stickyHeader {
-                    TitleText(
-                        text = "Multiple Choice Questions"
-                    )
-                }
-
-                items(items = state.multipleChoiceQuestions) { result ->
-                    ComprehensionQuestion(
-                        result = result,
-                    )
-                    Spacer(modifier = Modifier.height(12.dp))
-                }
-
-                item {
-                    Spacer(modifier = Modifier.height(20.dp))
-                }
+            items(items = state.paragraphs) { result ->
+                ParagraphResultItem(
+                    expected = result.content,
+                    studentAnswer = result.metadata?.transcript ?: "",
+                    onClick = {
+                        onAction.invoke(LiteracyResultAction.OnSelectAudioUrl(audioUrl = result.metadata?.audio_url))
+                    }
+                )
             }
 
+            item {
+                Spacer(modifier = Modifier.height(12.dp))
+            }
+
+        }
+
+        if (state.stories.isNotEmpty()){
+            stickyHeader {
+                TitleText(
+                    text = "Story"
+                )
+            }
+
+            items(items = state.stories){ result ->
+                ParagraphResultItem(
+                    expected = result.content,
+                    studentAnswer = result.metadata?.transcript ?: "",
+                    onClick = {
+                        onAction.invoke(LiteracyResultAction.OnSelectAudioUrl(audioUrl = result.metadata?.audio_url))
+                    }
+                )
+            }
+
+            item {
+                Spacer(modifier = Modifier.height(12.dp))
+            }
+
+        }
+
+        if (state.multipleChoiceQuestions.isNotEmpty()){
+            stickyHeader {
+                TitleText(
+                    text = "Multiple Choice Questions"
+                )
+            }
+
+            items(items = state.multipleChoiceQuestions) { result ->
+                ComprehensionQuestion(
+                    result = result,
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+            }
+
+            item {
+                Spacer(modifier = Modifier.height(20.dp))
+            }
         }
 
     }

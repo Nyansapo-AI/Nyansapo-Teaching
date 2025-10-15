@@ -22,6 +22,7 @@ import androidx.navigation.toRoute
 import com.google.firebase.auth.FirebaseAuth
 import com.nyansapoai.teaching.navController
 import com.nyansapoai.teaching.presentation.assessments.IndividualAssessment.IndividualAssessmentRoot
+import com.nyansapoai.teaching.presentation.assessments.assessmentResult.AssessmentResultRoot
 import com.nyansapoai.teaching.presentation.assessments.conductAssessment.ConductAssessmentRoot
 import com.nyansapoai.teaching.presentation.assessments.createAssessment.CreateAssessmentsRoot
 import com.nyansapoai.teaching.presentation.assessments.literacy.result.LiteracyResultRoot
@@ -129,6 +130,19 @@ fun Navigation(){
             composable<LiteracyResultsPage> {
                 val args = it.toRoute<LiteracyResultsPage>()
                 LiteracyResultRoot(assessmentId = args.assessmentId, studentId = args.studentId)
+            }
+
+            composable<AssessmentResultsPage> {
+                val args = it.toRoute<AssessmentResultsPage>()
+                AssessmentResultRoot(
+                    assessmentId = args.assessmentId,
+                    studentId = args.studentId,
+                    studentName = args.studentName,
+                    level = args.level,
+                    grade = args.grade,
+                    assessmentName = args.assessmentName,
+                    assessmentType = args.assessmentType
+                )
             }
 
             composable<CollectAttendancePage> {

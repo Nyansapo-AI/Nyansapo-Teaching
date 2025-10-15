@@ -12,4 +12,5 @@ data class LiteracyResultState(
     val paragraphs: List<LiteracyAssessmentResults.LiteracyResultsData.ReadingResult> = emptyList(),
     val stories: List<LiteracyAssessmentResults.LiteracyResultsData.ReadingResult> = emptyList(),
     val multipleChoiceQuestions: List<MultipleChoicesResult> = emptyList(),
+    val selectedAudioUrl: String? = null,
 )

@@ -51,6 +51,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nyansapoai.teaching.R
 import com.nyansapoai.teaching.domain.models.students.NyansapoStudent
 import com.nyansapoai.teaching.navController
+import com.nyansapoai.teaching.navigation.AssessmentResultsPage
 import com.nyansapoai.teaching.presentation.common.components.AppCircularLoading
 import com.nyansapoai.teaching.navigation.ConductAssessmentPage
 import com.nyansapoai.teaching.navigation.LiteracyResultsPage
@@ -220,10 +221,14 @@ fun IndividualAssessmentScreen(
                                         Toast.makeText(context, "${student.first_name} ${student.last_name} has already done the assessment", Toast.LENGTH_SHORT).show()
 
                                         navController.navigate(
-                                            LiteracyResultsPage(
+                                            AssessmentResultsPage(
                                                 assessmentId = assessment.id,
                                                 studentId = student.id,
-//                                                studentName = student.first_name + " " + student.last_name
+                                                studentName = student.first_name + " " + student.last_name,
+                                                level = student.baseline ?:"",
+                                                grade = student.grade ?: 0,
+                                                assessmentName = state.assessmentState.data.name,
+                                                assessmentType = state.assessmentState.data.type,
                                             )
                                         )
                                     },

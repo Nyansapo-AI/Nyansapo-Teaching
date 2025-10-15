@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 
 class LiteracyResultViewModel(
     savedStateHandle: SavedStateHandle,
@@ -54,7 +55,9 @@ class LiteracyResultViewModel(
 
     fun onAction(action: LiteracyResultAction) {
         when (action) {
-            else -> TODO("Handle actions")
+            is LiteracyResultAction.OnSelectAudioUrl -> {
+                _state.update { it.copy(selectedAudioUrl = action.audioUrl) }
+            }
         }
     }
 
