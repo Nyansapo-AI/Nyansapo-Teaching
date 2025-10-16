@@ -136,11 +136,15 @@
 
   "created_at": "timestamp",           
   
-  "assessmentNumber": "number",
+  "assessmentDate": "Timestamp",
 
   "type": "string", 
 
-  "start_level": ["string"], 
+  "start_level": ["string"],
+ "school_id": "string";
+ "project_id": "string";
+ "organization_id":"string"
+
 
   "alert": { 
     "day_before_assessment": "number", 
