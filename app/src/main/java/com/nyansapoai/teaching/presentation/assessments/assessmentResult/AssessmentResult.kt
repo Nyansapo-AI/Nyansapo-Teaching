@@ -25,8 +25,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.nyansapoai.teaching.R
 import com.nyansapoai.teaching.navController
-import com.nyansapoai.teaching.presentation.assessments.literacy.result.LiteracyResultRoot
-import com.nyansapoai.teaching.presentation.assessments.numeracy.results.NumeracyAssessmentResultRoot
+import com.nyansapoai.teaching.presentation.assessments.assessmentResult.literacyResult.LiteracyResultRoot
+import com.nyansapoai.teaching.presentation.assessments.assessmentResult.numeracyResults.NumeracyAssessmentResultRoot
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

@@ -1,4 +1,4 @@
-package com.nyansapoai.teaching.presentation.assessments.numeracy.results
+package com.nyansapoai.teaching.presentation.assessments.assessmentResult.numeracyResults
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -9,7 +9,6 @@ import com.nyansapoai.teaching.navigation.AssessmentResultsPage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 
@@ -46,13 +45,12 @@ class NumeracyAssessmentResultViewModel(
 
     fun onAction(action: NumeracyAssessmentResultAction) {
         when (action) {
-            is NumeracyAssessmentResultAction.OnSelectScreenshotImage -> {
-                _state.update { it.copy(screenshotImage = action.imageUrl) }
-            }
-
-
             is NumeracyAssessmentResultAction.OnSelectedNumeracyRecognitionResult -> {
                 _state.update { it.copy(selectedNumberRecognition = action.numberRecognition) }
+            }
+
+            is NumeracyAssessmentResultAction.OnSelectImageResult -> {
+                _state.update { it.copy(selectedImageResult = action.imageResult) }
             }
         }
     }

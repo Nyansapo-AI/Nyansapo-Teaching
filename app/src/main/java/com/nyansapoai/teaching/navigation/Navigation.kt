@@ -25,7 +25,7 @@ import com.nyansapoai.teaching.presentation.assessments.IndividualAssessment.Ind
 import com.nyansapoai.teaching.presentation.assessments.assessmentResult.AssessmentResultRoot
 import com.nyansapoai.teaching.presentation.assessments.conductAssessment.ConductAssessmentRoot
 import com.nyansapoai.teaching.presentation.assessments.createAssessment.CreateAssessmentsRoot
-import com.nyansapoai.teaching.presentation.assessments.literacy.result.LiteracyResultRoot
+import com.nyansapoai.teaching.presentation.assessments.assessmentResult.literacyResult.LiteracyResultRoot
 import com.nyansapoai.teaching.presentation.attendances.collectAttendance.CollectAttendanceRoot
 import com.nyansapoai.teaching.presentation.authentication.AuthControllerRoot
 import com.nyansapoai.teaching.presentation.authentication.otp.OTPRoot

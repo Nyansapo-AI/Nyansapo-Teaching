@@ -1,4 +1,4 @@
-package com.nyansapoai.teaching.presentation.assessments.literacy.result.components
+package com.nyansapoai.teaching.presentation.assessments.assessmentResult.literacyResult.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

@@ -1,10 +1,10 @@
-package com.nyansapoai.teaching.presentation.assessments.numeracy.results
+package com.nyansapoai.teaching.presentation.assessments.assessmentResult.numeracyResults
 
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.CountMatch
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumberRecognitionResult
-import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyAssessmentResults
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyOperationResult
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.WordProblemResult
+import com.nyansapoai.teaching.presentation.assessments.assessmentResult.ImageResult
 
 data class NumeracyAssessmentResultState(
     val isLoading: Boolean = false,
@@ -17,5 +17,5 @@ data class NumeracyAssessmentResultState(
     val word_problem: List<WordProblemResult> = emptyList(),
     val number_recognition: List<NumberRecognitionResult> = emptyList(),
     val selectedNumberRecognition: NumberRecognitionResult? = null,
-    val screenshotImage: String? = null,
+    val selectedImageResult: ImageResult? = null,
 )

@@ -1,4 +1,4 @@
-package com.nyansapoai.teaching.presentation.assessments.literacy.result
+package com.nyansapoai.teaching.presentation.assessments.assessmentResult.literacyResult
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -55,8 +55,12 @@ class LiteracyResultViewModel(
 
     fun onAction(action: LiteracyResultAction) {
         when (action) {
-            is LiteracyResultAction.OnSelectAudioUrl -> {
-                _state.update { it.copy(selectedAudioUrl = action.audioUrl) }
+            is LiteracyResultAction.OnSelectImageResult -> {
+                _state.update { it.copy(selectedImageResult = action.imageResult) }
+            }
+
+            is LiteracyResultAction.OnSelectAudioResult -> {
+                _state.update { it.copy(selectedAudioResult = action.audioResult) }
             }
         }
     }

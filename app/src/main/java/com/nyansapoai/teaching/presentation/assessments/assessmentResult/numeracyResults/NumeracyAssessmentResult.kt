@@ -1,9 +1,7 @@
-package com.nyansapoai.teaching.presentation.assessments.numeracy.results
+package com.nyansapoai.teaching.presentation.assessments.assessmentResult.numeracyResults
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -13,13 +11,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil3.compose.AsyncImage
+import com.nyansapoai.teaching.presentation.assessments.assessmentResult.ImageResult
 import com.nyansapoai.teaching.presentation.assessments.assessmentResult.composable.ReviewAssessmentAudio
-import com.nyansapoai.teaching.presentation.assessments.literacy.result.TitleText
-import com.nyansapoai.teaching.presentation.assessments.literacy.result.components.CharResultItem
-import com.nyansapoai.teaching.presentation.assessments.numeracy.results.composables.NumeracyOperationResultItemUI
-import com.nyansapoai.teaching.presentation.assessments.numeracy.results.composables.NumeracyWordProblemResultItemUI
-import com.nyansapoai.teaching.presentation.common.audio.AppNetworkAudioPlayer
+import com.nyansapoai.teaching.presentation.assessments.assessmentResult.composable.ReviewAssessmentImage
+import com.nyansapoai.teaching.presentation.assessments.assessmentResult.literacyResult.TitleText
+import com.nyansapoai.teaching.presentation.assessments.assessmentResult.literacyResult.components.CharResultItem
+import com.nyansapoai.teaching.presentation.assessments.assessmentResult.numeracyResults.composables.NumeracyOperationResultItemUI
+import com.nyansapoai.teaching.presentation.assessments.assessmentResult.numeracyResults.composables.NumeracyWordProblemResultItemUI
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -35,6 +33,8 @@ fun NumeracyAssessmentResultRoot(
     NumeracyAssessmentResultScreen(
         modifier = modifier,
         state = state,
+        studentId = studentId,
+        assessmentId = assessmentId,
         onAction = viewModel::onAction
     )
 }
@@ -44,22 +44,24 @@ fun NumeracyAssessmentResultRoot(
 fun NumeracyAssessmentResultScreen(
     modifier: Modifier = Modifier,
     state: NumeracyAssessmentResultState,
+    studentId: String,
+    assessmentId: String,
     onAction: (NumeracyAssessmentResultAction) -> Unit,
 ) {
 
 
-    if (state.screenshotImage != null){
+    if (state.selectedImageResult != null){
         ModalBottomSheet(
             onDismissRequest = {
-                onAction.invoke(NumeracyAssessmentResultAction.OnSelectScreenshotImage(imageUrl = null))
+                onAction.invoke(NumeracyAssessmentResultAction.OnSelectImageResult(imageResult = null))
             }
         ) {
-            AsyncImage(
-                model = state.screenshotImage,
-                contentDescription = "Translated description of what the image contains",
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(12.dp)
+            ReviewAssessmentImage(
+                imageUrl = state.selectedImageResult.imageUrl,
+                studentAnswer = state.selectedImageResult.studentAnswer,
+                expectedAnswer = state.selectedImageResult.expectedAnswer,
+                transcript = state.selectedImageResult.transcript,
+                passed = state.selectedImageResult.passed,
             )
         }
     }
@@ -150,7 +152,19 @@ fun NumeracyAssessmentResultScreen(
                         NumeracyOperationResultItemUI(
                             result = result,
                             onClick = {
-                                onAction.invoke(NumeracyAssessmentResultAction.OnSelectScreenshotImage(imageUrl = result.metadata.screenshot_url))
+                                onAction.invoke(
+                                    NumeracyAssessmentResultAction.OnSelectImageResult(
+                                        imageResult = ImageResult(
+                                            studentId = studentId,
+                                            assessmentId = assessmentId,
+                                            imageUrl = result.metadata.screenshot_url,
+                                            studentAnswer = result.student_answer ?: "Undefined",
+                                            expectedAnswer = result.expected_answer ?: "Undefined",
+                                            transcript = result.metadata.transcript ?: "Undefined",
+                                            passed = result.metadata.passed == true
+                                        )
+                                    )
+                                )
                             }
                         )
                     }
@@ -174,7 +188,20 @@ fun NumeracyAssessmentResultScreen(
                         NumeracyOperationResultItemUI(
                             result = result,
                             onClick = {
-                                onAction.invoke(NumeracyAssessmentResultAction.OnSelectScreenshotImage(imageUrl = result.metadata.screenshot_url))
+                                onAction.invoke(
+                                    NumeracyAssessmentResultAction.OnSelectImageResult(
+                                        imageResult = ImageResult(
+                                            studentId = studentId,
+                                            assessmentId = assessmentId,
+                                            imageUrl = result.metadata.screenshot_url,
+                                            studentAnswer = result.student_answer ?: "Undefined",
+                                            expectedAnswer = result.expected_answer ?: "Undefined",
+                                            transcript = result.metadata.transcript ?: "Undefined",
+                                            passed = result.metadata.passed == true
+                                        )
+                                    )
+                                )
+
                             }
                         )
                     }
@@ -198,7 +225,20 @@ fun NumeracyAssessmentResultScreen(
                         NumeracyOperationResultItemUI(
                             result = result,
                             onClick = {
-                                onAction.invoke(NumeracyAssessmentResultAction.OnSelectScreenshotImage(imageUrl = result.metadata.screenshot_url))
+                                onAction.invoke(
+                                    NumeracyAssessmentResultAction.OnSelectImageResult(
+                                        imageResult = ImageResult(
+                                            studentId = studentId,
+                                            assessmentId = assessmentId,
+                                            imageUrl = result.metadata.screenshot_url,
+                                            studentAnswer = result.student_answer ?: "Undefined",
+                                            expectedAnswer = result.expected_answer ?: "Undefined",
+                                            transcript = result.metadata.transcript ?: "Undefined",
+                                            passed = result.metadata.passed == true
+                                        )
+                                    )
+                                )
+
                             }
                         )
                     }
@@ -222,7 +262,20 @@ fun NumeracyAssessmentResultScreen(
                         NumeracyOperationResultItemUI(
                             result = result,
                             onClick = {
-                                onAction.invoke(NumeracyAssessmentResultAction.OnSelectScreenshotImage(imageUrl = result.metadata.screenshot_url))
+                                onAction.invoke(
+                                    NumeracyAssessmentResultAction.OnSelectImageResult(
+                                        imageResult = ImageResult(
+                                            studentId = studentId,
+                                            assessmentId = assessmentId,
+                                            imageUrl = result.metadata.screenshot_url,
+                                            studentAnswer = result.student_answer ?: "Undefined",
+                                            expectedAnswer = result.expected_answer ?: "Undefined",
+                                            transcript = result.metadata.transcript ?: "Undefined",
+                                            passed = result.metadata.passed == true
+                                        )
+                                    )
+                                )
+
                             }
                         )
                     }
@@ -241,7 +294,20 @@ fun NumeracyAssessmentResultScreen(
                 NumeracyWordProblemResultItemUI(
                     result = result,
                     onClick = {
-                        onAction.invoke(NumeracyAssessmentResultAction.OnSelectScreenshotImage(imageUrl = result.metadata.screenshot_url))
+                        onAction.invoke(
+                            NumeracyAssessmentResultAction.OnSelectImageResult(
+                                imageResult = ImageResult(
+                                    studentId = studentId,
+                                    assessmentId = assessmentId,
+                                    imageUrl = result.metadata.screenshot_url,
+                                    studentAnswer = result.metadata.student_answer ?: "Undefined",
+                                    expectedAnswer = result.expected_number,
+                                    transcript = result.metadata.transcript ?: "Undefined",
+                                    passed = result.metadata.passed == true
+                                )
+                            )
+                        )
+
                     }
                 )
             }

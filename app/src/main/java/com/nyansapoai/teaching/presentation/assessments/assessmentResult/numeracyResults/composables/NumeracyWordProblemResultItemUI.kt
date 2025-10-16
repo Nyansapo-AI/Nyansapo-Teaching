@@ -1,4 +1,4 @@
-package com.nyansapoai.teaching.presentation.assessments.numeracy.results.composables
+package com.nyansapoai.teaching.presentation.assessments.assessmentResult.numeracyResults.composables
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement

@@ -1,4 +1,4 @@
-package com.nyansapoai.teaching.presentation.assessments.literacy.result
+package com.nyansapoai.teaching.presentation.assessments.assessmentResult.literacyResult
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.FlowRow
@@ -19,9 +19,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.nyansapoai.teaching.presentation.assessments.literacy.result.components.CharResultItem
-import com.nyansapoai.teaching.presentation.assessments.literacy.result.components.ComprehensionQuestion
-import com.nyansapoai.teaching.presentation.assessments.literacy.result.components.ParagraphResultItem
+import com.nyansapoai.teaching.presentation.assessments.assessmentResult.AudioResult
+import com.nyansapoai.teaching.presentation.assessments.assessmentResult.composable.ReviewAssessmentAudio
+import com.nyansapoai.teaching.presentation.assessments.assessmentResult.literacyResult.components.CharResultItem
+import com.nyansapoai.teaching.presentation.assessments.assessmentResult.literacyResult.components.ComprehensionQuestion
+import com.nyansapoai.teaching.presentation.assessments.assessmentResult.literacyResult.components.ParagraphResultItem
 import com.nyansapoai.teaching.presentation.common.audio.AppNetworkAudioPlayer
 import org.koin.androidx.compose.koinViewModel
 
@@ -38,6 +40,8 @@ fun LiteracyResultRoot(
     LiteracyResultScreen(
         modifier = modifier,
         state = state,
+        studentId = studentId,
+        assessmentId = assessmentId,
         onAction = viewModel::onAction
     )
 
@@ -48,17 +52,23 @@ fun LiteracyResultRoot(
 fun LiteracyResultScreen(
     modifier: Modifier = Modifier,
     state: LiteracyResultState,
+    studentId: String,
+    assessmentId: String,
     onAction: (LiteracyResultAction) -> Unit,
 ) {
 
-    if (state.selectedAudioUrl != null){
+    if (state.selectedAudioResult != null){
         ModalBottomSheet(
             onDismissRequest = {
-                onAction.invoke(LiteracyResultAction.OnSelectAudioUrl(audioUrl = null))
+                onAction.invoke(LiteracyResultAction.OnSelectAudioResult(audioResult = null))
             }
         ) {
-            AppNetworkAudioPlayer(
-                audioUrl = state.selectedAudioUrl,
+            ReviewAssessmentAudio(
+                audioUrl = state.selectedAudioResult.audioUrl,
+                studentAnswer = state.selectedAudioResult.studentAnswer,
+                expectedAnswer = state.selectedAudioResult.expectedAnswer,
+                transcript = state.selectedAudioResult.transcript,
+                passed = state.selectedAudioResult.passed,
             )
         }
     }
@@ -84,7 +94,19 @@ fun LiteracyResultScreen(
                             char = result.content,
                             isCorrect = result.metadata?.passed ?: false,
                             onClick = {
-                                onAction.invoke(LiteracyResultAction.OnSelectAudioUrl(audioUrl = result.metadata?.audio_url))
+                                onAction.invoke(
+                                    LiteracyResultAction.OnSelectAudioResult(
+                                        audioResult = AudioResult(
+                                            studentId = studentId,
+                                            assessmentId = assessmentId,
+                                            audioUrl = result.metadata?.audio_url,
+                                            studentAnswer = result.metadata?.transcript ?: "",
+                                            expectedAnswer = result.content,
+                                            transcript = result.metadata?.transcript ?: "",
+                                            passed = result.metadata?.passed ?: false,
+                                        )
+                                    )
+                                )
                             }
                         )
                     }
@@ -114,7 +136,20 @@ fun LiteracyResultScreen(
                             char = result.content,
                             isCorrect = result.metadata?.passed ?: false,
                             onClick = {
-                                onAction.invoke(LiteracyResultAction.OnSelectAudioUrl(audioUrl = result.metadata?.audio_url))
+                                onAction.invoke(
+                                    LiteracyResultAction.OnSelectAudioResult(
+                                        audioResult = AudioResult(
+                                            studentId = studentId,
+                                            assessmentId = assessmentId,
+                                            audioUrl = result.metadata?.audio_url,
+                                            studentAnswer = result.metadata?.transcript ?: "",
+                                            expectedAnswer = result.content,
+                                            transcript = result.metadata?.transcript ?: "",
+                                            passed = result.metadata?.passed ?: false,
+                                        )
+                                    )
+                                )
+
                             }
                         )
                     }
@@ -139,7 +174,20 @@ fun LiteracyResultScreen(
                     expected = result.content,
                     studentAnswer = result.metadata?.transcript ?: "",
                     onClick = {
-                        onAction.invoke(LiteracyResultAction.OnSelectAudioUrl(audioUrl = result.metadata?.audio_url))
+                        onAction.invoke(
+                            LiteracyResultAction.OnSelectAudioResult(
+                                audioResult = AudioResult(
+                                    studentId = studentId,
+                                    assessmentId = assessmentId,
+                                    audioUrl = result.metadata?.audio_url,
+                                    studentAnswer = result.metadata?.transcript ?: "",
+                                    expectedAnswer = result.content,
+                                    transcript = result.metadata?.transcript ?: "",
+                                    passed = result.metadata?.passed ?: false,
+                                )
+                            )
+                        )
+
                     }
                 )
             }
@@ -162,7 +210,20 @@ fun LiteracyResultScreen(
                     expected = result.content,
                     studentAnswer = result.metadata?.transcript ?: "",
                     onClick = {
-                        onAction.invoke(LiteracyResultAction.OnSelectAudioUrl(audioUrl = result.metadata?.audio_url))
+                        onAction.invoke(
+                            LiteracyResultAction.OnSelectAudioResult(
+                                audioResult = AudioResult(
+                                    studentId = studentId,
+                                    assessmentId = assessmentId,
+                                    audioUrl = result.metadata?.audio_url,
+                                    studentAnswer = result.metadata?.transcript ?: "",
+                                    expectedAnswer = result.content,
+                                    transcript = result.metadata?.transcript ?: "",
+                                    passed = result.metadata?.passed ?: false,
+                                )
+                            )
+                        )
+
                     }
                 )
             }
