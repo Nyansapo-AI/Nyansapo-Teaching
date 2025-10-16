@@ -40,15 +40,15 @@ import com.nyansapoai.teaching.presentation.assessments.createAssessment.CreateA
 import com.nyansapoai.teaching.presentation.assessments.IndividualAssessment.IndividualAssessmentViewModel
 import com.nyansapoai.teaching.presentation.assessments.conductAssessment.ConductAssessmentViewModel
 import com.nyansapoai.teaching.presentation.assessments.literacy.LiteracyViewModel
-import com.nyansapoai.teaching.presentation.assessments.literacy.result.LiteracyResultViewModel
+import com.nyansapoai.teaching.presentation.assessments.assessmentResult.literacyResult.LiteracyResultViewModel
 import com.nyansapoai.teaching.presentation.assessments.numeracy.NumeracyAssessmentViewModel
+import com.nyansapoai.teaching.presentation.assessments.assessmentResult.numeracyResults.NumeracyAssessmentResultViewModel
 import com.nyansapoai.teaching.presentation.attendances.AttendancesViewModel
 import com.nyansapoai.teaching.presentation.attendances.collectAttendance.CollectAttendanceViewModel
 import com.nyansapoai.teaching.presentation.common.audio.play.AndroidAudioPlayer
 import com.nyansapoai.teaching.presentation.common.audio.play.AudioPlayer
 import com.nyansapoai.teaching.presentation.common.audio.record.AndroidAppAudioRecorder
 import com.nyansapoai.teaching.presentation.common.audio.record.AppAudioRecorder
-import com.nyansapoai.teaching.presentation.common.textToSpeech.TextToSpeechViewModel
 import com.nyansapoai.teaching.presentation.common.snackbar.SnackBarHandler
 import com.nyansapoai.teaching.presentation.students.StudentsViewModel
 
@@ -66,10 +66,10 @@ val appModules = module {
     viewModelOf(::IndividualAssessmentViewModel)
     viewModelOf(::ConductAssessmentViewModel)
     viewModelOf(::NumeracyAssessmentViewModel)
-    viewModelOf(::TextToSpeechViewModel)
     viewModelOf(::LiteracyViewModel)
     viewModelOf(::StudentsViewModel)
     viewModelOf(::LiteracyResultViewModel)
+    viewModelOf(::NumeracyAssessmentResultViewModel)
     viewModelOf(::AttendancesViewModel)
     viewModelOf(::CollectAttendanceViewModel)
 

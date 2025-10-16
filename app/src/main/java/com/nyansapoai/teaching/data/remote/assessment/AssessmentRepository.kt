@@ -7,6 +7,7 @@ import com.nyansapoai.teaching.domain.models.assessments.literacy.MultipleChoice
 import com.nyansapoai.teaching.domain.models.assessments.literacy.ReadingAssessmentResult
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.CountMatch
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyArithmeticOperation
+import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyAssessmentResults
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyWordProblem
 import com.nyansapoai.teaching.domain.models.students.NyansapoStudent
 import com.nyansapoai.teaching.utils.Results
@@ -80,4 +81,6 @@ interface  AssessmentRepository {
     fun fetchLiteracyAssessmentResults(assessmentId: String, studentId: String): Flow<Results<LiteracyAssessmentResults>>
 
     suspend fun markAssessmentDone(assessmentId: String, studentId: String): Results<String>
+
+    fun fetchNumeracyAssessmentResults(assessmentId: String, studentId: String): Flow<Results<NumeracyAssessmentResults>>
 }

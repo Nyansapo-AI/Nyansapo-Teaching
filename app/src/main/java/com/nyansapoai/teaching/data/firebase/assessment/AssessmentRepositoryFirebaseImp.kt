@@ -13,6 +13,7 @@ import com.nyansapoai.teaching.domain.models.assessments.literacy.ReadingAssessm
 import com.nyansapoai.teaching.domain.models.assessments.literacy.ReadingAssessmentResult
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.CountMatch
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyArithmeticOperation
+import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyAssessmentResults
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyWordProblem
 import com.nyansapoai.teaching.domain.models.students.NyansapoStudent
 import com.nyansapoai.teaching.utils.Results
@@ -24,7 +25,6 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
-import kotlin.text.get
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -454,7 +454,6 @@ class AssessmentRepositoryFirebaseImp(
 
                         if (snapshot != null && snapshot.exists()) {
                             try {
-
                                 val results = snapshot.toObject<LiteracyAssessmentResults>()
                                 if (results != null) {
                                     Log.d("AssessmentRepo", "Literacy results fetched successfully, size of reading results: ${snapshot.data}")
@@ -531,6 +530,67 @@ class AssessmentRepositoryFirebaseImp(
 
         return withContext(Dispatchers.IO) {
             deferred.await()
+        }
+    }
+
+    override fun fetchNumeracyAssessmentResults(
+        assessmentId: String,
+        studentId: String
+    ): Flow<Results<NumeracyAssessmentResults>> {
+        return callbackFlow {
+            if (assessmentId.isBlank() || studentId.isBlank()) {
+                Log.w("AssessmentRepo", "Invalid assessment ID or student ID provided")
+                trySend(Results.error(msg = "Invalid assessment ID or student ID provided"))
+                close()
+                return@callbackFlow
+            }
+
+            try {
+                val documentId = "${assessmentId}_$studentId"
+
+                val snapshotListener = firebaseDb.collection(assessmentCollection)
+                    .document(assessmentId)
+                    .collection(assessmentResultsCollection)
+                    .document(documentId)
+                    .addSnapshotListener { snapshot, error ->
+                        if (error != null) {
+                            Log.e("AssessmentRepo", "Error fetching numeracy results: ${error.message}", error)
+                            trySend(Results.error(msg = error.message ?: "Something went wrong"))
+                            close(error)
+                            return@addSnapshotListener
+                        }
+
+                        if (snapshot != null && snapshot.exists()) {
+                            try {
+                                val results = snapshot.toObject<NumeracyAssessmentResults>()
+                                if (results != null) {
+                                    Log.d("AssessmentRepo", "numeracy results fetched successfully, numeracy result: ${results}")
+
+                                    trySend(Results.success(data = results))
+
+                                } else {
+                                    Log.w("AssessmentRepo", "No numeracy assessment data found")
+
+                                    trySend(Results.error(msg = "No numeracy assessment data found"))
+                                }
+                            } catch (e: Exception) {
+                                Log.e("AssessmentRepo", "Error parsing numeracy results: ${e.message}", e)
+                                trySend(Results.error(msg = "Error parsing data: ${e.message}"))
+                            }
+                        } else {
+                            Log.w("AssessmentRepo", "numeracy assessment not found for ID: $documentId")
+                            trySend(Results.error(msg = "numeracy assessment not found"))
+                        }
+                    }
+
+                awaitClose {
+                    snapshotListener.remove()
+                }
+
+            }catch (e: Exception){
+                trySend(Results.error(msg = "Error accessing literacy results: ${e.message}"))
+                close(e)
+            }
         }
     }
 

@@ -43,6 +43,17 @@ data class LiteracyResultsPage(
 )
 
 @Serializable
+data class AssessmentResultsPage(
+    val assessmentId: String,
+    val studentId: String,
+    val studentName: String,
+    val level: String,
+    val grade: Int,
+    val assessmentName: String,
+    val assessmentType: String,
+)
+
+@Serializable
 data class CollectAttendancePage(
     val date: String,
     val schoolId: String,

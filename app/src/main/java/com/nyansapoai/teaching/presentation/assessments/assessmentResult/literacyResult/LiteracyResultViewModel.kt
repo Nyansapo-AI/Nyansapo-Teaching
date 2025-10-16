@@ -1,4 +1,4 @@
-package com.nyansapoai.teaching.presentation.assessments.literacy.result
+package com.nyansapoai.teaching.presentation.assessments.assessmentResult.literacyResult
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 
 class LiteracyResultViewModel(
     savedStateHandle: SavedStateHandle,
@@ -32,7 +33,7 @@ class LiteracyResultViewModel(
         currentState.copy(
             results = results.data,
             stories = results.data?.literacy_results?.reading_results?.filter { (content, metadata) -> metadata?.type == "Story" } ?: emptyList(),
-            letters = results.data?.literacy_results?.reading_results?.filter { (content, metadata) -> metadata?.type == "Letter Recognition" } ?: emptyList(),
+            letters = results.data?.literacy_results?.reading_results?.filter { (content, metadata) -> metadata?.type == "Letter" } ?: emptyList(),
             words = results.data?.literacy_results?.reading_results?.filter { (content, metadata) -> metadata?.type == "Word" } ?: emptyList(),
             paragraphs = results.data?.literacy_results?.reading_results?.filter { (content, metadata) -> metadata?.type == "Paragraph" } ?: emptyList(),
             multipleChoiceQuestions = results.data?.literacy_results?.multiple_choice_questions ?: emptyList(),
@@ -54,7 +55,13 @@ class LiteracyResultViewModel(
 
     fun onAction(action: LiteracyResultAction) {
         when (action) {
-            else -> TODO("Handle actions")
+            is LiteracyResultAction.OnSelectImageResult -> {
+                _state.update { it.copy(selectedImageResult = action.imageResult) }
+            }
+
+            is LiteracyResultAction.OnSelectAudioResult -> {
+                _state.update { it.copy(selectedAudioResult = action.audioResult) }
+            }
         }
     }
 
