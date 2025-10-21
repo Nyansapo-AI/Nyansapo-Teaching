@@ -113,6 +113,9 @@ dependencies {
 
     implementation (libs.material3)
 
+    //splash screen
+    implementation(libs.androidx.core.splashscreen)
+
     // Koin for Android
     implementation(libs.koin.android)
     implementation (libs.koin.androidx.compose)
