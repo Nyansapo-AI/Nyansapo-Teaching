@@ -60,7 +60,6 @@ fun StepsRow(
 
         items(numberOfSteps){ step ->
             Step(
-                modifier = Modifier,
                 step = step,
                 isCompete = step < currentStep - 1,
                 isCurrent = step == currentStep - 1,
@@ -68,7 +67,8 @@ fun StepsRow(
                 stepDescription = descriptionList[step],
                 unSelectedColor = unSelectedColor,
                 selectedColor = selectedColor,
-                onClick = onClick
+                onClick = onClick,
+                modifier = Modifier
             )
         }
 
@@ -131,7 +131,8 @@ private fun Step(
                     Text(
                         text = (step + 1 ).toString(),
                         color = if (isCurrent || isComplete) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary,
-                        fontSize = 9.sp,
+//                        fontSize = 12.sp,
+                        style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold
                     )
             }
@@ -140,7 +141,7 @@ private fun Step(
 
         Text(
             modifier = Modifier,
-            style = MaterialTheme.typography.bodyMedium,
+            style = MaterialTheme.typography.titleMedium,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             text = stepDescription,
