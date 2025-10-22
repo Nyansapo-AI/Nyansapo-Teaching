@@ -1,5 +1,8 @@
 package com.nyansapoai.teaching.presentation.survey
 
+import com.nyansapoai.teaching.domain.models.survey.Child
+import com.nyansapoai.teaching.domain.models.survey.Parent
+
 sealed interface SurveyAction {
     data class SetInterviewerName(val name: String) : SurveyAction
     data class SetCounty(val county: String) : SurveyAction
@@ -37,5 +40,28 @@ sealed interface SurveyAction {
     data class SetMissedReason(val reason: String) : SurveyAction
     data class SetShowMissedReasonDropdown(val show: Boolean) : SurveyAction
     data class SetOtherMissedReason(val other: String) : SurveyAction
+    data class SetShowParentOrGuardianSheet(val show: Boolean) : SurveyAction
+    data class SetParentName(val name: String) : SurveyAction
+    data class SetParentAge(val age: String) : SurveyAction
+    data class SetHasAttendedSchool(val attended: Boolean) : SurveyAction
+    data class SetShowHigherEducationDropdown(val show: Boolean) : SurveyAction
+    data class SetHighestEducationLevel(val level: String) : SurveyAction
+    data class SetParentGender(val gender: String) : SurveyAction
+    data class SetShowGuardianGenderDropdown(val show: Boolean) : SurveyAction
+    data class SetType(val type: String) : SurveyAction
+    data class SetShowTypeDropdown(val show: Boolean) : SurveyAction
+    data object OnAddParent : SurveyAction
+    data class OnRemoveParent(val parent: Parent) : SurveyAction
+
+    data class SetShowAddChildSheet(val show: Boolean) : SurveyAction
+    data class SetChildName(val name: String) : SurveyAction
+    data class SetChildGender(val gender: String) : SurveyAction
+    data class SetChildAge(val age: String) : SurveyAction
+    data class SetShowChildGenderDropdown(val show: Boolean) : SurveyAction
+    data class SetLivesWith(val livesWith: String) : SurveyAction
+    data class SetShowLivesWithDropdown(val show: Boolean) : SurveyAction
+    data object OnAddChild : SurveyAction
+    data class OnRemoveChild(val child: Child) : SurveyAction
+    data object SubmitSurvey: SurveyAction
 
 }

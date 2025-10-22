@@ -1,9 +1,9 @@
 package com.nyansapoai.teaching.presentation.survey
 
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -24,10 +24,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
+import com.nyansapoai.teaching.presentation.common.components.AppButton
 import com.nyansapoai.teaching.presentation.common.components.StepContent
 import com.nyansapoai.teaching.presentation.common.components.StepsRow
 import com.nyansapoai.teaching.presentation.survey.composables.ChildLearningEnvironmentContent
+import com.nyansapoai.teaching.presentation.survey.composables.FamilyMembersContent
 import com.nyansapoai.teaching.presentation.survey.composables.HouseholdBackgroundContent
 import com.nyansapoai.teaching.presentation.survey.composables.IdentificationAndContentContent
 import com.nyansapoai.teaching.presentation.survey.composables.ParentalEngagementContent
@@ -84,6 +85,8 @@ fun SurveyScreen(
             },
             title = "Identification and Consent"
         ),
+
+
         StepContent(
             screen = {
                 HouseholdBackgroundContent(
@@ -175,6 +178,57 @@ fun SurveyScreen(
             },
             title = "Household Background"
         ),
+
+        StepContent(
+            screen = {
+                FamilyMembersContent(
+                    showParentOrGuardianSheet = state.showParentOrGuardianSheet,
+                    onShowParentOrGuardianSheetChange = { onAction(SurveyAction.SetShowParentOrGuardianSheet(it)) },
+                    parentName = state.parentName,
+                    onParentNameChanged = { onAction(SurveyAction.SetParentName(it)) },
+                    parentAge = state.parentAge,
+                    onParentAgeChanged = { onAction(SurveyAction.SetParentAge(it)) },
+                    hasAttendedSchool = state.hasAttendedSchool,
+                    onHasAttendedSchoolChanged = { onAction(SurveyAction.SetHasAttendedSchool(it)) },
+                    showHigherEducationDropdown = state.showHigherEducationDropdown,
+                    onShowHighEducationDropdownChange = { onAction(SurveyAction.SetShowHigherEducationDropdown(it)) },
+                    highestEducationLevel = state.highestEducationLevel,
+                    onHighestEducationLevelChanged = { onAction(SurveyAction.SetHighestEducationLevel(it)) },
+                    parentGender = state.parentGender,
+                    onParentGenderChanged = { onAction(SurveyAction.SetParentGender(it)) },
+                    showGuardianGenderDropdown = state.showGuardianGenderDropdown,
+                    onShowGuardianGenderDropdownChanged = { onAction(SurveyAction.SetShowGuardianGenderDropdown(it)) },
+                    type = state.type,
+                    onTypeChanged = { onAction(SurveyAction.SetType(it)) },
+                    showTypeDropdown = state.showTypeDropdown,
+                    onShowTypeDropdownChanged = { onAction(SurveyAction.SetShowTypeDropdown(it)) },
+                    onAddParent = {onAction(SurveyAction.OnAddParent)},
+                    onRemoveParent = { onAction(SurveyAction.OnRemoveParent(it))},
+                    parents = state.parents,
+                    showAddChildSheet = state.showAddChildSheet,
+                    onShowAddChildSheetChange = { onAction(SurveyAction.SetShowAddChildSheet(it)) },
+                    childName = state.childName,
+                    onChildNameChanged = { onAction(SurveyAction.SetChildName(it)) },
+                    childGender = state.childGender,
+                    onChildGenderChanged = { onAction(SurveyAction.SetChildGender(it)) },
+                    showChildGenderDropdown = state.showChildGenderDropdown,
+
+                    onShowChildGenderDropdownChanged = { onAction(SurveyAction.SetShowChildGenderDropdown(it)) },
+                    livesWith = state.livesWith,
+                    onLivesWithChanged = { onAction(SurveyAction.SetLivesWith(it)) },
+                    showLivesWithDropdown = state.showLivesWithDropdown,
+                    onShowLivesWithDropdownChanged = { onAction(SurveyAction.SetShowLivesWithDropdown(it)) },
+                    onAddChild = {onAction(SurveyAction.OnAddChild)},
+                    onRemoveChild = {onAction(SurveyAction.OnRemoveChild(it))},
+                    children = state.children,
+                    childAge = state.childAge,
+                    onChildAgeChanged = { onAction(SurveyAction.SetChildAge(it)) }
+                )
+            },
+            onSubmit = {},
+            title = "Family Members"
+        ),
+
         StepContent(
             screen = {
                 ParentalEngagementContent(
@@ -352,6 +406,28 @@ fun SurveyScreen(
 
             item {
                 surveySteps[currentStep].screen(Modifier.padding(innerPadding))
+            }
+
+            item {
+                Spacer(Modifier.height(28.dp))
+            }
+
+            item {
+                AppButton(
+                    enabled = state.consentGiven,
+                    onClick = {
+                        if (currentStep < surveySteps.size -1){
+                            currentStep +=1
+                        } else {
+                            // Submit action
+                            onAction(SurveyAction.SubmitSurvey)
+                        }
+                    }
+                ) {
+                    Text(
+                        text = if (currentStep == surveySteps.size -1) "Submit" else "Next"
+                    )
+                }
             }
 
         }

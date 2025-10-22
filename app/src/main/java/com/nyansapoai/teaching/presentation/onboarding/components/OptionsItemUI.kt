@@ -29,3 +29,24 @@ fun OptionsItemUI(
         )
     }
 }
+
+
+@Composable
+fun OptionsItemContent(
+    modifier: Modifier = Modifier,
+    isSelected: Boolean,
+    onClick: () -> Unit,
+    content: @Composable () -> Unit
+) {
+    OutlinedButton(
+        border = BorderStroke(
+            width = 2.dp,
+            color = if(isSelected) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f)
+        ),
+        onClick = onClick,
+        modifier = modifier
+    ) {
+        content.invoke()
+    }
+
+}

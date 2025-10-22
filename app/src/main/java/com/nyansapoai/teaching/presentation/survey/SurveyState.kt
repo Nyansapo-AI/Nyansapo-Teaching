@@ -1,5 +1,8 @@
 package com.nyansapoai.teaching.presentation.survey
 
+import com.nyansapoai.teaching.domain.models.survey.Child
+import com.nyansapoai.teaching.domain.models.survey.Parent
+
 data class SurveyState(
     val interviewerName: String = "",
     val countyList: List<County> = County.entries,
@@ -44,6 +47,27 @@ data class SurveyState(
     val showMissedReasonDropdown: Boolean = false,
     val otherMissedReason: String = "",
     val showOtherMissedReasonDropdown: Boolean = false,
+
+    val showParentOrGuardianSheet: Boolean = false,
+    val parentName: String = "",
+    val parentAge: String = "",
+    val hasAttendedSchool: Boolean = false,
+    val showHigherEducationDropdown: Boolean = false,
+    val highestEducationLevel: String = "",
+    val parentGender: String = "",
+    val showGuardianGenderDropdown: Boolean = false,
+    val type: String = "",
+    val showTypeDropdown: Boolean = false,
+    val parents: MutableList<Parent> = mutableListOf(),
+
+    val showAddChildSheet: Boolean = false,
+    val childName: String = "",
+    val childGender: String = "",
+    val childAge: String = "",
+    val showChildGenderDropdown: Boolean = false,
+    val livesWith: String = "",
+    val showLivesWithDropdown: Boolean = false,
+    val children: MutableList<Child> = mutableListOf()
 )
 
 
@@ -80,3 +104,5 @@ enum class County(val title: String, val subCounties: List<String>) {
         )
     )
 }
+
+
