@@ -2,6 +2,7 @@ package com.nyansapoai.teaching.domain.models.survey
 
 import com.google.firebase.firestore.IgnoreExtraProperties
 import kotlinx.datetime.Clock
+import kotlinx.serialization.Serializable
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 

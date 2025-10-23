@@ -63,3 +63,8 @@ data class CollectAttendancePage(
 
 @Serializable
 data object AddHouseHoldPage
+
+@Serializable
+data class HouseHoldDetailsPage(
+    val houseHoldId: String
+)

@@ -32,6 +32,7 @@ import com.nyansapoai.teaching.R
 import com.nyansapoai.teaching.domain.models.survey.HouseHoldInfo
 import com.nyansapoai.teaching.navController
 import com.nyansapoai.teaching.navigation.AddHouseHoldPage
+import com.nyansapoai.teaching.navigation.HouseHoldDetailsPage
 import com.nyansapoai.teaching.presentation.common.components.AppCircularLoading
 import com.nyansapoai.teaching.ui.theme.lightPrimary
 import org.koin.androidx.compose.koinViewModel
@@ -169,7 +170,11 @@ fun HouseholdListItem(
 
 
         IconButton(
-            onClick = {}
+            onClick = {
+                navController.navigate(
+                    HouseHoldDetailsPage(houseHoldId = household.id)
+                )
+            }
         ) {
             Icon(
                 painter = painterResource(R.drawable.arrow_forward),

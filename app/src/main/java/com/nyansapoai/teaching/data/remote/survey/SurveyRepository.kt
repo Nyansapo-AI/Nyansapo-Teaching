@@ -13,4 +13,8 @@ interface SurveyRepository {
     suspend fun submitHouseholdSurvey(
         createHouseHold: CreateHouseHoldInfo
     ): Results<Unit>
+
+    fun getHouseholdSurveyById(
+        id: String
+    ): Flow<HouseHoldInfo?>
 }

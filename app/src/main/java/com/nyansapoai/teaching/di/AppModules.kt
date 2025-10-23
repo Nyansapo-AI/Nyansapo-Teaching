@@ -54,6 +54,7 @@ import com.nyansapoai.teaching.presentation.common.audio.record.AppAudioRecorder
 import com.nyansapoai.teaching.presentation.common.snackbar.SnackBarHandler
 import com.nyansapoai.teaching.presentation.students.StudentsViewModel
 import com.nyansapoai.teaching.presentation.survey.SurveyViewModel
+import com.nyansapoai.teaching.presentation.survey.detailedHouseHold.DetailedHouseholdInfoViewModel
 import com.nyansapoai.teaching.presentation.survey.household.HouseholdViewModel
 
 val appModules = module {
@@ -78,6 +79,7 @@ val appModules = module {
     viewModelOf(::AttendancesViewModel)
     viewModelOf(::CollectAttendanceViewModel)
     viewModelOf(::HouseholdViewModel)
+    viewModelOf(::DetailedHouseholdInfoViewModel)
 
 
 

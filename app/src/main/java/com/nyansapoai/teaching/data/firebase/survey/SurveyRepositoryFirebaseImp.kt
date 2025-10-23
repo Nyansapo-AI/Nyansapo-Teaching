@@ -65,4 +65,26 @@ class SurveyRepositoryFirebaseImp(
         }
 
     }
+
+    override fun getHouseholdSurveyById(id: String): Flow<HouseHoldInfo?>  = callbackFlow {
+        val snapshotListener = firebaseDb.collection(householdCollection)
+            .document(id)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null){
+                    close(error)
+                    return@addSnapshotListener
+                }
+
+                if (snapshot != null && snapshot.exists()){
+                    val household = snapshot.toObject<HouseHoldInfo>()
+                    trySend(household)
+                }else {
+                    trySend(null)
+                }
+            }
+
+        awaitClose {
+            snapshotListener.remove()
+        }
+    }
 }
