@@ -11,6 +11,7 @@ import com.nyansapoai.teaching.data.firebase.attendance.FirebaseAttendanceReposi
 import com.nyansapoai.teaching.data.firebase.media.FirebaseMediaRepositoryImpl
 import com.nyansapoai.teaching.data.firebase.schools.SchoolRepositoryFirebaseImp
 import com.nyansapoai.teaching.data.firebase.students.StudentsRepositoryFirebaseImp
+import com.nyansapoai.teaching.data.firebase.survey.SurveyRepositoryFirebaseImp
 import com.nyansapoai.teaching.data.firebase.user.UserRepositoryFirebaseImp
 import com.nyansapoai.teaching.data.local.LocalDataSource
 import com.nyansapoai.teaching.data.local.LocalDatabaseDriverFactory
@@ -25,6 +26,7 @@ import com.nyansapoai.teaching.data.remote.authentication.AuthenticationReposito
 import com.nyansapoai.teaching.data.remote.media.MediaRepository
 import com.nyansapoai.teaching.data.remote.school.SchoolRepository
 import com.nyansapoai.teaching.data.remote.students.StudentsRepository
+import com.nyansapoai.teaching.data.remote.survey.SurveyRepository
 import com.nyansapoai.teaching.data.remote.user.UserRepository
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
@@ -52,6 +54,7 @@ import com.nyansapoai.teaching.presentation.common.audio.record.AppAudioRecorder
 import com.nyansapoai.teaching.presentation.common.snackbar.SnackBarHandler
 import com.nyansapoai.teaching.presentation.students.StudentsViewModel
 import com.nyansapoai.teaching.presentation.survey.SurveyViewModel
+import com.nyansapoai.teaching.presentation.survey.household.HouseholdViewModel
 
 val appModules = module {
 
@@ -74,6 +77,8 @@ val appModules = module {
     viewModelOf(::NumeracyAssessmentResultViewModel)
     viewModelOf(::AttendancesViewModel)
     viewModelOf(::CollectAttendanceViewModel)
+    viewModelOf(::HouseholdViewModel)
+
 
 
 
@@ -179,6 +184,12 @@ val appModules = module {
 
     single<AttendanceRepository> {
         FirebaseAttendanceRepositoryImp(
+            firebaseDb = get(),
+        )
+    }
+
+    single<SurveyRepository>{
+        SurveyRepositoryFirebaseImp(
             firebaseDb = get(),
         )
     }

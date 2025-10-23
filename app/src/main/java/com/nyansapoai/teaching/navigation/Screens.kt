@@ -60,3 +60,6 @@ data class CollectAttendancePage(
     val organizationId: String,
     val projectId: String,
 )
+
+@Serializable
+data object AddHouseHoldPage

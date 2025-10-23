@@ -71,6 +71,16 @@ fun HouseholdBackgroundContent(
         )
     }
 
+    val relations = remember {
+        listOf(
+            "Wife",
+            "Husband",
+            "Sibling",
+            "Parent",
+            "Other"
+        )
+    }
+
 
     Column(
         modifier = modifier
@@ -118,34 +128,16 @@ fun HouseholdBackgroundContent(
                     value = relationship
                 )
                 {
+
                     Column {
-                        AppDropDownItem(
-                            item = "Wife",
-                            isSelected = relationship == "Wife",
-                            onClick = {onRelationshipChanged("Wife")}
-                        )
-                        AppDropDownItem(
-                            item = "Husband",
-                            isSelected = relationship == "Husband",
-                            onClick = {onRelationshipChanged("Husband")}
-                        )
-                        AppDropDownItem(
-                            item = "Sibling",
-                            isSelected = relationship == "Sibling",
-                            onClick = {onRelationshipChanged("Sibling")}
-                        )
-                        AppDropDownItem(
-                            item = "Parent",
-                            isSelected = relationship == "Parent",
-                            onClick = {onRelationshipChanged("Parent")}
-                        )
-                        AppDropDownItem(
-                            item = "Other",
-                            isSelected = relationship == "Other",
-                            onClick = {
-                                onRelationshipChanged("Other")
-                            }
-                        )
+                        relations.forEach { relation ->
+                            AppDropDownItem(
+                                item = relation,
+                                isSelected = relationship == relation,
+                                onClick = {onRelationshipChanged(relation)}
+                            )
+
+                        }
                     }
                 }
             }

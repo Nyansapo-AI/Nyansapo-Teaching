@@ -14,6 +14,7 @@ import com.nyansapoai.teaching.presentation.common.components.AppComingSoon
 import com.nyansapoai.teaching.presentation.schools.CampRoot
 import com.nyansapoai.teaching.presentation.students.StudentsRoot
 import com.nyansapoai.teaching.presentation.survey.SurveyRoot
+import com.nyansapoai.teaching.presentation.survey.household.HouseholdRoot
 
 data class BottomNavigationItem(
     val title: String,
@@ -51,7 +52,7 @@ data class BottomNavigationItem(
                 title = "Sessions",
                 icon = R.drawable.sessions,
                 screen = {
-                    SurveyRoot()
+                    HouseholdRoot()
                 },
             ),
         )

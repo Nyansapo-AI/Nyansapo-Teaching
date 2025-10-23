@@ -62,6 +62,9 @@ sealed interface SurveyAction {
     data class SetShowLivesWithDropdown(val show: Boolean) : SurveyAction
     data object OnAddChild : SurveyAction
     data class OnRemoveChild(val child: Child) : SurveyAction
+
+    data object OnChangeCurrentStep : SurveyAction
+    data class OnUpdateCurrentIndex(val index: Int) : SurveyAction
     data object SubmitSurvey: SurveyAction
 
 }

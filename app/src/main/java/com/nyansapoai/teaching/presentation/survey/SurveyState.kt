@@ -1,6 +1,7 @@
 package com.nyansapoai.teaching.presentation.survey
 
 import com.nyansapoai.teaching.domain.models.survey.Child
+import com.nyansapoai.teaching.domain.models.survey.CreateHouseHoldInfo
 import com.nyansapoai.teaching.domain.models.survey.Parent
 
 data class SurveyState(
@@ -67,8 +68,89 @@ data class SurveyState(
     val showChildGenderDropdown: Boolean = false,
     val livesWith: String = "",
     val showLivesWithDropdown: Boolean = false,
-    val children: MutableList<Child> = mutableListOf()
-)
+    val children: MutableList<Child> = mutableListOf(),
+
+    val currentStepIndex: Int = 0,
+    val currentStep: HouseSurveyStep = HouseSurveyStep.CONSENT,
+
+    val isSubmitting: Boolean = false,
+    val errorMessage: String? = null
+){
+    fun canSubmit(): Boolean {
+        when(currentStep){
+            HouseSurveyStep.CONSENT -> {
+                return consentGiven &&
+                        county.isNotBlank() &&
+                        subCounty.isNotBlank() &&
+                        ward.isNotBlank() &&
+                        interviewerName.isNotBlank()
+            }
+            HouseSurveyStep.HOUSEHOLD_BACKGROUND -> {
+                return if (isRespondentHeadOfHousehold){
+                    respondentName.isNotBlank() &&
+                            respondentAge.isNotBlank() &&
+                            householdHeadName.isNotBlank() &&
+                            mobileNumberError == null &&
+                            mainLanguageSpokenAtHome.isNotBlank() &&
+                            totalHouseholdMembers.isNotBlank() &&
+                            houseHoldIncomeSource.isNotBlank()
+                } else {
+                    respondentName.isNotBlank() &&
+                            respondentAge.isNotBlank() &&
+                            householdHeadName.isNotBlank() &&
+                            relationshipToHead.isNotBlank() &&
+                            mobileNumberError == null &&
+                            mainLanguageSpokenAtHome.isNotBlank() &&
+                            totalHouseholdMembers.isNotBlank() &&
+                            houseHoldIncomeSource.isNotBlank()
+                }
+
+            }
+            HouseSurveyStep.FAMILY_MEMBERS -> {
+                return parents.isNotEmpty() || children.isNotEmpty()
+            }
+            HouseSurveyStep.PARENTAL_ENGAGEMENT -> {
+                return if (isSchoolAgeChildrenPresent) {
+                    whoHelps.isNotBlank() && discussFrequency.isNotBlank()
+                } else {
+                    true
+                }
+            }
+
+            HouseSurveyStep.CHILD_LEARNING_ENVIRONMENT -> {
+                return true
+            }
+        }
+    }
+
+    companion object {
+        fun SurveyState.toCreateHouseHoldInfo(): CreateHouseHoldInfo{
+            return CreateHouseHoldInfo(
+                interviewerName = interviewerName,
+                village = "testVillage",
+                county = county,
+                subCounty = subCounty,
+                ward = ward,
+                consentGiven = consentGiven,
+                respondentName = respondentName,
+                isHouseholdHead = isRespondentHeadOfHousehold,
+                householdHeadName = householdHeadName,
+                relationshipToHead = relationshipToHead,
+                householdHeadPhone = householdHeadMobileNumber,
+                respondentAge = respondentAge.toIntOrNull(),
+                mainLanguage = mainLanguageSpokenAtHome,
+                children = children.toList(),
+                parents = parents.toList(),
+                householdMembersCount = totalHouseholdMembers.toIntOrNull(),
+                incomeSource = houseHoldIncomeSource,
+                hasElectricity = hasElectricity,
+                householdAssets = householdAssets.toList()
+            )
+        }
+
+
+    }
+}
 
 
 enum class County(val title: String, val subCounties: List<String>) {
@@ -103,6 +185,15 @@ enum class County(val title: String, val subCounties: List<String>) {
             "Mwala"
         )
     )
+}
+
+
+enum class HouseSurveyStep {
+    CONSENT,
+    HOUSEHOLD_BACKGROUND,
+    FAMILY_MEMBERS,
+    PARENTAL_ENGAGEMENT,
+    CHILD_LEARNING_ENVIRONMENT,
 }
 
 

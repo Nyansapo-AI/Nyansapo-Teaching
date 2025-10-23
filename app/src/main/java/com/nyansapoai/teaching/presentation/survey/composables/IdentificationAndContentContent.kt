@@ -41,9 +41,9 @@ fun IdentificationAndContentContent(
         mutableStateOf(countyList.find { it.title == county })
     }
 
-    LaunchedEffect(selectedCounty) {
+    LaunchedEffect(selectedCounty ) {
         Log.d("TAG", "IdentificationAndContentContent: $selectedCounty")
-        onSubCountyChanged("")
+//        onSubCountyChanged("")
     }
 
 

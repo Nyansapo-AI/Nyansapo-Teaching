@@ -3,16 +3,22 @@ package com.nyansapoai.teaching.presentation.survey
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.nyansapoai.teaching.data.remote.survey.SurveyRepository
 import com.nyansapoai.teaching.domain.models.survey.Child
 import com.nyansapoai.teaching.domain.models.survey.Parent
+import com.nyansapoai.teaching.presentation.survey.SurveyState.Companion.toCreateHouseHoldInfo
+import com.nyansapoai.teaching.utils.ResultStatus
 import com.nyansapoai.teaching.utils.Utils
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
-class SurveyViewModel : ViewModel() {
+class SurveyViewModel(
+    private val surveyRepository: SurveyRepository
+) : ViewModel() {
 
     private var hasLoadedInitialData = false
 
@@ -37,7 +43,12 @@ class SurveyViewModel : ViewModel() {
             }
 
             is SurveyAction.SetCounty -> {
-                _state.update { it.copy(county = action.county) }
+                _state.update {
+                    it.copy(
+                        county = action.county,
+                        subCounty = ""
+                    )
+                }
             }
 
             is SurveyAction.SetInterviewerName -> {
@@ -319,15 +330,105 @@ class SurveyViewModel : ViewModel() {
                 }
             }
 
+            is SurveyAction.OnChangeCurrentStep -> {
+                updateStep()
+            }
+
+            is SurveyAction.OnUpdateCurrentIndex -> {
+                _state.update { it.copy(currentStepIndex = action.index) }
+            }
+
+
             SurveyAction.SubmitSurvey -> {
                 submitSurvey()
             }
+
         }
 
+    }
+
+    private fun updateStep(){
+        val flow = when(_state.value.currentStep){
+            HouseSurveyStep.CONSENT -> HouseSurveyStep.HOUSEHOLD_BACKGROUND
+            HouseSurveyStep.HOUSEHOLD_BACKGROUND -> HouseSurveyStep.FAMILY_MEMBERS
+            HouseSurveyStep.FAMILY_MEMBERS -> HouseSurveyStep.PARENTAL_ENGAGEMENT
+            HouseSurveyStep.PARENTAL_ENGAGEMENT -> HouseSurveyStep.CHILD_LEARNING_ENVIRONMENT
+            HouseSurveyStep.CHILD_LEARNING_ENVIRONMENT -> HouseSurveyStep.CONSENT
+        }
+        _state.update { it.copy(currentStep = flow) }
     }
 
     private fun submitSurvey() {
         Log.d("SurveyViewModel", "Survey submitted with state: ${_state.value}")
 
+        viewModelScope.launch {
+            _state.update { it.copy(isSubmitting = true) }
+
+           val response =  surveyRepository.submitHouseholdSurvey(
+               createHouseHold = _state.value.toCreateHouseHoldInfo()
+           )
+
+            when(response.status){
+                ResultStatus.INITIAL ,
+                ResultStatus.LOADING -> {
+                    _state.update { it.copy(isSubmitting = true) }
+                }
+                ResultStatus.SUCCESS -> {
+                    _state.update { it.copy(isSubmitting = false) }
+                    Log.d("SurveyViewModel", "Survey submission successful")
+
+                    _state.update {
+                        it.copy(
+                            currentStep = HouseSurveyStep.CONSENT,
+                            consentGiven = false,
+                            county = "",
+                            subCounty = "",
+                            ward = "",
+                            interviewerName = "",
+                            respondentName = "",
+                            respondentAge = "",
+                            isRespondentHeadOfHousehold = false,
+                            householdHeadName = "",
+                            householdHeadMobileNumber = "",
+                            mobileNumberError = null,
+                            relationshipToHead = "",
+                            mainLanguageSpokenAtHome = "",
+                            totalHouseholdMembers = "",
+                            houseHoldIncomeSource = "",
+                            hasElectricity = false,
+                            householdAssets = mutableListOf(),
+                            discussFrequency = "",
+                            doAttendMeetings = false,
+                            doMonitorAttendance = false,
+                            isSchoolAgeChildrenPresent = false,
+                            whoHelps = "",
+                            otherWhoHelps = "",
+                            hasLearningMaterials = false,
+                            hasMissedSchool = false,
+                            isQuietPlaceAvailable = false,
+                            missedReason = "",
+                            otherMissedReason = "",
+                            childGender = "",
+                            childAge = "",
+                            childName = "",
+                            hasAttendedSchool = false,
+                            highestEducationLevel = "",
+                            parentAge = "",
+                            parentGender = "",
+                            parentName = "",
+                            type = "",
+                            parents = mutableListOf(),
+                            children = mutableListOf(),
+                            errorMessage = null,
+                            currentStepIndex = 0
+                        )
+                    }
+                }
+                ResultStatus.ERROR -> {
+                    _state.update { it.copy(errorMessage = response.message ) }
+                }
+            }
+
+        }
     }
 }

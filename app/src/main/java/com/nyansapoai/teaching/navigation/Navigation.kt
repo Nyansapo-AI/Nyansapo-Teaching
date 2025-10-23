@@ -35,6 +35,7 @@ import com.nyansapoai.teaching.presentation.common.snackbar.SnackBarHandler
 import com.nyansapoai.teaching.presentation.getStarted.GetStartedRoot
 import com.nyansapoai.teaching.presentation.home.HomeRoot
 import com.nyansapoai.teaching.presentation.onboarding.OnboardingRoot
+import com.nyansapoai.teaching.presentation.survey.SurveyRoot
 import com.nyansapoai.teaching.utils.ResultStatus
 import org.koin.compose.koinInject
 
@@ -153,6 +154,10 @@ fun Navigation(){
                      organizationId = args.organizationId,
                      projectId = args.projectId
                  )
+            }
+
+            composable<AddHouseHoldPage> {
+                SurveyRoot()
             }
 
         }
