@@ -1,4 +1,4 @@
-package com.nyansapoai.teaching.presentation.survey
+package com.nyansapoai.teaching.presentation.survey.takeSurvey
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.nyansapoai.teaching.data.remote.survey.SurveyRepository
 import com.nyansapoai.teaching.domain.models.survey.Child
 import com.nyansapoai.teaching.domain.models.survey.Parent
-import com.nyansapoai.teaching.presentation.survey.SurveyState.Companion.toCreateHouseHoldInfo
+import com.nyansapoai.teaching.presentation.survey.takeSurvey.SurveyState.Companion.toCreateHouseHoldInfo
 import com.nyansapoai.teaching.utils.ResultStatus
 import com.nyansapoai.teaching.utils.Utils
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -335,9 +335,29 @@ class SurveyViewModel(
             }
 
             is SurveyAction.OnUpdateCurrentIndex -> {
-                _state.update { it.copy(currentStepIndex = action.index) }
+                _state.update {
+                    it.copy(
+                        currentStepIndex = action.index,
+                        currentStep = it.surveyFlow[action.index]
+                    )
+                }
+                Log.d("SurveyViewModel", "Current step updated to: ${_state.value.currentStep} ${_state.value.currentStepIndex}")
             }
 
+            is SurveyAction.SetHouseholdAssetsAddRemove -> {
+
+                _state.update { currentState ->
+                    val updatedAssets = currentState.householdAssets.toMutableList()
+
+                    if (updatedAssets.contains(action.asset)) {
+                        updatedAssets.remove(action.asset)
+                    } else {
+                        updatedAssets.add(action.asset)
+                    }
+
+                    currentState.copy(householdAssets = updatedAssets)
+                }
+            }
 
             SurveyAction.SubmitSurvey -> {
                 submitSurvey()

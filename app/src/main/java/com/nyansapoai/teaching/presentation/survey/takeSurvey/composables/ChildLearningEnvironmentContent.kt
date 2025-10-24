@@ -1,4 +1,4 @@
-package com.nyansapoai.teaching.presentation.survey.composables
+package com.nyansapoai.teaching.presentation.survey.takeSurvey.composables
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Column
@@ -14,16 +14,12 @@ import com.nyansapoai.teaching.presentation.common.components.AppTextField
 @Composable
 fun ChildLearningEnvironmentContent(
     modifier: Modifier = Modifier,
-    // F01
     isQuietPlaceAvailable: Boolean,
     onQuietPlaceChanged: (Boolean) -> Unit,
-    // F02
     hasLearningMaterials: Boolean,
     onHasLearningMaterialsChanged: (Boolean) -> Unit,
-    // F03
     hasMissedSchool: Boolean,
     onHasMissedSchoolChanged: (Boolean) -> Unit,
-    // F04
     showMissedReasonDropdown: Boolean,
     onShowMissedReasonDropdownChanged: (Boolean) -> Unit,
     missedReason: String,
@@ -39,28 +35,26 @@ fun ChildLearningEnvironmentContent(
         modifier = modifier
             .imePadding()
     ) {
-        // F01
         AppCheckBox(
             text = "Does the child have a quiet place to study?",
             checked = isQuietPlaceAvailable,
             onCheckedChange = { onQuietPlaceChanged(it) }
         )
 
-        // F02
+
         AppCheckBox(
             text = "Does the household have books or learning materials?",
             checked = hasLearningMaterials,
             onCheckedChange = { onHasLearningMaterialsChanged(it) }
         )
 
-        // F03
+
         AppCheckBox(
             text = "Has the child missed school in the last month?",
             checked = hasMissedSchool,
             onCheckedChange = { onHasMissedSchoolChanged(it) }
         )
 
-        // If No -> skip F04 (AnimatedVisibility shows F04 only when hasMissedSchool is true)
         AnimatedVisibility(visible = hasMissedSchool) {
             Column {
                 AppDropDownMenu(

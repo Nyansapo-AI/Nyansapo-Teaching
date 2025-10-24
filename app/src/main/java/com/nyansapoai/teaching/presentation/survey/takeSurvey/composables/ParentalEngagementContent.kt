@@ -1,4 +1,4 @@
-package com.nyansapoai.teaching.presentation.survey.composables
+package com.nyansapoai.teaching.presentation.survey.takeSurvey.composables
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Column

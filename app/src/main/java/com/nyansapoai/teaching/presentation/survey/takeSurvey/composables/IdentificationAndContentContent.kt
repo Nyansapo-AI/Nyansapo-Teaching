@@ -1,11 +1,9 @@
-package com.nyansapoai.teaching.presentation.survey.composables
+package com.nyansapoai.teaching.presentation.survey.takeSurvey.composables
 
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -15,7 +13,7 @@ import com.nyansapoai.teaching.presentation.common.components.AppCheckBox
 import com.nyansapoai.teaching.presentation.common.components.AppDropDownItem
 import com.nyansapoai.teaching.presentation.common.components.AppDropDownMenu
 import com.nyansapoai.teaching.presentation.common.components.AppTextField
-import com.nyansapoai.teaching.presentation.survey.County
+import com.nyansapoai.teaching.presentation.survey.takeSurvey.County
 
 @Composable
 fun IdentificationAndContentContent(
@@ -37,21 +35,16 @@ fun IdentificationAndContentContent(
     onConsentChanged: (Boolean) -> Unit
 ) {
 
-    var selectedCounty by remember {
+    var selectedCounty by remember(county, countyList) {
         mutableStateOf(countyList.find { it.title == county })
     }
-
-    LaunchedEffect(selectedCounty ) {
-        Log.d("TAG", "IdentificationAndContentContent: $selectedCounty")
-//        onSubCountyChanged("")
-    }
-
 
     Column(
         modifier = modifier
             .imePadding()
     ) {
         AppTextField(
+            required = true,
             label = "Full Name",
             value = name,
             onValueChanged = onNameChanged,
@@ -59,6 +52,7 @@ fun IdentificationAndContentContent(
         )
 
         AppDropDownMenu(
+            required = true,
             expanded = showCountyDropdown,
             label = "County",
             placeholder = "Select your county",
@@ -82,6 +76,7 @@ fun IdentificationAndContentContent(
         ) {
             Column {
                 AppDropDownMenu(
+                    required = true,
                     expanded = showSubCountyDropdown,
                     label = "Sub County",
                     placeholder = "Select your sub county",
@@ -98,6 +93,7 @@ fun IdentificationAndContentContent(
                 }
 
                 AppTextField(
+                    required = true,
                     label = "Ward",
                     value = ward,
                     onValueChanged = onWardChanged,

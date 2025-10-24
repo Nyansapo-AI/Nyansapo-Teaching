@@ -1,8 +1,10 @@
-package com.nyansapoai.teaching.presentation.survey
+package com.nyansapoai.teaching.presentation.survey.takeSurvey
 
 import com.nyansapoai.teaching.domain.models.survey.Child
+import com.nyansapoai.teaching.domain.models.survey.ChildLearningEnvironment
 import com.nyansapoai.teaching.domain.models.survey.CreateHouseHoldInfo
 import com.nyansapoai.teaching.domain.models.survey.Parent
+import com.nyansapoai.teaching.domain.models.survey.ParentalEngagement
 
 data class SurveyState(
     val interviewerName: String = "",
@@ -14,7 +16,7 @@ data class SurveyState(
     val ward: String = "",
     val consentGiven: Boolean = false,
 
-    val respondentName: String = "",
+    val respondentName: String = interviewerName,
     val isRespondentHeadOfHousehold: Boolean = false,
     val respondentAge: String = "",
     val householdHeadName: String = "",
@@ -72,6 +74,13 @@ data class SurveyState(
 
     val currentStepIndex: Int = 0,
     val currentStep: HouseSurveyStep = HouseSurveyStep.CONSENT,
+    val surveyFlow: List<HouseSurveyStep> = listOf(
+        HouseSurveyStep.CONSENT,
+        HouseSurveyStep.HOUSEHOLD_BACKGROUND,
+        HouseSurveyStep.FAMILY_MEMBERS,
+        HouseSurveyStep.PARENTAL_ENGAGEMENT,
+        HouseSurveyStep.CHILD_LEARNING_ENVIRONMENT
+    ),
 
     val isSubmitting: Boolean = false,
     val errorMessage: String? = null
@@ -89,7 +98,6 @@ data class SurveyState(
                 return if (isRespondentHeadOfHousehold){
                     respondentName.isNotBlank() &&
                             respondentAge.isNotBlank() &&
-                            householdHeadName.isNotBlank() &&
                             mobileNumberError == null &&
                             mainLanguageSpokenAtHome.isNotBlank() &&
                             totalHouseholdMembers.isNotBlank() &&
@@ -144,7 +152,22 @@ data class SurveyState(
                 householdMembersCount = totalHouseholdMembers.toIntOrNull(),
                 incomeSource = houseHoldIncomeSource,
                 hasElectricity = hasElectricity,
-                householdAssets = householdAssets.toList()
+                householdAssets = householdAssets.toList(),
+                parentalEngagement = if (isSchoolAgeChildrenPresent){
+                    ParentalEngagement(
+                        hasSchoolAgeChild = true,
+                        homeworkHelper = if (whoHelps == "Other") otherWhoHelps else whoHelps,
+                        teacherDiscussionFrequency = discussFrequency,
+                        attendsSchoolMeetings = doAttendMeetings,
+                        monitorsAttendance = doMonitorAttendance
+                    )
+                } else null,
+                childLearningEnvironment = ChildLearningEnvironment(
+                    hasQuietPlaceToStudy = isQuietPlaceAvailable,
+                    hasBooksOrMaterials = hasLearningMaterials,
+                    missedSchoolLastMonth = hasMissedSchool,
+                    reasonForMissingSchool = if (missedReason == "Other") otherMissedReason else missedReason
+                )
             )
         }
 

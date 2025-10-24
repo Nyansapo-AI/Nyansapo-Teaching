@@ -4,7 +4,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
@@ -25,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import com.nyansapoai.teaching.R
 import com.nyansapoai.teaching.domain.models.survey.Child
 import com.nyansapoai.teaching.domain.models.survey.Parent
@@ -41,7 +44,12 @@ fun HouseholdDetailScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(household.householdHeadName ?: "Household Details", style = MaterialTheme.typography.titleLarge)
+                    Text(
+                        household.householdHeadName ?: "Household Details",
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        fontWeight = FontWeight.ExtraBold
+                    )
                 },
                 navigationIcon = {
                     IconButton(
@@ -51,6 +59,7 @@ fun HouseholdDetailScreen(
                             painter = painterResource(R.drawable.arrow_back),
                             contentDescription = "Back"
                         )
+
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -120,26 +129,74 @@ fun HouseholdDetailScreen(
             }
 
             item {
-                Divider()
-                household.parentalEngagement?.let { parentalEngagement ->
-                    InfoCard {
-                        Text("Parental Engagement", style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(bottom = 6.dp))
-                        KeyValueRow("Has school age child", parentalEngagement.hasSchoolAgeChild.toString())
-                        KeyValueRow("Homework helper", parentalEngagement.homeworkHelper ?: "N/A")
-                        KeyValueRow("Teacher discussion freq.", parentalEngagement.teacherDiscussionFrequency ?: "N/A")
-                        KeyValueRow("Attends meetings", parentalEngagement.attendsSchoolMeetings?.toString() ?: "N/A")
-                        KeyValueRow("Monitors attendance", parentalEngagement.monitorsAttendance?.toString() ?: "N/A")
-                    }
-                }
+                Column {
+                    Divider()
+                    Spacer(Modifier.height(12.dp))
 
-                household.childLearningEnvironment?.let { learningEnvironment ->
-                    InfoCard {
-                        Text("Learning Environment", style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(bottom = 6.dp))
-                        KeyValueRow("Quiet place to study", learningEnvironment.hasQuietPlaceToStudy.toString())
-                        KeyValueRow("Has books/materials", learningEnvironment.hasBooksOrMaterials.toString())
-                        KeyValueRow("Missed school last month", learningEnvironment.missedSchoolLastMonth.toString())
-                        KeyValueRow("Reason missed", learningEnvironment.reasonForMissingSchool ?: "N/A")
+                    household.parentalEngagement?.let { parentalEngagement ->
+                        Text(
+                            "Parental Engagement",
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier.padding(bottom = 6.dp)
+                        )
+                        InfoCard {
+                            KeyValueRow(
+                                "Has school age child",
+                                parentalEngagement.hasSchoolAgeChild.toString()
+                            )
+                            KeyValueRow(
+                                "Homework helper",
+                                parentalEngagement.homeworkHelper ?: "N/A"
+                            )
+                            KeyValueRow(
+                                "Teacher discussion freq.",
+                                parentalEngagement.teacherDiscussionFrequency ?: "N/A"
+                            )
+                            KeyValueRow(
+                                "Attends meetings",
+                                parentalEngagement.attendsSchoolMeetings?.toString() ?: "N/A"
+                            )
+                            KeyValueRow(
+                                "Monitors attendance",
+                                parentalEngagement.monitorsAttendance?.toString() ?: "N/A"
+                            )
+                        }
                     }
+
+                    Spacer(Modifier.height(12.dp))
+
+
+
+                    household.childLearningEnvironment?.let { learningEnvironment ->
+                        Text(
+                            "Learning Environment",
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier.padding(bottom = 6.dp)
+                        )
+
+                        InfoCard {
+
+                            KeyValueRow(
+                                "Quiet place to study",
+                                learningEnvironment.hasQuietPlaceToStudy.toString()
+                            )
+                            KeyValueRow(
+                                "Has books/materials",
+                                learningEnvironment.hasBooksOrMaterials.toString()
+                            )
+                            KeyValueRow(
+                                "Missed school last month",
+                                learningEnvironment.missedSchoolLastMonth.toString()
+                            )
+                            KeyValueRow(
+                                "Reason missed",
+                                learningEnvironment.reasonForMissingSchool ?: "N/A"
+                            )
+                        }
+                    }
+                    Spacer(Modifier.height(12.dp))
+                    Divider()
+
                 }
             }
         }

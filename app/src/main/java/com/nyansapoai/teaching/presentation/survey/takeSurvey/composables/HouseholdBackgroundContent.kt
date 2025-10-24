@@ -1,4 +1,4 @@
-package com.nyansapoai.teaching.presentation.survey.composables
+package com.nyansapoai.teaching.presentation.survey.takeSurvey.composables
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Column
@@ -59,7 +59,7 @@ fun HouseholdBackgroundContent(
         )
     }
 
-    val householdAssets = remember {
+    val householdAssetsList = remember {
         listOf(
             "Radio",
             "Television",
@@ -77,6 +77,8 @@ fun HouseholdBackgroundContent(
             "Husband",
             "Sibling",
             "Parent",
+            "Child",
+            "Relative",
             "Other"
         )
     }
@@ -94,6 +96,7 @@ fun HouseholdBackgroundContent(
         )
 
         AppTextField(
+            required = true,
             label = "Respondent Name",
             value = respondentName,
             onValueChanged = onRespondentNameChanged,
@@ -101,6 +104,7 @@ fun HouseholdBackgroundContent(
         )
 
         AppTextField(
+            required = true,
             label = "Respondent Age",
             value = respondentAge,
             onValueChanged = {onRespondentAgeChanged(it)},
@@ -115,12 +119,14 @@ fun HouseholdBackgroundContent(
 
             Column {
                 AppTextField(
+                    required = true,
                     label = "Household Head Name",
                     value = householdHeadName,
                     onValueChanged = onHouseholdHeadNameChanged,
                     placeholder = "Enter the household head name",
                 )
                 AppDropDownMenu(
+                    required = true,
                     expanded = showRelationshipDropdown,
                     label = "Select Relationship to Household Head",
                     placeholder = "How are you related with the household head",
@@ -146,6 +152,7 @@ fun HouseholdBackgroundContent(
 
 
         AppTextField(
+            required = true,
             label = "Household Head Mobile Number",
             value = householdHeadMobileNumber,
             onValueChanged = {onHouseholdHeadMobileNumberChanged(it)},
@@ -155,6 +162,7 @@ fun HouseholdBackgroundContent(
         )
 
         AppDropDownMenu(
+            required = true,
             expanded = showMainLanguageDropdown,
             label = "Main Language Spoken at Home",
             placeholder = "Select the main language spoken at home",
@@ -187,6 +195,7 @@ fun HouseholdBackgroundContent(
 
 
         AppTextField(
+            required = true,
             label = "Total Household Members",
             value = householdMembersTotalNumber,
             onValueChanged = {onHouseholdMembersNumberChanged(it)},
@@ -196,6 +205,7 @@ fun HouseholdBackgroundContent(
         )
 
         AppDropDownMenu(
+            required = true,
             expanded = showIncomeSourceDropdown,
             label = "Main Source of Income",
             placeholder = "Select the main source of income for the household",
@@ -212,24 +222,6 @@ fun HouseholdBackgroundContent(
             }
         }
 
-        /*
-        AppDropDownMenu(
-            expanded = showIncomeSourceDropdown,
-            label = "Main Source of Income",
-            placeholder = "Select the main source of income for the household",
-            onClick = { onShowIncomeSourceDropdownChanged(!showIncomeSourceDropdown)},
-            value = houseHoldIncomeSource
-        )
-        {
-            householdIncomeSources.forEach { source ->
-                AppDropDownItem(
-                    item = source,
-                    isSelected = houseHoldIncomeSource == source,
-                    onClick = {onHouseHoldIncomeSourceChanged(source)}
-                )
-            }
-        }*/
-
         AppCheckBox(
             text = "Does the household have electricity?",
             checked = hasElectricity,
@@ -244,11 +236,11 @@ fun HouseholdBackgroundContent(
             value = householdAssets.joinToString(", ")
         )
         {
-            householdIncomeSources.forEach { source ->
+            householdAssetsList.forEach { asset ->
                 AppDropDownItem(
-                    item = source,
-                    isSelected = source in householdAssets,
-                    onClick = {onHouseholdAssetsChanged(source)}
+                    item = asset,
+                    isSelected = asset in householdAssets,
+                    onClick = {onHouseholdAssetsChanged(asset)}
                 )
             }
         }

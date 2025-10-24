@@ -49,6 +49,7 @@ fun AppDropDownMenu(
             onValueChanged = {},
             keyboardType = KeyboardType.Text,
             error = error,
+            maxLines = 2,
             trailingIcon = {
                 IconButton(
                     onClick = onClick,

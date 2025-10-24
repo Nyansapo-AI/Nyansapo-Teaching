@@ -1,4 +1,4 @@
-package com.nyansapoai.teaching.presentation.survey
+package com.nyansapoai.teaching.presentation.survey.takeSurvey
 
 import com.nyansapoai.teaching.domain.models.survey.Child
 import com.nyansapoai.teaching.domain.models.survey.Parent
@@ -24,6 +24,7 @@ sealed interface SurveyAction {
     data class SetHouseholdIncomeSource(val source: String) : SurveyAction
     data class SetShowIncomeSourceDropdown(val show: Boolean) : SurveyAction
     data class SetHouseholdAssets(val assets: List<String>) : SurveyAction
+    data class SetHouseholdAssetsAddRemove(val asset: String) : SurveyAction
     data class SetShowAssetsDropdown(val show: Boolean) : SurveyAction
     data class SetHasElectricity(val hasElectricity: Boolean) : SurveyAction
     data class SetIsSchoolAgeChildrenPresent(val isPresent: Boolean) : SurveyAction

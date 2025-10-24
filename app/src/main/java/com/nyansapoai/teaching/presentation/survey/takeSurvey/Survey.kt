@@ -1,5 +1,6 @@
-package com.nyansapoai.teaching.presentation.survey
+package com.nyansapoai.teaching.presentation.survey.takeSurvey
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
@@ -21,6 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -37,11 +39,11 @@ import com.nyansapoai.teaching.navController
 import com.nyansapoai.teaching.presentation.common.components.AppButton
 import com.nyansapoai.teaching.presentation.common.components.StepContent
 import com.nyansapoai.teaching.presentation.common.components.StepsRow
-import com.nyansapoai.teaching.presentation.survey.composables.ChildLearningEnvironmentContent
-import com.nyansapoai.teaching.presentation.survey.composables.FamilyMembersContent
-import com.nyansapoai.teaching.presentation.survey.composables.HouseholdBackgroundContent
-import com.nyansapoai.teaching.presentation.survey.composables.IdentificationAndContentContent
-import com.nyansapoai.teaching.presentation.survey.composables.ParentalEngagementContent
+import com.nyansapoai.teaching.presentation.survey.takeSurvey.composables.ChildLearningEnvironmentContent
+import com.nyansapoai.teaching.presentation.survey.takeSurvey.composables.FamilyMembersContent
+import com.nyansapoai.teaching.presentation.survey.takeSurvey.composables.HouseholdBackgroundContent
+import com.nyansapoai.teaching.presentation.survey.takeSurvey.composables.IdentificationAndContentContent
+import com.nyansapoai.teaching.presentation.survey.takeSurvey.composables.ParentalEngagementContent
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -67,8 +69,24 @@ fun SurveyScreen(
 
     val surveyStepState = rememberLazyListState()
 
-    var currentStep by remember { mutableStateOf(0) }
 
+    LaunchedEffect(state.currentStepIndex) {
+        surveyStepState.animateScrollToItem(state.currentStepIndex)
+    }
+
+    LaunchedEffect(state.errorMessage) {
+        state.errorMessage?.let {
+            Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+        }
+    }
+
+    LaunchedEffect(state.currentStepIndex)  {
+        Log.d("SurveyScreen", "SurveyScreen: ${state.currentStepIndex}")
+    }
+
+    LaunchedEffect(state.currentStep) {
+        Log.d("SurveyScreen", "SurveyScreen: ${state.currentStep}")
+    }
 
     val surveySteps = listOf(
         // Define your survey steps here
@@ -93,7 +111,6 @@ fun SurveyScreen(
                 )
             },
             onSubmit = {
-                currentStep = 0
             },
             title = "Identification and Consent"
         ),
@@ -181,12 +198,19 @@ fun SurveyScreen(
                             SurveyAction.SetShowAssetsDropdown(it)
                         )
                     },
+                    householdAssets = state.householdAssets,
+                    onHouseholdAssetsChanged = {
+                        onAction(
+                            SurveyAction.SetHouseholdAssetsAddRemove(
+                                it
+                            )
+                        )
+                    },
                     hasElectricity = state.hasElectricity,
                     onHasElectricityChanged = { onAction(SurveyAction.SetHasElectricity(it)) },
                 )
             },
             onSubmit = {
-                currentStep = 1
             },
             title = "Household Background"
         ),
@@ -305,7 +329,6 @@ fun SurveyScreen(
                 )
             },
             onSubmit = {
-                currentStep = 2
             },
             title = "Parental Engagement"
         ),
@@ -363,7 +386,6 @@ fun SurveyScreen(
                 )
             },
             onSubmit = {
-                currentStep = 3
             },
             title = "Child Learning Environment"
         ),
@@ -408,7 +430,11 @@ fun SurveyScreen(
                             currentStep = state.currentStepIndex,
                             stepDescriptionList = surveySteps,
                             onClick = { step ->
-//                                currentStep = step - 1
+
+                                if (step <= state.currentStepIndex) {
+                                    onAction(SurveyAction.OnUpdateCurrentIndex(step - 1))
+
+                                }
                             },
                             modifier = Modifier
 //                                .padding(start = 16.dp)
@@ -425,14 +451,6 @@ fun SurveyScreen(
             .statusBarsPadding()
             .navigationBarsPadding()
     ) { innerPadding ->
-
-        AnimatedVisibility(
-            visible = state.errorMessage != null
-        ) {
-            state.errorMessage?.let {
-                Toast.makeText(context, it, Toast.LENGTH_LONG).show()
-            }
-        }
 
         LazyColumn(
             modifier = Modifier
@@ -456,7 +474,7 @@ fun SurveyScreen(
 
                             onAction(SurveyAction.OnUpdateCurrentIndex(state.currentStepIndex +1))
 //                            currentStep +=1
-                            onAction(SurveyAction.OnChangeCurrentStep)
+//                            onAction(SurveyAction.OnChangeCurrentStep)
                         } else {
                             // Submit action
                             onAction(SurveyAction.SubmitSurvey)

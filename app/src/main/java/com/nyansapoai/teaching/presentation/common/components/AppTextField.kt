@@ -52,7 +52,8 @@ fun AppTextField(
         disabledIndicatorColor = Color.Transparent,
         disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
         disabledTextColor = MaterialTheme.colorScheme.onBackground,
-    ) ,
+    ),
+    maxLines: Int = 1,
     trailingIcon: @Composable () -> Unit = {},
     leadingIcon: @Composable() (() -> Unit)? = null,
     textFieldModifier: Modifier = Modifier
@@ -72,7 +73,7 @@ fun AppTextField(
                     Text(
                         text = " *",
                         style =
-                            MaterialTheme.typography.bodyMedium.copy(
+                            MaterialTheme.typography.titleLarge.copy(
                                 fontWeight = FontWeight.SemiBold,
                                 color = MaterialTheme.colorScheme.error,
                             ),
@@ -91,7 +92,7 @@ fun AppTextField(
                     style = MaterialTheme.typography.labelLarge.copy(color = Color.Gray),
                 )
             },
-            maxLines = 1,
+            maxLines = maxLines,
             colors =textFieldColors,
             leadingIcon = leadingIcon,
             singleLine = singleLine,

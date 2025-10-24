@@ -1,4 +1,4 @@
-package com.nyansapoai.teaching.presentation.survey.composables
+package com.nyansapoai.teaching.presentation.survey.takeSurvey.composables
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
@@ -64,7 +64,6 @@ fun FamilyMembersContent(
     onAddParent: () -> Unit,
     onRemoveParent: (Parent) -> Unit = {},
     parents: MutableList<Parent>,
-
     showAddChildSheet: Boolean = false,
     onShowAddChildSheetChange: (Boolean) -> Unit = {},
     childName: String = "",
@@ -134,6 +133,7 @@ fun FamilyMembersContent(
 
                 item {
                     AppTextField(
+                        required = true,
                         label = "Name",
                         value = parentName,
                         onValueChanged = onParentNameChanged,
@@ -144,6 +144,7 @@ fun FamilyMembersContent(
 
                 item {
                     AppTextField(
+                        required = true,
                         label = "Age",
                         value = parentAge,
                         onValueChanged = onParentAgeChanged,
@@ -155,6 +156,7 @@ fun FamilyMembersContent(
 
                 item {
                     AppDropDownMenu(
+                        required = true,
                         expanded = showGuardianGenderDropdown,
                         label = "What is the gender of the guardian?",
                         placeholder = "Select gender",
@@ -174,6 +176,7 @@ fun FamilyMembersContent(
 
                 item {
                     AppDropDownMenu(
+                        required = true,
                         expanded = showTypeDropdown,
                         label = "Type",
                         placeholder = "Select type",
@@ -205,6 +208,7 @@ fun FamilyMembersContent(
                         visible = hasAttendedSchool
                     ) {
                         AppDropDownMenu(
+                            required = true,
                             expanded = showHigherEducationDropdown,
                             label = "Highest education level of the guardian",
                             placeholder = "Select education level",
@@ -271,6 +275,7 @@ fun FamilyMembersContent(
 
                 item{
                     AppTextField(
+                        required = true,
                         label = "Name of the child",
                         value = childName,
                         onValueChanged = onChildNameChanged,
@@ -280,6 +285,7 @@ fun FamilyMembersContent(
 
                 item {
                     AppDropDownMenu(
+                        required = true,
                         expanded = showChildGenderDropdown,
                         label = "Gender of the child",
                         placeholder = "Select gender",
@@ -298,6 +304,7 @@ fun FamilyMembersContent(
 
                 item {
                     AppTextField(
+                        required = true,
                         label = "Age of the child",
                         value = childAge,
                         onValueChanged = onChildAgeChanged,
@@ -309,6 +316,7 @@ fun FamilyMembersContent(
 
                 item {
                     AppDropDownMenu(
+                        required = true,
                         expanded = showLivesWithDropdown,
                         label = "The child lives with",
                         placeholder = "Select who the child lives with",

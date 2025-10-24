@@ -53,7 +53,7 @@ import com.nyansapoai.teaching.presentation.common.audio.record.AndroidAppAudioR
 import com.nyansapoai.teaching.presentation.common.audio.record.AppAudioRecorder
 import com.nyansapoai.teaching.presentation.common.snackbar.SnackBarHandler
 import com.nyansapoai.teaching.presentation.students.StudentsViewModel
-import com.nyansapoai.teaching.presentation.survey.SurveyViewModel
+import com.nyansapoai.teaching.presentation.survey.takeSurvey.SurveyViewModel
 import com.nyansapoai.teaching.presentation.survey.detailedHouseHold.DetailedHouseholdInfoViewModel
 import com.nyansapoai.teaching.presentation.survey.household.HouseholdViewModel
 
