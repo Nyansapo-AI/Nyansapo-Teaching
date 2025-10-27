@@ -3,32 +3,56 @@ package com.nyansapoai.teaching.presentation.survey.takeSurvey
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.work.BackoffPolicy
+import androidx.work.Constraints
+import androidx.work.ExistingWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.WorkRequest
+import com.nyansapoai.teaching.data.local.LocalDataSource
+import com.nyansapoai.teaching.data.remote.students.StudentsRepository
 import com.nyansapoai.teaching.data.remote.survey.SurveyRepository
 import com.nyansapoai.teaching.domain.models.survey.Child
 import com.nyansapoai.teaching.domain.models.survey.Parent
 import com.nyansapoai.teaching.presentation.survey.takeSurvey.SurveyState.Companion.toCreateHouseHoldInfo
+import com.nyansapoai.teaching.presentation.survey.workers.UpdateLearnerDetailWorker
 import com.nyansapoai.teaching.utils.ResultStatus
 import com.nyansapoai.teaching.utils.Utils
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
 
 class SurveyViewModel(
-    private val surveyRepository: SurveyRepository
+    private val surveyRepository: SurveyRepository,
+    private val localDataSource: LocalDataSource,
+    private val studentsRepository: StudentsRepository,
+    private val workManager: WorkManager
 ) : ViewModel() {
 
-    private var hasLoadedInitialData = false
-
     private val _state = MutableStateFlow(SurveyState())
-    val state = _state
+    val state = combine(
+        _state,
+        localDataSource.getSavedCurrentSchoolInfo(),
+    ){ currentState, localSchoolInfo ->
+        currentState.copy(
+            localSchoolInfo = localSchoolInfo,
+        )
+
+    }
         .onStart {
-            if (!hasLoadedInitialData) {
-                /** Load initial data here **/
-                hasLoadedInitialData = true
+            /*
+            localDataSource.getSavedCurrentSchoolInfo().collect { schoolInfo ->
+                _state.update { it.copy(localSchoolInfo = schoolInfo) }
             }
+
+             */
         }
         .stateIn(
             scope = viewModelScope,
@@ -206,8 +230,12 @@ class SurveyViewModel(
                 _state.update { it.copy(childGender = action.gender) }
             }
 
-            is SurveyAction.SetChildName -> {
-                _state.update { it.copy(childName = action.name) }
+            is SurveyAction.SetChildFirstName -> {
+                _state.update { it.copy(childFirstName = action.name) }
+            }
+
+            is SurveyAction.SetChildLastName -> {
+                _state.update { it.copy(childLastName = action.name ) }
             }
 
             is SurveyAction.SetHasAttendedSchool -> {
@@ -298,20 +326,32 @@ class SurveyViewModel(
             is SurveyAction.OnAddChild -> {
                 _state.update { currentState ->
                     val newChild = Child(
-                        name = currentState.childName,
+                        firstName = currentState.childFirstName,
+                        lastName = currentState.childLastName,
                         gender = currentState.childGender,
                         age = currentState.childAge,
-                        livesWith = currentState.livesWith
+                        livesWith = currentState.livesWith,
+                        linkedLearnerId = currentState.linkedLearnerId
                     )
 
                     currentState.copy(
                         children = currentState.children.apply { add(newChild) },
+                        isLinkedIdList = currentState.isLinkedIdList.apply {
+                            if (newChild.linkedLearnerId.isNotEmpty()) {
+                                add(newChild.linkedLearnerId)
+                            }
+                        },
                         showAddChildSheet = false,
-                        childName = "",
+                        childFirstName = "",
+                        childLastName = "",
                         childGender = "",
                         childAge = "",
-                        livesWith = ""
+                        livesWith = "",
+                        linkedLearnerId = "",
+
                     )
+
+
                 }
             }
 
@@ -319,6 +359,11 @@ class SurveyViewModel(
                 _state.update { currentState ->
                     currentState.copy(
                         children = currentState.children.apply { removeIf { it == action.child } },
+                        isLinkedIdList = currentState.isLinkedIdList.apply {
+                            if (action.child.linkedLearnerId.isNotEmpty()) {
+                                remove(action.child.linkedLearnerId)
+                            }
+                        },
                         showAddChildSheet = true
                     )
                 }
@@ -363,6 +408,22 @@ class SurveyViewModel(
                 submitSurvey()
             }
 
+            is SurveyAction.SetLinkedLearnerId -> {
+                _state.update { it.copy(linkedLearnerId = action.learnerId) }
+            }
+            is SurveyAction.SetShowAvailableLearnerDropdown -> {
+                _state.update { it.copy(showAvailableLearnersDropdown = action.show) }
+            }
+
+            is SurveyAction.FetchAvailableStudents -> {
+                fetchSchoolDetails(
+                    organizationId = action.localSchoolInfo.organizationUid,
+                    projectId = action.localSchoolInfo.projectUId,
+                    schoolId = action.localSchoolInfo.schoolUId,
+                )
+            }
+
+
         }
 
     }
@@ -380,13 +441,28 @@ class SurveyViewModel(
 
     private fun submitSurvey() {
         Log.d("SurveyViewModel", "Survey submitted with state: ${_state.value}")
+//        _state.update { it.copy(isLoading = true) }
 
         viewModelScope.launch {
+            val localSchoolInfo = _state.value.localSchoolInfo
+            if (localSchoolInfo == null) {
+                Log.e("SurveyViewModel", "Cannot submit survey - school info not loaded")
+
+                localDataSource.getSavedCurrentSchoolInfo().collect { schoolInfo ->
+                    Log.d("SurveyViewModel", "Fetched school info from local data source")
+                    _state.update { it.copy( localSchoolInfo = schoolInfo)}
+                }
+            }
+
             _state.update { it.copy(isSubmitting = true) }
 
-           val response =  surveyRepository.submitHouseholdSurvey(
-               createHouseHold = _state.value.toCreateHouseHoldInfo()
-           )
+            val response =  surveyRepository.submitHouseholdSurvey(
+                createHouseHold = _state.value.toCreateHouseHoldInfo(),
+                localSchoolInfo = _state.value.localSchoolInfo
+            )
+
+
+
 
             when(response.status){
                 ResultStatus.INITIAL ,
@@ -397,58 +473,154 @@ class SurveyViewModel(
                     _state.update { it.copy(isSubmitting = false) }
                     Log.d("SurveyViewModel", "Survey submission successful")
 
-                    _state.update {
-                        it.copy(
-                            currentStep = HouseSurveyStep.CONSENT,
-                            consentGiven = false,
-                            county = "",
-                            subCounty = "",
-                            ward = "",
-                            interviewerName = "",
-                            respondentName = "",
-                            respondentAge = "",
-                            isRespondentHeadOfHousehold = false,
-                            householdHeadName = "",
-                            householdHeadMobileNumber = "",
-                            mobileNumberError = null,
-                            relationshipToHead = "",
-                            mainLanguageSpokenAtHome = "",
-                            totalHouseholdMembers = "",
-                            houseHoldIncomeSource = "",
-                            hasElectricity = false,
-                            householdAssets = mutableListOf(),
-                            discussFrequency = "",
-                            doAttendMeetings = false,
-                            doMonitorAttendance = false,
-                            isSchoolAgeChildrenPresent = false,
-                            whoHelps = "",
-                            otherWhoHelps = "",
-                            hasLearningMaterials = false,
-                            hasMissedSchool = false,
-                            isQuietPlaceAvailable = false,
-                            missedReason = "",
-                            otherMissedReason = "",
-                            childGender = "",
-                            childAge = "",
-                            childName = "",
-                            hasAttendedSchool = false,
-                            highestEducationLevel = "",
-                            parentAge = "",
-                            parentGender = "",
-                            parentName = "",
-                            type = "",
-                            parents = mutableListOf(),
-                            children = mutableListOf(),
-                            errorMessage = null,
-                            currentStepIndex = 0
-                        )
-                    }
+                    _state.value.children
+                        .filter { it.linkedLearnerId.isNotEmpty() }
+                        .forEach { child ->
+                            enqueueUpdateLearnerWork(child)
+                        }
+                    resetState()
                 }
                 ResultStatus.ERROR -> {
                     _state.update { it.copy(errorMessage = response.message ) }
                 }
             }
+        }
+    }
 
+
+    private fun fetchSchoolDetails(organizationId: String, projectId: String, schoolId: String, grade: Int? = null) {
+        if (organizationId.isEmpty() || projectId.isEmpty() || schoolId.isEmpty()) {
+            return
+        }
+
+        viewModelScope.launch {
+            val data = studentsRepository.getSchoolStudents(
+                organizationId = organizationId,
+                projectId = projectId,
+                schoolId = schoolId,
+                studentClass = grade
+            ).first()
+
+            when(data.status){
+                ResultStatus.INITIAL ,
+                ResultStatus.LOADING -> {
+                    _state.update {  it.copy(isLoading = true)}
+                }
+                ResultStatus.SUCCESS -> {
+
+                    _state.update { it ->
+                        it.copy(
+                            availableLearners = data.data
+                                ?.filter { student -> !student.isLinked }
+                                ?.filter { student ->
+                                    student.id !in _state.value.isLinkedIdList
+                                }
+                                ?.take(10)
+                                ?: emptyList(),
+                            isLoading = false,
+                            error = null
+                        )
+                    }
+
+                    Log.d("SurveyViewModel", "Fetched ${_state.value.availableLearners} available learners" )
+                }
+                ResultStatus.ERROR -> {
+                    _state.update {
+                        it.copy(
+                            error = data.message ?: "Failed to load school details",
+                            isLoading = false
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    private fun enqueueUpdateLearnerWork(child: Child) {
+        val workData = UpdateLearnerDetailWorker.createInputData(
+            studentId = child.linkedLearnerId,
+            organizationId = _state.value.localSchoolInfo?.organizationUid.orEmpty(),
+            projectId = _state.value.localSchoolInfo?.projectUId.orEmpty(),
+            schoolId = _state.value.localSchoolInfo?.schoolUId.orEmpty(),
+            firstName = child.firstName,
+            lastName = child.lastName,
+            isLinked = true
+        )
+
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
+        val workRequest = OneTimeWorkRequestBuilder<UpdateLearnerDetailWorker>()
+            .setInputData(workData)
+            .setConstraints(constraints = constraints)
+            .setBackoffCriteria(
+                BackoffPolicy.LINEAR,
+                WorkRequest.MIN_BACKOFF_MILLIS,
+                TimeUnit.MILLISECONDS
+            )
+            .build()
+
+
+
+        val uniqueWorkName = "UpdateLearnerDetailWorker_${child.linkedLearnerId}"
+
+        workManager.enqueueUniqueWork(
+            uniqueWorkName,
+            ExistingWorkPolicy.REPLACE,
+            workRequest
+        )
+    }
+
+
+    private fun resetState() {
+        _state.update {
+            it.copy(
+                isSubmitting = false,
+                errorMessage = null,
+                currentStep = HouseSurveyStep.CONSENT,
+                currentStepIndex = 0,
+                consentGiven = false,
+                county = "",
+                subCounty = "",
+                ward = "",
+                interviewerName = "",
+                respondentName = "",
+                respondentAge = "",
+                isRespondentHeadOfHousehold = false,
+                householdHeadName = "",
+                householdHeadMobileNumber = "",
+                mobileNumberError = null,
+                relationshipToHead = "",
+                mainLanguageSpokenAtHome = "",
+                totalHouseholdMembers = "",
+                houseHoldIncomeSource = "",
+                hasElectricity = false,
+                householdAssets = mutableListOf(),
+                discussFrequency = "",
+                doAttendMeetings = false,
+                doMonitorAttendance = false,
+                isSchoolAgeChildrenPresent = false,
+                whoHelps = "",
+                otherWhoHelps = "",
+                hasLearningMaterials = false,
+                hasMissedSchool = false,
+                isQuietPlaceAvailable = false,
+                missedReason = "",
+                otherMissedReason = "",
+                childGender = "",
+                childAge = "",
+                childFirstName = "",
+                childLastName = "",
+                hasAttendedSchool = false,
+                highestEducationLevel = "",
+                parentAge = "",
+                parentGender = "",
+                parentName = "",
+                type = "",
+                parents = mutableListOf(),
+                children = mutableListOf()
+            )
         }
     }
 }

@@ -66,5 +66,8 @@ data object AddHouseHoldPage
 
 @Serializable
 data class HouseHoldDetailsPage(
-    val houseHoldId: String
+    val houseHoldId: String,
+    val projectId: String,
+    val organizationId: String,
+    val schoolId: String
 )

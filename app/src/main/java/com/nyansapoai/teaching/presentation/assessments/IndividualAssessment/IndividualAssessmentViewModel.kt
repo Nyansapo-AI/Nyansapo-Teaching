@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.nyansapoai.teaching.data.local.LocalDataSource
 import com.nyansapoai.teaching.data.remote.assessment.AssessmentRepository
+import com.nyansapoai.teaching.domain.mapper.assessment.toNyansapoStudent
 import com.nyansapoai.teaching.domain.models.assessments.Assessment
 import com.nyansapoai.teaching.navigation.IndividualAssessmentPage
 import com.nyansapoai.teaching.utils.ResultStatus
@@ -60,7 +61,7 @@ class IndividualAssessmentViewModel(
     ){ state, assessment ->
         state.copy(
             assessmentState = assessment,
-            studentsList = state.selectedGrade?.let { assessment.data?.assigned_students?.filter { it.grade == state.selectedGrade } }  ?: assessment.data?.assigned_students ?: emptyList()
+            studentsList = state.selectedGrade?.let { assessment.data?.assigned_students?.filter { it.grade == state.selectedGrade } }?.map { it.toNyansapoStudent() }  ?: assessment.data?.assigned_students?.map { it.toNyansapoStudent() } ?: emptyList()
         )
     }
         .stateIn(
@@ -81,7 +82,7 @@ class IndividualAssessmentViewModel(
                 _state.update { currentState ->
                     currentState.copy(
                         selectedGrade = action.grade,
-                        studentsList = action.grade?.let { currentState.assessmentState.data?.assigned_students?.filter { it.grade == action.grade } }  ?: currentState.assessmentState.data?.assigned_students ?: emptyList()
+                        studentsList = action.grade?.let { currentState.assessmentState.data?.assigned_students?.filter { it.grade == action.grade }?.map { it.toNyansapoStudent() } }  ?: currentState.assessmentState.data?.assigned_students?.map { it.toNyansapoStudent() } ?: emptyList()
                     )
                 }
             }

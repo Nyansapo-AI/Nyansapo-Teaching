@@ -239,7 +239,7 @@ private fun KeyValueRow(key: String, value: String) {
 @Composable
 private fun ChildItem(child: Child) {
     InfoCard {
-        KeyValueRow("Name", child.name)
+        KeyValueRow("Name", child.firstName)
         KeyValueRow("Gender", child.gender)
         KeyValueRow("Age", child.age)
         KeyValueRow("Lives with", child.livesWith)

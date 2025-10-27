@@ -7,7 +7,7 @@ import com.nyansapoai.teaching.data.local.LocalDataSource
 import com.nyansapoai.teaching.data.remote.assessment.AssessmentRepository
 import com.nyansapoai.teaching.data.remote.students.StudentsRepository
 import com.nyansapoai.teaching.data.remote.user.UserRepository
-import com.nyansapoai.teaching.domain.models.students.NyansapoStudent
+import com.nyansapoai.teaching.domain.models.assessments.AssignedStudentDto
 import com.nyansapoai.teaching.presentation.common.snackbar.SnackBarHandler
 import com.nyansapoai.teaching.presentation.common.snackbar.SnackBarItem
 import com.nyansapoai.teaching.utils.ResultStatus
@@ -58,13 +58,12 @@ class CreateAssessmentsViewModel(
     fun onAction(action: CreateAssessmentsAction) {
         when (action) {
             is CreateAssessmentsAction.AddAssignedStudent -> {
-
                 _state.update { currentState ->
-                    val isDuplicate = currentState.assignedStudents.any { it == action.student }
+                    val isDuplicate = currentState.assignedStudentDtos.any { it == action.student }
                     if (!isDuplicate) {
-                        currentState.copy(assignedStudents = currentState.assignedStudents + action.student)
+                        currentState.copy(assignedStudentDtos = currentState.assignedStudentDtos + action.student)
                     } else {
-                        currentState.copy(assignedStudents = currentState.assignedStudents - action.student)
+                        currentState.copy(assignedStudentDtos = currentState.assignedStudentDtos - action.student)
                     }
                 }
             }
@@ -106,7 +105,7 @@ class CreateAssessmentsViewModel(
                     type = _state.value.type,
                     startLevel = _state.value.startLevel,
                     assessmentNumber = _state.value.assessmentNumber,
-                    assignedStudents = _state.value.assignedStudents,
+                    assignedStudentDtos = _state.value.assignedStudentDtos,
                     schoolId = _state.value.localSchoolInfo?.schoolUId ?: "",
                     projectId = _state.value.localSchoolInfo?.projectUId ?: "",
                     organizationId = _state.value.localSchoolInfo?.organizationUid ?: ""
@@ -136,7 +135,7 @@ class CreateAssessmentsViewModel(
         type: String,
         startLevel: String,
         assessmentNumber: Int,
-        assignedStudents: List<NyansapoStudent>,
+        assignedStudentDtos: List<AssignedStudentDto>,
         schoolId: String,
         organizationId: String,
         projectId: String
@@ -149,7 +148,7 @@ class CreateAssessmentsViewModel(
                 type = type,
                 startLevel = startLevel,
                 assessmentNumber = assessmentNumber,
-                assignedStudents = assignedStudents,
+                assignedStudentDtos = assignedStudentDtos,
                 schoolId = schoolId,
                 organizationId = organizationId,
                 projectId = projectId
@@ -168,7 +167,7 @@ class CreateAssessmentsViewModel(
                             type = "",
                             startLevel = "",
                             assessmentNumber = 5,
-                            assignedStudents = emptyList(),
+                            assignedStudentDtos = emptyList(),
                             isAssessmentNumberDropDownExpanded = false,
                             isStartLevelDropDownExpanded = false,
                             isTypeDropDownExpanded = false,

@@ -21,7 +21,12 @@ class   DetailedHouseholdInfoViewModel(
     private val _state = MutableStateFlow(DetailedHouseholdInfoState())
     val state = combine(
         _state,
-        surveyRepository.getHouseholdSurveyById(id = household.houseHoldId)
+        surveyRepository.getHouseholdSurveyById(
+            id = household.houseHoldId,
+            organizationId = household.organizationId,
+            projectId = household.projectId,
+            schoolId = household.schoolId
+        )
     ){ currentState, householdInfo ->
 
         currentState.copy(isLoading = true)

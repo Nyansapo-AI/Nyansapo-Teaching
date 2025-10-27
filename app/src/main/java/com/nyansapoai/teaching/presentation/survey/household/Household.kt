@@ -29,6 +29,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nyansapoai.teaching.R
+import com.nyansapoai.teaching.domain.models.school.LocalSchoolInfo
 import com.nyansapoai.teaching.domain.models.survey.HouseHoldInfo
 import com.nyansapoai.teaching.navController
 import com.nyansapoai.teaching.navigation.AddHouseHoldPage
@@ -128,7 +129,8 @@ fun HouseholdScreen(
 
             items(items = state.households){ household ->
                 HouseholdListItem(
-                    household = household
+                    household = household,
+                    localSchoolInfo = state.localSchoolInfo
                 )
             }
 
@@ -141,7 +143,8 @@ fun HouseholdScreen(
 @Composable
 fun HouseholdListItem(
     modifier: Modifier = Modifier,
-    household: HouseHoldInfo
+    household: HouseHoldInfo,
+    localSchoolInfo: LocalSchoolInfo?
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -172,7 +175,12 @@ fun HouseholdListItem(
         IconButton(
             onClick = {
                 navController.navigate(
-                    HouseHoldDetailsPage(houseHoldId = household.id)
+                    HouseHoldDetailsPage(
+                        houseHoldId = household.id,
+                        projectId = localSchoolInfo?.projectUId ?: "",
+                        organizationId = localSchoolInfo?.organizationUid ?: "",
+                        schoolId = localSchoolInfo?.schoolUId ?: ""
+                    )
                 )
             }
         ) {

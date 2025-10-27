@@ -1,5 +1,7 @@
 package com.nyansapoai.teaching.presentation.survey.takeSurvey
 
+import com.nyansapoai.teaching.domain.models.school.LocalSchoolInfo
+import com.nyansapoai.teaching.domain.models.students.NyansapoStudent
 import com.nyansapoai.teaching.domain.models.survey.Child
 import com.nyansapoai.teaching.domain.models.survey.ChildLearningEnvironment
 import com.nyansapoai.teaching.domain.models.survey.CreateHouseHoldInfo
@@ -7,6 +9,11 @@ import com.nyansapoai.teaching.domain.models.survey.Parent
 import com.nyansapoai.teaching.domain.models.survey.ParentalEngagement
 
 data class SurveyState(
+    val localSchoolInfo: LocalSchoolInfo? = null,
+    val isLoading: Boolean = false,
+    val error: String? = null,
+
+
     val interviewerName: String = "",
     val countyList: List<County> = County.entries,
     val showCountyDropdown: Boolean = false,
@@ -64,13 +71,18 @@ data class SurveyState(
     val parents: MutableList<Parent> = mutableListOf(),
 
     val showAddChildSheet: Boolean = false,
-    val childName: String = "",
+    val childFirstName: String = "",
+    val childLastName: String = "",
     val childGender: String = "",
     val childAge: String = "",
     val showChildGenderDropdown: Boolean = false,
     val livesWith: String = "",
+    val linkedLearnerId: String = "",
+    val showAvailableLearnersDropdown: Boolean = false,
     val showLivesWithDropdown: Boolean = false,
     val children: MutableList<Child> = mutableListOf(),
+    val isLinkedIdList: MutableList<String> = mutableListOf(),
+    val availableLearners: List<NyansapoStudent> = emptyList(),
 
     val currentStepIndex: Int = 0,
     val currentStep: HouseSurveyStep = HouseSurveyStep.CONSENT,

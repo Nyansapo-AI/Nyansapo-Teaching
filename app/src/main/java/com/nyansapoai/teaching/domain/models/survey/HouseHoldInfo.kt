@@ -2,7 +2,6 @@ package com.nyansapoai.teaching.domain.models.survey
 
 import com.google.firebase.firestore.IgnoreExtraProperties
 import kotlinx.datetime.Clock
-import kotlinx.serialization.Serializable
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -85,8 +84,10 @@ data class Parent(
 )
 
 data class Child(
-    val name: String = "",
+    val firstName: String = "",
+    val lastName: String = "",
     val gender: String = "",
     val age: String = "",
-    val livesWith: String = ""
+    val livesWith: String = "",
+    val linkedLearnerId: String = ""
 )

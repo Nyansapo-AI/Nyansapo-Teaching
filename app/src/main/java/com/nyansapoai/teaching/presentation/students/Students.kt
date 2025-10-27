@@ -32,6 +32,7 @@ fun StudentsScreen(
     state: StudentsState,
     onAction: (StudentsAction) -> Unit,
 ) {
+
     LaunchedEffect(state.localSchoolInfo, state.selectedGrade) {
         onAction.invoke(
             StudentsAction.OnFetchStudents(

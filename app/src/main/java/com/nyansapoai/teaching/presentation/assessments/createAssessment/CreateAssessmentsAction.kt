@@ -1,7 +1,6 @@
 package com.nyansapoai.teaching.presentation.assessments.createAssessment
 
-import com.nyansapoai.teaching.domain.models.assessments.AssignedStudent
-import com.nyansapoai.teaching.domain.models.students.NyansapoStudent
+import com.nyansapoai.teaching.domain.models.assessments.AssignedStudentDto
 
 sealed interface CreateAssessmentsAction {
 
@@ -21,7 +20,7 @@ sealed interface CreateAssessmentsAction {
 
     data class ToggleStudentListDropDown(val isExpanded: Boolean) : CreateAssessmentsAction
 
-    data class AddAssignedStudent(val student: NyansapoStudent) : CreateAssessmentsAction
+    data class AddAssignedStudent(val student: AssignedStudentDto) : CreateAssessmentsAction
 
     data class SubmitAssessment(val onSuccess: () -> Unit) : CreateAssessmentsAction
 

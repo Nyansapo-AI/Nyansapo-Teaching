@@ -1,6 +1,7 @@
 package com.nyansapoai.teaching.data.remote.assessment
 
 import com.nyansapoai.teaching.domain.models.assessments.Assessment
+import com.nyansapoai.teaching.domain.models.assessments.AssignedStudentDto
 import com.nyansapoai.teaching.domain.models.assessments.CompletedAssessment
 import com.nyansapoai.teaching.domain.models.assessments.literacy.LiteracyAssessmentResults
 import com.nyansapoai.teaching.domain.models.assessments.literacy.MultipleChoicesResult
@@ -9,7 +10,6 @@ import com.nyansapoai.teaching.domain.models.assessments.numeracy.CountMatch
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyArithmeticOperation
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyAssessmentResults
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyWordProblem
-import com.nyansapoai.teaching.domain.models.students.NyansapoStudent
 import com.nyansapoai.teaching.utils.Results
 import kotlinx.coroutines.flow.Flow
 
@@ -19,7 +19,7 @@ interface  AssessmentRepository {
         type: String,
         startLevel: String,
         assessmentNumber: Int,
-        assignedStudents: List<NyansapoStudent>,
+        assignedStudentDtos: List<AssignedStudentDto>,
         schoolId: String = "",
         organizationId: String = "",
         projectId: String = ""
@@ -83,4 +83,12 @@ interface  AssessmentRepository {
     suspend fun markAssessmentDone(assessmentId: String, studentId: String): Results<String>
 
     fun fetchNumeracyAssessmentResults(assessmentId: String, studentId: String): Flow<Results<NumeracyAssessmentResults>>
+
+    suspend fun updateAssignedStudent(
+        schoolId: String = "",
+        studentId: String,
+        firstName: String,
+        lastName: String,
+        isLinked: Boolean
+    ): Results<Unit>
 }

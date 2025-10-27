@@ -6,6 +6,7 @@ import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.toObject
 import com.nyansapoai.teaching.data.remote.assessment.AssessmentRepository
 import com.nyansapoai.teaching.domain.models.assessments.Assessment
+import com.nyansapoai.teaching.domain.models.assessments.AssignedStudentDto
 import com.nyansapoai.teaching.domain.models.assessments.CompletedAssessment
 import com.nyansapoai.teaching.domain.models.assessments.literacy.LiteracyAssessmentResults
 import com.nyansapoai.teaching.domain.models.assessments.literacy.MultipleChoicesResult
@@ -15,7 +16,6 @@ import com.nyansapoai.teaching.domain.models.assessments.numeracy.CountMatch
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyArithmeticOperation
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyAssessmentResults
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyWordProblem
-import com.nyansapoai.teaching.domain.models.students.NyansapoStudent
 import com.nyansapoai.teaching.utils.Results
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
@@ -23,6 +23,7 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.single
+import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
 import kotlin.uuid.ExperimentalUuidApi
@@ -42,7 +43,7 @@ class AssessmentRepositoryFirebaseImp(
         type: String,
         startLevel: String,
         assessmentNumber: Int,
-        assignedStudents: List<NyansapoStudent>,
+        assignedStudentDtos: List<AssignedStudentDto>,
         schoolId: String,
         organizationId: String,
         projectId: String
@@ -63,7 +64,7 @@ class AssessmentRepositoryFirebaseImp(
             type = type,
             start_level = startLevel,
             assessmentNumber = assessmentNumber,
-            assigned_students = assignedStudents,
+            assigned_students = assignedStudentDtos,
             school_id = schoolId,
             organization_id = organizationId,
             project_id = projectId
@@ -79,7 +80,7 @@ class AssessmentRepositoryFirebaseImp(
                 // Create assessment result documents for each assigned student
                 val batch = firebaseDb.batch()
 
-                assignedStudents.forEach { student ->
+                assignedStudentDtos.forEach { student ->
                     val resultDocRef = firebaseDb.collection(assessmentCollection)
                         .document(newAssessment.id)
                         .collection("assessments-results")
@@ -591,6 +592,61 @@ class AssessmentRepositoryFirebaseImp(
                 trySend(Results.error(msg = "Error accessing literacy results: ${e.message}"))
                 close(e)
             }
+        }
+    }
+
+    override suspend fun updateAssignedStudent(
+        schoolId: String,
+        studentId: String,
+        firstName: String,
+        lastName: String,
+        isLinked: Boolean
+    ): Results<Unit> {
+        val deferred = CompletableDeferred<Results<Unit>>()
+
+        try {
+            val assessmentsSnapshot = firebaseDb.collection(assessmentCollection)
+                .whereEqualTo("school_id", schoolId)
+                .get()
+                .await()
+
+            val batch = firebaseDb.batch()
+
+            for (assessmentDoc in assessmentsSnapshot.documents) {
+                val assessment = assessmentDoc.toObject<Assessment>()
+                assessment?.let {
+                    val updatedStudents = it.assigned_students.map { student ->
+                        if (student.id == studentId) {
+                            student.copy(
+                                first_name = firstName,
+                                last_name = lastName,
+                                isLinked = isLinked
+                            )
+                        } else {
+                            student
+                        }
+                    }
+
+                    val assessmentRef = firebaseDb.collection(assessmentCollection)
+                        .document(assessmentDoc.id)
+
+                    batch.update(assessmentRef, "assigned_students", updatedStudents)
+                }
+            }
+
+            batch.commit()
+                .addOnSuccessListener {
+                    deferred.complete(Results.success(data = Unit))
+                }
+                .addOnFailureListener { e ->
+                    deferred.complete(Results.error(msg = "Failed to update assigned students: ${e.message}"))
+                }
+        } catch (e: Exception) {
+            deferred.complete(Results.error(msg = "Error updating assigned students: ${e.message}"))
+        }
+
+        return withContext(Dispatchers.IO) {
+            deferred.await()
         }
     }
 

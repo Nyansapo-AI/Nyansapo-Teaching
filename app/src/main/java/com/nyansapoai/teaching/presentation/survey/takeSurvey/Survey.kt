@@ -1,8 +1,6 @@
 package com.nyansapoai.teaching.presentation.survey.takeSurvey
 
-import android.util.Log
 import android.widget.Toast
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -24,9 +22,6 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -69,6 +64,16 @@ fun SurveyScreen(
 
     val surveyStepState = rememberLazyListState()
 
+    LaunchedEffect(state.localSchoolInfo, state.isLinkedIdList) {
+
+        state.localSchoolInfo?.let {
+            onAction.invoke(
+                SurveyAction.FetchAvailableStudents(localSchoolInfo = state.localSchoolInfo)
+            )
+        }
+
+    }
+
 
     LaunchedEffect(state.currentStepIndex) {
         surveyStepState.animateScrollToItem(state.currentStepIndex)
@@ -80,13 +85,7 @@ fun SurveyScreen(
         }
     }
 
-    LaunchedEffect(state.currentStepIndex)  {
-        Log.d("SurveyScreen", "SurveyScreen: ${state.currentStepIndex}")
-    }
 
-    LaunchedEffect(state.currentStep) {
-        Log.d("SurveyScreen", "SurveyScreen: ${state.currentStep}")
-    }
 
     val surveySteps = listOf(
         // Define your survey steps here
@@ -219,7 +218,13 @@ fun SurveyScreen(
             screen = {
                 FamilyMembersContent(
                     showParentOrGuardianSheet = state.showParentOrGuardianSheet,
-                    onShowParentOrGuardianSheetChange = { onAction(SurveyAction.SetShowParentOrGuardianSheet(it)) },
+                    onShowParentOrGuardianSheetChange = {
+                        onAction(
+                            SurveyAction.SetShowParentOrGuardianSheet(
+                                it
+                            )
+                        )
+                    },
                     parentName = state.parentName,
                     onParentNameChanged = { onAction(SurveyAction.SetParentName(it)) },
                     parentAge = state.parentAge,
@@ -227,38 +232,82 @@ fun SurveyScreen(
                     hasAttendedSchool = state.hasAttendedSchool,
                     onHasAttendedSchoolChanged = { onAction(SurveyAction.SetHasAttendedSchool(it)) },
                     showHigherEducationDropdown = state.showHigherEducationDropdown,
-                    onShowHighEducationDropdownChange = { onAction(SurveyAction.SetShowHigherEducationDropdown(it)) },
+                    onShowHighEducationDropdownChange = {
+                        onAction(
+                            SurveyAction.SetShowHigherEducationDropdown(
+                                it
+                            )
+                        )
+                    },
                     highestEducationLevel = state.highestEducationLevel,
-                    onHighestEducationLevelChanged = { onAction(SurveyAction.SetHighestEducationLevel(it)) },
+                    onHighestEducationLevelChanged = {
+                        onAction(
+                            SurveyAction.SetHighestEducationLevel(
+                                it
+                            )
+                        )
+                    },
                     parentGender = state.parentGender,
                     onParentGenderChanged = { onAction(SurveyAction.SetParentGender(it)) },
                     showGuardianGenderDropdown = state.showGuardianGenderDropdown,
-                    onShowGuardianGenderDropdownChanged = { onAction(SurveyAction.SetShowGuardianGenderDropdown(it)) },
+                    onShowGuardianGenderDropdownChanged = {
+                        onAction(
+                            SurveyAction.SetShowGuardianGenderDropdown(
+                                it
+                            )
+                        )
+                    },
                     type = state.type,
                     onTypeChanged = { onAction(SurveyAction.SetType(it)) },
                     showTypeDropdown = state.showTypeDropdown,
                     onShowTypeDropdownChanged = { onAction(SurveyAction.SetShowTypeDropdown(it)) },
-                    onAddParent = {onAction(SurveyAction.OnAddParent)},
-                    onRemoveParent = { onAction(SurveyAction.OnRemoveParent(it))},
+                    onAddParent = { onAction(SurveyAction.OnAddParent) },
+                    onRemoveParent = { onAction(SurveyAction.OnRemoveParent(it)) },
                     parents = state.parents,
                     showAddChildSheet = state.showAddChildSheet,
                     onShowAddChildSheetChange = { onAction(SurveyAction.SetShowAddChildSheet(it)) },
-                    childName = state.childName,
-                    onChildNameChanged = { onAction(SurveyAction.SetChildName(it)) },
+                    childFirstName = state.childFirstName,
+                    onChildFirstNameChanged = { onAction(SurveyAction.SetChildFirstName(it)) },
+                    childLastName = state.childLastName,
+                    onChildLastNameChanged = { onAction(SurveyAction.SetChildLastName(it)) },
                     childGender = state.childGender,
                     onChildGenderChanged = { onAction(SurveyAction.SetChildGender(it)) },
                     showChildGenderDropdown = state.showChildGenderDropdown,
-
-                    onShowChildGenderDropdownChanged = { onAction(SurveyAction.SetShowChildGenderDropdown(it)) },
+                    onShowChildGenderDropdownChanged = {
+                        onAction(
+                            SurveyAction.SetShowChildGenderDropdown(
+                                it
+                            )
+                        )
+                    },
                     livesWith = state.livesWith,
                     onLivesWithChanged = { onAction(SurveyAction.SetLivesWith(it)) },
                     showLivesWithDropdown = state.showLivesWithDropdown,
-                    onShowLivesWithDropdownChanged = { onAction(SurveyAction.SetShowLivesWithDropdown(it)) },
-                    onAddChild = {onAction(SurveyAction.OnAddChild)},
-                    onRemoveChild = {onAction(SurveyAction.OnRemoveChild(it))},
+                    onShowLivesWithDropdownChanged = {
+                        onAction(
+                            SurveyAction.SetShowLivesWithDropdown(
+                                it
+                            )
+                        )
+                    },
+                    onAddChild = { onAction(SurveyAction.OnAddChild) },
+                    onRemoveChild = { onAction(SurveyAction.OnRemoveChild(it)) },
                     children = state.children,
                     childAge = state.childAge,
-                    onChildAgeChanged = { onAction(SurveyAction.SetChildAge(it)) }
+                    onChildAgeChanged = { onAction(SurveyAction.SetChildAge(it)) },
+                    linkedLearnerId = state.linkedLearnerId,
+                    onLinkedLearnerIdChange = { onAction(SurveyAction.SetLinkedLearnerId(it)) },
+                    showAvailableLearnersDropdown = state.showAvailableLearnersDropdown,
+                    onShowAvailableLearnersDropdownChanged = {
+                        onAction(
+                            SurveyAction.SetShowAvailableLearnerDropdown(
+                                it
+                            )
+                        )
+                    },
+                    availableLearners = state.availableLearners,
+                    modifier = Modifier,
+
                 )
             },
             onSubmit = {},
@@ -469,6 +518,7 @@ fun SurveyScreen(
             item {
                 AppButton(
                     enabled = state.canSubmit(),
+                    isLoading = state.isLoading,
                     onClick = {
                         if (state.currentStepIndex < surveySteps.size -1){
 

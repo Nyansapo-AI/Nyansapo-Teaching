@@ -27,6 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.nyansapoai.teaching.R
+import com.nyansapoai.teaching.domain.models.students.NyansapoStudent
 import com.nyansapoai.teaching.domain.models.survey.Child
 import com.nyansapoai.teaching.domain.models.survey.Parent
 import com.nyansapoai.teaching.presentation.common.components.AppButton
@@ -66,8 +67,10 @@ fun FamilyMembersContent(
     parents: MutableList<Parent>,
     showAddChildSheet: Boolean = false,
     onShowAddChildSheetChange: (Boolean) -> Unit = {},
-    childName: String = "",
-    onChildNameChanged: (String) -> Unit = {},
+    childFirstName: String = "",
+    onChildFirstNameChanged: (String) -> Unit = {},
+    childLastName: String,
+    onChildLastNameChanged: (String) -> Unit,
     childGender: String = "",
     onChildGenderChanged: (String) -> Unit = {},
     childAge: String,
@@ -75,14 +78,20 @@ fun FamilyMembersContent(
     showChildGenderDropdown: Boolean = false,
     onShowChildGenderDropdownChanged: (Boolean) -> Unit = {},
     livesWith: String = "",
+    linkedLearnerId: String,
+    linkedIdList: MutableList<String> = mutableListOf(),
+    onLinkedLearnerIdChange: (String) -> Unit,
+    showAvailableLearnersDropdown: Boolean,
+    onShowAvailableLearnersDropdownChanged: (Boolean) -> Unit,
     onLivesWithChanged: (String) -> Unit = {},
     showLivesWithDropdown: Boolean = false,
     onShowLivesWithDropdownChanged: (Boolean) -> Unit = {},
     onAddChild: () -> Unit,
     onRemoveChild: (Child) -> Unit = {},
-    children: MutableList<Child>
+    children: MutableList<Child>,
+    availableLearners: List<NyansapoStudent> = emptyList(),
 
-) {
+    ) {
     val types = remember { listOf("Father", "Mother", "Guardian") }
 
     val genderOptions = remember { listOf("Female", "Male") }
@@ -276,10 +285,19 @@ fun FamilyMembersContent(
                 item{
                     AppTextField(
                         required = true,
-                        label = "Name of the child",
-                        value = childName,
-                        onValueChanged = onChildNameChanged,
-                        placeholder = "Enter child's full name"
+                        label = "First Name of the child",
+                        value = childFirstName,
+                        onValueChanged = onChildFirstNameChanged,
+                        placeholder = "Enter child's first name"
+                    )
+                }
+                item{
+                    AppTextField(
+                        required = true,
+                        label = "Last Name of the child",
+                        value = childLastName,
+                        onValueChanged = onChildLastNameChanged,
+                        placeholder = "Enter child's last name"
                     )
                 }
 
@@ -335,8 +353,36 @@ fun FamilyMembersContent(
 
 
                 item {
+                    AppDropDownMenu(
+                        required = true,
+                        expanded = showAvailableLearnersDropdown,
+                        label = "Link the child to",
+                        placeholder = "Select one ",
+                        onClick = { onShowAvailableLearnersDropdownChanged(!showAvailableLearnersDropdown) },
+                        value = if (linkedLearnerId.isNotBlank()) "Linked" else "Not Linked"
+                    ) {
+                        if (availableLearners.isEmpty()){
+                            Text(
+                                text = "No available learners",
+                                style = MaterialTheme.typography.bodyMedium,
+                            )
+                            return@AppDropDownMenu
+                        }
+
+                        availableLearners.forEach { learner ->
+                            AppDropDownItem(
+                                item = learner.name.ifEmpty { learner.first_name + " " + learner.last_name },
+                                isSelected = linkedLearnerId == learner.id,
+                                onClick = { onLinkedLearnerIdChange(learner.id) }
+                            )
+                        }
+                    }
+                }
+
+
+                item {
                     AppButton(
-                        enabled = childName.isNotBlank() && childGender.isNotBlank() && livesWith.isNotBlank() && childAge.isNotBlank(),
+                        enabled =childLastName.isNotBlank() && childFirstName.isNotBlank() && childGender.isNotBlank() && livesWith.isNotBlank() && childAge.isNotBlank() && linkedLearnerId.isNotBlank(),
                         onClick = {
                             onAddChild.invoke()
                         }
@@ -470,7 +516,7 @@ fun FamilyMembersContent(
                             horizontalArrangement = Arrangement.spacedBy(4.dp)
                         ) {
                             Text(
-                                text = it.name,
+                                text = it.firstName,
                                 style = MaterialTheme.typography.bodyMedium,
                                 fontWeight = FontWeight.SemiBold,
                             )

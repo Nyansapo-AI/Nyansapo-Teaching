@@ -8,6 +8,7 @@ import com.nyansapoai.teaching.utils.Results
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.tasks.await
 
 class StudentsRepositoryFirebaseImp(
     private val firebaseDb: FirebaseFirestore,
@@ -65,13 +66,12 @@ class StudentsRepositoryFirebaseImp(
                             id = documentSnapshot.id,
                             baseline = student?.baseline ?: "",
                             grade = student?.grade,
-//                            createdAt = student?.createdAt ?: "",
                             group = student?.group ?: "",
-//                            lastUpdated = student?.lastUpdated ?: "",
                             name = student?.name ?: "",
                             first_name = student?.first_name ?: "",
                             last_name = student?.last_name ?: "",
-                            sex = student?.sex ?: ""
+                            sex = student?.sex ?: "",
+                            isLinked = student?.isLinked ?: false
                         )
                     }
 
@@ -83,6 +83,40 @@ class StudentsRepositoryFirebaseImp(
 
         awaitClose {
             snapshotListener.remove()
+        }
+    }
+
+    override suspend fun updateStudentLinkStatus(
+        organizationId: String,
+        projectId: String,
+        schoolId: String,
+        studentId: String,
+        firstName: String,
+        lastName: String,
+        isLinked: Boolean
+    ): Results<Unit> {
+        return try {
+
+            val docRef = firebaseDb.collection(ORGANIZATION_COLLECTION)
+                .document(organizationId)
+                .collection(PROJECTS_COLLECTION)
+                .document(projectId)
+                .collection(SCHOOLS_COLLECTION)
+                .document(schoolId)
+                .collection(STUDENTS_COLLECTION)
+                .document(studentId)
+
+            docRef.update(
+                mapOf(
+                    "first_name" to firstName,
+                    "last_name" to lastName,
+                    "isLinked" to isLinked
+                )
+            ).await()
+
+            Results.success(Unit)
+        } catch (e: Exception) {
+            Results.error(msg = e.message ?: "Failed to update student link status")
         }
     }
 }

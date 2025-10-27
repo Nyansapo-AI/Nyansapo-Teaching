@@ -1,9 +1,11 @@
 package com.nyansapoai.teaching.presentation.survey.takeSurvey
 
+import com.nyansapoai.teaching.domain.models.school.LocalSchoolInfo
 import com.nyansapoai.teaching.domain.models.survey.Child
 import com.nyansapoai.teaching.domain.models.survey.Parent
 
 sealed interface SurveyAction {
+    data class FetchAvailableStudents(val localSchoolInfo: LocalSchoolInfo) : SurveyAction
     data class SetInterviewerName(val name: String) : SurveyAction
     data class SetCounty(val county: String) : SurveyAction
     data class SetShowCountyDropdown(val show: Boolean) : SurveyAction
@@ -55,12 +57,15 @@ sealed interface SurveyAction {
     data class OnRemoveParent(val parent: Parent) : SurveyAction
 
     data class SetShowAddChildSheet(val show: Boolean) : SurveyAction
-    data class SetChildName(val name: String) : SurveyAction
+    data class SetChildFirstName(val name: String) : SurveyAction
+    data class SetChildLastName(val name: String) : SurveyAction
     data class SetChildGender(val gender: String) : SurveyAction
     data class SetChildAge(val age: String) : SurveyAction
     data class SetShowChildGenderDropdown(val show: Boolean) : SurveyAction
     data class SetLivesWith(val livesWith: String) : SurveyAction
     data class SetShowLivesWithDropdown(val show: Boolean) : SurveyAction
+    data class SetShowAvailableLearnerDropdown(val show: Boolean) : SurveyAction
+    data class SetLinkedLearnerId(val learnerId: String) : SurveyAction
     data object OnAddChild : SurveyAction
     data class OnRemoveChild(val child: Child) : SurveyAction
 

@@ -1,7 +1,6 @@
 package com.nyansapoai.teaching.presentation.assessments.createAssessment
 
-import com.nyansapoai.teaching.domain.models.assessments.numeracy.numeracyAssessmentData
-import com.nyansapoai.teaching.domain.models.assessments.literacy.literacyAssessmentContent
+import com.nyansapoai.teaching.domain.models.assessments.AssignedStudentDto
 import com.nyansapoai.teaching.domain.models.school.LocalSchoolInfo
 import com.nyansapoai.teaching.domain.models.students.NyansapoStudent
 
@@ -13,7 +12,7 @@ data class CreateAssessmentsState(
     val assessmentNumber: Int = 8,
     val error: String? = null,
     val localSchoolInfo: LocalSchoolInfo? = null,
-    val assignedStudents: List<NyansapoStudent> = emptyList(),
+    val assignedStudentDtos: List<AssignedStudentDto> = emptyList(),
     val selectedGrade: Int? = null,
     val isTypeDropDownExpanded: Boolean = false,
     val isStartLevelDropDownExpanded: Boolean = false,
@@ -53,5 +52,5 @@ data class CreateAssessmentsState(
             type.isNotBlank() &&
 //            startLevel.isNotBlank() &&
             assessmentNumber > 0 &&
-            assignedStudents.isNotEmpty()
+            assignedStudentDtos.isNotEmpty()
 }

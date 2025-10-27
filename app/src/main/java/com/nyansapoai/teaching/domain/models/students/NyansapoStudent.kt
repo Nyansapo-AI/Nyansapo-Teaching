@@ -9,6 +9,7 @@ data class NyansapoStudent(
     val id: String = "",
     val baseline: String? = null,
     val grade: Int? = null,
+    val isLinked: Boolean = false,
 //    val createdAt: String = "",
     val group: String = "",
 //    val lastUpdated: String = "",

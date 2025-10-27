@@ -32,6 +32,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nyansapoai.teaching.R
+import com.nyansapoai.teaching.domain.mapper.assessment.toNyansapoStudent
+import com.nyansapoai.teaching.domain.models.assessments.AssignedStudentDto
 import com.nyansapoai.teaching.navController
 import com.nyansapoai.teaching.presentation.students.components.StudentSelectionListUI
 import com.nyansapoai.teaching.presentation.common.components.AppButton
@@ -127,9 +129,21 @@ fun CreateAssessmentsScreen(
             ) {
                 StudentSelectionListUI(
                     studentList = state.studentList,
-                    selectedStudents = state.assignedStudents,
+                    selectedStudents = state.assignedStudentDtos.map { it.toNyansapoStudent() },
                     onSelectStudent = { student ->
-                        onAction(CreateAssessmentsAction.AddAssignedStudent(student))
+                        onAction(
+                            CreateAssessmentsAction.AddAssignedStudent(
+                                student = AssignedStudentDto(
+                                    id = student.id,
+                                    name = student.name,
+                                    grade = student.grade,
+                                    first_name = student.first_name,
+                                    last_name = student.last_name,
+                                    sex = student.sex,
+                                    group = student.group,
+                                )
+                            )
+                        )
                     },
                     selectedGrade = state.selectedGrade,
                     onOptionSelected = { grade ->
@@ -221,7 +235,7 @@ fun CreateAssessmentsScreen(
                         label = "Assigned Students",
                         placeholder = "Select students to assign",
                         required = true,
-                        value = if (state.assignedStudents.size > 1) "${state.assignedStudents.size} student" else "${state.assignedStudents.size} students",
+                        value = if (state.assignedStudentDtos.size > 1) "${state.assignedStudentDtos.size} student" else "${state.assignedStudentDtos.size} students",
                         onClick = {
                             onAction(CreateAssessmentsAction.ToggleStudentListDropDown(isExpanded = !state.isStudentListDropDownExpanded))
                         },
@@ -230,9 +244,21 @@ fun CreateAssessmentsScreen(
                         state.studentList.forEach { student ->
                             AppDropDownItem(
                                 item = student.name,
-                                isSelected = student in state.assignedStudents,
+                                isSelected = student.id in state.assignedStudentDtos.map { it.id },
                                 onClick = {
-                                    onAction(CreateAssessmentsAction.AddAssignedStudent(student = student))
+                                    onAction(
+                                        CreateAssessmentsAction.AddAssignedStudent(
+                                            student = AssignedStudentDto(
+                                                id = student.id,
+                                                name = student.name,
+                                                grade = student.grade,
+                                                first_name = student.first_name,
+                                                last_name = student.last_name,
+                                                sex = student.sex,
+                                                group = student.group,
+                                            )
+                                        )
+                                    )
                                 }
                             )
                         }
