@@ -267,6 +267,7 @@ class LiteracyViewModel(
             LiteracyAssessmentLevel.MULTIPLE_CHOICE -> emptyList()
             LiteracyAssessmentLevel.COMPLETED -> emptyList()
             LiteracyAssessmentLevel.PRE_TEST -> emptyList()
+            LiteracyAssessmentLevel.LISTENING_COMPREHENSION -> emptyList()
         }
 
         currentAssessmentContentList?.let {
