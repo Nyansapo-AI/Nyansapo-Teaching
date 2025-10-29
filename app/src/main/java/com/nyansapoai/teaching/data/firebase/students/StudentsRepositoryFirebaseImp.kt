@@ -62,23 +62,6 @@ class StudentsRepositoryFirebaseImp(
 
                 if (snapshot != null){
                     val data = snapshot.documents.mapNotNull { documentSnapshot ->
-                        /*
-                        val student = documentSnapshot.toObject<NyansapoStudent>()
-
-                        NyansapoStudent(
-                            id = documentSnapshot.id,
-                            baseline = student?.baseline ?: "",
-                            grade = student?.grade,
-                            group = student?.group ?: "",
-                            name = student?.name ?: "",
-                            first_name = student?.first_name ?: "",
-                            last_name = student?.last_name ?: "",
-                            sex = student?.sex ?: "",
-                            isLinked = student?.isLinked ?: false
-                        )*/
-
-                        Log.d("Check Students", "Student Data: $documentSnapshot")
-
 
                         NyansapoStudent(
                             id = documentSnapshot.id,

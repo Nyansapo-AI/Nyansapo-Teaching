@@ -32,6 +32,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
+import kotlin.collections.remove
 
 class SurveyViewModel(
     private val surveyRepository: SurveyRepository,
@@ -53,9 +54,13 @@ class SurveyViewModel(
     val state = combine(
         _state,
         localDataSource.getSavedCurrentSchoolInfo(),
-    ){ currentState, localSchoolInfo ->
+        localDataSource.getChildrenInPendingHouseholds()
+    ){ currentState, localSchoolInfo, linkedLearners ->
+        val linked = linkedLearners.map { it.linkedLearnerId }
+
         currentState.copy(
             localSchoolInfo = localSchoolInfo,
+            isLinkedIdList = linked.toMutableList()
         )
 
     }
@@ -340,44 +345,43 @@ class SurveyViewModel(
             is SurveyAction.OnAddChild -> {
                 _state.update { currentState ->
                     val newChild = Child(
-                        firstName = currentState.childFirstName,
-                        lastName = currentState.childLastName,
-                        gender = currentState.childGender,
-                        age = currentState.childAge,
-                        livesWith = currentState.livesWith,
-                        linkedLearnerId = currentState.linkedLearnerId
+                        firstName = currentState.childFirstName.trim(),
+                        lastName = currentState.childLastName.trim(),
+                        gender = currentState.childGender.trim(),
+                        age = currentState.childAge.trim(),
+                        livesWith = currentState.livesWith.trim(),
+                        linkedLearnerId = currentState.linkedLearnerId.trim()
                     )
 
+                    val updatedChildren = currentState.children.toMutableList().apply { add(newChild) }
+                    val updatedIsLinkedIdList = currentState.isLinkedIdList.toMutableList().apply {
+                        if (newChild.linkedLearnerId.isNotEmpty()) add(newChild.linkedLearnerId)
+                    }
+
                     currentState.copy(
-                        children = currentState.children.apply { add(newChild) },
-                        isLinkedIdList = currentState.isLinkedIdList.apply {
-                            if (newChild.linkedLearnerId.isNotEmpty()) {
-                                add(newChild.linkedLearnerId)
-                            }
-                        },
+                        children = updatedChildren,
+                        isLinkedIdList = updatedIsLinkedIdList,
                         showAddChildSheet = false,
                         childFirstName = "",
                         childLastName = "",
                         childGender = "",
                         childAge = "",
                         livesWith = "",
-                        linkedLearnerId = "",
-
+                        linkedLearnerId = ""
                     )
-
-
                 }
             }
 
             is SurveyAction.OnRemoveChild -> {
                 _state.update { currentState ->
+                    val updatedChildren = currentState.children.filter { it != action.child }.toMutableList()
+                    val updatedIsLinkedIdList = currentState.isLinkedIdList.toMutableList().apply {
+                        if (action.child.linkedLearnerId.isNotEmpty()) remove(action.child.linkedLearnerId)
+                    }
+
                     currentState.copy(
-                        children = currentState.children.apply { removeIf { it == action.child } },
-                        isLinkedIdList = currentState.isLinkedIdList.apply {
-                            if (action.child.linkedLearnerId.isNotEmpty()) {
-                                remove(action.child.linkedLearnerId)
-                            }
-                        },
+                        children = updatedChildren,
+                        isLinkedIdList = updatedIsLinkedIdList,
                         showAddChildSheet = true
                     )
                 }
@@ -505,8 +509,6 @@ class SurveyViewModel(
                 studentClass = grade
             ).first()
 
-            Log.d("Check Students", "Fetched school details: $data")
-
 
             when(data.status){
                 ResultStatus.INITIAL ,
@@ -553,6 +555,10 @@ class SurveyViewModel(
                 isLinked = true
             )
         }
+    }
+
+    private fun getLinkedLearners(){
+        TODO()
     }
 
 

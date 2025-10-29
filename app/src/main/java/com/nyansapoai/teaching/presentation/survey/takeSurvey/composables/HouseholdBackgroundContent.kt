@@ -171,11 +171,6 @@ fun HouseholdBackgroundContent(
         )
         {
             AppDropDownItem(
-                item = "English",
-                isSelected = mainLanguageSpokenAtHome == "English",
-                onClick = {onMainLanguageSpokenAtHomeChanged("English")}
-            )
-            AppDropDownItem(
                 item = "Kiswahili",
                 isSelected = mainLanguageSpokenAtHome == "Kiswahili",
                 onClick = {onMainLanguageSpokenAtHomeChanged("Kiswahili")}

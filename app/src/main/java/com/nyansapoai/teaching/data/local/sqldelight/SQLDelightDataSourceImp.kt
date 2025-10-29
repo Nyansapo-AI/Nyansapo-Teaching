@@ -587,111 +587,104 @@ class SQLDelightDataSourceImp(
             .flowOn(Dispatchers.IO)
     }
 
-    // kotlin
+
     override fun getPendingHouseholdDataById(householdId: String): Flow<CreateHouseHoldInfo?> {
-        return surveyQueries.getFullHouseholdById(id = householdId)
+        return surveyQueries.getHouseholdById(id = householdId)
             .asFlow()
             .mapToList(Dispatchers.IO)
             .map { rows ->
-                if (rows.isEmpty()) return@map null
+                val householdRow = rows.firstOrNull() ?: return@map null
 
-                val group = rows.groupBy { it.id }
-                val householdRows = group.values.first()
-                val householdRow = householdRows.first()
+                // children, parents, assets from dedicated queries
+                val children = surveyQueries.getChildrenByHouseholdId(id = householdId)
+                    .executeAsList()
+                    .map { row ->
+                        Child(
+                            firstName = row.first_name ?: "",
+                            lastName = row.last_name ?: "",
+                            gender = row.gender ?: "",
+                            age = row.age ?: "",
+                            livesWith = row.lives_with ?: "",
+                            linkedLearnerId = row.linked_learner_id ?: ""
+                        )
+                    }
 
-                val children = householdRows.mapNotNull { row ->
-                    if (row.childFirstName == null &&
-                        row.childLastName == null &&
-                        row.childGender == null &&
-                        row.childAge == null &&
-                        row.childLivesWith == null &&
-                        row.childLinkedLearnerId == null
-                    ) null
-                    else Child(
-                        firstName = row.childFirstName ?: "",
-                        lastName = row.childLastName ?: "",
-                        gender = row.childGender ?: "",
-                        age = row.childAge ?: "",
-                        livesWith = row.childLivesWith ?: "",
-                        linkedLearnerId = row.childLinkedLearnerId ?: ""
-                    )
-                }
-//                    .distinctBy { listOf(it.firstName, it.lastName, it.age, it.linkedLearnerId) }
+                val parents = surveyQueries.getParentsByHouseholdId(id = householdId)
+                    .executeAsList()
+                    .map { row ->
+                        Parent(
+                            name = row.name ?: "",
+                            age = row.age ?: "",
+                            type = row.type ?: "",
+                            hasAttendedSchool = (row.has_attended_school == 1L),
+                            highestEducationLevel = row.highest_education_level ?: ""
+                        )
+                    }
 
-                val parents = householdRows.mapNotNull { row ->
-                    if (row.parentName == null &&
-                        row.parentAge == null &&
-                        row.parentType == null &&
-                        row.parentHasAttendedSchool == null &&
-                        row.parentHighestEducationLevel == null
-                    ) null
-                    else Parent(
-                        name = row.parentName ?: "",
-                        age = row.parentAge ?: "",
-                        type = row.parentType ?: "",
-                        hasAttendedSchool = (row.parentHasAttendedSchool == 1L),
-                        highestEducationLevel = row.parentHighestEducationLevel ?: ""
-                    )
-                }
-//                    .distinctBy { listOf(it.name, it.age, it.type) }
+                val assets = surveyQueries.getHouseholdAssetsByHouseholdId(id = householdId)
+                    .executeAsList()
+                    .mapNotNull { it.asset }
+                    .distinct()
 
-                val assets = householdRows.mapNotNull { it.householdAsset }
-//                    .distinct()
+                // use the full-household joined query to fetch parental engagement and child learning environment fields
+                val fullRow = surveyQueries.getFullHouseholdById(id = householdId).executeAsList().firstOrNull()
 
-                val parentalEngagement = if (householdRow.parentalEngagementHasSchoolAgeChild == null &&
-                    householdRow.parentalEngagementHomeworkHelper == null &&
-                    householdRow.parentalEngagementTeacherDiscussionFrequency == null &&
-                    householdRow.parentalEngagementAttendsSchoolMeetings == null &&
-                    householdRow.parentalEngagementMonitorsAttendance == null
+                val parentalEngagement = if (fullRow == null ||
+                    (fullRow.parentalEngagementHasSchoolAgeChild == null &&
+                            fullRow.parentalEngagementHomeworkHelper == null &&
+                            fullRow.parentalEngagementTeacherDiscussionFrequency == null &&
+                            fullRow.parentalEngagementAttendsSchoolMeetings == null &&
+                            fullRow.parentalEngagementMonitorsAttendance == null)
                 ) {
                     null
                 } else {
                     ParentalEngagement(
-                        hasSchoolAgeChild = (householdRow.parentalEngagementHasSchoolAgeChild == 1L),
-                        homeworkHelper = householdRow.parentalEngagementHomeworkHelper,
-                        teacherDiscussionFrequency = householdRow.parentalEngagementTeacherDiscussionFrequency,
-                        attendsSchoolMeetings = householdRow.parentalEngagementAttendsSchoolMeetings?.let { it == 1L },
-                        monitorsAttendance = householdRow.parentalEngagementMonitorsAttendance?.let { it == 1L }
+                        hasSchoolAgeChild = (fullRow.parentalEngagementHasSchoolAgeChild == 1L),
+                        homeworkHelper = fullRow.parentalEngagementHomeworkHelper,
+                        teacherDiscussionFrequency = fullRow.parentalEngagementTeacherDiscussionFrequency,
+                        attendsSchoolMeetings = fullRow.parentalEngagementAttendsSchoolMeetings?.let { it == 1L },
+                        monitorsAttendance = fullRow.parentalEngagementMonitorsAttendance?.let { it == 1L }
                     )
                 }
 
-                val childLearningEnvironment = if (householdRow.childLearningEnvironmentHasQuietPlaceToStudy == null &&
-                    householdRow.childLearningEnvironmentHasBooksOrMaterials == null &&
-                    householdRow.childLearningEnvironmentMissedSchoolLastMonth == null &&
-                    householdRow.childLearningEnvironmentReasonForMissingSchool == null
+                val childLearningEnvironment = if (fullRow == null ||
+                    (fullRow.childLearningEnvironmentHasQuietPlaceToStudy == null &&
+                            fullRow.childLearningEnvironmentHasBooksOrMaterials == null &&
+                            fullRow.childLearningEnvironmentMissedSchoolLastMonth == null &&
+                            fullRow.childLearningEnvironmentReasonForMissingSchool == null)
                 ) {
                     null
                 } else {
                     ChildLearningEnvironment(
-                        hasQuietPlaceToStudy = (householdRow.childLearningEnvironmentHasQuietPlaceToStudy == 1L),
-                        hasBooksOrMaterials = (householdRow.childLearningEnvironmentHasBooksOrMaterials == 1L),
-                        missedSchoolLastMonth = (householdRow.childLearningEnvironmentMissedSchoolLastMonth == 1L),
-                        reasonForMissingSchool = householdRow.childLearningEnvironmentReasonForMissingSchool
+                        hasQuietPlaceToStudy = (fullRow.childLearningEnvironmentHasQuietPlaceToStudy == 1L),
+                        hasBooksOrMaterials = (fullRow.childLearningEnvironmentHasBooksOrMaterials == 1L),
+                        missedSchoolLastMonth = (fullRow.childLearningEnvironmentMissedSchoolLastMonth == 1L),
+                        reasonForMissingSchool = fullRow.childLearningEnvironmentReasonForMissingSchool
                     )
                 }
 
                 CreateHouseHoldInfo(
                     id = householdRow.id,
-                    interviewerName = householdRow.interviewerName,
-                    interviewDate = householdRow.interviewDate,
+                    interviewerName = householdRow.interviewer_name,
+                    interviewDate = householdRow.interview_date,
                     village = householdRow.village,
                     county = householdRow.county ?: "",
-                    subCounty = householdRow.subCounty ?: "",
+                    subCounty = householdRow.sub_county ?: "",
                     ward = householdRow.ward ?: "",
-                    consentGiven = (householdRow.consentGiven == 1L),
-                    respondentName = householdRow.respondentName,
-                    isHouseholdHead = (householdRow.isHouseholdHead == 1L),
-                    householdHeadName = householdRow.householdHeadName,
-                    relationshipToHead = householdRow.relationshipToHead,
-                    householdHeadPhone = householdRow.householdHeadPhone,
-                    respondentAge = householdRow.respondentAge?.toInt(),
-                    mainLanguage = householdRow.mainLanguage,
+                    consentGiven = (householdRow.consent_given == 1L),
+                    respondentName = householdRow.respondent_name,
+                    isHouseholdHead = (householdRow.is_household_head == 1L),
+                    householdHeadName = householdRow.household_head_name,
+                    relationshipToHead = householdRow.relationship_to_head,
+                    householdHeadPhone = householdRow.household_head_phone,
+                    respondentAge = householdRow.respondent_age?.toInt(),
+                    mainLanguage = householdRow.main_language,
                     children = children,
                     parents = parents,
-                    maritalStatus = householdRow.maritalStatus,
-                    householdMembersCount = householdRow.householdMembersCount?.toInt(),
-                    incomeSource = householdRow.incomeSource,
-                    hasElectricity = householdRow.hasElectricity?.let { it == 1L },
+                    maritalStatus = householdRow.marital_status,
+                    householdMembersCount = householdRow.household_members_count?.toInt(),
+                    incomeSource = householdRow.income_source,
+                    hasElectricity = householdRow.has_electricity?.let { it == 1L },
                     householdAssets = assets,
                     parentalEngagement = parentalEngagement,
                     childLearningEnvironment = childLearningEnvironment
@@ -699,6 +692,26 @@ class SQLDelightDataSourceImp(
             }
             .flowOn(Dispatchers.IO)
     }
+
+    override fun getChildrenInPendingHouseholds(): Flow<List<Child>> {
+        return surveyQueries.getChildren()
+            .asFlow()
+            .mapToList(Dispatchers.IO)
+            .map { entries ->
+                entries.map { entry ->
+                    Child(
+                        firstName = entry.first_name ?: "",
+                        lastName = entry.last_name ?: "",
+                        gender = entry.gender ?: "",
+                        age = entry.age ?: "",
+                        livesWith = entry.lives_with ?: "",
+                        linkedLearnerId = entry.linked_learner_id ?: ""
+                    )
+                }
+            }
+            .flowOn(Dispatchers.Main)
+    }
+
     override fun clearSubmittedHouseholdData(householdId: String) {
         surveyQueries.clearHouseholdData(householdId)
     }

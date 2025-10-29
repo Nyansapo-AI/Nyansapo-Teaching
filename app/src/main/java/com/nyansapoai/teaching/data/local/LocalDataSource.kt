@@ -80,6 +80,6 @@ interface LocalDataSource {
     fun getPendingHouseholdData(): Flow<List<CreateHouseHoldInfo>>
 
     fun getPendingHouseholdDataById(householdId: String): Flow<CreateHouseHoldInfo?>
-
+    fun getChildrenInPendingHouseholds(): Flow<List<Child>>
     fun clearSubmittedHouseholdData(householdId: String)
 }

@@ -53,7 +53,6 @@ class SubmitHouseholdSurveyWorker(
         )
 
         return try {
-//            val pending = localDataSource.getPendingHouseholdData().first()
 
             val data = localDataSource.getPendingHouseholdDataById(householdId = surveyId).first()
 
@@ -61,6 +60,8 @@ class SubmitHouseholdSurveyWorker(
                 Log.e(TAG, "No pending household data found for survey ID: $surveyId")
                 return Result.success()
             }
+
+            Log.d("Survey Data Upload", "Uploading household data for household ID: ${data}")
 
             data.let { householdData ->
                 try {

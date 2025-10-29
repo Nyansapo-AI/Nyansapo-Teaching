@@ -237,6 +237,61 @@ LEFT JOIN household_assets        AS household_asset ON household_asset.househol
 WHERE household.id = :id
 GROUP BY household.id;
 
+
+-- get household basic info
+getHouseholdById:
+SELECT *
+FROM households
+WHERE id = :id;
+
+-- all children for a household
+getChildrenByHouseholdId:
+SELECT *
+FROM children
+WHERE household_id = :id;
+
+-- all parents for a household
+getParentsByHouseholdId:
+SELECT *
+FROM parents
+WHERE household_id = :id;
+
+-- all assets for a household
+getHouseholdAssetsByHouseholdId:
+SELECT *
+FROM household_assets
+WHERE household_id = :id;
+
+-- alternative: return joined rows (no GROUP BY) so Kotlin can aggregate them
+getFullHouseholdRowsById:
+SELECT
+  household.*,
+  parental_engagement.*,
+  child_learning_environment.*,
+  child.first_name   AS childFirstName,
+  child.last_name    AS childLastName,
+  child.gender       AS childGender,
+  child.age          AS childAge,
+  child.lives_with   AS childLivesWith,
+  child.linked_learner_id AS childLinkedLearnerId,
+  parent.name        AS parentName,
+  parent.age         AS parentAge,
+  parent.type        AS parentType,
+  parent.has_attended_school AS parentHasAttendedSchool,
+  household_asset.asset AS householdAsset
+FROM households AS household
+LEFT JOIN parental_engagement ON parental_engagement.household_id = household.id
+LEFT JOIN child_learning_environment ON child_learning_environment.household_id = household.id
+LEFT JOIN children AS child ON child.household_id = household.id
+LEFT JOIN parents AS parent ON parent.household_id = household.id
+LEFT JOIN household_assets AS household_asset ON household_asset.household_id = household.id
+WHERE household.id = :id;
+
+
+
+getChildren:
+SELECT * FROM children;
+
 clearHouseholdData:
 DELETE FROM households
 WHERE id = :id;
