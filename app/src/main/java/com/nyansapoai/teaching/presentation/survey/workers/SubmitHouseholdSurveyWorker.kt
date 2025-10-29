@@ -53,7 +53,6 @@ class SubmitHouseholdSurveyWorker(
         )
 
         return try {
-
             val data = localDataSource.getPendingHouseholdDataById(householdId = surveyId).first()
 
             if (data == null){
@@ -209,7 +208,6 @@ class SubmitHouseholdSurveyWorker(
             )
 
             val constraints = Constraints.Builder()
-//                .setRequiredNetworkType(NetworkType.CONNECTED)
                 .build()
 
             return OneTimeWorkRequestBuilder<SubmitHouseholdSurveyWorker>()

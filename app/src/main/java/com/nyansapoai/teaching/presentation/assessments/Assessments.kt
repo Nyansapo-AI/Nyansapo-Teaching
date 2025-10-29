@@ -71,11 +71,15 @@ fun AssessmentsScreen(
                     .background(MaterialTheme.colorScheme.primary)
                     .padding(horizontal = 12.dp, vertical = 4.dp)
             ) {
+
                 Text(
                     text = stringResource(R.string.assessment),
                     style = MaterialTheme.typography.headlineSmall,
+                    modifier = Modifier
+                        .padding(vertical =8.dp)
                 )
 
+                /*
                 TextButton (
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.secondary,
@@ -86,7 +90,8 @@ fun AssessmentsScreen(
                     },
                     modifier = Modifier
                         .width(180.dp),
-                ) {
+                )
+                {
                     Row(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically,
@@ -105,7 +110,7 @@ fun AssessmentsScreen(
                             )
                         )
                     }
-                }
+                }*/
             }
 
         }

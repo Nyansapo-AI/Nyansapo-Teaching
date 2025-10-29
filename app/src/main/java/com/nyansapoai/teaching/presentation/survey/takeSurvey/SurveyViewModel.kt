@@ -3,23 +3,16 @@ package com.nyansapoai.teaching.presentation.survey.takeSurvey
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.work.BackoffPolicy
-import androidx.work.Constraints
 import androidx.work.ExistingWorkPolicy
-import androidx.work.NetworkType
-import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
-import androidx.work.WorkRequest
 import com.nyansapoai.teaching.data.local.LocalDataSource
 import com.nyansapoai.teaching.data.remote.students.StudentsRepository
-import com.nyansapoai.teaching.data.remote.survey.SurveyRepository
 import com.nyansapoai.teaching.domain.models.school.LocalSchoolInfo
 import com.nyansapoai.teaching.domain.models.survey.Child
 import com.nyansapoai.teaching.domain.models.survey.CreateHouseHoldInfo
 import com.nyansapoai.teaching.domain.models.survey.Parent
 import com.nyansapoai.teaching.presentation.common.connectivity.NetworkConnectivityObserver
 import com.nyansapoai.teaching.presentation.survey.takeSurvey.SurveyState.Companion.toCreateHouseHoldInfo
-import com.nyansapoai.teaching.presentation.survey.workers.UpdateLearnerDetailWorker
 import com.nyansapoai.teaching.presentation.survey.workers.SubmitHouseholdSurveyWorker
 import com.nyansapoai.teaching.utils.ResultStatus
 import com.nyansapoai.teaching.utils.Utils
@@ -31,17 +24,13 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.util.concurrent.TimeUnit
-import kotlin.collections.remove
 
 class SurveyViewModel(
-    private val surveyRepository: SurveyRepository,
     private val localDataSource: LocalDataSource,
     private val studentsRepository: StudentsRepository,
     private val workManager: WorkManager,
     private val networkObserver: NetworkConnectivityObserver
 ) : ViewModel() {
-
 
     val isOnline: StateFlow<Boolean> = networkObserver.observe()
         .stateIn(
@@ -50,7 +39,7 @@ class SurveyViewModel(
             initialValue = false
         )
 
-    private val _state = MutableStateFlow(SurveyState.demoSurveyState)
+    private val _state = MutableStateFlow(SurveyState())
     val state = combine(
         _state,
         localDataSource.getSavedCurrentSchoolInfo(),
@@ -67,7 +56,7 @@ class SurveyViewModel(
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000L),
-            initialValue = SurveyState()
+            initialValue = _state.value
         )
 
     fun onAction(action: SurveyAction) {
