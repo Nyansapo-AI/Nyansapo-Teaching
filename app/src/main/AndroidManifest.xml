@@ -35,6 +35,7 @@
     <!-- Required for different types of foreground services (Android 14+) -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
 
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <application
         android:name=".NyansapoTeaching"
         android:allowBackup="true"

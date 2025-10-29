@@ -9,6 +9,7 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
+import kotlin.text.get
 
 class StudentsRepositoryFirebaseImp(
     private val firebaseDb: FirebaseFirestore,
@@ -96,7 +97,6 @@ class StudentsRepositoryFirebaseImp(
         isLinked: Boolean
     ): Results<Unit> {
         return try {
-
             val docRef = firebaseDb.collection(ORGANIZATION_COLLECTION)
                 .document(organizationId)
                 .collection(PROJECTS_COLLECTION)
@@ -105,6 +105,11 @@ class StudentsRepositoryFirebaseImp(
                 .document(schoolId)
                 .collection(STUDENTS_COLLECTION)
                 .document(studentId)
+
+            val snapshot = docRef.get().await()
+            if (!snapshot.exists()) {
+                return Results.error(msg = "Student not found")
+            }
 
             docRef.update(
                 mapOf(

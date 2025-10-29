@@ -51,6 +51,7 @@ import com.nyansapoai.teaching.presentation.common.audio.play.AndroidAudioPlayer
 import com.nyansapoai.teaching.presentation.common.audio.play.AudioPlayer
 import com.nyansapoai.teaching.presentation.common.audio.record.AndroidAppAudioRecorder
 import com.nyansapoai.teaching.presentation.common.audio.record.AppAudioRecorder
+import com.nyansapoai.teaching.presentation.common.connectivity.NetworkConnectivityObserver
 import com.nyansapoai.teaching.presentation.common.snackbar.SnackBarHandler
 import com.nyansapoai.teaching.presentation.students.StudentsViewModel
 import com.nyansapoai.teaching.presentation.survey.takeSurvey.SurveyViewModel
@@ -142,6 +143,12 @@ val appModules = module {
 
     factory<AudioPlayer> {
         AndroidAudioPlayer(
+            context = get()
+        )
+    }
+
+    single<NetworkConnectivityObserver>{
+        NetworkConnectivityObserver(
             context = get()
         )
     }

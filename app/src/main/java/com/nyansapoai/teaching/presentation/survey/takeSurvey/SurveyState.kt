@@ -184,6 +184,56 @@ data class SurveyState(
         }
 
 
+        val demoSurveyState = SurveyState(
+            interviewerName = "John Doe",
+            county = County.KAKAMEGA.title,
+            subCounty = "Lurambi",
+            ward = "Central Ward",
+            consentGiven = true,
+
+            respondentName = "Jane Smith",
+            isRespondentHeadOfHousehold = true,
+            respondentAge = "35",
+            householdHeadMobileNumber = "+254712345678",
+            householdHeadName = "Jane Smith",
+            mainLanguageSpokenAtHome = "Swahili",
+            totalHouseholdMembers = "5",
+            houseHoldIncomeSource = "Farming",
+            householdAssets = mutableListOf("Radio", "Bicycle"),
+            hasElectricity = true,
+
+            children = mutableListOf(
+                Child(
+                    firstName = "Alice",
+                    lastName = "Smith",
+                    gender = "Female",
+                    age = "10",
+                    linkedLearnerId = "learn123",
+                    livesWith = "Both Parents"
+                )
+            ),
+
+            parents = mutableListOf(
+                Parent(
+                    name = "Jane Smith",
+                    age = "35",
+//                    gender = "Female",
+                    hasAttendedSchool = true,
+                    highestEducationLevel = "Secondary",
+                    type = "Mother"
+                )
+            ),
+
+            isSchoolAgeChildrenPresent = true,
+            whoHelps = "Mother",
+            discussFrequency = "Monthly",
+            doAttendMeetings = true,
+            doMonitorAttendance = true,
+
+            isQuietPlaceAvailable = true,
+            hasLearningMaterials = true,
+            currentStep = HouseSurveyStep.HOUSEHOLD_BACKGROUND
+        )
     }
 }
 

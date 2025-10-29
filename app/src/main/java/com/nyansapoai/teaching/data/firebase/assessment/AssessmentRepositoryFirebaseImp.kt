@@ -26,6 +26,7 @@ import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
+import kotlin.text.get
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -601,52 +602,62 @@ class AssessmentRepositoryFirebaseImp(
         firstName: String,
         lastName: String,
         isLinked: Boolean
-    ): Results<Unit> {
-        val deferred = CompletableDeferred<Results<Unit>>()
-
+    ): Results<Unit> = withContext(Dispatchers.IO) {
         try {
+            if (schoolId.isBlank() || studentId.isBlank()) {
+                return@withContext Results.error(msg = "Invalid school ID or student ID")
+            }
+
             val assessmentsSnapshot = firebaseDb.collection(assessmentCollection)
                 .whereEqualTo("school_id", schoolId)
                 .get()
                 .await()
 
+            if (assessmentsSnapshot.isEmpty) {
+                return@withContext Results.error(msg = "No assessments found for the provided school")
+            }
+
             val batch = firebaseDb.batch()
+            var updatedAny = false
 
             for (assessmentDoc in assessmentsSnapshot.documents) {
                 val assessment = assessmentDoc.toObject<Assessment>()
                 assessment?.let {
-                    val updatedStudents = it.assigned_students.map { student ->
-                        if (student.id == studentId) {
-                            student.copy(
-                                first_name = firstName,
-                                last_name = lastName,
-                                isLinked = isLinked
-                            )
-                        } else {
-                            student
+                    if (it.assigned_students.any { s -> s.id == studentId }) {
+                        val updatedStudents = it.assigned_students.map { student ->
+                            if (student.id == studentId) {
+                                student.copy(
+                                    first_name = firstName,
+                                    last_name = lastName,
+                                    isLinked = isLinked,
+                                    id = student.id,
+                                    name = student.name,
+                                    grade = student.grade,
+                                    has_done = student.has_done
+                                )
+                            } else {
+                                student
+                            }
                         }
+
+                        val assessmentRef = firebaseDb.collection(assessmentCollection)
+                            .document(assessmentDoc.id)
+                        batch.update(assessmentRef, "assigned_students", updatedStudents)
+                        updatedAny = true
                     }
-
-                    val assessmentRef = firebaseDb.collection(assessmentCollection)
-                        .document(assessmentDoc.id)
-
-                    batch.update(assessmentRef, "assigned_students", updatedStudents)
                 }
             }
 
-            batch.commit()
-                .addOnSuccessListener {
-                    deferred.complete(Results.success(data = Unit))
-                }
-                .addOnFailureListener { e ->
-                    deferred.complete(Results.error(msg = "Failed to update assigned students: ${e.message}"))
-                }
-        } catch (e: Exception) {
-            deferred.complete(Results.error(msg = "Error updating assigned students: ${e.message}"))
-        }
+            if (!updatedAny) {
+                return@withContext Results.error(msg = "Student not found in any assessments for this school")
+            }
 
-        return withContext(Dispatchers.IO) {
-            deferred.await()
+            batch.commit().await()
+            Results.success(Unit)
+
+        } catch (e: Exception) {
+            Log.e("AssessmentRepo", "Error updating assigned students", e)
+            Results.error(msg = "Error updating assigned students: ${e.message}")
         }
     }
 

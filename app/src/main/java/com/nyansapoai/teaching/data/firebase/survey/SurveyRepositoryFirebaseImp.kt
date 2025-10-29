@@ -13,6 +13,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 
 class SurveyRepositoryFirebaseImp(
@@ -73,36 +74,28 @@ class SurveyRepositoryFirebaseImp(
             localSchoolInfo.schoolUId.isEmpty() ||
             localSchoolInfo.projectUId.isEmpty() ||
             localSchoolInfo.organizationUid.isEmpty()) {
-            Log.e("SurveyRepositoryFirebaseImp", "submitHouseholdSurvey: Invalid school information. Please sync school data and try again.")
-            Log.e("SurveyRepositoryFirebaseImp", "OrganizationId: ${localSchoolInfo?.organizationUid}, ProjectId: ${localSchoolInfo?.projectUId}, SchoolId: ${localSchoolInfo?.schoolUId}")
+            Log.e("SurveyRepositoryFirebaseImp", "submitHouseholdSurvey: Invalid school information")
             return Results.error(msg = "Invalid school information. Please sync school data and try again.")
         }
 
-        val deferred = CompletableDeferred<Results<Unit>>()
+        return try {
+            firebaseDb.collection(ORGANIZATION_COLLECTION)
+                .document(localSchoolInfo.organizationUid)
+                .collection(PROJECTS_COLLECTION)
+                .document(localSchoolInfo.projectUId)
+                .collection(SCHOOLS_COLLECTION)
+                .document(localSchoolInfo.schoolUId)
+                .collection(HOUSEHOLDS_COLLECTION)
+                .document(createHouseHold.id)
+                .set(createHouseHold)
+                .await()
 
-        firebaseDb.collection(ORGANIZATION_COLLECTION)
-            .document(localSchoolInfo.organizationUid)
-            .collection(PROJECTS_COLLECTION)
-            .document(localSchoolInfo.projectUId)
-            .collection(SCHOOLS_COLLECTION)
-            .document(localSchoolInfo.schoolUId)
-            .collection(HOUSEHOLDS_COLLECTION)
-            .document(createHouseHold.id)
-            .set(createHouseHold)
-            .addOnSuccessListener {
-                Log.d("SurveyRepositoryFirebaseImp", "submitHouseholdSurvey: Success")
-                deferred.complete(Results.success(Unit))
-
-            }
-            .addOnFailureListener { exception ->
-                Log.e("SurveyRepositoryFirebaseImp", "submitHouseholdSurvey: Failure", exception)
-                deferred.complete(Results.error(msg = exception.message ?: "Unknown error"))
-            }
-
-        return withContext(Dispatchers.IO){
-            deferred.await()
+            Log.d("SurveyRepositoryFirebaseImp", "submitHouseholdSurvey: Success (may sync later)")
+            Results.success(Unit)
+        } catch (exception: Exception) {
+            Log.e("SurveyRepositoryFirebaseImp", "submitHouseholdSurvey: Failure", exception)
+            Results.error(msg = exception.message ?: "Unknown error")
         }
-
     }
 
     override fun getHouseholdSurveyById(

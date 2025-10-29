@@ -36,32 +36,33 @@ class IndividualAssessmentViewModel(
 
     private val _state = MutableStateFlow(IndividualAssessmentState())
 
-    /*
-    val state = _state.asStateFlow()
-        .onStart {
-            _state.update { it.copy(isLoading = true) }
-            getAssessmentById(assessmentId = assessmentArgs.assessmentId)
-            _state.update { it.copy(isLoading = false) }
-        }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000L),
-            initialValue = IndividualAssessmentState()
-        )
-
-     */
-
-
-
 
 
     val state = combine(
         _state,
         assessmentRepository.getAssessmentById(assessmentId = assessmentArgs.assessmentId),
-    ){ state, assessment ->
+        localDataSource.getAssignedStudents()
+    ){ state, assessment, assignedStudents ->
+
+        val filteredStudents = assessment.data?.assigned_students
+            ?.filter { remoteStudent ->
+                remoteStudent.isLinked || assignedStudents.any { localStudent ->
+                    localStudent.linkedLearnerId == remoteStudent.id
+                }
+            }
+            ?.let { students ->
+                when {
+                    state.selectedGrade != null ->
+                        students.filter { it.grade == state.selectedGrade }
+                    else -> students
+                }
+            }
+            ?.map { it.toNyansapoStudent() }
+            ?: emptyList()
+
         state.copy(
             assessmentState = assessment,
-            studentsList = state.selectedGrade?.let { assessment.data?.assigned_students?.filter { it.grade == state.selectedGrade } }?.map { it.toNyansapoStudent() }  ?: assessment.data?.assigned_students?.map { it.toNyansapoStudent() } ?: emptyList()
+            studentsList = filteredStudents
         )
     }
         .stateIn(

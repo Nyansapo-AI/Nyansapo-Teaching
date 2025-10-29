@@ -7,6 +7,8 @@ import com.nyansapoai.teaching.domain.models.assessments.literacy.PendingReading
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.CountMatch
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyArithmeticOperation
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyWordProblem
+import com.nyansapoai.teaching.domain.models.survey.Child
+import com.nyansapoai.teaching.domain.models.survey.CreateHouseHoldInfo
 import kotlinx.coroutines.flow.Flow
 
 interface LocalDataSource {
@@ -69,4 +71,15 @@ interface LocalDataSource {
 
     suspend fun clearPendingCountMatches(assessmentId: String, studentId: String)
 
+    suspend fun insertAssignedStudent(studentId: String, firstName: String, lastName:String, isLinked: Boolean)
+
+    fun getAssignedStudents(): Flow<List<Child>>
+
+    fun insertHouseholdData(createHouseHoldData: CreateHouseHoldInfo)
+
+    fun getPendingHouseholdData(): Flow<List<CreateHouseHoldInfo>>
+
+    fun getPendingHouseholdDataById(householdId: String): Flow<CreateHouseHoldInfo?>
+
+    fun clearSubmittedHouseholdData(householdId: String)
 }

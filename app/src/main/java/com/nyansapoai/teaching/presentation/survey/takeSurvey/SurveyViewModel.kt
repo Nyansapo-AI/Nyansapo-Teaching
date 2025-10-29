@@ -13,17 +13,21 @@ import androidx.work.WorkRequest
 import com.nyansapoai.teaching.data.local.LocalDataSource
 import com.nyansapoai.teaching.data.remote.students.StudentsRepository
 import com.nyansapoai.teaching.data.remote.survey.SurveyRepository
+import com.nyansapoai.teaching.domain.models.school.LocalSchoolInfo
 import com.nyansapoai.teaching.domain.models.survey.Child
+import com.nyansapoai.teaching.domain.models.survey.CreateHouseHoldInfo
 import com.nyansapoai.teaching.domain.models.survey.Parent
+import com.nyansapoai.teaching.presentation.common.connectivity.NetworkConnectivityObserver
 import com.nyansapoai.teaching.presentation.survey.takeSurvey.SurveyState.Companion.toCreateHouseHoldInfo
 import com.nyansapoai.teaching.presentation.survey.workers.UpdateLearnerDetailWorker
+import com.nyansapoai.teaching.presentation.survey.workers.UploadAllHouseholdDataWorker
 import com.nyansapoai.teaching.utils.ResultStatus
 import com.nyansapoai.teaching.utils.Utils
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -33,10 +37,19 @@ class SurveyViewModel(
     private val surveyRepository: SurveyRepository,
     private val localDataSource: LocalDataSource,
     private val studentsRepository: StudentsRepository,
-    private val workManager: WorkManager
+    private val workManager: WorkManager,
+    private val networkObserver: NetworkConnectivityObserver
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(SurveyState())
+
+    val isOnline: StateFlow<Boolean> = networkObserver.observe()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = false
+        )
+
+    private val _state = MutableStateFlow(SurveyState.demoSurveyState)
     val state = combine(
         _state,
         localDataSource.getSavedCurrentSchoolInfo(),
@@ -46,14 +59,6 @@ class SurveyViewModel(
         )
 
     }
-        .onStart {
-            /*
-            localDataSource.getSavedCurrentSchoolInfo().collect { schoolInfo ->
-                _state.update { it.copy(localSchoolInfo = schoolInfo) }
-            }
-
-             */
-        }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000L),
@@ -97,7 +102,9 @@ class SurveyViewModel(
             }
 
             is SurveyAction.SetHouseholdHeadName -> {
-                _state.update { it.copy(householdHeadName = action.name) }
+                _state.update {
+                    it.copy(householdHeadName = action.name)
+                }
             }
 
             is SurveyAction.SetIsRespondentHeadOfHousehold -> {
@@ -114,7 +121,9 @@ class SurveyViewModel(
             }
 
             is SurveyAction.SetRelationshipToHead -> {
-                _state.update { it.copy(relationshipToHead = action.relationship) }
+                _state.update {
+                    it.copy(relationshipToHead = action.relationship)
+                }
             }
 
             is SurveyAction.SetRespondentAge -> {
@@ -122,7 +131,12 @@ class SurveyViewModel(
             }
 
             is SurveyAction.SetRespondentName -> {
-                _state.update { it.copy(respondentName = action.name) }
+                _state.update {
+                    it.copy(
+                        respondentName = action.name,
+                        householdHeadName = if (it.isRespondentHeadOfHousehold) action.name else it.householdHeadName
+                    )
+                }
             }
 
             is SurveyAction.SetShowMainLanguageDropdown -> {
@@ -439,9 +453,9 @@ class SurveyViewModel(
         _state.update { it.copy(currentStep = flow) }
     }
 
+
     private fun submitSurvey() {
         Log.d("SurveyViewModel", "Survey submitted with state: ${_state.value}")
-//        _state.update { it.copy(isLoading = true) }
 
         viewModelScope.launch {
             val localSchoolInfo = _state.value.localSchoolInfo
@@ -450,29 +464,38 @@ class SurveyViewModel(
 
                 localDataSource.getSavedCurrentSchoolInfo().collect { schoolInfo ->
                     Log.d("SurveyViewModel", "Fetched school info from local data source")
-                    _state.update { it.copy( localSchoolInfo = schoolInfo)}
+                    _state.update {
+                        it.copy(
+                            localSchoolInfo = schoolInfo,
+                            errorMessage = "Please try submitting the survey again."
+                        )
+                    }
                 }
+                return@launch
             }
 
+            _state.value.children.forEach { child ->
+                insertLinkedLearner(child = child)
+            }
+
+            insertPendingSurvey(householdData = _state.value.toCreateHouseHoldInfo())
+
+            enqueueUploadHouseholdsWork(localSchoolInfo = localSchoolInfo)
+
+            resetState()
+
+            /*
             _state.update { it.copy(isSubmitting = true) }
 
-            val response =  surveyRepository.submitHouseholdSurvey(
-                createHouseHold = _state.value.toCreateHouseHoldInfo(),
-                localSchoolInfo = _state.value.localSchoolInfo
-            )
+            when(isOnline.value){
+                true -> {
 
+                    val response =  surveyRepository.submitHouseholdSurvey(
+                        createHouseHold = _state.value.toCreateHouseHoldInfo(),
+                        localSchoolInfo = _state.value.localSchoolInfo
+                    )
 
-
-
-            when(response.status){
-                ResultStatus.INITIAL ,
-                ResultStatus.LOADING -> {
-                    _state.update { it.copy(isSubmitting = true) }
-                }
-                ResultStatus.SUCCESS -> {
-                    _state.update { it.copy(isSubmitting = false) }
-                    Log.d("SurveyViewModel", "Survey submission successful")
-
+                    Log.d("SurveyViewModel Connected", "Survey submission response: $response")
                     _state.value.children
                         .filter { it.linkedLearnerId.isNotEmpty() }
                         .forEach { child ->
@@ -480,12 +503,99 @@ class SurveyViewModel(
                         }
                     resetState()
                 }
-                ResultStatus.ERROR -> {
-                    _state.update { it.copy(errorMessage = response.message ) }
+                false -> {
+                    val response =  surveyRepository.submitHouseholdSurvey(
+                        createHouseHold = _state.value.toCreateHouseHoldInfo(),
+                        localSchoolInfo = _state.value.localSchoolInfo
+                    )
+
+                    Log.d("SurveyViewModel Connected", " Offline Mode Survey submission response: $response ")
+                    when(response.status){
+                        ResultStatus.INITIAL ,
+                        ResultStatus.LOADING -> {
+                            _state.update { it.copy(isSubmitting = true) }
+                        }
+                        ResultStatus.SUCCESS -> {
+                            _state.update { it.copy(isSubmitting = false) }
+                            Log.d("SurveyViewModel", "Survey submission successful")
+
+                            _state.value.children
+                                .filter { it.linkedLearnerId.isNotEmpty() }
+                                .forEach { child ->
+                                    enqueueUpdateLearnerWork(child)
+                                }
+                            resetState()
+                        }
+                        ResultStatus.ERROR -> {
+                            _state.update { it.copy(errorMessage = response.message ) }
+                        }
+                    }
                 }
+            }
+            */
+        }
+    }
+
+
+
+    /*
+    private fun submitSurvey() {
+        Log.d("SurveyViewModel", "Survey submitted with state: ${_state.value}")
+
+        viewModelScope.launch {
+            val localSchoolInfo = _state.value.localSchoolInfo ?: try {
+                val saved = localDataSource.getSavedCurrentSchoolInfo().first()
+                _state.update { it.copy(localSchoolInfo = saved, errorMessage = "Please try submitting the survey again.") }
+                saved
+            } catch (e: Exception) {
+                Log.e("SurveyViewModel", "Cannot submit survey - school info not loaded", e)
+                _state.update { it.copy(errorMessage = "Please try submitting the survey again") }
+                return@launch
+            }
+
+            _state.update { it.copy(isSubmitting = true) }
+
+            val response = try {
+                surveyRepository.submitHouseholdSurvey(
+                    createHouseHold = _state.value.toCreateHouseHoldInfo(),
+                    localSchoolInfo = localSchoolInfo
+                )
+            } catch (e: Exception) {
+                Log.w("SurveyViewModel", "Remote submission failed, treating as offline", e)
+                null
+            }
+
+            try {
+                val linkedChildren = _state.value.children
+                    .filter { it.linkedLearnerId.isNotEmpty() }
+                    .distinctBy { it.linkedLearnerId }
+
+                val onlineAndSuccessful = isOnline.value && response?.status == ResultStatus.SUCCESS
+
+                if (onlineAndSuccessful) {
+                    Log.d("SurveyViewModel Connected", "Survey submission response: $response")
+                    linkedChildren.forEach { child -> enqueueUpdateLearnerWork(child) }
+                    resetState()
+                } else {
+                    Log.d("SurveyViewModel", "Offline or remote failed: $response")
+                    // persist & enqueue background work so sync can retry later
+                    linkedChildren.forEach { child -> enqueueUpdateLearnerWork(child) }
+
+                    // surface any server error if present, otherwise mark pending/success locally
+                    if (response?.status == ResultStatus.ERROR) {
+                        _state.update { it.copy(errorMessage = response.message) }
+                    } else {
+                        // optional: set a pending flag/message instead of clearing immediately
+                        resetState()
+                    }
+                }
+            } finally {
+                _state.update { it.copy(isSubmitting = false) }
             }
         }
     }
+    */
+
 
 
     private fun fetchSchoolDetails(organizationId: String, projectId: String, schoolId: String, grade: Int? = null) {
@@ -537,6 +647,9 @@ class SurveyViewModel(
     }
 
     private fun enqueueUpdateLearnerWork(child: Child) {
+
+        insertLinkedLearner(child = child)
+
         val workData = UpdateLearnerDetailWorker.createInputData(
             studentId = child.linkedLearnerId,
             organizationId = _state.value.localSchoolInfo?.organizationUid.orEmpty(),
@@ -569,6 +682,34 @@ class SurveyViewModel(
             uniqueWorkName,
             ExistingWorkPolicy.REPLACE,
             workRequest
+        )
+    }
+
+
+    private fun insertLinkedLearner(child: Child){
+        viewModelScope.launch {
+            localDataSource.insertAssignedStudent(
+                studentId = child.linkedLearnerId,
+                firstName = child.firstName,
+                lastName = child.lastName,
+                isLinked = true
+            )
+        }
+    }
+
+
+    private fun insertPendingSurvey(householdData: CreateHouseHoldInfo) {
+        viewModelScope.launch {
+            localDataSource.insertHouseholdData(createHouseHoldData = householdData)
+        }
+    }
+
+    private fun enqueueUploadHouseholdsWork(localSchoolInfo: LocalSchoolInfo) {
+        val request  = UploadAllHouseholdDataWorker.buildRequest(localSchoolInfo = localSchoolInfo)
+        workManager.enqueueUniqueWork(
+            uniqueWorkName = UploadAllHouseholdDataWorker.WORK_NAME,
+            existingWorkPolicy =ExistingWorkPolicy.REPLACE,
+            request = request
         )
     }
 

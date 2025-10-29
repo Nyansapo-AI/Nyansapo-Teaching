@@ -1,0 +1,242 @@
+CREATE TABLE households (
+    id TEXT PRIMARY KEY,
+    interviewer_name TEXT NOT NULL,
+    interview_date TEXT NOT NULL,
+    village TEXT NOT NULL,
+    county TEXT,
+    sub_county TEXT,
+    ward TEXT,
+    consent_given INTEGER NOT NULL,        -- 0/1 for Boolean
+    respondent_name TEXT,
+    is_household_head INTEGER NOT NULL,    -- 0/1
+    household_head_name TEXT,
+    relationship_to_head TEXT,
+    household_head_phone TEXT,
+    respondent_age INTEGER,
+    main_language TEXT,
+    marital_status TEXT,
+    household_members_count INTEGER,
+    income_source TEXT,
+    has_electricity INTEGER                  -- nullable boolean mapped to INTEGER
+);
+
+CREATE TABLE children (
+    household_id TEXT NOT NULL,
+    first_name TEXT,
+    last_name TEXT,
+    gender TEXT,
+    age TEXT,
+    lives_with TEXT,
+    linked_learner_id TEXT,
+    FOREIGN KEY (household_id) REFERENCES households(id) ON DELETE CASCADE
+);
+
+CREATE TABLE parents (
+    household_id TEXT NOT NULL,
+    name TEXT,
+    age TEXT,
+    type TEXT,
+    has_attended_school INTEGER,            -- 0/1
+    highest_education_level TEXT,
+    FOREIGN KEY (household_id) REFERENCES households(id) ON DELETE CASCADE
+);
+
+CREATE TABLE household_assets (
+    household_id TEXT NOT NULL,
+    asset TEXT,
+    FOREIGN KEY (household_id) REFERENCES households(id) ON DELETE CASCADE
+);
+
+CREATE TABLE parental_engagement (
+    household_id TEXT NOT NULL UNIQUE,
+    has_school_age_child INTEGER NOT NULL,  -- 0/1
+    homework_helper TEXT,
+    teacher_discussion_frequency TEXT,
+    attends_school_meetings INTEGER,        -- 0/1
+    monitors_attendance INTEGER,            -- 0/1
+    FOREIGN KEY (household_id) REFERENCES households(id) ON DELETE CASCADE
+);
+
+CREATE TABLE child_learning_environment (
+    household_id TEXT NOT NULL UNIQUE,
+    has_quiet_place_to_study INTEGER NOT NULL, -- 0/1
+    has_books_or_materials INTEGER NOT NULL,   -- 0/1
+    missed_school_last_month INTEGER NOT NULL, -- 0/1
+    reason_for_missing_school TEXT,
+    FOREIGN KEY (household_id) REFERENCES households(id) ON DELETE CASCADE
+);
+
+
+insertHousehold:
+INSERT INTO households (
+  id, interviewer_name, interview_date, village, county, sub_county, ward,
+  consent_given, respondent_name, is_household_head, household_head_name,
+  relationship_to_head, household_head_phone, respondent_age, main_language,
+  marital_status, household_members_count, income_source, has_electricity
+) VALUES (
+  :id, :interviewer_name, :interview_date, :village, :county, :sub_county, :ward,
+  :consent_given, :respondent_name, :is_household_head, :household_head_name,
+  :relationship_to_head, :household_head_phone, :respondent_age, :main_language,
+  :marital_status, :household_members_count, :income_source, :has_electricity
+);
+
+insertChild:
+INSERT INTO children (
+  household_id, first_name, last_name, gender, age, lives_with, linked_learner_id
+) VALUES (
+  :household_id, :first_name, :last_name, :gender, :age, :lives_with, :linked_learner_id
+);
+
+insertParent:
+INSERT INTO parents (
+  household_id, name, age, type, has_attended_school, highest_education_level
+) VALUES (
+  :household_id, :name, :age, :type, :has_attended_school, :highest_education_level
+);
+
+insertHouseholdAsset:
+INSERT INTO household_assets (
+  household_id, asset
+) VALUES (
+  :household_id, :asset
+);
+
+insertParentalEngagement:
+INSERT INTO parental_engagement (
+  household_id, has_school_age_child, homework_helper, teacher_discussion_frequency,
+  attends_school_meetings, monitors_attendance
+) VALUES (
+  :household_id, :has_school_age_child, :homework_helper, :teacher_discussion_frequency,
+  :attends_school_meetings, :monitors_attendance
+);
+
+insertChildLearningEnvironment:
+INSERT INTO child_learning_environment (
+  household_id, has_quiet_place_to_study, has_books_or_materials,
+  missed_school_last_month, reason_for_missing_school
+) VALUES (
+  :household_id, :has_quiet_place_to_study, :has_books_or_materials,
+  :missed_school_last_month, :reason_for_missing_school
+);
+
+getAllFullCreateHouseHoldInfo:
+SELECT
+  household.id,
+  household.interviewer_name           AS interviewerName,
+  household.interview_date             AS interviewDate,
+  household.village                    AS village,
+  household.county                     AS county,
+  household.sub_county                 AS subCounty,
+  household.ward                       AS ward,
+  household.consent_given              AS consentGiven,
+  household.respondent_name            AS respondentName,
+  household.is_household_head          AS isHouseholdHead,
+  household.household_head_name        AS householdHeadName,
+  household.relationship_to_head       AS relationshipToHead,
+  household.household_head_phone       AS householdHeadPhone,
+  household.respondent_age             AS respondentAge,
+  household.main_language              AS mainLanguage,
+  household.marital_status             AS maritalStatus,
+  household.household_members_count    AS householdMembersCount,
+  household.income_source              AS incomeSource,
+  household.has_electricity            AS hasElectricity,
+
+  -- parental engagement (prefixed)
+  parental_engagement.has_school_age_child    AS parentalEngagementHasSchoolAgeChild,
+  parental_engagement.homework_helper         AS parentalEngagementHomeworkHelper,
+  parental_engagement.teacher_discussion_frequency AS parentalEngagementTeacherDiscussionFrequency,
+  parental_engagement.attends_school_meetings AS parentalEngagementAttendsSchoolMeetings,
+  parental_engagement.monitors_attendance     AS parentalEngagementMonitorsAttendance,
+
+  -- child learning environment (prefixed)
+  child_learning_environment.has_quiet_place_to_study  AS childLearningEnvironmentHasQuietPlaceToStudy,
+  child_learning_environment.has_books_or_materials    AS childLearningEnvironmentHasBooksOrMaterials,
+  child_learning_environment.missed_school_last_month  AS childLearningEnvironmentMissedSchoolLastMonth,
+  child_learning_environment.reason_for_missing_school AS childLearningEnvironmentReasonForMissingSchool,
+
+  -- child columns (prefixed)
+  child.first_name              AS childFirstName,
+  child.last_name               AS childLastName,
+  child.gender                  AS childGender,
+  child.age                     AS childAge,
+  child.lives_with              AS childLivesWith,
+  child.linked_learner_id       AS childLinkedLearnerId,
+
+  -- parent columns (prefixed)
+  parent.name                   AS parentName,
+  parent.age                    AS parentAge,
+  parent.type                   AS parentType,
+  parent.has_attended_school    AS parentHasAttendedSchool,
+  parent.highest_education_level AS parentHighestEducationLevel,
+  -- asset (prefixed)
+  household_asset.asset         AS householdAsset
+
+FROM households AS household
+LEFT JOIN parental_engagement     ON parental_engagement.household_id = household.id
+LEFT JOIN child_learning_environment ON child_learning_environment.household_id = household.id
+LEFT JOIN children                AS child ON child.household_id = household.id
+LEFT JOIN parents                 AS parent ON parent.household_id = household.id
+LEFT JOIN household_assets        AS household_asset ON household_asset.household_id = household.id
+GROUP BY household.id;
+
+
+getFullHouseholdById:
+SELECT
+  household.id,
+  household.interviewer_name           AS interviewerName,
+  household.interview_date             AS interviewDate,
+  household.village                    AS village,
+  household.county                     AS county,
+  household.sub_county                 AS subCounty,
+  household.ward                       AS ward,
+  household.consent_given              AS consentGiven,
+  household.respondent_name            AS respondentName,
+  household.is_household_head          AS isHouseholdHead,
+  household.household_head_name        AS householdHeadName,
+  household.relationship_to_head       AS relationshipToHead,
+  household.household_head_phone       AS householdHeadPhone,
+  household.respondent_age             AS respondentAge,
+  household.main_language              AS mainLanguage,
+  household.marital_status             AS maritalStatus,
+  household.household_members_count    AS householdMembersCount,
+  household.income_source              AS incomeSource,
+  household.has_electricity            AS hasElectricity,
+
+  parental_engagement.has_school_age_child    AS parentalEngagementHasSchoolAgeChild,
+  parental_engagement.homework_helper         AS parentalEngagementHomeworkHelper,
+  parental_engagement.teacher_discussion_frequency AS parentalEngagementTeacherDiscussionFrequency,
+  parental_engagement.attends_school_meetings AS parentalEngagementAttendsSchoolMeetings,
+  parental_engagement.monitors_attendance     AS parentalEngagementMonitorsAttendance,
+
+  child_learning_environment.has_quiet_place_to_study  AS childLearningEnvironmentHasQuietPlaceToStudy,
+  child_learning_environment.has_books_or_materials    AS childLearningEnvironmentHasBooksOrMaterials,
+  child_learning_environment.missed_school_last_month  AS childLearningEnvironmentMissedSchoolLastMonth,
+  child_learning_environment.reason_for_missing_school AS childLearningEnvironmentReasonForMissingSchool,
+
+  child.first_name              AS childFirstName,
+  child.last_name               AS childLastName,
+  child.gender                  AS childGender,
+  child.age                     AS childAge,
+  child.lives_with              AS childLivesWith,
+  child.linked_learner_id       AS childLinkedLearnerId,
+
+  parent.name                   AS parentName,
+  parent.age                    AS parentAge,
+  parent.type                   AS parentType,
+  parent.has_attended_school    AS parentHasAttendedSchool,
+  parent.highest_education_level AS parentHighestEducationLevel,
+
+  household_asset.asset         AS householdAsset
+
+FROM households AS household
+LEFT JOIN parental_engagement     ON parental_engagement.household_id = household.id
+LEFT JOIN child_learning_environment ON child_learning_environment.household_id = household.id
+LEFT JOIN children                AS child ON child.household_id = household.id
+LEFT JOIN parents                 AS parent ON parent.household_id = household.id
+LEFT JOIN household_assets        AS household_asset ON household_asset.household_id = household.id
+WHERE household.id = :id
+GROUP BY household.id;
+
+clearHouseholdData:
+DELETE FROM households
+WHERE id = :id;
