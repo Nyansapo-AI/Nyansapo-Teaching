@@ -41,6 +41,7 @@ import com.nyansapoai.teaching.R
 import com.nyansapoai.teaching.navController
 import com.nyansapoai.teaching.presentation.assessments.components.HasCompletedAssessment
 import com.nyansapoai.teaching.presentation.assessments.literacy.LiteracyAction.*
+import com.nyansapoai.teaching.presentation.assessments.literacy.components.ListeningQuestionUI
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.LiteracyAssessmentLevel
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.LiteracyReadingAssessmentUI
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.MultichoiceQuestionsUI
@@ -353,6 +354,29 @@ fun LiteracyScreen(
                             onStart = {
                                 onAction(OnCompletePreTest)
                             }
+                        )
+                    }
+
+                    LiteracyAssessmentLevel.LISTENING_COMPREHENSION -> {
+                        ListeningQuestionUI(
+                            story = state.assessmentContent?.storys[0]?.story  ?: "",
+                            questionsList = state.assessmentContent?.storys[0]?.questionsData ?: emptyList(),
+                            selectedChoice = state.selectedChoice,
+                            onSelectedChoiceChange = {
+                                onAction(SetSelectedChoice(it))
+                            },
+                            onSubmitMultipleChoices = {
+                                onAction(
+                                    OnSubmitMultipleChoiceResponse(
+                                        assessmentId = assessmentId,
+                                        studentId = studentId
+                                    )
+                                )
+                            },
+                            onSetOptionsList = { options ->
+                                onAction(SetMultipleQuestionOptions(options))
+                            },
+                            storyAudio = R.raw.two_friends_and_bird,
                         )
                     }
                 }

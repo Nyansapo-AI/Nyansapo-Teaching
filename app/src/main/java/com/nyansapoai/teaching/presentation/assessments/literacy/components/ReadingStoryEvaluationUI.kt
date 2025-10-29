@@ -73,6 +73,7 @@ fun ReadingStoryEvaluationUI(
     audioFilePath: String? = null,
     onAudioPathChange: (String) -> Unit = {},
     onSubmit: () -> Unit = {},
+    isListeningStory: Boolean = false,
     storySentencesList: List<String> =
             "Anna and her younger brother Tom were on the way to the market to buy some toys. On the way, they saw their friend Juma. Juma was looking for something. Anna asked Juma, ‘’ What are you looking for?’’. Juma said, ‘’I have lost my money. I have to buy tomatoes for dinner. What will we eat now?\\\" On hearing Juma’s problems, Anna and Tom decided to help him. They bought some tomatoes using their own money. Juma thanked them and rushed home. As he arrived home, he found his lost money by his front door. He picked up the money and ran after Anna and Tom.".split(".")
 ) {
@@ -199,7 +200,9 @@ fun ReadingStoryEvaluationUI(
                         }
                     }
 
-                })
+
+                }
+            )
         }
     )
 

@@ -1,10 +1,16 @@
 package com.nyansapoai.teaching.presentation.authentication
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.nyansapoai.teaching.presentation.getStarted.GetStartedRoot
+import com.nyansapoai.teaching.presentation.home.HomeRoot
 import com.nyansapoai.teaching.presentation.onboarding.OnboardingRoot
 import org.koin.androidx.compose.koinViewModel
 
