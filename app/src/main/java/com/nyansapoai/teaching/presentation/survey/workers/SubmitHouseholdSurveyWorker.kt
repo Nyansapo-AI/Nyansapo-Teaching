@@ -24,7 +24,7 @@ import org.koin.core.component.inject
 import java.util.concurrent.TimeUnit
 import kotlin.getValue
 
-class UploadAllHouseholdDataWorker(
+class SubmitHouseholdSurveyWorker(
     appContext: Context,
     workerParams: WorkerParameters
 ) : CoroutineWorker(appContext, workerParams), KoinComponent
@@ -38,8 +38,10 @@ class UploadAllHouseholdDataWorker(
         val organizationId = inputData.getString(ORGANIZATION_ID) ?: return Result.failure()
         val projectId = inputData.getString(PROJECT_ID) ?: return Result.failure()
         val schoolId = inputData.getString(SCHOOL_ID) ?: return Result.failure()
+        val surveyId = inputData.getString(SURVEY_ID) ?: return Result.failure()
 
-        if (organizationId.isEmpty() || projectId.isEmpty() || schoolId.isEmpty()) {
+
+        if (organizationId.isEmpty() || projectId.isEmpty() || schoolId.isEmpty() || surveyId.isEmpty()) {
             Log.e(TAG, "Invalid input data")
             return Result.failure()
         }
@@ -51,16 +53,19 @@ class UploadAllHouseholdDataWorker(
         )
 
         return try {
-            val pending = localDataSource.getPendingHouseholdData().first()
+//            val pending = localDataSource.getPendingHouseholdData().first()
 
-            if (pending.isEmpty()) {
+            val data = localDataSource.getPendingHouseholdDataById(householdId = surveyId).first()
+
+            if (data == null){
+                Log.e(TAG, "No pending household data found for survey ID: $surveyId")
                 return Result.success()
             }
 
-            for (houseHoldInfo in pending) {
+            data.let { householdData ->
                 try {
                     val response = surveyRepository.submitHouseholdSurvey(
-                        createHouseHold = houseHoldInfo,
+                        createHouseHold = householdData,
                         localSchoolInfo = schoolInfo
                     )
 
@@ -68,11 +73,12 @@ class UploadAllHouseholdDataWorker(
                         ResultStatus.INITIAL,
                         ResultStatus.ERROR,
                         ResultStatus.LOADING -> {
-                            Log.e(TAG, "Error uploading household ${houseHoldInfo.id}")
+                            Log.e(TAG, "Error uploading household ${householdData.id}")
                             return Result.retry()
                         }
+
                         ResultStatus.SUCCESS -> {
-                            for (child in houseHoldInfo.children) {
+                            for (child in householdData.children) {
                                 if (child.linkedLearnerId.isBlank()) {
                                     continue
                                 }
@@ -90,27 +96,35 @@ class UploadAllHouseholdDataWorker(
                                 when (updateResponse.status) {
                                     ResultStatus.INITIAL,
                                     ResultStatus.LOADING -> {
-                                        Log.e(TAG, "Error updating learner ${child.linkedLearnerId} for household ${houseHoldInfo.id}")
+                                        Log.e(
+                                            TAG,
+                                            "Error updating learner ${child.linkedLearnerId} for household ${householdData.id}"
+                                        )
                                         return Result.retry()
                                     }
+
                                     ResultStatus.SUCCESS -> {
-                                        Log.d(TAG, "Successfully updated learner ${child.linkedLearnerId} for household ${houseHoldInfo.id}")
+                                        Log.d(
+                                            TAG,
+                                            "Successfully updated learner ${child.linkedLearnerId} for household ${householdData.id}"
+                                        )
                                         // No-op
                                     }
+
                                     ResultStatus.ERROR -> {
-                                        Log.e(TAG, "Error updating learner ${child.linkedLearnerId} for household ${houseHoldInfo.id}")
-//                                        return Result.failure()
+                                        Log.e(
+                                            TAG,
+                                            "Error updating learner ${child.linkedLearnerId} for household ${householdData.id}"
+                                        )
                                         continue
                                     }
                                 }
                             }
-                            Log.d(TAG, "Successfully uploaded household ${houseHoldInfo.id}")
-
-                            localDataSource.clearSubmittedHouseholdData(householdId = houseHoldInfo.id)
                         }
                     }
-                } catch (e: Exception) {
-                    Log.e(TAG, "Error processing household ${houseHoldInfo.id}", e)
+
+                }catch (e: Exception) {
+                    Log.e(TAG, "Error processing household ${householdData.id}", e)
                     return Result.retry()
                 }
             }
@@ -180,21 +194,24 @@ class UploadAllHouseholdDataWorker(
         const val ORGANIZATION_ID = "organization_id"
         const val PROJECT_ID = "project_id"
         const val SCHOOL_ID = "school_id"
+        const val SURVEY_ID = "survey_id"
 
         fun buildRequest(
-            localSchoolInfo: LocalSchoolInfo
+            localSchoolInfo: LocalSchoolInfo,
+            surveyId: String
         ): OneTimeWorkRequest {
             val inputData = workDataOf(
                 ORGANIZATION_ID to localSchoolInfo.organizationUid,
                 PROJECT_ID to localSchoolInfo.projectUId,
-                SCHOOL_ID to localSchoolInfo.schoolUId
+                SCHOOL_ID to localSchoolInfo.schoolUId,
+                SURVEY_ID to surveyId
             )
 
             val constraints = Constraints.Builder()
 //                .setRequiredNetworkType(NetworkType.CONNECTED)
                 .build()
 
-            return OneTimeWorkRequestBuilder<UploadAllHouseholdDataWorker>()
+            return OneTimeWorkRequestBuilder<SubmitHouseholdSurveyWorker>()
                 .setInputData(inputData)
                 .setConstraints(constraints)
                 .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 30, TimeUnit.SECONDS)

@@ -1,5 +1,6 @@
 package com.nyansapoai.teaching.data.firebase.students
 
+import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.toObject
 import com.nyansapoai.teaching.data.remote.students.StudentsRepository
@@ -61,6 +62,7 @@ class StudentsRepositoryFirebaseImp(
 
                 if (snapshot != null){
                     val data = snapshot.documents.mapNotNull { documentSnapshot ->
+                        /*
                         val student = documentSnapshot.toObject<NyansapoStudent>()
 
                         NyansapoStudent(
@@ -73,6 +75,21 @@ class StudentsRepositoryFirebaseImp(
                             last_name = student?.last_name ?: "",
                             sex = student?.sex ?: "",
                             isLinked = student?.isLinked ?: false
+                        )*/
+
+                        Log.d("Check Students", "Student Data: $documentSnapshot")
+
+
+                        NyansapoStudent(
+                            id = documentSnapshot.id,
+                            baseline = documentSnapshot.getString("baseline") ?: "",
+                            grade = documentSnapshot.getLong("grade")?.toInt(),
+                            group = documentSnapshot.getString("group") ?: "",
+                            name = documentSnapshot.getString("name") ?: "",
+                            first_name = documentSnapshot.getString("first_name") ?: "",
+                            last_name = documentSnapshot.getString("last_name") ?: "",
+                            sex = documentSnapshot.getString("sex") ?: "",
+                            isLinked = documentSnapshot.getBoolean("isLinked") ?: false
                         )
                     }
 

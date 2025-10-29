@@ -188,7 +188,6 @@ val numeracyAssessmentData = NumeracyAssessmentData(
                 )
             )
         ),
-
         //Dignitas
         NumeracyAssessmentContent(
             countAndMatchNumbersList = listOf(
@@ -240,8 +239,6 @@ val numeracyAssessmentData = NumeracyAssessmentData(
                 )
             )
         )
-
-
     )
 )
 
