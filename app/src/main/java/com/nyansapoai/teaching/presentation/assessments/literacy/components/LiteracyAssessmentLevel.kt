@@ -9,7 +9,6 @@ enum class LiteracyAssessmentLevel(
     PARAGRAPH("Paragraph"),
     STORY("Story"),
     MULTIPLE_CHOICE("Story"),
-
     LISTENING_COMPREHENSION("Listening Comprehension"),
     COMPLETED("Completed");
 }

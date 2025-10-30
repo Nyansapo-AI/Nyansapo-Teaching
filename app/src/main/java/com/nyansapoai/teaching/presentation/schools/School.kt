@@ -290,6 +290,7 @@ fun SchoolScreen(
         } */
 
 
+        /*
         item{
             Column(
                 modifier = Modifier
@@ -337,6 +338,9 @@ fun SchoolScreen(
                 )
             }
         }
+
+         */
+
 
 
     }

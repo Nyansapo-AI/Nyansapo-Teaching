@@ -58,7 +58,8 @@ class LiteracyViewModel(
             _state.update { it.copy(isLoading = true) }
 
             _state.update {
-                it.copy(assessmentContent = literacyAssessmentContent[assessmentNo], isLoading = false)
+//                it.copy(assessmentContent = literacyAssessmentContent[assessmentNo], isLoading = false)
+                it.copy(assessmentContent = literacyAssessmentContent[9], isLoading = false)
             }
         }
     }
@@ -270,7 +271,7 @@ class LiteracyViewModel(
             LiteracyAssessmentLevel.LISTENING_COMPREHENSION -> emptyList()
         }
 
-        currentAssessmentContentList?.let {
+        currentAssessmentContentList.let {
             evaluateReadingAssessmentWithWorkManager(
                 assessmentId = _state.value.assessmentId ?: return@let,
                 studentId = _state.value.studentId ?: return@let,
@@ -323,12 +324,6 @@ class LiteracyViewModel(
 
                 }
             )
-        } ?: run {
-            _state.update {
-                it.copy(
-                    error = "No assessment content available."
-                )
-            }
         }
     }
 
@@ -422,7 +417,8 @@ class LiteracyViewModel(
     fun onSubmitStoryAssessment() {
 
         val contentList = when(_state.value.currentAssessmentLevel){
-            LiteracyAssessmentLevel.MULTIPLE_CHOICE -> _state.value.assessmentContent?.storys[0]?.questionsData ?: emptyList()
+            LiteracyAssessmentLevel.MULTIPLE_CHOICE -> _state.value.assessmentContent?.storys[1]?.questionsData ?: emptyList()
+            LiteracyAssessmentLevel.LISTENING_COMPREHENSION -> state.value.assessmentContent?.storys[0]?.questionsData ?: emptyList()
             else -> emptyList()
         }
 

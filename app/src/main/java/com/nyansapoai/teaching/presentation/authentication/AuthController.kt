@@ -32,13 +32,35 @@ fun AuthControllerScreen(
     onAction: (AuthControllerAction) -> Unit,
 ) {
 
-    when(state.isUserLoggedIn){
-        false -> {
-            GetStartedRoot()
+    AnimatedContent(
+        targetState = state.isLoading,
+        modifier = Modifier
+            .fillMaxSize()
+    ) { isLoading ->
+        when(isLoading){
+            true -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    LinearProgressIndicator(modifier = Modifier)
+                }
+            }
+            false -> {
+                when(state.isUserLoggedIn){
+                    false -> {
+                        GetStartedRoot()
+                    }
+                    true -> {
+                        OnboardingRoot()
+                    }
+                }
+            }
         }
-        true -> {
-            OnboardingRoot()
-        }
+
     }
+
+
 
 }

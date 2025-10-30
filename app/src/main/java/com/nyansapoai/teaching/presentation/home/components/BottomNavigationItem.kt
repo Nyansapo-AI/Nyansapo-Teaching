@@ -29,6 +29,14 @@ data class BottomNavigationItem(
             ),
 
             BottomNavigationItem(
+                title = "Survey",
+                icon = R.drawable.sessions,
+                screen = {
+                    HouseholdRoot()
+                },
+            ),
+
+            BottomNavigationItem(
                 title = "Assessments",
                 icon = R.drawable.assessment,
                 screen = { AssessmentsRoot() },
@@ -41,13 +49,7 @@ data class BottomNavigationItem(
                     AttendancesRoot()
                 },
             ),
-            BottomNavigationItem(
-                title = "Sessions",
-                icon = R.drawable.sessions,
-                screen = {
-                    HouseholdRoot()
-                },
-            ),
+
         )
     }
 }

@@ -26,18 +26,27 @@ data class LiteracyState(
     val selectedChoice: String? = null,
     val options: List<String> = emptyList(),
 
-    val currentAssessmentLevel: LiteracyAssessmentLevel = LiteracyAssessmentLevel.PRE_TEST,
+    val currentAssessmentLevel: LiteracyAssessmentLevel = LiteracyAssessmentLevel.LISTENING_COMPREHENSION,
     val currentAssessmentLevelIndex: Int = 0,
     val assessmentContent: LiteracyAssessmentData? = null,
     val readingAssessmentResults: MutableList<ReadingAssessmentResult> = mutableListOf(),
     val assessmentFlow: List<LiteracyAssessmentLevel> = listOf(
+        LiteracyAssessmentLevel.LISTENING_COMPREHENSION,
         LiteracyAssessmentLevel.LETTER_RECOGNITION,
         LiteracyAssessmentLevel.WORD,
-        LiteracyAssessmentLevel.PARAGRAPH,
+//        LiteracyAssessmentLevel.PARAGRAPH,
         LiteracyAssessmentLevel.STORY,
         LiteracyAssessmentLevel.MULTIPLE_CHOICE,
         LiteracyAssessmentLevel.COMPLETED
     ),
+//    val assessmentFlow: List<LiteracyAssessmentLevel> = listOf(
+//        LiteracyAssessmentLevel.LETTER_RECOGNITION,
+//        LiteracyAssessmentLevel.WORD,
+//        LiteracyAssessmentLevel.PARAGRAPH,
+//        LiteracyAssessmentLevel.STORY,
+//        LiteracyAssessmentLevel.MULTIPLE_CHOICE,
+//        LiteracyAssessmentLevel.COMPLETED
+//    ),
     val round: Int = 0,
 
     val multipleChoiceQuestionsResult: MutableList<MultipleChoicesResult> = mutableListOf(),
