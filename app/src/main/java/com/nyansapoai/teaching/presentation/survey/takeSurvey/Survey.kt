@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -93,6 +94,7 @@ fun SurveyScreen(
             screen = {
                 IdentificationAndContentContent(
                     name = state.interviewerName,
+                    nameError = state.interviewNameError,
                     county = state.county,
                     subCounty = state.subCounty,
                     ward = state.ward,
@@ -119,6 +121,8 @@ fun SurveyScreen(
             screen = {
                 HouseholdBackgroundContent(
                     respondentName = state.respondentName,
+                    respondentNameError = state.respondentNameError,
+                    respondentAgeError = state.respondentAgeError,
                     respondentAge = state.respondentAge,
                     onRespondentNameChanged = { onAction(SurveyAction.SetRespondentName(it)) },
                     isRespondentHead = state.isRespondentHeadOfHousehold,
@@ -130,6 +134,7 @@ fun SurveyScreen(
                         )
                     },
                     householdHeadName = state.householdHeadName,
+                    householdHeadNameError = state.householdHeadNameError,
                     onHouseholdHeadNameChanged = { onAction(SurveyAction.SetHouseholdHeadName(it)) },
                     showRelationshipDropdown = state.showRelationshipToHeadDropdown,
                     onRelationshipDropdownChanged = {
@@ -226,8 +231,10 @@ fun SurveyScreen(
                         )
                     },
                     parentName = state.parentName,
+                    parentNameError = state.parentNameError,
                     onParentNameChanged = { onAction(SurveyAction.SetParentName(it)) },
                     parentAge = state.parentAge,
+                    parentAgeError = state.parentAgeError,
                     onParentAgeChanged = { onAction(SurveyAction.SetParentAge(it)) },
                     hasAttendedSchool = state.hasAttendedSchool,
                     onHasAttendedSchoolChanged = { onAction(SurveyAction.SetHasAttendedSchool(it)) },
@@ -294,6 +301,7 @@ fun SurveyScreen(
                     onRemoveChild = { onAction(SurveyAction.OnRemoveChild(it)) },
                     children = state.children,
                     childAge = state.childAge,
+                    childAgeError = state.childAgeError,
                     onChildAgeChanged = { onAction(SurveyAction.SetChildAge(it)) },
                     linkedLearnerId = state.linkedLearnerId,
                     onLinkedLearnerIdChange = { onAction(SurveyAction.SetLinkedLearnerId(it)) },
@@ -306,6 +314,7 @@ fun SurveyScreen(
                         )
                     },
                     availableLearners = state.availableLearners,
+                    error = state.familyMemberError,
                     modifier = Modifier,
 
                 )
@@ -504,6 +513,7 @@ fun SurveyScreen(
         LazyColumn(
             modifier = Modifier
                 .padding(innerPadding)
+                .imePadding()
                 .padding(16.dp)
         ){
 
@@ -523,10 +533,7 @@ fun SurveyScreen(
                         if (state.currentStepIndex < surveySteps.size -1){
 
                             onAction(SurveyAction.OnUpdateCurrentIndex(state.currentStepIndex +1))
-//                            currentStep +=1
-//                            onAction(SurveyAction.OnChangeCurrentStep)
                         } else {
-                            // Submit action
                             onAction(SurveyAction.SubmitSurvey)
                         }
                     }

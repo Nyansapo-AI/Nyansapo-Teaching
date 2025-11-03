@@ -19,6 +19,7 @@ import com.nyansapoai.teaching.presentation.survey.takeSurvey.County
 fun IdentificationAndContentContent(
     modifier: Modifier = Modifier,
     name: String,
+    nameError: String?,
     county: String,
     subCounty: String,
     ward: String,
@@ -27,7 +28,7 @@ fun IdentificationAndContentContent(
     onShowCountyDropdownChanged: (Boolean) -> Unit,
     showSubCountyDropdown: Boolean,
     onShowSubCountyDropdownChanged: (Boolean) -> Unit,
-    consentGiven: Boolean,
+    consentGiven: Boolean?,
     onNameChanged: (String) -> Unit,
     onCountyChanged: (String) -> Unit,
     onSubCountyChanged: (String) -> Unit,
@@ -41,12 +42,12 @@ fun IdentificationAndContentContent(
 
     Column(
         modifier = modifier
-            .imePadding()
     ) {
         AppTextField(
             required = true,
             label = "Full Name",
             value = name,
+            error = nameError,
             onValueChanged = onNameChanged,
             placeholder = "Enter your full name",
         )
@@ -73,7 +74,8 @@ fun IdentificationAndContentContent(
 
         AnimatedVisibility(
             visible = selectedCounty != null
-        ) {
+        )
+        {
             Column {
                 AppDropDownMenu(
                     required = true,
@@ -103,10 +105,10 @@ fun IdentificationAndContentContent(
 
         }
 
-        AppCheckBox(
+        YesNoOption(
             text = "I consent to participate in this survey",
-            checked = consentGiven,
-            onCheckedChange = onConsentChanged
+            isYes = consentGiven,
+            onChange = onConsentChanged
         )
     }
 }

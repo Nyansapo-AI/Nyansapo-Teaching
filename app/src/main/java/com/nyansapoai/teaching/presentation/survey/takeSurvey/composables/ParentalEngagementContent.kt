@@ -14,7 +14,7 @@ import com.nyansapoai.teaching.presentation.common.components.AppTextField
 @Composable
 fun ParentalEngagementContent(
     modifier: Modifier = Modifier,
-    isSchoolAgePresent: Boolean,
+    isSchoolAgePresent: Boolean?,
     onSchoolAgeChanged: (Boolean) -> Unit,
     showWhoHelpsDropdown: Boolean,
     onShowWhoHelpsDropdownChanged: (Boolean) -> Unit,
@@ -26,9 +26,9 @@ fun ParentalEngagementContent(
     onShowDiscussDropdownChanged: (Boolean) -> Unit,
     discussFrequency: String,
     onDiscussFrequencyChanged: (String) -> Unit,
-    attendMeetings: Boolean,
+    attendMeetings: Boolean?,
     onAttendMeetingsChanged: (Boolean) -> Unit,
-    monitorAttendance: Boolean,
+    monitorAttendance: Boolean?,
     onMonitorAttendanceChanged: (Boolean) -> Unit
 ) {
     val whoHelpsOptions = remember { listOf("Mother", "Father", "Both", "Other") }
@@ -38,15 +38,15 @@ fun ParentalEngagementContent(
         modifier = modifier
             .imePadding()
     ) {
-        AppCheckBox(
+        YesNoOption(
             text = "Is there any school-age child (6–17 years) in this household?",
-            checked = isSchoolAgePresent,
-            onCheckedChange = {onSchoolAgeChanged(it)}
+            isYes = isSchoolAgePresent,
+            onChange = {onSchoolAgeChanged(it)}
 
         )
 
         // If No -> skip rest (AnimatedVisibility hides them)
-        AnimatedVisibility(isSchoolAgePresent) {
+        AnimatedVisibility(isSchoolAgePresent == true) {
             Column {
                 // D02
                 AppDropDownMenu(
@@ -65,7 +65,6 @@ fun ParentalEngagementContent(
                     }
                 }
 
-                // show specify field when Other selected
                 AnimatedVisibility(visible = whoHelps == "Other") {
                     AppTextField(
                         label = "Specify Other",
@@ -93,17 +92,17 @@ fun ParentalEngagementContent(
                 }
 
                 // D04
-                AppCheckBox(
+                YesNoOption (
                     text = "Do you attend school meetings or parent–teacher forums?",
-                    checked = attendMeetings,
-                    onCheckedChange = onAttendMeetingsChanged
+                    isYes = attendMeetings,
+                    onChange = onAttendMeetingsChanged
                 )
 
                 // D05
-                AppCheckBox(
+                YesNoOption(
                     text = "Do you monitor your child’s school attendance?",
-                    checked = monitorAttendance,
-                    onCheckedChange = onMonitorAttendanceChanged
+                    isYes = monitorAttendance,
+                    onChange = onMonitorAttendanceChanged
                 )
             }
         }

@@ -14,11 +14,11 @@ import com.nyansapoai.teaching.presentation.common.components.AppTextField
 @Composable
 fun ChildLearningEnvironmentContent(
     modifier: Modifier = Modifier,
-    isQuietPlaceAvailable: Boolean,
+    isQuietPlaceAvailable: Boolean?,
     onQuietPlaceChanged: (Boolean) -> Unit,
-    hasLearningMaterials: Boolean,
+    hasLearningMaterials: Boolean?,
     onHasLearningMaterialsChanged: (Boolean) -> Unit,
-    hasMissedSchool: Boolean,
+    hasMissedSchool: Boolean?,
     onHasMissedSchoolChanged: (Boolean) -> Unit,
     showMissedReasonDropdown: Boolean,
     onShowMissedReasonDropdownChanged: (Boolean) -> Unit,
@@ -35,27 +35,27 @@ fun ChildLearningEnvironmentContent(
         modifier = modifier
             .imePadding()
     ) {
-        AppCheckBox(
+        YesNoOption(
             text = "Does the child have a quiet place to study?",
-            checked = isQuietPlaceAvailable,
-            onCheckedChange = { onQuietPlaceChanged(it) }
+            isYes = isQuietPlaceAvailable,
+            onChange = { onQuietPlaceChanged(it) }
         )
 
 
-        AppCheckBox(
+        YesNoOption(
             text = "Does the household have books or learning materials?",
-            checked = hasLearningMaterials,
-            onCheckedChange = { onHasLearningMaterialsChanged(it) }
+            isYes = hasLearningMaterials,
+            onChange = { onHasLearningMaterialsChanged(it) }
         )
 
 
-        AppCheckBox(
+        YesNoOption(
             text = "Has the child missed school in the last month?",
-            checked = hasMissedSchool,
-            onCheckedChange = { onHasMissedSchoolChanged(it) }
+            isYes = hasMissedSchool,
+            onChange = { onHasMissedSchoolChanged(it) }
         )
 
-        AnimatedVisibility(visible = hasMissedSchool) {
+        AnimatedVisibility(visible = hasMissedSchool == true) {
             Column {
                 AppDropDownMenu(
                     expanded = showMissedReasonDropdown,

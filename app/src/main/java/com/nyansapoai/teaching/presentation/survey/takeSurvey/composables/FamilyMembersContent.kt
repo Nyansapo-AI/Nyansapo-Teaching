@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -25,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.nyansapoai.teaching.R
 import com.nyansapoai.teaching.domain.models.students.NyansapoStudent
@@ -45,10 +47,12 @@ fun FamilyMembersContent(
     showParentOrGuardianSheet: Boolean = false,
     onShowParentOrGuardianSheetChange: (Boolean) -> Unit = {},
     parentName: String = "",
+    parentNameError: String?,
     onParentNameChanged: (String) -> Unit = {},
     parentAge: String = "",
+    parentAgeError: String?,
     onParentAgeChanged: (String) -> Unit = {},
-    hasAttendedSchool: Boolean = false,
+    hasAttendedSchool: Boolean? = null,
     onHasAttendedSchoolChanged: (Boolean) -> Unit = {},
     showHigherEducationDropdown: Boolean = false,
     onShowHighEducationDropdownChange: (Boolean) -> Unit = {},
@@ -74,6 +78,7 @@ fun FamilyMembersContent(
     childGender: String = "",
     onChildGenderChanged: (String) -> Unit = {},
     childAge: String,
+    childAgeError: String?,
     onChildAgeChanged: (String) -> Unit,
     showChildGenderDropdown: Boolean = false,
     onShowChildGenderDropdownChanged: (Boolean) -> Unit = {},
@@ -90,11 +95,12 @@ fun FamilyMembersContent(
     onRemoveChild: (Child) -> Unit = {},
     children: MutableList<Child>,
     availableLearners: List<NyansapoStudent> = emptyList(),
+    error: String?
 
     ) {
     val types = remember { listOf("Father", "Mother", "Guardian") }
 
-    val genderOptions = remember { listOf("Female", "Male") }
+    val genderOptions = remember { listOf("Female","Intersex", "Male") }
     val livesWithOptions = remember { listOf("Mother", "Father", "Both Mother and Father", "Guardian") }
 
     val educationOptions = remember {
@@ -133,9 +139,11 @@ fun FamilyMembersContent(
                 item {
                     Text(
                         text = "Add Parent/Guardian",
-                        style = MaterialTheme.typography.titleMedium,
+                        style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.SemiBold,
+                        textAlign = TextAlign.Center,
                         modifier = Modifier
+                            .fillMaxWidth()
                     )
                 }
 
@@ -145,6 +153,7 @@ fun FamilyMembersContent(
                         required = true,
                         label = "Name",
                         value = parentName,
+                        error = parentNameError,
                         onValueChanged = onParentNameChanged,
                         placeholder = "Enter name"
                     )
@@ -156,9 +165,10 @@ fun FamilyMembersContent(
                         required = true,
                         label = "Age",
                         value = parentAge,
+                        error = parentAgeError,
                         onValueChanged = onParentAgeChanged,
                         keyboardType = KeyboardType.Number,
-                        placeholder = "Enter father's age"
+                        placeholder = "Enter age"
                     )
                 }
 
@@ -167,7 +177,7 @@ fun FamilyMembersContent(
                     AppDropDownMenu(
                         required = true,
                         expanded = showGuardianGenderDropdown,
-                        label = "What is the gender of the guardian?",
+                        label = "What is the gender?",
                         placeholder = "Select gender",
                         onClick = { onShowGuardianGenderDropdownChanged(!showGuardianGenderDropdown) },
                         value = parentGender
@@ -204,17 +214,17 @@ fun FamilyMembersContent(
 
 
                 item {
-                    AppCheckBox(
-                        text = "Has ever attended school",
-                        checked = hasAttendedSchool ,
-                        onCheckedChange = {onHasAttendedSchoolChanged(it)}
+                    YesNoOption(
+                        text = "Has ever attended school?",
+                        isYes = hasAttendedSchool ,
+                        onChange = {onHasAttendedSchoolChanged(it)}
                     )
                 }
 
 
                 item {
                     AnimatedVisibility(
-                        visible = hasAttendedSchool
+                        visible = hasAttendedSchool == true
                     ) {
                         AppDropDownMenu(
                             required = true,
@@ -238,7 +248,7 @@ fun FamilyMembersContent(
 
                 item {
                     AppButton(
-                        enabled = parentName.isNotBlank() && parentAge.isNotBlank() && parentGender.isNotBlank() && type.isNotBlank() && (!hasAttendedSchool || highestEducationLevel.isNotBlank()),
+                        enabled = parentName.isNotBlank() && parentAge.isNotBlank() && parentGender.isNotBlank() && type.isNotBlank() && (hasAttendedSchool == false || highestEducationLevel.isNotBlank()) && parentNameError == null && parentAgeError == null,
                         onClick = {
                             onAddParent.invoke()
                         }
@@ -275,9 +285,11 @@ fun FamilyMembersContent(
                 item{
                     Text(
                         text = "Add Child",
-                        style = MaterialTheme.typography.titleMedium,
+                        style = MaterialTheme.typography.titleLarge,
+                        textAlign = TextAlign.Center,
                         fontWeight = FontWeight.SemiBold,
                         modifier = Modifier
+                            .fillMaxWidth()
                     )
                 }
 
@@ -325,9 +337,10 @@ fun FamilyMembersContent(
                         required = true,
                         label = "Age of the child",
                         value = childAge,
+                        error = childAgeError,
                         onValueChanged = onChildAgeChanged,
                         keyboardType = KeyboardType.Number,
-                        placeholder = "Enter child's age"
+                        placeholder = "The child should be between 6 and 17"
                     )
                 }
 
@@ -382,7 +395,7 @@ fun FamilyMembersContent(
 
                 item {
                     AppButton(
-                        enabled =childLastName.isNotBlank() && childFirstName.isNotBlank() && childGender.isNotBlank() && livesWith.isNotBlank() && childAge.isNotBlank() && linkedLearnerId.isNotBlank(),
+                        enabled =childLastName.isNotBlank() && childFirstName.isNotBlank() && childGender.isNotBlank() && livesWith.isNotBlank() && childAge.isNotBlank() && linkedLearnerId.isNotBlank() && childAgeError == null ,
                         onClick = {
                             onAddChild.invoke()
                         }
@@ -406,7 +419,8 @@ fun FamilyMembersContent(
     ) {
         Column(
             verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
+        )
+        {
             Text(
                 text = "Parent/Guardian",
                 style = MaterialTheme.typography.titleMedium,
@@ -452,6 +466,7 @@ fun FamilyMembersContent(
                             Text(
                                 text = "${it.type}: ${it.name}",
                                 style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onPrimary,
                                 fontWeight = FontWeight.SemiBold
                             )
 
@@ -475,7 +490,8 @@ fun FamilyMembersContent(
 
         Column(
             verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
+        )
+        {
             Text(
                 text = "Children",
                 style = MaterialTheme.typography.titleMedium,
@@ -518,6 +534,7 @@ fun FamilyMembersContent(
                             Text(
                                 text = it.firstName,
                                 style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onPrimary,
                                 fontWeight = FontWeight.SemiBold,
                             )
 
@@ -538,5 +555,16 @@ fun FamilyMembersContent(
 
 
         }
+
+        AnimatedVisibility(
+            visible = error != null
+        ){
+            Text(
+                text = error ?: "",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.error
+            )
+        }
+
     }
 }

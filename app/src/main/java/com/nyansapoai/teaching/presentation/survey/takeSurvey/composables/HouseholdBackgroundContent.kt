@@ -17,10 +17,12 @@ import com.nyansapoai.teaching.presentation.common.components.AppTextField
 fun HouseholdBackgroundContent(
     modifier: Modifier = Modifier,
     respondentName: String,
+    respondentNameError: String?,
     onRespondentNameChanged: (String) -> Unit,
-    isRespondentHead: Boolean,
+    isRespondentHead: Boolean?,
     onRespondentHeadChanged: (Boolean) -> Unit,
     householdHeadName: String,
+    householdHeadNameError: String?,
     onHouseholdHeadNameChanged: (String) -> Unit,
     showRelationshipDropdown: Boolean,
     onRelationshipDropdownChanged: (Boolean) -> Unit,
@@ -30,6 +32,7 @@ fun HouseholdBackgroundContent(
     mobileNumberError: String?,
     onHouseholdHeadMobileNumberChanged: (String) -> Unit,
     respondentAge: String,
+    respondentAgeError: String?,
     onRespondentAgeChanged: (String) -> Unit,
     showMainLanguageDropdown: Boolean,
     onMainLanguageDropdownChanged: (Boolean) -> Unit,
@@ -45,7 +48,7 @@ fun HouseholdBackgroundContent(
     onHouseholdAssetsChanged: (String) -> Unit = {},
     showAssetsDropdown: Boolean,
     onShowAssetsDropdownChanged: (Boolean) -> Unit,
-    hasElectricity: Boolean,
+    hasElectricity: Boolean?,
     onHasElectricityChanged: (Boolean) -> Unit
 ) {
 
@@ -83,38 +86,48 @@ fun HouseholdBackgroundContent(
         )
     }
 
+    val languageSpoken = remember {
+        listOf(
+            "Kiswahili",
+            "Mother Tongue",
+            "Other"
+        )
+    }
+
 
     Column(
         modifier = modifier
             .imePadding()
     ) {
 
-        AppCheckBox(
-            text = "Is the respondent the household head",
-            checked = isRespondentHead,
-            onCheckedChange = onRespondentHeadChanged
+        YesNoOption(
+            text = "Is the respondent the household head?",
+            isYes = isRespondentHead,
+            onChange = onRespondentHeadChanged
         )
 
         AppTextField(
             required = true,
             label = "Respondent Name",
             value = respondentName,
+            error = respondentNameError,
             onValueChanged = onRespondentNameChanged,
-            placeholder = "Enter the county you live in",
+            placeholder = "Enter the respondent name",
         )
 
         AppTextField(
             required = true,
             label = "Respondent Age",
+            error = respondentAgeError,
             value = respondentAge,
             onValueChanged = {onRespondentAgeChanged(it)},
             keyboardType = KeyboardType.Number,
-            placeholder = "Enter the household head name",
+            placeholder = "Enter the respondent age",
         )
 
 
         AnimatedVisibility(
-            visible = !isRespondentHead
+            visible = isRespondentHead == false
         ) {
 
             Column {
@@ -122,6 +135,7 @@ fun HouseholdBackgroundContent(
                     required = true,
                     label = "Household Head Name",
                     value = householdHeadName,
+                    error = householdHeadNameError,
                     onValueChanged = onHouseholdHeadNameChanged,
                     placeholder = "Enter the household head name",
                 )
@@ -157,7 +171,7 @@ fun HouseholdBackgroundContent(
             value = householdHeadMobileNumber,
             onValueChanged = {onHouseholdHeadMobileNumberChanged(it)},
             keyboardType = KeyboardType.Phone,
-            placeholder = "Enter the household head name",
+            placeholder = "Enter the household head mobile number",
             error = mobileNumberError
         )
 
@@ -170,21 +184,16 @@ fun HouseholdBackgroundContent(
             value = mainLanguageSpokenAtHome
         )
         {
-            AppDropDownItem(
-                item = "Kiswahili",
-                isSelected = mainLanguageSpokenAtHome == "Kiswahili",
-                onClick = {onMainLanguageSpokenAtHomeChanged("Kiswahili")}
-            )
-            AppDropDownItem(
-                item = "Mother Tongue",
-                isSelected = mainLanguageSpokenAtHome == "Mother Tongue",
-                onClick = {onMainLanguageSpokenAtHomeChanged("Mother Tongue")}
-            )
-            AppDropDownItem(
-                item = "Other",
-                isSelected = mainLanguageSpokenAtHome == "Other",
-                onClick = {onMainLanguageSpokenAtHomeChanged("Other")}
-            )
+
+            Column {
+                languageSpoken.forEach { language ->
+                    AppDropDownItem(
+                        item = language,
+                        isSelected = mainLanguageSpokenAtHome == language,
+                        onClick = {onMainLanguageSpokenAtHomeChanged(language)}
+                    )
+                }
+            }
 
         }
 
@@ -217,10 +226,10 @@ fun HouseholdBackgroundContent(
             }
         }
 
-        AppCheckBox(
+        YesNoOption(
             text = "Does the household have electricity?",
-            checked = hasElectricity,
-            onCheckedChange = {onHasElectricityChanged(it)}
+            isYes = hasElectricity,
+            onChange = {onHasElectricityChanged(it)}
         )
 
         AppDropDownMenu(

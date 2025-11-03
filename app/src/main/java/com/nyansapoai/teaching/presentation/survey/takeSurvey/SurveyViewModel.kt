@@ -40,6 +40,7 @@ class SurveyViewModel(
         )
 
     private val _state = MutableStateFlow(SurveyState())
+//    private val _state = MutableStateFlow(SurveyState.demoSurveyState)
     val state = combine(
         _state,
         localDataSource.getSavedCurrentSchoolInfo(),
@@ -75,7 +76,12 @@ class SurveyViewModel(
             }
 
             is SurveyAction.SetInterviewerName -> {
-                _state.update { it.copy(interviewerName = action.name) }
+                _state.update {
+                    it.copy(
+                        interviewerName = action.name,
+                        interviewNameError = if(Utils.hasTwoOrMoreNames(action.name) ) null else "Please enter full name"
+                    )
+                }
             }
 
             is SurveyAction.SetSubCounty -> {
@@ -97,7 +103,10 @@ class SurveyViewModel(
 
             is SurveyAction.SetHouseholdHeadName -> {
                 _state.update {
-                    it.copy(householdHeadName = action.name)
+                    it.copy(
+                        householdHeadName = action.name,
+                        householdHeadNameError = if (Utils.hasTwoOrMoreNames(action.name)) null else "Please enter full name"
+                    )
                 }
             }
 
@@ -121,14 +130,20 @@ class SurveyViewModel(
             }
 
             is SurveyAction.SetRespondentAge -> {
-                _state.update { it.copy(respondentAge = action.age) }
+                _state.update {
+                    it.copy(
+                        respondentAge = action.age,
+                        respondentAgeError = if (Utils.isValidAdultAge(action.age)) null else "Respondent must be at least 18 years old and a valid age"
+                    )
+                }
             }
 
             is SurveyAction.SetRespondentName -> {
                 _state.update {
                     it.copy(
                         respondentName = action.name,
-                        householdHeadName = if (it.isRespondentHeadOfHousehold) action.name else it.householdHeadName
+                        respondentNameError = if (Utils.hasTwoOrMoreNames(action.name)) null else "Please enter full name",
+                        householdHeadName = if (it.isRespondentHeadOfHousehold == true) action.name else it.householdHeadName
                     )
                 }
             }
@@ -259,7 +274,12 @@ class SurveyViewModel(
             }
 
             is SurveyAction.SetParentAge -> {
-                _state.update { it.copy(parentAge = action.age) }
+                _state.update {
+                    it.copy(
+                        parentAge = action.age,
+                        parentAgeError = if (Utils.isValidAdultAge(action.age)) null else "Parent must be at least 18 years old"
+                    )
+                }
             }
 
             is SurveyAction.SetParentGender -> {
@@ -267,7 +287,12 @@ class SurveyViewModel(
             }
 
             is SurveyAction.SetParentName -> {
-                _state.update { it.copy(parentName = action.name) }
+                _state.update {
+                    it.copy(
+                        parentName = action.name,
+                        parentNameError = if (Utils.hasTwoOrMoreNames(action.name)) null else "Please enter full name"
+                    )
+                }
             }
 
             is SurveyAction.SetShowAddChildSheet -> {
@@ -317,7 +342,8 @@ class SurveyViewModel(
                         parentName = "",
                         parentAge = "",
                         hasAttendedSchool = false,
-                        highestEducationLevel = ""
+                        highestEducationLevel = "",
+                        familyMemberError = validateChildrenHaveParents(children = currentState.children, parents = currentState.parents)
                     )
                 }
             }
@@ -327,6 +353,7 @@ class SurveyViewModel(
                     currentState.copy(
                         parents = currentState.parents.apply { removeIf { it == action.parent } },
                         showParentOrGuardianSheet = true,
+                        familyMemberError = validateChildrenHaveParents(children = currentState.children, parents = currentState.parents)
                     )
                 }
             }
@@ -356,7 +383,8 @@ class SurveyViewModel(
                         childGender = "",
                         childAge = "",
                         livesWith = "",
-                        linkedLearnerId = ""
+                        linkedLearnerId = "",
+                        familyMemberError = validateChildrenHaveParents(children = updatedChildren, parents = currentState.parents)
                     )
                 }
             }
@@ -371,14 +399,18 @@ class SurveyViewModel(
                     currentState.copy(
                         children = updatedChildren,
                         isLinkedIdList = updatedIsLinkedIdList,
-                        showAddChildSheet = true
+                        showAddChildSheet = true,
+                        familyMemberError = validateChildrenHaveParents(children = updatedChildren, parents = currentState.parents)
                     )
                 }
             }
 
             is SurveyAction.SetChildAge -> {
                 _state.update {
-                    it.copy(childAge = action.age)
+                    it.copy(
+                        childAge = action.age,
+                        childAgeError = if (Utils.isAgeBetween(action.age)) null else "Child age must be a valid age"
+                    )
                 }
             }
 
@@ -546,10 +578,6 @@ class SurveyViewModel(
         }
     }
 
-    private fun getLinkedLearners(){
-        TODO()
-    }
-
 
     private fun insertPendingSurvey(householdData: CreateHouseHoldInfo) {
         viewModelScope.launch {
@@ -616,5 +644,34 @@ class SurveyViewModel(
                 children = mutableListOf()
             )
         }
+    }
+
+    private fun validateChildrenHaveParents(children: List<Child>, parents: List<Parent>): String? {
+        if (children.isEmpty()) return null
+
+        fun hasParent(type: String) =
+            parents.any { it.type.equals(type, ignoreCase = true) || it.type.contains(type, ignoreCase = true) }
+
+        for (child in children) {
+            val livesWith = child.livesWith.trim()
+            if (livesWith.isEmpty()) continue
+
+            when {
+                livesWith.equals("Mother", ignoreCase = true) -> {
+                    if (!hasParent("Mother")) return "Child ${child.firstName} ${child.lastName} indicates living with Mother but no Mother added in parents."
+                }
+                livesWith.equals("Father", ignoreCase = true) -> {
+                    if (!hasParent("Father")) return "Child ${child.firstName} ${child.lastName} indicates living with Father but no Father added in parents."
+                }
+                livesWith.contains("Both", ignoreCase = true) && livesWith.contains("Mother", ignoreCase = true) && livesWith.contains("Father", ignoreCase = true) -> {
+                    if (!hasParent("Mother") || !hasParent("Father")) return "Child ${child.firstName} ${child.lastName} indicates living with both parents but one or both parents are missing."
+                }
+                livesWith.equals("Guardian", ignoreCase = true) -> {
+                    if (!hasParent("Guardian") && !hasParent("Guardian")) return "Child ${child.firstName} ${child.lastName} indicates living with a Guardian but no Guardian added in parents."
+                }
+            }
+        }
+
+        return null
     }
 }

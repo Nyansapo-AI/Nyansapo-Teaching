@@ -138,6 +138,44 @@ object Utils {
     }
 
     /**
+     * Checks if the input string contains two or more names (words)
+     *
+     * @param input The input string to check
+     * @return True if there are two or more names, false otherwise
+     */
+    fun hasTwoOrMoreNames(input: String): Boolean {
+        val parts = input.trim()
+            .split(Regex("\\s+"))
+            .filter { it.isNotEmpty() }
+        return parts.size >= 2
+    }
+
+    /**
+     * Validates if the input string represents a valid adult age (18 or older)
+     *
+     * @param ageInput The input string representing age
+     * @return True if the age is 18 or older, false otherwise
+     */
+    fun isValidAdultAge(ageInput: String): Boolean {
+        val age = ageInput.trim().toIntOrNull() ?: return false
+        if (age !in 0..150) return false
+        return age >= 18
+    }
+
+    /**
+     * Validates if the input string represents a valid age between the specified range
+     *
+     * @param ageInput The input string representing age
+
+     */
+    fun isAgeBetween(ageInput: String, min: Int = 6, max: Int = 17): Boolean {
+        val age = ageInput.trim().toIntOrNull() ?: return false
+        if (age !in 0..150) return false
+        if (min > max) return false
+        return age in min..max
+    }
+
+    /**
      * Converts an ImageBitmap to a ByteArray
      */
     fun ImageBitmap.toByteArray(

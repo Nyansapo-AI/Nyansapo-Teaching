@@ -15,18 +15,22 @@ data class SurveyState(
 
 
     val interviewerName: String = "",
+    val interviewNameError: String? = null,
     val countyList: List<County> = County.entries,
     val showCountyDropdown: Boolean = false,
     val showSubCountyDropdown: Boolean = false,
     val county: String = "",
     val subCounty: String = "",
     val ward: String = "",
-    val consentGiven: Boolean = false,
+    val consentGiven: Boolean? = null,
 
     val respondentName: String = interviewerName,
-    val isRespondentHeadOfHousehold: Boolean = false,
+    val respondentNameError: String? = null,
+    val isRespondentHeadOfHousehold: Boolean? = null,
     val respondentAge: String = "",
+    val respondentAgeError: String? = null,
     val householdHeadName: String = "",
+    val householdHeadNameError: String? = null,
     val showRelationshipToHeadDropdown: Boolean = false,
     val relationshipToHead: String = "",
     val householdHeadMobileNumber: String = "",
@@ -38,21 +42,21 @@ data class SurveyState(
     val showIncomeSourceDropdown: Boolean = false,
     val householdAssets: MutableList<String> = mutableListOf(),
     val showAssetsDropdown: Boolean = false,
-    val hasElectricity: Boolean = false,
+    val hasElectricity: Boolean? = null,
 
-    val isSchoolAgeChildrenPresent: Boolean = false,
+    val isSchoolAgeChildrenPresent: Boolean? = null,
     val showWhoHelpsDropdown: Boolean = false,
     val whoHelps: String = "",
     val otherWhoHelps: String = "",
     val showOtherWhoHelpsDropdown: Boolean = false,
     val showDiscussWithTeachersDropdown: Boolean = false,
     val discussFrequency: String = "",
-    val doAttendMeetings: Boolean = false,
-    val doMonitorAttendance: Boolean = false,
+    val doAttendMeetings: Boolean? = null,
+    val doMonitorAttendance: Boolean? = null,
 
-    val isQuietPlaceAvailable: Boolean = false,
-    val hasLearningMaterials: Boolean = false,
-    val hasMissedSchool: Boolean = false,
+    val isQuietPlaceAvailable: Boolean? = null,
+    val hasLearningMaterials: Boolean? = null,
+    val hasMissedSchool: Boolean? = null,
     val missedReason: String = "",
     val showMissedReasonDropdown: Boolean = false,
     val otherMissedReason: String = "",
@@ -60,7 +64,9 @@ data class SurveyState(
 
     val showParentOrGuardianSheet: Boolean = false,
     val parentName: String = "",
+    val parentNameError: String? = null,
     val parentAge: String = "",
+    val parentAgeError: String? = null,
     val hasAttendedSchool: Boolean = false,
     val showHigherEducationDropdown: Boolean = false,
     val highestEducationLevel: String = "",
@@ -75,6 +81,7 @@ data class SurveyState(
     val childLastName: String = "",
     val childGender: String = "",
     val childAge: String = "",
+    val childAgeError: String? = null,
     val showChildGenderDropdown: Boolean = false,
     val livesWith: String = "",
     val linkedLearnerId: String = "",
@@ -83,6 +90,8 @@ data class SurveyState(
     val children: MutableList<Child> = mutableListOf(),
     val isLinkedIdList: MutableList<String> = mutableListOf(),
     val availableLearners: List<NyansapoStudent> = emptyList(),
+    val familyMemberError: String? = null,
+
 
     val currentStepIndex: Int = 0,
     val currentStep: HouseSurveyStep = HouseSurveyStep.CONSENT,
@@ -100,24 +109,31 @@ data class SurveyState(
     fun canSubmit(): Boolean {
         when(currentStep){
             HouseSurveyStep.CONSENT -> {
-                return consentGiven &&
+                return consentGiven == true &&
                         county.isNotBlank() &&
                         subCounty.isNotBlank() &&
                         ward.isNotBlank() &&
-                        interviewerName.isNotBlank()
+                        interviewerName.isNotBlank() &&
+                        interviewNameError == null
             }
             HouseSurveyStep.HOUSEHOLD_BACKGROUND -> {
-                return if (isRespondentHeadOfHousehold){
+                return if (isRespondentHeadOfHousehold == true){
                     respondentName.isNotBlank() &&
+                            respondentNameError == null &&
                             respondentAge.isNotBlank() &&
+                            respondentAgeError == null &&
                             mobileNumberError == null &&
                             mainLanguageSpokenAtHome.isNotBlank() &&
                             totalHouseholdMembers.isNotBlank() &&
                             houseHoldIncomeSource.isNotBlank()
                 } else {
                     respondentName.isNotBlank() &&
+                            isRespondentHeadOfHousehold != null &&
+                            respondentNameError == null &&
                             respondentAge.isNotBlank() &&
+                            respondentAgeError == null &&
                             householdHeadName.isNotBlank() &&
+                            householdHeadNameError == null &&
                             relationshipToHead.isNotBlank() &&
                             mobileNumberError == null &&
                             mainLanguageSpokenAtHome.isNotBlank() &&
@@ -127,18 +143,19 @@ data class SurveyState(
 
             }
             HouseSurveyStep.FAMILY_MEMBERS -> {
-                return parents.isNotEmpty() || children.isNotEmpty()
+                return parents.isNotEmpty() || children.isNotEmpty() &&
+                        familyMemberError != null
             }
             HouseSurveyStep.PARENTAL_ENGAGEMENT -> {
-                return if (isSchoolAgeChildrenPresent) {
+                return if (isSchoolAgeChildrenPresent == true) {
                     whoHelps.isNotBlank() && discussFrequency.isNotBlank()
                 } else {
-                    true
+                    isSchoolAgeChildrenPresent != null
                 }
             }
 
             HouseSurveyStep.CHILD_LEARNING_ENVIRONMENT -> {
-                return true
+                return isQuietPlaceAvailable != null && hasLearningMaterials != null && hasMissedSchool != null
             }
         }
     }
@@ -151,9 +168,9 @@ data class SurveyState(
                 county = county,
                 subCounty = subCounty,
                 ward = ward,
-                consentGiven = consentGiven,
+                consentGiven = consentGiven ?: false,
                 respondentName = respondentName,
-                isHouseholdHead = isRespondentHeadOfHousehold,
+                isHouseholdHead = isRespondentHeadOfHousehold ?: false,
                 householdHeadName = householdHeadName,
                 relationshipToHead = relationshipToHead,
                 householdHeadPhone = householdHeadMobileNumber,
@@ -165,7 +182,7 @@ data class SurveyState(
                 incomeSource = houseHoldIncomeSource,
                 hasElectricity = hasElectricity,
                 householdAssets = householdAssets.toList(),
-                parentalEngagement = if (isSchoolAgeChildrenPresent){
+                parentalEngagement = if (isSchoolAgeChildrenPresent == true){
                     ParentalEngagement(
                         hasSchoolAgeChild = true,
                         homeworkHelper = if (whoHelps == "Other") otherWhoHelps else whoHelps,
@@ -175,9 +192,9 @@ data class SurveyState(
                     )
                 } else null,
                 childLearningEnvironment = ChildLearningEnvironment(
-                    hasQuietPlaceToStudy = isQuietPlaceAvailable,
-                    hasBooksOrMaterials = hasLearningMaterials,
-                    missedSchoolLastMonth = hasMissedSchool,
+                    hasQuietPlaceToStudy = isQuietPlaceAvailable ?: false,
+                    hasBooksOrMaterials = hasLearningMaterials ?: false,
+                    missedSchoolLastMonth = hasMissedSchool ?: false,
                     reasonForMissingSchool = if (missedReason == "Other") otherMissedReason else missedReason
                 )
             )
