@@ -49,4 +49,6 @@ data class NumeracyAssessmentState(
     ),
 
     val showEndAssessmentDialog: Boolean = false,
+    val showPreMatureAssessmentEndDialog: Boolean = false,
+
 )
