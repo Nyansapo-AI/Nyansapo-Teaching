@@ -84,6 +84,9 @@ fun FamilyMembersContent(
     onShowChildGenderDropdownChanged: (Boolean) -> Unit = {},
     livesWith: String = "",
     linkedLearnerId: String,
+    childGrade: String,
+    childGradeError: String?,
+    onChildGradeChanged: (String) -> Unit,
     linkedIdList: MutableList<String> = mutableListOf(),
     onLinkedLearnerIdChange: (String) -> Unit,
     showAvailableLearnersDropdown: Boolean,
@@ -340,7 +343,18 @@ fun FamilyMembersContent(
                         error = childAgeError,
                         onValueChanged = onChildAgeChanged,
                         keyboardType = KeyboardType.Number,
-                        placeholder = "The child should be between 6 and 17"
+                        placeholder = "The child age should be between 6 and 17"
+                    )
+                }
+                item {
+                    AppTextField(
+                        required = true,
+                        label = "Grade of the child",
+                        value = childGrade,
+                        error = childGradeError,
+                        onValueChanged = onChildGradeChanged,
+                        keyboardType = KeyboardType.Number,
+                        placeholder = "Enter child's grade(should be between 1 and 9)"
                     )
                 }
 
@@ -395,7 +409,7 @@ fun FamilyMembersContent(
 
                 item {
                     AppButton(
-                        enabled =childLastName.isNotBlank() && childFirstName.isNotBlank() && childGender.isNotBlank() && livesWith.isNotBlank() && childAge.isNotBlank() && linkedLearnerId.isNotBlank() && childAgeError == null ,
+                        enabled =childLastName.isNotBlank() && childFirstName.isNotBlank() && childGender.isNotBlank() && livesWith.isNotBlank() && childAge.isNotBlank() && linkedLearnerId.isNotBlank() && childAgeError == null && childGradeError == null && childGrade.isNotBlank(),
                         onClick = {
                             onAddChild.invoke()
                         }

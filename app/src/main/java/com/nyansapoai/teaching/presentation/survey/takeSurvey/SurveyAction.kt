@@ -63,6 +63,8 @@ sealed interface SurveyAction {
     data class SetChildAge(val age: String) : SurveyAction
     data class SetShowChildGenderDropdown(val show: Boolean) : SurveyAction
     data class SetLivesWith(val livesWith: String) : SurveyAction
+
+    data class SetChildGrade(val grade: String): SurveyAction
     data class SetShowLivesWithDropdown(val show: Boolean) : SurveyAction
     data class SetShowAvailableLearnerDropdown(val show: Boolean) : SurveyAction
     data class SetLinkedLearnerId(val learnerId: String) : SurveyAction

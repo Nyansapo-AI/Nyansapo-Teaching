@@ -364,6 +364,7 @@ class SurveyViewModel(
                         firstName = currentState.childFirstName.trim(),
                         lastName = currentState.childLastName.trim(),
                         gender = currentState.childGender.trim(),
+                        grade = currentState.childGrade.trim(),
                         age = currentState.childAge.trim(),
                         livesWith = currentState.livesWith.trim(),
                         linkedLearnerId = currentState.linkedLearnerId.trim()
@@ -383,6 +384,7 @@ class SurveyViewModel(
                         childGender = "",
                         childAge = "",
                         livesWith = "",
+                        childGrade = "",
                         linkedLearnerId = "",
                         familyMemberError = validateChildrenHaveParents(children = updatedChildren, parents = currentState.parents)
                     )
@@ -410,6 +412,15 @@ class SurveyViewModel(
                     it.copy(
                         childAge = action.age,
                         childAgeError = if (Utils.isAgeBetween(action.age)) null else "Child age must be a valid age"
+                    )
+                }
+            }
+
+            is SurveyAction.SetChildGrade -> {
+                _state.update {
+                    it.copy(
+                        childGrade = action.grade,
+                        childGradeError =if (Utils.isGradeValid(action.grade)) null else "Child grade must be a valid grade"
                     )
                 }
             }
@@ -461,7 +472,6 @@ class SurveyViewModel(
                     schoolId = action.localSchoolInfo.schoolUId,
                 )
             }
-
 
         }
 

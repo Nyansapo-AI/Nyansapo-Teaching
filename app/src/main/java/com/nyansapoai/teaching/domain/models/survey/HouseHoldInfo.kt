@@ -87,6 +87,7 @@ data class Child(
     val firstName: String = "",
     val lastName: String = "",
     val gender: String = "",
+    val grade: String = "",
     val age: String = "",
     val livesWith: String = "",
     val linkedLearnerId: String = ""

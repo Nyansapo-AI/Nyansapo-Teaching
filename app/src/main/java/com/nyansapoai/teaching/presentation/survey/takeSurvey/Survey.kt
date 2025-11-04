@@ -288,6 +288,9 @@ fun SurveyScreen(
                         )
                     },
                     livesWith = state.livesWith,
+                    childGrade = state.childGrade,
+                    childGradeError = state.childGradeError,
+                    onChildGradeChanged = { onAction(SurveyAction.SetChildGrade(it)) },
                     onLivesWithChanged = { onAction(SurveyAction.SetLivesWith(it)) },
                     showLivesWithDropdown = state.showLivesWithDropdown,
                     onShowLivesWithDropdownChanged = {

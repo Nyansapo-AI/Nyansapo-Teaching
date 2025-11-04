@@ -163,6 +163,17 @@ object Utils {
     }
 
     /**
+     * Validates if the input string represents a valid grade
+     *
+     * @param gradeInput The input string representing grade
+     */
+    fun isGradeValid(gradeInput: String, min: Int = 1, max: Int = 9): Boolean {
+        val grade = gradeInput.trim().toIntOrNull() ?: return false
+        if (min > max) return false
+        return grade in min..max
+    }
+
+    /**
      * Validates if the input string represents a valid age between the specified range
      *
      * @param ageInput The input string representing age

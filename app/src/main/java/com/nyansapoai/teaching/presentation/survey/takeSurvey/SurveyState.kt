@@ -82,6 +82,8 @@ data class SurveyState(
     val childGender: String = "",
     val childAge: String = "",
     val childAgeError: String? = null,
+    val childGrade: String = "",
+    val childGradeError: String? = null,
     val showChildGenderDropdown: Boolean = false,
     val livesWith: String = "",
     val linkedLearnerId: String = "",
