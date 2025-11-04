@@ -1,11 +1,11 @@
 package com.nyansapoai.teaching.presentation.assessments.numeracy.components
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -16,6 +16,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.nyansapoai.teaching.presentation.common.components.AppLinearProgressIndicator
@@ -70,48 +71,52 @@ fun NumeracyWordProblemContainer(
         }
     }
 
-    LazyColumn(
+    Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(40.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
         modifier = modifier
             .widthIn(max = 700.dp)
             .padding(16.dp),
     ) {
-        item {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-            )
-            {
-                Text(
-                    text = "Question ${currentIndex + 1}/${wordProblemList.size}",
-                    style = MaterialTheme.typography.titleMedium,
-                )
+        Text(
+            text = "Word Problem",
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier
+                .fillMaxWidth()
+        )
 
+        Column(
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+        )
+        {
+            AnimatedVisibility(
+                visible = wordProblemList.size > 1
+            ) {
                 AppLinearProgressIndicator(
                     progress = progress
                 )
+
             }
         }
 
-        item {
-            NumeracyWordProblem(
-                title = "Word Problem",
-                wordProblem = wordProblemList[currentIndex],
-                shouldCaptureAnswer = shouldCapture,
-                onAnswerImageFilePathChange = { path ->
-                    onAnswerFilePathChange(path)
-                },
-                onWorkAreaImageFilePathChange = {path ->
-                    onWorkOutFilePathChange(path)
-                },
-                onSubmit = {
-                    onIsSubmittingChange(true)
-                },
-                modifier = modifier
-            )
-        }
+
+        NumeracyWordProblem(
+            wordProblem = wordProblemList[currentIndex],
+            shouldCaptureAnswer = shouldCapture,
+            onAnswerImageFilePathChange = { path ->
+                onAnswerFilePathChange(path)
+            },
+            onWorkAreaImageFilePathChange = {path ->
+                onWorkOutFilePathChange(path)
+            },
+            onSubmit = {
+                onIsSubmittingChange(true)
+            },
+            modifier = modifier
+        )
     }
 
 

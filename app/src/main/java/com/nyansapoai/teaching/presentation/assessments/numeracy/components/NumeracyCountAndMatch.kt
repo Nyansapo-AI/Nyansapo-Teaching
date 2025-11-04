@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import com.nyansapoai.teaching.R
 import com.nyansapoai.teaching.presentation.common.components.AppButton
 import com.nyansapoai.teaching.presentation.common.components.AppLinearProgressIndicator
+import com.nyansapoai.teaching.presentation.common.components.AppShowInstructions
 
 @Composable
 fun NumeracyCountAndMatch(
@@ -137,16 +138,23 @@ fun NumeracyCountAndMatch(
 
                 ) {
 
-                    FlowRow(
-                        horizontalArrangement = Arrangement.Center,
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
-                        itemVerticalAlignment = Alignment.CenterVertically,
-                        maxItemsInEachRow = 5
-                    ) {
-                        repeat(count) { index ->
-                            CountItem()
+                    AppShowInstructions(
+                        instructionAudio = R.raw.count_the_balls_then_select_your_answer,
+                        instructionsTitle = "Count the Balls",
+                        instructionsDescription = "Count the balls shown below, then select your answer.",
+                        content = {
+                            FlowRow(
+                                horizontalArrangement = Arrangement.Center,
+                                verticalArrangement = Arrangement.spacedBy(8.dp),
+                                itemVerticalAlignment = Alignment.CenterVertically,
+                                maxItemsInEachRow = 5
+                            ) {
+                                repeat(count) { index ->
+                                    CountItem()
+                                }
+                            }
                         }
-                    }
+                    )
 
                     Divider(
                         color = MaterialTheme.colorScheme.onBackground,

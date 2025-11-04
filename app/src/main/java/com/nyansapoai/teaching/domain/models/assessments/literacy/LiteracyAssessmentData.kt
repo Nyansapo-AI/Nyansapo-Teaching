@@ -1,5 +1,6 @@
 package com.nyansapoai.teaching.domain.models.assessments.literacy
 
+import com.nyansapoai.teaching.R
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -11,12 +12,15 @@ data class MultipleChoices(
 @Serializable
 data class QuestionData(
     val question: String,
+    val audio : Int? = null,
     val multipleChoices: MultipleChoices
 )
 
 @Serializable
 data class StoryData(
     val story: String,
+    val storyAudio: Int? = null,
+    val isListeningStory: Boolean = false,
     val title: String? = null,
     val questionsData: List<QuestionData>
 )
@@ -513,6 +517,161 @@ val literacyAssessmentContent = listOf(
                                 "He wanted to give them tomatoes.",
                                 "He wanted to go to the market."
                             )
+                        )
+                    )
+                )
+            )
+        )
+    ),
+
+    LiteracyAssessmentData(
+        letters = listOf("d", "n", "o", "m", "w"), // L2 letters
+        words = listOf(
+            "can", "book", "tree", "chair", "market", // L3 words
+//            "hen", "jug", "bird", "window", "train", "cupboard" // L4 words
+        ),
+        paragraphs = emptyList(), // none listed separately
+        storys = listOf(
+            // --- STORY 1 ---
+            StoryData(
+                title = "Two Friends and a Bird",
+                story = """
+                Kache and her friend Tunu go to the playground every evening. 
+                One evening, they found a hurt bird on the ground. 
+                They took the bird home and made a nest in a box with leaves. 
+                They gave the bird food and water. The bird got stronger and flew around the house. 
+                One day, the window was left open, and the bird was gone.
+            """.trimIndent(),
+                isListeningStory = true,
+                storyAudio = R.raw.two_friends_and_bird,
+                questionsData = listOf(
+                    QuestionData(
+                        question = "What is the name of Kache’s friend?",
+                        audio = R.raw.what_is_the_name_of_kaches_friend,
+                        multipleChoices = MultipleChoices(
+                            correctChoices = listOf("Tunu"),
+                            wrongChoices = listOf("Kisa", "Amina", "Musa")
+                        )
+                    ),
+                    QuestionData(
+                        question = "What do Kache and Tunu do every evening?",
+                        audio = R.raw.what_do_kache_and_tunu_do_every_evening,
+                        multipleChoices = MultipleChoices(
+                            correctChoices = listOf("They go to the playground."),
+                            wrongChoices = listOf("They go to school.", "They feed the cows.", "They visit the market.")
+                        )
+                    ),
+                    QuestionData(
+                        question = "What did the girls make a nest with?",
+                        audio = R.raw.what_did_the_girls_make_a_nest_with,
+                        multipleChoices = MultipleChoices(
+                            correctChoices = listOf("Leaves."),
+                            wrongChoices = listOf("Paper.", "Plastic.", "Stones.")
+                        )
+                    ),
+                    QuestionData(
+                        question = "Why do you think the bird was nowhere to be found?",
+                        audio = R.raw.why_do_you_think_the_bird_was_nowhere_to_be_found,
+                        multipleChoices = MultipleChoices(
+                            correctChoices = listOf("Because it flew away."),
+                            wrongChoices = listOf("Because a cat took it.", "Because it was hiding.", "Because it fell asleep.")
+                        )
+                    )
+                )
+            ),
+
+            // --- STORY 2 ---
+            StoryData(
+                title = "A Girl and a Boy with Balloons",
+                story = """
+                A girl and a boy were playing with their balloons. 
+                The girl had a red balloon and the boy had a green balloon. 
+                The boy's balloon burst and he started crying. 
+                The girl ran to her mother and asked for money.
+            """.trimIndent(),
+                questionsData = listOf(
+                    QuestionData(
+                        question = "What were the girl and boy playing with?",
+                        multipleChoices = MultipleChoices(
+                            correctChoices = listOf("Balloons."),
+                            wrongChoices = listOf("Toys.", "Kites.", "Balls.")
+                        )
+                    ),
+                    QuestionData(
+                        question = "What colors were the balloons?",
+                        multipleChoices = MultipleChoices(
+                            correctChoices = listOf("Red and green."),
+                            wrongChoices = listOf("Blue and yellow.", "Pink and white.", "Orange and purple.")
+                        )
+                    ),
+                    QuestionData(
+                        question = "What did the boy do when his balloon burst?",
+                        multipleChoices = MultipleChoices(
+                            correctChoices = listOf("He started crying."),
+                            wrongChoices = listOf("He laughed.", "He ran away.", "He played with another balloon.")
+                        )
+                    ),
+                    QuestionData(
+                        question = "Why was the boy crying?",
+                        multipleChoices = MultipleChoices(
+                            correctChoices = listOf("Because his balloon burst."),
+                            wrongChoices = listOf("Because he was hungry.", "Because he fell down.", "Because the girl shouted at him.")
+                        )
+                    ),
+                    QuestionData(
+                        question = "In the story, 'The boy’s balloon burst.' What is the meaning of 'burst'?",
+                        multipleChoices = MultipleChoices(
+                            correctChoices = listOf("Exploded or broke open."),
+                            wrongChoices = listOf("Flew away.", "Changed color.", "Rolled on the floor.")
+                        )
+                    )
+                )
+            ),
+
+            // --- STORY 3 ---
+            StoryData(
+                title = "The Famous Cow",
+                story = """
+                My village is called Kome. We have many cows. The strongest cow was named Kisa. 
+                One night, some bad guys tried to steal our cows. They got into the cow shed. 
+                Kisa was brave! She kicked one of the bad guys. The bad guy yelled in pain. 
+                The loud noise woke everyone up. We all helped to catch the bad guys. 
+                The next morning, we thanked each other. Kisa became the most famous cow in the village.
+            """.trimIndent(),
+                questionsData = listOf(
+                    QuestionData(
+                        question = "Which animal do people in Kome keep?",
+                        multipleChoices = MultipleChoices(
+                            correctChoices = listOf("Cows."),
+                            wrongChoices = listOf("Goats.", "Sheep.", "Chickens.")
+                        )
+                    ),
+                    QuestionData(
+                        question = "What did the bad guys attempt to do with the cows?",
+                        multipleChoices = MultipleChoices(
+                            correctChoices = listOf("Steal them."),
+                            wrongChoices = listOf("Feed them.", "Sell them.", "Wash them.")
+                        )
+                    ),
+                    QuestionData(
+                        question = "What caused the villagers to awaken?",
+                        multipleChoices = MultipleChoices(
+                            correctChoices = listOf("The loud noise when Kisa kicked the bad guy."),
+                            wrongChoices = listOf("The sound of rain.", "The rooster crowing.", "The barking dogs.")
+                        )
+                    ),
+                    QuestionData(
+                        question = "Who assisted in capturing the bad guys?",
+                        multipleChoices = MultipleChoices(
+                            correctChoices = listOf("The villagers."),
+                            wrongChoices = listOf("Only Kisa.", "The police.", "The farmer’s children.")
+                        )
+                    ),
+                    QuestionData(
+                        question = "How did Kisa help the villagers?",
+                        multipleChoices = MultipleChoices(
+                            correctChoices = listOf("By kicking one of the bad guys."),
+                            wrongChoices = listOf("By waking up the farmer.", "By running away.", "By hiding the cows.")
                         )
                     )
                 )

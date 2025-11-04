@@ -54,12 +54,12 @@ fun ConductAssessmentScreen(
             NumeracyAssessmentRoot(
                 assessmentId = assessmentId,
                 studentId = studentId,
-                assessmentNo = assessmentNo
+                assessmentNo = assessmentNo,
+                studentName = studentName
             )
         }
         else -> {
-            // Handle unknown assessment type
-            // You can show an error message or navigate to a default screen
+
         }
     }
 

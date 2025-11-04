@@ -57,7 +57,6 @@ class OnboardingViewModel(
             is OnboardingAction.OnSelectSchool -> {
                 _state.update { it.copy(selectedSchool = action.school, currentStep = it.currentStep) }
             }
-
             is OnboardingAction.OnContinue -> {
                 saveInfo(
                     onSuccess = { action.onSuccess.invoke() }
@@ -104,15 +103,12 @@ class OnboardingViewModel(
             return
         }
 
-
         viewModelScope.launch(Dispatchers.IO) {
-
             localDataSource.saveCurrentSchoolInfo(
                 organizationUid = _state.value.selectedOrganization?.id ?: "",
                 projectUid = _state.value.selectedProject?.id ?: "",
                 schoolUid = _state.value.selectedSchool?.id ?: ""
             )
-
         }
         onSuccess.invoke()
 

@@ -7,6 +7,7 @@ import com.nyansapoai.teaching.domain.models.assessments.literacy.MultipleChoice
 import com.nyansapoai.teaching.domain.models.assessments.literacy.ReadingAssessmentResult
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.CountMatch
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyArithmeticOperation
+import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyAssessmentResults
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyWordProblem
 import com.nyansapoai.teaching.domain.models.students.NyansapoStudent
 import com.nyansapoai.teaching.utils.Results
@@ -26,7 +27,7 @@ interface  AssessmentRepository {
 
     suspend fun getAssessments(schoolId: String = ""): Flow<List<Assessment>>
 
-    suspend fun getAssessmentById(assessmentId: String): Flow<Results<Assessment>>
+    fun getAssessmentById(assessmentId: String): Flow<Results<Assessment>>
 
     suspend fun assessNumeracyCountAndMatch(
         assessmentId: String,
@@ -78,4 +79,8 @@ interface  AssessmentRepository {
     fun getCompletedAssessments(assessmentId: String): Flow<Results<List<CompletedAssessment>>>
 
     fun fetchLiteracyAssessmentResults(assessmentId: String, studentId: String): Flow<Results<LiteracyAssessmentResults>>
+
+    suspend fun markAssessmentDone(assessmentId: String, studentId: String): Results<String>
+
+    fun fetchNumeracyAssessmentResults(assessmentId: String, studentId: String): Flow<Results<NumeracyAssessmentResults>>
 }

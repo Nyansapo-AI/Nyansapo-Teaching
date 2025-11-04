@@ -1,6 +1,7 @@
 package com.nyansapoai.teaching.data.remote.authentication
 
 import android.content.Context
+import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.PhoneAuthOptions
 import com.google.firebase.auth.PhoneAuthProvider
@@ -14,6 +15,9 @@ class AuthenticationRepositoryImp(
     }
 
     override suspend fun signOut() {
+
         auth.signOut()
+        Log.d("Authentication User", "User signed out: ${auth.currentUser}")
+
     }
 }

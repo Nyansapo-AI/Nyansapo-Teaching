@@ -10,6 +10,9 @@ data object GetStartedPage
 data object SignInPage
 
 @Serializable
+data object AuthControllerPage
+
+@Serializable
 data class OTPPage(val phoneNumber: String)
 
 @Serializable
@@ -37,6 +40,17 @@ data class ConductAssessmentPage(
 data class LiteracyResultsPage(
     val assessmentId: String,
     val studentId: String,
+)
+
+@Serializable
+data class AssessmentResultsPage(
+    val assessmentId: String,
+    val studentId: String,
+    val studentName: String,
+    val level: String,
+    val grade: Int,
+    val assessmentName: String,
+    val assessmentType: String,
 )
 
 @Serializable

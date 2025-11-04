@@ -7,8 +7,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -71,6 +73,7 @@ fun ReadingStoryEvaluationUI(
     audioFilePath: String? = null,
     onAudioPathChange: (String) -> Unit = {},
     onSubmit: () -> Unit = {},
+    isListeningStory: Boolean = false,
     storySentencesList: List<String> =
             "Anna and her younger brother Tom were on the way to the market to buy some toys. On the way, they saw their friend Juma. Juma was looking for something. Anna asked Juma, ‘’ What are you looking for?’’. Juma said, ‘’I have lost my money. I have to buy tomatoes for dinner. What will we eat now?\\\" On hearing Juma’s problems, Anna and Tom decided to help him. They bought some tomatoes using their own money. Juma thanked them and rushed home. As he arrived home, he found his lost money by his front door. He picked up the money and ran after Anna and Tom.".split(".")
 ) {
@@ -197,7 +200,9 @@ fun ReadingStoryEvaluationUI(
                         }
                     }
 
-                })
+
+                }
+            )
         }
     )
 
@@ -225,9 +230,10 @@ fun ReadingStoryEvaluationUI(
 
     val listState = rememberLazyListState()
 
+    /*
     LaunchedEffect(currentIndex) {
         listState.animateScrollToItem(currentIndex)
-    }
+    } */
 
 
     Column(
@@ -302,9 +308,35 @@ fun ReadingStoryEvaluationUI(
                     instructionAudio = R.raw.click_the_button_to_move_to_the_next_sentence,
                     instructionsDescription = "click to move to the next sentence",
                     modifier = Modifier
-                        .align(Alignment.BottomEnd)
+                        .align(Alignment.BottomCenter)
                         .zIndex(1f)
-                ) {
+                )
+                {
+
+                    AppButton(
+                        enabled = !isLoading && !showInstructions,
+                        onClick = {
+                            appAudioRecorder.stop()
+                            isRecording = false
+                            audioFile?.let {
+                                onAudioPathChange(it.absolutePath)
+                                audioFilePathList = audioFilePathList + it.absolutePath
+                                audioFile = null
+                                onSubmit.invoke()
+                            }
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    ) {
+                        Text(
+                            text = "Next",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+
+
+                    /*
                     IconButton(
                         enabled = !isLoading && !showInstructions,
                         colors = IconButtonDefaults.iconButtonColors(
@@ -331,10 +363,8 @@ fun ReadingStoryEvaluationUI(
                             contentDescription = "Next",
                             tint = MaterialTheme.colorScheme.secondary
                         )
-                    }
+                    }*/
                 }
-
-
 
 
                 AppShowInstructions(
@@ -356,7 +386,8 @@ fun ReadingStoryEvaluationUI(
                     ) {
                         itemsIndexed(
                             items = storySentencesList
-                        ){index, it ->
+                        )
+                        { index, it ->
                             Text(
                                 text = it,
                                 textAlign = TextAlign.Center,
@@ -375,6 +406,10 @@ fun ReadingStoryEvaluationUI(
                                 modifier = Modifier
                                     .align(Alignment.Center)
                             )
+                        }
+
+                        item {
+                            Spacer(Modifier.height(40.dp) )
                         }
                     }
                 }

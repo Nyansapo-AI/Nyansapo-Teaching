@@ -1,6 +1,8 @@
 package com.nyansapoai.teaching.presentation.schools
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -14,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -34,10 +37,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nyansapoai.teaching.R
+import com.nyansapoai.teaching.presentation.common.components.AppAlertDialog
 import com.nyansapoai.teaching.presentation.common.components.AppCardItem
 import com.nyansapoai.teaching.presentation.common.components.AppCircularLoading
 import com.nyansapoai.teaching.presentation.common.components.AppComingSoon
 import com.nyansapoai.teaching.presentation.schools.components.LearningLevelItem
+import com.nyansapoai.teaching.ui.theme.lightPrimary
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -70,17 +75,39 @@ fun SchoolScreen(
     }
 
     AnimatedVisibility(
+        visible = state.showLogOutDialog,
+        enter = fadeIn(),
+        exit = fadeOut()
+    ) {
+        AppAlertDialog(
+            onDismissRequest = { onAction.invoke(SchoolAction.OnShowLogOutDialog(false)) },
+            dialogText = "You are about to sign out. Click confirm to continue.",
+            dialogTitle = "Sign Out",
+//            icon = Icons.Default.Info,
+            onConfirmation = {
+                onAction.invoke(SchoolAction.OnShowLogOutDialog(false))
+                onAction.invoke(SchoolAction.SignOut)
+            },
+        )
+    }
+
+
+    AnimatedVisibility(
         visible = state.showSchoolSelector
     ) {
         ModalBottomSheet(
+            containerColor = lightPrimary,
             onDismissRequest = {
                 onAction.invoke(SchoolAction.OnShowSchoolSelector(show = false))
             },
-            sheetState = rememberModalBottomSheetState()
+            sheetState = rememberModalBottomSheetState(),
+            modifier = Modifier
+                .fillMaxWidth()
         )
         {
             LazyColumn(
                 modifier = Modifier
+                    .fillMaxWidth()
                     .padding(vertical = 16.dp, horizontal = 12.dp)
             ) {
                 stickyHeader {
@@ -90,7 +117,7 @@ fun SchoolScreen(
                     ) {
                         Icon(
                             painter = painterResource(id = R.drawable.school),
-                            contentDescription = "school",
+                            contentDescription = state.schoolDetails?.name ?: "School",
                             tint = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.3f)
                         )
 
@@ -103,18 +130,32 @@ fun SchoolScreen(
                 }
 
                 item{
-                    Spacer(Modifier.padding(20.dp))
+                    Spacer(Modifier.padding(12.dp))
                 }
 
                 items(items = state.user?.organizations[0]?.projects[0]?.schools ?: emptyList(), key = {it.id}){ school ->
-                    Text(
-                        text = school.name
-                    )
+                    TextButton(
+                        colors = ButtonColors(
+                            containerColor = MaterialTheme.colorScheme.background,
+                            contentColor = MaterialTheme.colorScheme.onPrimary,
+                            disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                            disabledContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                        ),
+                        onClick = {
+
+                        }
+                    ) {
+                        Text(
+                            text = school.name
+                        )
+                    }
                 }
 
                 item {
                     TextButton(
-                        onClick = {}
+                        onClick = {
+                            onAction.invoke(SchoolAction.OnShowLogOutDialog(true))
+                        }
                     ) {
                         Text(
                             text = "Sign out",
@@ -127,7 +168,6 @@ fun SchoolScreen(
 
             }
         }
-
     }
 
     AnimatedVisibility(
@@ -271,8 +311,8 @@ fun SchoolScreen(
                         totalStudents = 15,
                         data = listOf(
                             Level("Letters", 1, Color.Blue),
-                            Level("Words", 2, Color.Cyan),
-                            Level("Sentence", 3, Color.Green),
+                            Level("Words", 5, Color.Cyan),
+//                            Level("Sentence", 3, Color.Green),
                             Level("Paragraph", 4, Color(0xFFC8DF47)),
                             Level("Story", 5, Color.Magenta),
                         )

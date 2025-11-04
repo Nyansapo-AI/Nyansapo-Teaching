@@ -33,7 +33,7 @@ android {
         minSdk = 26
         targetSdk = 35
         versionCode = 1
-        versionName = "1.9.0"
+        versionName = "1.9.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -113,6 +113,8 @@ dependencies {
 
     implementation (libs.material3)
 
+    //splash screen
+    implementation(libs.androidx.core.splashscreen)
 
     // Koin for Android
     implementation(libs.koin.android)
@@ -152,9 +154,6 @@ dependencies {
 
     //lottie
     implementation (libs.lottie.compose)
-    
-    //microsoft cognitive services speech
-    implementation(libs.client.sdk)
 
     // media 3
     implementation(libs.androidx.media3.exoplayer)
@@ -180,7 +179,9 @@ dependencies {
     implementation(libs.androidx.startup.runtime)
 
     //calendar
-//    implementation("com.kizitonwose.calendar:compose:2.9.0")
     implementation(libs.kizitonwose.calendar)
 
+    //coil
+    implementation(libs.coil.compose.v330)
+    implementation(libs.coil.network.okhttp)
 }

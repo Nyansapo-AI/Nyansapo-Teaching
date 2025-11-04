@@ -39,12 +39,12 @@ fun generateComparisonText(
             val style = if (isMatched) {
                 SpanStyle(
                     color = Color(0xFF008000),
-                    fontWeight = FontWeight.Bold
+//                    fontWeight = FontWeight.Bold
                 )
             } else {
                 SpanStyle(
                     color = Color(0xFFFF0000),
-                    fontWeight = FontWeight.Bold,
+//                    fontWeight = FontWeight.Bold,
 //                    textDecoration = TextDecoration.Underline
                 )
             }

@@ -10,6 +10,8 @@ import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyWordPr
 import kotlinx.coroutines.flow.Flow
 
 interface LocalDataSource {
+    suspend fun clearAllData()
+
     suspend fun insertPendingReadingResult(assessmentId: String,studentId: String,type: String, content: String, audioUrl: String, transcript: String, passed: Boolean, timestamp: Int, isPending: Boolean)
 
     suspend fun getPendingReadingResults(assessmentId: String,studentId: String): Flow<List<PendingReadingAssessmentResult>>

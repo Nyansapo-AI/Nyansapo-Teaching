@@ -18,6 +18,7 @@ import com.nyansapoai.teaching.presentation.assessments.literacy.components.Lite
 import com.nyansapoai.teaching.presentation.assessments.literacy.workers.EvaluateMultipleChoiceQuestionWorker
 import com.nyansapoai.teaching.presentation.assessments.literacy.workers.EvaluateReadingAssessmentWorker
 import com.nyansapoai.teaching.presentation.assessments.literacy.workers.LiteracyAssessmentsMonitorWorker
+import com.nyansapoai.teaching.presentation.assessments.literacy.workers.MarkAssessmentDoneWorker
 import com.nyansapoai.teaching.presentation.assessments.literacy.workers.MarkLiteracyAssessmentWorker
 import com.nyansapoai.teaching.presentation.assessments.literacy.workers.SubmitMultipleChoiceResultsWorker
 import com.nyansapoai.teaching.presentation.assessments.literacy.workers.SubmitReadingAssessmentWorker
@@ -146,6 +147,32 @@ class LiteracyViewModel(
                     studentId = action.studentId
                 )
             }
+
+            LiteracyAction.OnCompletePreTest -> {
+                _state.update { it.copy(currentAssessmentLevel = LiteracyAssessmentLevel.LETTER_RECOGNITION) }
+            }
+
+            is LiteracyAction.OnShowEndAssessmentDialogChange -> {
+                _state.update {
+                    it.copy(
+                        showEndAssessmentDialog = action.show
+                    )
+                }
+            }
+
+            is LiteracyAction.OnShowPrematureEndAssessmentDialogChange -> {
+                _state.update {
+                    it.copy(
+                        showPrematureEndAssessmentDialog = action.show
+                    )
+                }
+            }
+
+            LiteracyAction.OnEndAssessment -> {
+                endAssessment()
+            }
+
+
         }
     }
 
@@ -245,10 +272,12 @@ class LiteracyViewModel(
         val currentAssessmentContentList =when(_state.value.currentAssessmentLevel){
             LiteracyAssessmentLevel.LETTER_RECOGNITION -> _state.value.assessmentContent?.letters?.take(5) ?: emptyList()
             LiteracyAssessmentLevel.WORD -> _state.value.assessmentContent?.words?.take(5) ?: emptyList()
-            LiteracyAssessmentLevel.PARAGRAPH -> _state.value.assessmentContent?.paragraphs[0]?.split(".") ?: emptyList()
-            LiteracyAssessmentLevel.STORY -> _state.value.assessmentContent?.storys[0]?.story?.trim()?.split(".") ?: emptyList()
+            LiteracyAssessmentLevel.PARAGRAPH -> listOf(_state.value.assessmentContent?.paragraphs?.get(0) ?: "")
+            LiteracyAssessmentLevel.STORY -> listOf(_state.value.assessmentContent?.storys?.get(0)?.story ?: "")
             LiteracyAssessmentLevel.MULTIPLE_CHOICE -> emptyList()
             LiteracyAssessmentLevel.COMPLETED -> emptyList()
+            LiteracyAssessmentLevel.PRE_TEST -> emptyList()
+            LiteracyAssessmentLevel.LISTENING_COMPREHENSION -> emptyList()
         }
 
         currentAssessmentContentList?.let {
@@ -487,36 +516,8 @@ class LiteracyViewModel(
             "assessment_id" to assessmentId
         )
 
-        val readingWorkData = workDataOf(
-            "assessment_type" to "reading_assessment",
-            "student_id" to studentId,
-            "assessment_id" to assessmentId
-        )
-
-        val mcWorkData = workDataOf(
-            "assessment_type" to "multiple_choices",
-            "student_id" to studentId,
-            "assessment_id" to assessmentId
-        )
-
-
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
-            .setRequiresStorageNotLow(true)
-            .build()
-
-
-        val readingMonitorRequest = OneTimeWorkRequestBuilder<LiteracyAssessmentsMonitorWorker>()
-            .setInputData(readingWorkData)
-            .build()
-
-        val multipleChoicesMonitorRequest = OneTimeWorkRequestBuilder<LiteracyAssessmentsMonitorWorker>()
-            .setInputData(mcWorkData)
-            .build()
-
-        val submitReadingResultsRequest = OneTimeWorkRequestBuilder<SubmitReadingAssessmentWorker>()
-            .setInputData(workData)
-            .setConstraints(constraints = constraints)
             .build()
 
         val submitMultipleChoicesResultsRequest = OneTimeWorkRequestBuilder<SubmitMultipleChoiceResultsWorker>()
@@ -524,20 +525,27 @@ class LiteracyViewModel(
             .setConstraints(constraints = constraints)
             .build()
 
-        val markLiteracyAssessmentRequest = OneTimeWorkRequestBuilder<MarkLiteracyAssessmentWorker>()
+        val markAssessmentDoneRequest = OneTimeWorkRequestBuilder<MarkAssessmentDoneWorker>()
             .setInputData(workData)
-            .setConstraints(constraints = constraints)
             .build()
 
         workManager
             .beginUniqueWork(
                 uniqueWorkName ="complete_assessment_${assessmentId}_${studentId}",
                  existingWorkPolicy =  ExistingWorkPolicy.REPLACE,
-                request = readingMonitorRequest
+                request = markAssessmentDoneRequest
             )
-            .then(multipleChoicesMonitorRequest)
             .then(submitMultipleChoicesResultsRequest)
             .enqueue()
+    }
+
+
+    private fun endAssessment(){
+        _state.update {
+            it.copy(
+                currentAssessmentLevel = LiteracyAssessmentLevel.COMPLETED
+            )
+        }
     }
 
 }

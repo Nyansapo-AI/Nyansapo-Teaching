@@ -43,7 +43,6 @@ class LiteracyAssessmentsMonitorWorker(
             val requestsId = localDataSource.getLiteracyAssessmentWorkerRequests(assessmentId = assessmentId, studentId = studentId, type = assessmentType).first()
 
 
-
             val worksId = requestsId.map { UUID.fromString(it) }
 
             if (worksId.isEmpty()){

@@ -1,5 +1,6 @@
 package com.nyansapoai.teaching.presentation.assessments.numeracy
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.Constraints
@@ -12,7 +13,7 @@ import com.nyansapoai.teaching.data.local.LocalDataSource
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.CountMatch
 import com.nyansapoai.teaching.presentation.assessments.components.checkAnswer
 import com.nyansapoai.teaching.presentation.assessments.numeracy.components.NumeracyAssessmentLevel
-import com.nyansapoai.teaching.presentation.assessments.numeracy.workers.MarkNumeracyAssessmentAsCompleteWorker
+import com.nyansapoai.teaching.presentation.assessments.numeracy.workers.MarkNumeracyAssessmentAsDoneWorker
 import com.nyansapoai.teaching.presentation.assessments.numeracy.workers.UploadNumeracyWordProblemImagesWorker
 import com.nyansapoai.teaching.presentation.assessments.numeracy.workers.UploadNumeracyArithmeticOperationImageWorker
 import com.nyansapoai.teaching.presentation.assessments.numeracy.workers.SubmitNumeracyCountAndMatchResultWorker
@@ -111,6 +112,19 @@ class NumeracyAssessmentViewModel(
             is NumeracyAssessmentAction.OnShowInstructionChange -> {
                 _state.update { it.copy(showInstruction = action.showInstruction) }
             }
+
+            is NumeracyAssessmentAction.OnShowEndAssessmentDialogChange -> {
+                _state.update { it.copy(showEndAssessmentDialog = action.show) }
+            }
+            is NumeracyAssessmentAction.OnShowPreMatureAssessmentEndDialogChange -> {
+                _state.update { it.copy(showPreMatureAssessmentEndDialog = action.show) }
+            }
+
+            NumeracyAssessmentAction.EndAssessment -> {
+                endAssessment()
+            }
+
+
         }
     }
 
@@ -582,6 +596,9 @@ class NumeracyAssessmentViewModel(
         assessmentId: String,
         studentId: String,
     ){
+
+        Log.d("submitNumeracyAssessment", "submitNumeracyAssessment: $assessmentId, $studentId")
+
         val workData = workDataOf(
             "assessment_id" to assessmentId,
             "student_id" to studentId,
@@ -597,7 +614,7 @@ class NumeracyAssessmentViewModel(
             .setConstraints(constraints = constraints)
             .build()
 
-        val markAsCompleteWork = OneTimeWorkRequestBuilder<MarkNumeracyAssessmentAsCompleteWorker>()
+        val markAsCompleteWork = OneTimeWorkRequestBuilder<MarkNumeracyAssessmentAsDoneWorker>()
             .setInputData(workData)
             .build()
 
@@ -606,10 +623,18 @@ class NumeracyAssessmentViewModel(
             .beginUniqueWork(
                 uniqueWorkName = "submit_numeracy_assessment_${assessmentId}_${studentId}",
                 existingWorkPolicy = ExistingWorkPolicy.REPLACE,
-                request = submitNumeracyCountMatchResults,
+                request = markAsCompleteWork,
             )
-            .then(markAsCompleteWork)
+            .then(submitNumeracyCountMatchResults)
             .enqueue()
 
+    }
+
+    private fun endAssessment(){
+        _state.update {
+            it.copy(
+                hasCompletedAssessment = true
+            )
+        }
     }
 }

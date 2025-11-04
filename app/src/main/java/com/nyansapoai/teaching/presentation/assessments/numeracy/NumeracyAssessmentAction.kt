@@ -20,4 +20,7 @@ sealed interface NumeracyAssessmentAction {
     data class OnShowContentChange(val showContent: Boolean) : NumeracyAssessmentAction
     data class OnAudioFilePathChange(val audioFilePath: String) : NumeracyAssessmentAction
     data class SubmitNumeracyAssessmentResults(val assessmentId: String, val studentId: String, ) : NumeracyAssessmentAction
+    data object EndAssessment : NumeracyAssessmentAction
+    data class OnShowEndAssessmentDialogChange(val show: Boolean) : NumeracyAssessmentAction
+    data class OnShowPreMatureAssessmentEndDialogChange(val show: Boolean): NumeracyAssessmentAction
 }

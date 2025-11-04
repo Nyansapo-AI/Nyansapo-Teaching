@@ -34,6 +34,7 @@ import com.nyansapoai.teaching.domain.models.attendance.StudentAttendance
 import com.nyansapoai.teaching.domain.models.students.NyansapoStudent
 import com.nyansapoai.teaching.navController
 import com.nyansapoai.teaching.presentation.common.components.AppButton
+import com.nyansapoai.teaching.presentation.common.components.AppComingSoon
 import com.nyansapoai.teaching.presentation.common.components.AppDropDownItem
 import com.nyansapoai.teaching.presentation.onboarding.components.OptionsItemUI
 import com.nyansapoai.teaching.presentation.students.components.StudentSelectionListUI
@@ -74,6 +75,12 @@ fun CollectAttendanceScreen(
         modifier = Modifier
             .padding(horizontal = 12.dp)
     ) { innerPadding ->
+        AppComingSoon(
+            modifier = Modifier
+                .padding(innerPadding)
+        )
+
+        /*
         CollectAttendanceContent(
             studentList = state.studentAttendanceList,
             selectedGrade = state.selectedGrade,
@@ -88,7 +95,7 @@ fun CollectAttendanceScreen(
             },
             modifier = Modifier
                 .padding(innerPadding)
-        )
+        )*/
     }
 
 }

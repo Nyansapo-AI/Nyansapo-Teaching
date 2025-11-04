@@ -22,10 +22,12 @@ import androidx.navigation.toRoute
 import com.google.firebase.auth.FirebaseAuth
 import com.nyansapoai.teaching.navController
 import com.nyansapoai.teaching.presentation.assessments.IndividualAssessment.IndividualAssessmentRoot
+import com.nyansapoai.teaching.presentation.assessments.assessmentResult.AssessmentResultRoot
 import com.nyansapoai.teaching.presentation.assessments.conductAssessment.ConductAssessmentRoot
 import com.nyansapoai.teaching.presentation.assessments.createAssessment.CreateAssessmentsRoot
-import com.nyansapoai.teaching.presentation.assessments.literacy.result.LiteracyResultRoot
+import com.nyansapoai.teaching.presentation.assessments.assessmentResult.literacyResult.LiteracyResultRoot
 import com.nyansapoai.teaching.presentation.attendances.collectAttendance.CollectAttendanceRoot
+import com.nyansapoai.teaching.presentation.authentication.AuthControllerRoot
 import com.nyansapoai.teaching.presentation.authentication.otp.OTPRoot
 import com.nyansapoai.teaching.presentation.authentication.signIn.SignInRoot
 import com.nyansapoai.teaching.presentation.common.snackbar.SnackBarContent
@@ -74,10 +76,14 @@ fun Navigation(){
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = if (firebaseAuth.currentUser == null ) GetStartedPage else OnboardingPage,
+            startDestination = AuthControllerPage,
             modifier = Modifier
                 .padding(innerPadding)
         ){
+
+            composable<AuthControllerPage> {
+                AuthControllerRoot()
+            }
 
             composable<GetStartedPage> {
                 GetStartedRoot()
@@ -124,6 +130,19 @@ fun Navigation(){
             composable<LiteracyResultsPage> {
                 val args = it.toRoute<LiteracyResultsPage>()
                 LiteracyResultRoot(assessmentId = args.assessmentId, studentId = args.studentId)
+            }
+
+            composable<AssessmentResultsPage> {
+                val args = it.toRoute<AssessmentResultsPage>()
+                AssessmentResultRoot(
+                    assessmentId = args.assessmentId,
+                    studentId = args.studentId,
+                    studentName = args.studentName,
+                    level = args.level,
+                    grade = args.grade,
+                    assessmentName = args.assessmentName,
+                    assessmentType = args.assessmentType
+                )
             }
 
             composable<CollectAttendancePage> {

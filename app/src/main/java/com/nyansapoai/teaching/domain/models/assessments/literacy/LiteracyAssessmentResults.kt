@@ -8,6 +8,7 @@ data class LiteracyAssessmentResults(
     val completed_assessment: Boolean = false,
     val student_id: String = "",
     val literacy_results: LiteracyResultsData? = null,
+    val student_grade: Int? =  null
 ){
     data class LiteracyResultsData(
         val reading_results: List<ReadingResult>? = null,

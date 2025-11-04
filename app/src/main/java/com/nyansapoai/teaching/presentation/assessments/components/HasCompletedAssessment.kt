@@ -24,13 +24,14 @@ fun HasCompletedAssessment(modifier: Modifier = Modifier) {
 
 
     Box(
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
+        modifier = modifier
     ) {
 
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(12.dp),
-            modifier = modifier
+            modifier = Modifier
                 .widthIn(max = 600.dp)
         ) {
             Text(
