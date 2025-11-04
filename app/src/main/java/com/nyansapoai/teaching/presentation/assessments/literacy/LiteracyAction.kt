@@ -41,6 +41,8 @@ sealed interface LiteracyAction {
     ) : LiteracyAction
 
     data class OnShowEndAssessmentDialogChange( val show: Boolean) : LiteracyAction
+
+    data class OnShowPrematureEndAssessmentDialogChange(val show: Boolean): LiteracyAction
     data object OnEndAssessment : LiteracyAction
     data object OnCompletePreTest : LiteracyAction
 }

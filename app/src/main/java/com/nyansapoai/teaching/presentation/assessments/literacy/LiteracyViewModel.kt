@@ -161,9 +161,19 @@ class LiteracyViewModel(
                 }
             }
 
+            is LiteracyAction.OnShowPrematureEndAssessmentDialogChange -> {
+                _state.update {
+                    it.copy(
+                        showPrematureEndAssessmentDialog = action.show
+                    )
+                }
+            }
+
             LiteracyAction.OnEndAssessment -> {
                 endAssessment()
             }
+
+
         }
     }
 

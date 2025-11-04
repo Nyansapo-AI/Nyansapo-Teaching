@@ -1,5 +1,6 @@
 package com.nyansapoai.teaching.presentation.assessments.literacy
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -47,12 +48,10 @@ import com.nyansapoai.teaching.presentation.assessments.literacy.components.Lite
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.MultichoiceQuestionsUI
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.PreTestReadingAssessmentUI
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.ReadingStoryEvaluationUI
-import com.nyansapoai.teaching.presentation.assessments.numeracy.NumeracyAssessmentAction
 import com.nyansapoai.teaching.presentation.common.components.AppAlertDialog
 import com.nyansapoai.teaching.presentation.common.components.AppSimulateNavigation
 import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
-import kotlin.invoke
 
 @Composable
 fun LiteracyRoot(
@@ -102,6 +101,17 @@ fun LiteracyScreen(
         }
     }
 
+    BackHandler(enabled = true) {
+
+        if (state.currentAssessmentLevel == LiteracyAssessmentLevel.PRE_TEST || state.currentAssessmentLevel == LiteracyAssessmentLevel.COMPLETED) {
+            navController.popBackStack()
+            return@BackHandler
+        }
+
+        onAction.invoke(LiteracyAction.OnShowPrematureEndAssessmentDialogChange(true))
+
+    }
+
 
     Scaffold(
         topBar = {
@@ -109,7 +119,12 @@ fun LiteracyScreen(
                 navigationIcon = {
                     IconButton(
                         onClick = {
-                            navController.popBackStack()
+                            if(state.currentAssessmentLevel == LiteracyAssessmentLevel.PRE_TEST || state.currentAssessmentLevel == LiteracyAssessmentLevel.COMPLETED) {
+                                navController.popBackStack()
+                                return@IconButton
+                            }
+
+                            onAction.invoke(LiteracyAction.OnShowPrematureEndAssessmentDialogChange(true))
                         }
                     ) {
                         Icon(
@@ -168,6 +183,22 @@ fun LiteracyScreen(
 
 
     ) { innerPadding ->
+
+        AnimatedVisibility(
+            visible = state.showPrematureEndAssessmentDialog,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            AppAlertDialog(
+                onDismissRequest = { onAction.invoke(LiteracyAction.OnShowPrematureEndAssessmentDialogChange(false)) },
+                dialogText = "You are about to end assessment, and you have to restart the assessment. Click confirm to continue.",
+                dialogTitle = "End Assessment",
+                onConfirmation = {
+                    onAction.invoke(LiteracyAction.OnShowPrematureEndAssessmentDialogChange(false))
+                    navController.popBackStack()
+                }
+            )
+        }
 
         AnimatedVisibility(
             visible = state.showEndAssessmentDialog,

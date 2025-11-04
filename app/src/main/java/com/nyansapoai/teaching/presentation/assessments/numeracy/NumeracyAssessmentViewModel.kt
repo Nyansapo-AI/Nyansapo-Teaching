@@ -116,9 +116,14 @@ class NumeracyAssessmentViewModel(
             is NumeracyAssessmentAction.OnShowEndAssessmentDialogChange -> {
                 _state.update { it.copy(showEndAssessmentDialog = action.show) }
             }
+            is NumeracyAssessmentAction.OnShowPreMatureAssessmentEndDialogChange -> {
+                _state.update { it.copy(showPreMatureAssessmentEndDialog = action.show) }
+            }
+
             NumeracyAssessmentAction.EndAssessment -> {
                 endAssessment()
             }
+
 
         }
     }
