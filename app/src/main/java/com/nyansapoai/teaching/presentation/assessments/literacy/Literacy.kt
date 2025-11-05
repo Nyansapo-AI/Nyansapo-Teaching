@@ -41,7 +41,16 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nyansapoai.teaching.R
 import com.nyansapoai.teaching.navController
 import com.nyansapoai.teaching.presentation.assessments.components.HasCompletedAssessment
-import com.nyansapoai.teaching.presentation.assessments.literacy.LiteracyAction.*
+import com.nyansapoai.teaching.presentation.assessments.literacy.LiteracyAction.OnCompletePreTest
+import com.nyansapoai.teaching.presentation.assessments.literacy.LiteracyAction.OnSubmitLiteracyResults
+import com.nyansapoai.teaching.presentation.assessments.literacy.LiteracyAction.OnSubmitMultipleChoiceResponse
+import com.nyansapoai.teaching.presentation.assessments.literacy.LiteracyAction.OnSubmitResponse
+import com.nyansapoai.teaching.presentation.assessments.literacy.LiteracyAction.SetAudioByteArray
+import com.nyansapoai.teaching.presentation.assessments.literacy.LiteracyAction.SetAudioFilePath
+import com.nyansapoai.teaching.presentation.assessments.literacy.LiteracyAction.SetMultipleQuestionOptions
+import com.nyansapoai.teaching.presentation.assessments.literacy.LiteracyAction.SetSelectedChoice
+import com.nyansapoai.teaching.presentation.assessments.literacy.LiteracyAction.SetShowContent
+import com.nyansapoai.teaching.presentation.assessments.literacy.LiteracyAction.SetShowInstructions
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.ListeningQuestionUI
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.LiteracyAssessmentLevel
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.LiteracyReadingAssessmentUI
