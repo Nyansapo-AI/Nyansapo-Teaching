@@ -187,3 +187,23 @@ SELECT * FROM PendingCountAndMatchResultEntity WHERE assessmentId = ? AND studen
 clearPendingCountAndMatchResults:
 DELETE FROM PendingCountAndMatchResultEntity
 WHERE assessmentId = ? AND studentId = ?;
+
+CREATE TABLE AssessmentProgressEntity(
+    assessmentId TEXT NOT NULL,
+    studentId TEXT NOT NULL,
+    currentIndex INTEGER NOT NULL,
+    level TEXT NOT NULL,
+    PRIMARY KEY (assessmentId, studentId)
+);
+
+insertOrUpdateAssessmentProgress:
+INSERT OR REPLACE INTO AssessmentProgressEntity(assessmentId, studentId, currentIndex, level)
+VALUES (?, ?, ?, ?);
+
+getAssessmentProgress:
+SELECT * FROM AssessmentProgressEntity
+WHERE assessmentId = ? AND studentId = ?;
+
+clearAssessmentProgress:
+DELETE FROM AssessmentProgressEntity
+WHERE assessmentId = ? AND studentId = ?;

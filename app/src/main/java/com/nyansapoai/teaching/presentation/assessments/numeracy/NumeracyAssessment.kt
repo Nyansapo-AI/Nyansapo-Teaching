@@ -7,11 +7,8 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
@@ -386,12 +383,10 @@ fun NumeracyAssessmentScreen(
                         instructionTitle = "Read the number",
                         instructionDescription = "Read the number shown in the screen",
                         showQuestionNumber = true,
-                        onAudioByteArrayChange = {},
                         onAudioPathChange = { filePath ->
                             onAction.invoke(OnAudioFilePathChange(filePath))
                         },
                         audioFilePath = state.audioFilePath,
-                        response = null,
                         onSubmit = {
                             onAction.invoke(
                                 OnSubmitNumberRecognition(
