@@ -1,5 +1,6 @@
 package com.nyansapoai.teaching.presentation.assessments.literacy
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -40,19 +41,25 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nyansapoai.teaching.R
 import com.nyansapoai.teaching.navController
 import com.nyansapoai.teaching.presentation.assessments.components.HasCompletedAssessment
-import com.nyansapoai.teaching.presentation.assessments.literacy.LiteracyAction.*
+import com.nyansapoai.teaching.presentation.assessments.literacy.LiteracyAction.OnCompletePreTest
+import com.nyansapoai.teaching.presentation.assessments.literacy.LiteracyAction.OnSubmitLiteracyResults
+import com.nyansapoai.teaching.presentation.assessments.literacy.LiteracyAction.OnSubmitMultipleChoiceResponse
+import com.nyansapoai.teaching.presentation.assessments.literacy.LiteracyAction.OnSubmitResponse
+import com.nyansapoai.teaching.presentation.assessments.literacy.LiteracyAction.SetAudioFilePath
+import com.nyansapoai.teaching.presentation.assessments.literacy.LiteracyAction.SetMultipleQuestionOptions
+import com.nyansapoai.teaching.presentation.assessments.literacy.LiteracyAction.SetSelectedChoice
+import com.nyansapoai.teaching.presentation.assessments.literacy.LiteracyAction.SetShowContent
+import com.nyansapoai.teaching.presentation.assessments.literacy.LiteracyAction.SetShowInstructions
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.ListeningQuestionUI
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.LiteracyAssessmentLevel
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.LiteracyReadingAssessmentUI
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.MultichoiceQuestionsUI
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.PreTestReadingAssessmentUI
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.ReadingStoryEvaluationUI
-import com.nyansapoai.teaching.presentation.assessments.numeracy.NumeracyAssessmentAction
 import com.nyansapoai.teaching.presentation.common.components.AppAlertDialog
 import com.nyansapoai.teaching.presentation.common.components.AppSimulateNavigation
 import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
-import kotlin.invoke
 
 @Composable
 fun LiteracyRoot(
@@ -102,6 +109,17 @@ fun LiteracyScreen(
         }
     }
 
+    BackHandler(enabled = true) {
+
+        if (state.currentAssessmentLevel == LiteracyAssessmentLevel.PRE_TEST || state.currentAssessmentLevel == LiteracyAssessmentLevel.COMPLETED) {
+            navController.popBackStack()
+            return@BackHandler
+        }
+
+        onAction.invoke(LiteracyAction.OnShowPrematureEndAssessmentDialogChange(true))
+
+    }
+
 
     Scaffold(
         topBar = {
@@ -109,7 +127,12 @@ fun LiteracyScreen(
                 navigationIcon = {
                     IconButton(
                         onClick = {
-                            navController.popBackStack()
+                            if(state.currentAssessmentLevel == LiteracyAssessmentLevel.PRE_TEST || state.currentAssessmentLevel == LiteracyAssessmentLevel.COMPLETED) {
+                                navController.popBackStack()
+                                return@IconButton
+                            }
+
+                            onAction.invoke(LiteracyAction.OnShowPrematureEndAssessmentDialogChange(true))
                         }
                     ) {
                         Icon(
@@ -170,6 +193,22 @@ fun LiteracyScreen(
     ) { innerPadding ->
 
         AnimatedVisibility(
+            visible = state.showPrematureEndAssessmentDialog,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            AppAlertDialog(
+                onDismissRequest = { onAction.invoke(LiteracyAction.OnShowPrematureEndAssessmentDialogChange(false)) },
+                dialogText = "You are about to end assessment, and you have to restart the assessment. Click confirm to continue.",
+                dialogTitle = "End Assessment",
+                onConfirmation = {
+                    onAction.invoke(LiteracyAction.OnShowPrematureEndAssessmentDialogChange(false))
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        AnimatedVisibility(
             visible = state.showEndAssessmentDialog,
             enter = fadeIn(),
             exit = fadeOut()
@@ -215,10 +254,6 @@ fun LiteracyScreen(
                             onShowContentChange = {
                                 onAction(SetShowContent(it))
                             },
-                            onAudioByteArrayChange = {
-                                onAction(SetAudioByteArray(it))
-                            },
-                            response = state.response,
                             isLoading = state.isLoading,
                             onAudioPathChange = {
                                 onAction(SetAudioFilePath(audioFilePath = it))
@@ -253,10 +288,6 @@ fun LiteracyScreen(
                             onShowContentChange = {
                                 onAction(SetShowContent(it))
                             },
-                            onAudioByteArrayChange = {
-                                onAction(SetAudioByteArray(it))
-                            },
-                            response = state.response,
                             isLoading = state.isLoading,
                             onAudioPathChange = {
                                 onAction(SetAudioFilePath(audioFilePath = it))

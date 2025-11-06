@@ -23,14 +23,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.BasicAlertDialog
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -46,7 +44,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -99,10 +96,8 @@ fun LiteracyReadingAssessmentUI(
     instructionTitle: String = "Read the letter",
     instructionDescription: String = "Hold the box to record your voice saying the letter.",
     showQuestionNumber: Boolean = true,
-    onAudioByteArrayChange: (ByteArray) -> Unit,
     onAudioPathChange: (String) -> Unit,
     audioFilePath: String?,
-    response: String?,
     onSubmit: () -> Unit,
 ) {
 
@@ -249,7 +244,7 @@ fun LiteracyReadingAssessmentUI(
 
             }
         }else if (audioFile != null){
-            delay(1000)
+            delay(100)
             appAudioRecorder.stop()
             audioFile?.let {
                 when {
@@ -339,46 +334,6 @@ fun LiteracyReadingAssessmentUI(
             AppLinearProgressIndicator(
                 progress = progress
             )
-
-            /*
-            TextButton(
-                colors = ButtonDefaults.textButtonColors(
-                    containerColor = MaterialTheme.colorScheme.tertiary,
-                    contentColor = MaterialTheme.colorScheme.onTertiary
-                ),
-                onClick = {
-                    onShowInstructionsChange(!showInstructions)
-
-                    /*
-                    audioFile?.let {
-                        audioPlayer.playFile(it)
-                    } ?: run {
-                        println("Audio file not available")
-                        // Handle case where audio file is not available
-                    }
-                     */
-                }
-            )
-            {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    modifier = Modifier,
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.play),
-                        contentDescription = "click for instructions"
-                    )
-
-                    Text(
-                        text = "Instructions",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Medium
-                    )
-                }
-            }
-
-             */
         }
 
         Box(
@@ -591,12 +546,10 @@ fun PreTestReadingAssessmentUI(
                                     showContent = it
                                 },
                                 isLoading = false,
-                                onAudioByteArrayChange = {},
                                 onAudioPathChange = {
                                     filePath = it
                                 },
                                 audioFilePath = filePath,
-                                response = null,
                                 showQuestionNumber = false,
                                 instructionAudio = R.raw.read_letter,
                                 instructionTitle = "Read the letter",

@@ -10,18 +10,12 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.workDataOf
 import com.nyansapoai.teaching.data.local.LocalDataSource
-import com.nyansapoai.teaching.data.remote.ai.ArtificialIntelligenceRepository
-import com.nyansapoai.teaching.data.remote.assessment.AssessmentRepository
-import com.nyansapoai.teaching.data.remote.media.MediaRepository
 import com.nyansapoai.teaching.domain.models.assessments.literacy.literacyAssessmentContent
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.LiteracyAssessmentLevel
 import com.nyansapoai.teaching.presentation.assessments.literacy.workers.EvaluateMultipleChoiceQuestionWorker
 import com.nyansapoai.teaching.presentation.assessments.literacy.workers.EvaluateReadingAssessmentWorker
-import com.nyansapoai.teaching.presentation.assessments.literacy.workers.LiteracyAssessmentsMonitorWorker
 import com.nyansapoai.teaching.presentation.assessments.literacy.workers.MarkAssessmentDoneWorker
-import com.nyansapoai.teaching.presentation.assessments.literacy.workers.MarkLiteracyAssessmentWorker
 import com.nyansapoai.teaching.presentation.assessments.literacy.workers.SubmitMultipleChoiceResultsWorker
-import com.nyansapoai.teaching.presentation.assessments.literacy.workers.SubmitReadingAssessmentWorker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -160,9 +154,19 @@ class LiteracyViewModel(
                 }
             }
 
+            is LiteracyAction.OnShowPrematureEndAssessmentDialogChange -> {
+                _state.update {
+                    it.copy(
+                        showPrematureEndAssessmentDialog = action.show
+                    )
+                }
+            }
+
             LiteracyAction.OnEndAssessment -> {
                 endAssessment()
             }
+
+
         }
     }
 

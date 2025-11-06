@@ -3,11 +3,11 @@ package com.nyansapoai.teaching.presentation.assessments.literacy
 import com.nyansapoai.teaching.domain.models.assessments.literacy.LiteracyAssessmentData
 import com.nyansapoai.teaching.domain.models.assessments.literacy.MultipleChoicesResult
 import com.nyansapoai.teaching.domain.models.assessments.literacy.ReadingAssessmentResult
-import com.nyansapoai.teaching.domain.models.assessments.literacy.literacyAssessmentContent
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.LiteracyAssessmentLevel
 
 data class LiteracyState(
     val currentIndex: Int = 0,
+    val showPrematureEndAssessmentDialog: Boolean = false,
     val showInstructions: Boolean = true,
     val title: String = "",
     val showContent: Boolean = false,
@@ -26,7 +26,7 @@ data class LiteracyState(
     val selectedChoice: String? = null,
     val options: List<String> = emptyList(),
 
-    val currentAssessmentLevel: LiteracyAssessmentLevel = LiteracyAssessmentLevel.PRE_TEST,
+    val currentAssessmentLevel: LiteracyAssessmentLevel = LiteracyAssessmentLevel.STORY,
     val currentAssessmentLevelIndex: Int = 0,
     val assessmentContent: LiteracyAssessmentData? = null,
     val readingAssessmentResults: MutableList<ReadingAssessmentResult> = mutableListOf(),

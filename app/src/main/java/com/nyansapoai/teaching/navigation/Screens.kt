@@ -60,3 +60,20 @@ data class CollectAttendancePage(
     val organizationId: String,
     val projectId: String,
 )
+
+@Serializable
+data class LiteracyAssessmentPage(
+    val assessmentId: String,
+    val studentId: String,
+    val studentName: String,
+    val assessmentNo: Int,
+)
+
+@Serializable
+data class NumeracyAssessmentPage(
+    val assessmentId: String,
+    val studentId: String,
+    val studentName: String,
+    val assessmentNo: Int,
+)
+
