@@ -75,12 +75,15 @@ fun CollectAttendanceScreen(
         modifier = Modifier
             .padding(horizontal = 12.dp)
     ) { innerPadding ->
+        /*
         AppComingSoon(
             modifier = Modifier
                 .padding(innerPadding)
         )
 
-        /*
+         */
+
+
         CollectAttendanceContent(
             studentList = state.studentAttendanceList,
             selectedGrade = state.selectedGrade,
@@ -95,7 +98,7 @@ fun CollectAttendanceScreen(
             },
             modifier = Modifier
                 .padding(innerPadding)
-        )*/
+        )
     }
 
 }
@@ -110,7 +113,8 @@ fun CollectAttendanceContent(
     onOptionSelected: (Int?) -> Unit = {  },
     selectedGrade: Int? = null,
     onSubmitAttendance: () -> Unit = {  },
-) {
+)
+{
     Box {
         Column(
             verticalArrangement = Arrangement.spacedBy(20.dp),

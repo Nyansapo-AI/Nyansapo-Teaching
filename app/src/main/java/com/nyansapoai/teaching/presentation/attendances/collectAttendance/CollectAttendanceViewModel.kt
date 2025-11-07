@@ -31,7 +31,8 @@ class CollectAttendanceViewModel(
     private val _state = MutableStateFlow(CollectAttendanceState())
     val state = _state
         .onStart {
-            Log.d("Attendance Data", "attendance collect attendance viewmodel school info: $collectAttendanceRouteArgs")
+            Log.d("Attendance Data", "attendance collect attendance viewmodel school info: $collectAttendanceRouteArgs.")
+            Log.d("Attendance Data Date", "attendance collect attendance viewmodel school info: ${collectAttendanceRouteArgs.date}.")
 
 
             fetchSchoolDetails(
@@ -43,7 +44,7 @@ class CollectAttendanceViewModel(
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000L),
-            initialValue = CollectAttendanceState()
+            initialValue = _state.value
         )
 
     fun onAction(action: CollectAttendanceAction) {

@@ -9,7 +9,7 @@ interface AttendanceRepository {
         organizationId: String,
         projectId: String,
         schoolId: String,
-    ): Results<AttendanceRecord>
+    ): Results<AttendanceRecord?>
 
     suspend fun submitAttendanceData(attendanceRecord: AttendanceRecord, organizationId: String,projectId: String, schoolId: String ): Results<Unit>
 }

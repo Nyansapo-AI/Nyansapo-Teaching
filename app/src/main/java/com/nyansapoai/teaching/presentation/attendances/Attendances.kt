@@ -3,6 +3,7 @@ package com.nyansapoai.teaching.presentation.attendances
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -39,6 +40,7 @@ import com.kizitonwose.calendar.core.firstDayOfWeekFromLocale
 import com.nyansapoai.teaching.R
 import com.nyansapoai.teaching.navController
 import com.nyansapoai.teaching.navigation.CollectAttendancePage
+import com.nyansapoai.teaching.presentation.attendances.composables.AttendanceRecordSummary
 import com.nyansapoai.teaching.presentation.common.components.AppButton
 import com.nyansapoai.teaching.presentation.common.components.AppTextField
 import com.nyansapoai.teaching.utils.Utils
@@ -64,6 +66,18 @@ fun AttendancesScreen(
     onAction: (AttendancesAction) -> Unit,
 ) {
 
+    val selectedDate = state.currentWeekDay
+
+    val isToday = remember(selectedDate) {
+        try {
+            selectedDate != null &&
+                    selectedDate.isNotBlank() &&
+                    LocalDate.parse(selectedDate) == LocalDate.now()
+        } catch (e: Exception) {
+            false
+        }
+    }
+
     Scaffold(
         topBar = {
             Text(
@@ -84,37 +98,80 @@ fun AttendancesScreen(
                 .padding(12.dp)
         ) {
             WeekContent(
-
-            )
-
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-            ) {
-                AppButton(
-                    onClick = {
-                        Log.d("Attendance Data", "attendance school info: ${state.localSchoolInfo}")
-
-                        navController.navigate(
-                            CollectAttendancePage(
-                                date = state.currentWeekDay ?: "",
-                                schoolId = state.localSchoolInfo?.schoolUId ?: "",
-                                organizationId = state.localSchoolInfo?.organizationUid ?: "",
-                                projectId = state.localSchoolInfo?.projectUId ?: ""
-                            )
-                        )
-                    },
-                    modifier = Modifier
-                        .align(Alignment.TopCenter)
-                        .padding(40.dp)
-                ) {
-                    Text(
-                        text = stringResource(R.string.take_attendance),
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.Bold,
+                onSelectedWeekDay = {
+                    onAction.invoke(
+                        AttendancesAction.SetWeekDay(it)
                     )
                 }
+            )
+
+            /*
+            Text(
+                text = state.currentWeekDay ?: "No selected date"
+            )
+
+             */
+
+            AnimatedContent(
+                targetState = isToday
+            ) { isToday ->
+               when(isToday){
+                   true -> {
+                       state.attendanceRecord?.let {
+                           AttendanceRecordSummary(
+                               attendanceRecord = it,
+                               modifier = Modifier
+                                   .fillMaxSize()
+                           )
+                       } ?:
+                       Box(
+                           modifier = Modifier
+                               .fillMaxSize()
+                       )
+                       {
+                           AppButton(
+                               onClick = {
+                                   Log.d("Attendance Data", "attendance school info: ${state.localSchoolInfo}")
+
+                                   navController.navigate(
+                                       CollectAttendancePage(
+                                           date = state.currentWeekDay ?: "",
+                                           schoolId = state.localSchoolInfo?.schoolUId ?: "",
+                                           organizationId = state.localSchoolInfo?.organizationUid ?: "",
+                                           projectId = state.localSchoolInfo?.projectUId ?: ""
+                                       )
+                                   )
+
+                               },
+                               modifier = Modifier
+                                   .align(Alignment.TopCenter)
+                                   .padding(40.dp)
+                           ) {
+                               Text(
+                                   text = stringResource(R.string.take_attendance),
+                                   style = MaterialTheme.typography.bodyLarge,
+                                   fontWeight = FontWeight.Bold,
+                               )
+                           }
+                       }
+
+                   }
+                   false -> {
+                       state.attendanceRecord?.let {
+                           AttendanceRecordSummary(
+                               attendanceRecord = it,
+                               modifier = Modifier
+                                   .fillMaxSize()
+                           )
+                       } ?: Text(
+                           text = "No attendance record found",
+                           style = MaterialTheme.typography.titleLarge,
+                           fontWeight = FontWeight.Bold,
+                       )
+                   }
+               }
             }
+
 
         }
     }
@@ -124,7 +181,10 @@ fun AttendancesScreen(
 
 
 @Composable
-fun WeekContent(){
+fun WeekContent(
+    modifier: Modifier = Modifier,
+    onSelectedWeekDay: (WeekDay) -> Unit = {},
+){
     val currentDate = remember { LocalDate.now() }
     val currentMonth = remember { YearMonth.now() }
     val startDate = remember { currentMonth.minusMonths(1).atStartOfMonth() } // Adjust as needed
@@ -153,9 +213,12 @@ fun WeekContent(){
             WeekDayItem(
                 weekday = weekDay,
                 isSelected = weekDay.date == currentDate,
-                onClick = {}
+                onClick = {
+                    onSelectedWeekDay(it)
+                }
             )
-        }
+        },
+        modifier = modifier
     )
 }
 
@@ -166,7 +229,8 @@ fun WeekDayItem(
     weekday: WeekDay,
     isSelected: Boolean ,
     onClick: (WeekDay) -> Unit = {}
-){
+)
+{
 
     Box(
         contentAlignment = Alignment.TopCenter,
