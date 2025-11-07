@@ -1,6 +1,10 @@
 package com.nyansapoai.teaching.presentation.survey.takeSurvey
 
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -32,6 +36,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nyansapoai.teaching.R
 import com.nyansapoai.teaching.navController
+import com.nyansapoai.teaching.presentation.assessments.literacy.LiteracyAction
+import com.nyansapoai.teaching.presentation.common.components.AppAlertDialog
 import com.nyansapoai.teaching.presentation.common.components.AppButton
 import com.nyansapoai.teaching.presentation.common.components.StepContent
 import com.nyansapoai.teaching.presentation.common.components.StepsRow
@@ -86,7 +92,14 @@ fun SurveyScreen(
         }
     }
 
+    BackHandler(enabled = true) {
+        if (state.currentStepIndex > 0){
+            onAction(SurveyAction.OnUpdateCurrentIndex(state.currentStepIndex -1))
+            return@BackHandler
+        }
 
+        onAction(SurveyAction.SetShowPrematureExitDialog(show = true))
+    }
 
     val surveySteps = listOf(
         // Define your survey steps here
@@ -287,6 +300,14 @@ fun SurveyScreen(
                             )
                         )
                     },
+                    showChildGradeDropdown = state.showChildGradeDropdown,
+                    onShowChildGradeDropdownChanged = {
+                        onAction(
+                            SurveyAction.SetShowChildGradeDropdown(
+                                it
+                            )
+                        )
+                    },
                     livesWith = state.livesWith,
                     childGrade = state.childGrade,
                     childGradeError = state.childGradeError,
@@ -466,7 +487,13 @@ fun SurveyScreen(
                         ) {
                             IconButton(
                                 onClick = {
-                                    navController.popBackStack()
+
+                                    if (state.currentStepIndex > 0){
+                                        onAction(SurveyAction.OnUpdateCurrentIndex(state.currentStepIndex -1))
+                                        return@IconButton
+                                    }
+
+                                    onAction(SurveyAction.SetShowPrematureExitDialog(show = true))
                                 }
                             ) {
                                 Icon(
@@ -512,6 +539,23 @@ fun SurveyScreen(
             .statusBarsPadding()
             .navigationBarsPadding()
     ) { innerPadding ->
+
+
+        AnimatedVisibility(
+            visible = state.prematureExitDialog,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            AppAlertDialog(
+                onDismissRequest = { onAction(SurveyAction.SetShowPrematureExitDialog(show = false)) },
+                dialogText = "You are about to exit the survey, and you will lose all data. Click confirm to continue.",
+                dialogTitle = "Exit Survey",
+                onConfirmation = {
+                    onAction(SurveyAction.SetShowPrematureExitDialog(show = true))
+                    navController.popBackStack()
+                }
+            )
+        }
 
         LazyColumn(
             modifier = Modifier

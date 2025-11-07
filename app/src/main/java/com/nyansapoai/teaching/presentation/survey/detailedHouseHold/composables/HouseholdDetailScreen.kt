@@ -77,9 +77,9 @@ fun HouseholdDetailScreen(
                 InfoCard {
                     KeyValueRow("Interviewer", household.interviewerName)
                     KeyValueRow("Interview Date", household.interviewDate)
-                    KeyValueRow("County", household.county)
-                    KeyValueRow("Sub-county", household.subCounty)
-                    KeyValueRow("Ward", household.ward)
+//                    KeyValueRow("County", household.county)
+//                    KeyValueRow("Sub-county", household.subCounty)
+//                    KeyValueRow("Ward", household.ward)
                     KeyValueRow("Consent given", household.consentGiven.toString())
                     KeyValueRow("Household members", household.householdMembersCount?.toString() ?: "N/A")
                     KeyValueRow("Income source", household.incomeSource ?: "N/A")
@@ -242,6 +242,7 @@ private fun ChildItem(child: Child) {
         KeyValueRow("Name", child.firstName)
         KeyValueRow("Gender", child.gender)
         KeyValueRow("Age", child.age)
+        KeyValueRow("Grade", child.grade)
         KeyValueRow("Lives with", child.livesWith)
     }
 }

@@ -5,6 +5,7 @@ import com.nyansapoai.teaching.domain.models.survey.Child
 import com.nyansapoai.teaching.domain.models.survey.Parent
 
 sealed interface SurveyAction {
+    data class SetShowPrematureExitDialog(val show: Boolean) : SurveyAction
     data class FetchAvailableStudents(val localSchoolInfo: LocalSchoolInfo) : SurveyAction
     data class SetInterviewerName(val name: String) : SurveyAction
     data class SetCounty(val county: String) : SurveyAction
@@ -63,6 +64,7 @@ sealed interface SurveyAction {
     data class SetChildAge(val age: String) : SurveyAction
     data class SetShowChildGenderDropdown(val show: Boolean) : SurveyAction
     data class SetLivesWith(val livesWith: String) : SurveyAction
+    data class SetShowChildGradeDropdown(val show: Boolean) : SurveyAction
 
     data class SetChildGrade(val grade: String): SurveyAction
     data class SetShowLivesWithDropdown(val show: Boolean) : SurveyAction

@@ -86,6 +86,8 @@ fun FamilyMembersContent(
     linkedLearnerId: String,
     childGrade: String,
     childGradeError: String?,
+    showChildGradeDropdown: Boolean = false,
+    onShowChildGradeDropdownChanged: (Boolean) -> Unit,
     onChildGradeChanged: (String) -> Unit,
     linkedIdList: MutableList<String> = mutableListOf(),
     onLinkedLearnerIdChange: (String) -> Unit,
@@ -116,6 +118,9 @@ fun FamilyMembersContent(
             "Beyond Secondary School"
         )
     }
+
+
+    val gradesAllowed = remember { listOf("3", "4", "5",)}
 
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true,
@@ -347,15 +352,23 @@ fun FamilyMembersContent(
                     )
                 }
                 item {
-                    AppTextField(
+                    AppDropDownMenu(
                         required = true,
+                        expanded = showChildGradeDropdown,
                         label = "Grade of the child",
-                        value = childGrade,
-                        error = childGradeError,
-                        onValueChanged = onChildGradeChanged,
-                        keyboardType = KeyboardType.Number,
-                        placeholder = "Enter child's grade(should be between 1 and 9)"
-                    )
+                        placeholder = "Select grade",
+                        onClick = { onShowChildGradeDropdownChanged(!showChildGradeDropdown) },
+                        value = childGrade
+                    ) {
+                        gradesAllowed.forEach {
+                            AppDropDownItem(
+                                item = "Grade $it",
+                                isSelected = childGrade == it,
+                                onClick = { onChildGradeChanged(it) }
+                            )
+                        }
+                    }
+
                 }
 
 

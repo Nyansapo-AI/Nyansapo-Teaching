@@ -183,6 +183,7 @@ fun AssessmentItemBasic(
                     fontWeight = FontWeight.Bold
                 )
 
+                /*
                 Text(
                     text = when (assessment.assigned_students.size) {
                         0 -> "No students"
@@ -197,7 +198,7 @@ fun AssessmentItemBasic(
                         .zIndex(1f)
                     //                    .align(Alignment.BottomStart)
 
-                )
+                )*/
 
             }
         }

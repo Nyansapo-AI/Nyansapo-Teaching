@@ -62,6 +62,10 @@ class SurveyViewModel(
 
     fun onAction(action: SurveyAction) {
         when (action) {
+            is SurveyAction.SetShowPrematureExitDialog -> {
+                _state.update { it.copy(prematureExitDialog = action.show) }
+            }
+
             is SurveyAction.SetConsentGiven -> {
                 _state.update { it.copy(consentGiven = action.given) }
             }
@@ -120,12 +124,20 @@ class SurveyViewModel(
             }
 
             is SurveyAction.SetMainLanguageSpokenAtHome -> {
-                _state.update { it.copy(mainLanguageSpokenAtHome = action.language) }
+                _state.update {
+                    it.copy(
+                        mainLanguageSpokenAtHome = action.language,
+                        showMainLanguageDropdown = false
+                    )
+                }
             }
 
             is SurveyAction.SetRelationshipToHead -> {
                 _state.update {
-                    it.copy(relationshipToHead = action.relationship)
+                    it.copy(
+                        relationshipToHead = action.relationship,
+                        showRelationshipToHeadDropdown = false
+                    )
                 }
             }
 
@@ -149,7 +161,11 @@ class SurveyViewModel(
             }
 
             is SurveyAction.SetShowMainLanguageDropdown -> {
-                _state.update { it.copy(showMainLanguageDropdown = action.show) }
+                _state.update {
+                    it.copy(
+                        showMainLanguageDropdown = action.show,
+                    )
+                }
             }
 
             is SurveyAction.SetShowRelationshipToHeadDropdown -> {
@@ -161,7 +177,12 @@ class SurveyViewModel(
             }
 
             is SurveyAction.SetHouseholdIncomeSource -> {
-                _state.update { it.copy(houseHoldIncomeSource = action.source) }
+                _state.update {
+                    it.copy(
+                        houseHoldIncomeSource = action.source,
+                        showIncomeSourceDropdown = false
+                    )
+                }
             }
 
             is SurveyAction.SetShowIncomeSourceDropdown -> {
@@ -181,11 +202,20 @@ class SurveyViewModel(
             }
 
             is SurveyAction.SetDiscussFrequency -> {
-                _state.update { it.copy(discussFrequency = action.frequency) }
+                _state.update {
+                    it.copy(
+                        discussFrequency = action.frequency,
+                        showDiscussWithTeachersDropdown = false
+                    )
+                }
             }
 
             is SurveyAction.SetDoAttendMeetings -> {
-                _state.update { it.copy(doAttendMeetings = action.attend) }
+                _state.update {
+                    it.copy(
+                        doAttendMeetings = action.attend
+                    )
+                }
             }
 
             is SurveyAction.SetDoMonitorAttendance -> {
@@ -201,7 +231,12 @@ class SurveyViewModel(
             }
 
             is SurveyAction.SetShowWhoHelpsDropdown -> {
-                _state.update { it.copy(showWhoHelpsDropdown = action.show) }
+                _state.update {
+                    it.copy(
+                        showWhoHelpsDropdown = action.show,
+                        showOtherWhoHelpsDropdown = false
+                    )
+                }
             }
 
             is SurveyAction.SetWhoHelps -> {
@@ -266,11 +301,21 @@ class SurveyViewModel(
             }
 
             is SurveyAction.SetHighestEducationLevel -> {
-                _state.update { it.copy(highestEducationLevel = action.level) }
+                _state.update {
+                    it.copy(
+                        highestEducationLevel = action.level,
+                        showHigherEducationDropdown = false
+                    )
+                }
             }
 
             is SurveyAction.SetLivesWith -> {
-                _state.update { it.copy(livesWith = action.livesWith) }
+                _state.update {
+                    it.copy(
+                        livesWith = action.livesWith,
+                        showLivesWithDropdown = false
+                    )
+                }
             }
 
             is SurveyAction.SetParentAge -> {
@@ -283,7 +328,12 @@ class SurveyViewModel(
             }
 
             is SurveyAction.SetParentGender -> {
-                _state.update { it.copy(parentGender = action.gender) }
+                _state.update {
+                    it.copy(
+                        parentGender = action.gender,
+//                        showParentOrGuardianSheet = false
+                    )
+                }
             }
 
             is SurveyAction.SetParentName -> {
@@ -300,7 +350,11 @@ class SurveyViewModel(
             }
 
             is SurveyAction.SetShowChildGenderDropdown -> {
-                _state.update { it.copy(showChildGenderDropdown = action.show) }
+                _state.update {
+                    it.copy(
+                        showChildGenderDropdown = action.show,
+                    )
+                }
             }
 
             is SurveyAction.SetShowGuardianGenderDropdown -> {
@@ -320,11 +374,20 @@ class SurveyViewModel(
             }
 
             is SurveyAction.SetShowTypeDropdown -> {
-                _state.update { it.copy(showTypeDropdown = action.show) }
+                _state.update {
+                    it.copy(
+                        showTypeDropdown = action.show,
+                    )
+                }
             }
 
             is SurveyAction.SetType -> {
-                _state.update { it.copy(type = action.type) }
+                _state.update {
+                    it.copy(
+                        type = action.type,
+                        showTypeDropdown = false
+                    )
+                }
             }
 
             is SurveyAction.OnAddParent -> {
@@ -424,6 +487,11 @@ class SurveyViewModel(
                     )
                 }
             }
+
+            is SurveyAction.SetShowChildGradeDropdown -> {
+                _state.update { it.copy(showChildGradeDropdown = action.show) }
+            }
+
 
             is SurveyAction.OnChangeCurrentStep -> {
                 updateStep()

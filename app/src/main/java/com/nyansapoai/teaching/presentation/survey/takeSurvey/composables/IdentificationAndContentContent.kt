@@ -52,6 +52,7 @@ fun IdentificationAndContentContent(
             placeholder = "Enter your full name",
         )
 
+        /*
         AppDropDownMenu(
             required = true,
             expanded = showCountyDropdown,
@@ -104,6 +105,7 @@ fun IdentificationAndContentContent(
             }
 
         }
+        */
 
         YesNoOption(
             text = "I consent to participate in this survey",

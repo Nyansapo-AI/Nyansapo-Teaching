@@ -12,6 +12,7 @@ data class SurveyState(
     val localSchoolInfo: LocalSchoolInfo? = null,
     val isLoading: Boolean = false,
     val error: String? = null,
+    val prematureExitDialog: Boolean = false,
 
 
     val interviewerName: String = "",
@@ -85,6 +86,7 @@ data class SurveyState(
     val childGrade: String = "",
     val childGradeError: String? = null,
     val showChildGenderDropdown: Boolean = false,
+    val showChildGradeDropdown: Boolean = false,
     val livesWith: String = "",
     val linkedLearnerId: String = "",
     val showAvailableLearnersDropdown: Boolean = false,
@@ -112,9 +114,9 @@ data class SurveyState(
         when(currentStep){
             HouseSurveyStep.CONSENT -> {
                 return consentGiven == true &&
-                        county.isNotBlank() &&
-                        subCounty.isNotBlank() &&
-                        ward.isNotBlank() &&
+//                        county.isNotBlank() &&
+//                        subCounty.isNotBlank() &&
+//                        ward.isNotBlank() &&
                         interviewerName.isNotBlank() &&
                         interviewNameError == null
             }
@@ -145,8 +147,7 @@ data class SurveyState(
 
             }
             HouseSurveyStep.FAMILY_MEMBERS -> {
-                return parents.isNotEmpty() || children.isNotEmpty() &&
-                        familyMemberError != null
+                return parents.isNotEmpty() || children.isNotEmpty() && familyMemberError != null
             }
             HouseSurveyStep.PARENTAL_ENGAGEMENT -> {
                 return if (isSchoolAgeChildrenPresent == true) {
@@ -166,9 +167,10 @@ data class SurveyState(
         fun SurveyState.toCreateHouseHoldInfo(): CreateHouseHoldInfo{
             return CreateHouseHoldInfo(
                 interviewerName = interviewerName,
-                village = "testVillage",
-                county = county,
-                subCounty = subCounty,
+                villageId = localSchoolInfo?.schoolUId,
+//                village = "testVillage",
+//                county = county,
+//                subCounty = subCounty,
                 ward = ward,
                 consentGiven = consentGiven ?: false,
                 respondentName = respondentName,
