@@ -71,3 +71,20 @@ data class HouseHoldDetailsPage(
     val organizationId: String,
     val schoolId: String
 )
+
+@Serializable
+data class LiteracyAssessmentPage(
+    val assessmentId: String,
+    val studentId: String,
+    val studentName: String,
+    val assessmentNo: Int,
+)
+
+@Serializable
+data class NumeracyAssessmentPage(
+    val assessmentId: String,
+    val studentId: String,
+    val studentName: String,
+    val assessmentNo: Int,
+)
+

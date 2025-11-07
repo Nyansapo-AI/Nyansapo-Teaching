@@ -26,6 +26,8 @@ import com.nyansapoai.teaching.presentation.assessments.assessmentResult.Assessm
 import com.nyansapoai.teaching.presentation.assessments.conductAssessment.ConductAssessmentRoot
 import com.nyansapoai.teaching.presentation.assessments.createAssessment.CreateAssessmentsRoot
 import com.nyansapoai.teaching.presentation.assessments.assessmentResult.literacyResult.LiteracyResultRoot
+import com.nyansapoai.teaching.presentation.assessments.literacy.LiteracyRoot
+import com.nyansapoai.teaching.presentation.assessments.numeracy.NumeracyAssessmentRoot
 import com.nyansapoai.teaching.presentation.attendances.collectAttendance.CollectAttendanceRoot
 import com.nyansapoai.teaching.presentation.authentication.AuthControllerRoot
 import com.nyansapoai.teaching.presentation.authentication.otp.OTPRoot
@@ -168,6 +170,29 @@ fun Navigation(){
                     householdId = args.houseHoldId
                 )
 
+            }
+
+            composable<LiteracyAssessmentPage> {
+                val args = it.toRoute<LiteracyAssessmentPage>()
+
+                LiteracyRoot(
+                    assessmentId = args.assessmentId,
+                    studentId = args.studentId,
+                    assessmentNo = args.assessmentNo,
+                    studentName = args.studentName
+                )
+
+            }
+
+            composable<NumeracyAssessmentPage> {
+                val args = it.toRoute<NumeracyAssessmentPage>()
+
+                NumeracyAssessmentRoot(
+                    assessmentId = args.assessmentId,
+                    studentId = args.studentId,
+                    assessmentNo = args.assessmentNo,
+                    studentName = args.studentName
+                )
             }
 
         }

@@ -3,6 +3,7 @@ package com.nyansapoai.teaching.data.local.sqldelight
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import app.cash.sqldelight.coroutines.mapToOne
+import app.cash.sqldelight.coroutines.mapToOneOrNull
 import com.nyansapoai.teaching.Database
 import com.nyansapoai.teaching.data.local.LocalDataSource
 import com.nyansapoai.teaching.domain.models.school.LocalSchoolInfo
@@ -12,6 +13,7 @@ import com.nyansapoai.teaching.domain.mapper.assessment.toNumeracyWordProblem
 import com.nyansapoai.teaching.domain.mapper.assessment.toPendingMultipleChoicesResult
 import com.nyansapoai.teaching.domain.mapper.assessment.toPendingReadingAssessmentResult
 import com.nyansapoai.teaching.domain.mapper.school.toLocalSchoolInfo
+import com.nyansapoai.teaching.domain.models.assessments.AssessmentProgress
 import com.nyansapoai.teaching.domain.models.assessments.CompletedAssessment
 import com.nyansapoai.teaching.domain.models.assessments.literacy.PendingMultipleChoicesResult
 import com.nyansapoai.teaching.domain.models.assessments.literacy.PendingReadingAssessmentResult
@@ -27,7 +29,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
-import kotlin.text.toInt
 
 class SQLDelightDataSourceImp(
     private val database: Database,
@@ -716,4 +717,48 @@ class SQLDelightDataSourceImp(
         surveyQueries.clearHouseholdData(householdId)
     }
 
+
+    override suspend fun insertAssessmentProgress(
+        assessmentId: String,
+        studentId: String,
+        currentIndex: Int,
+        level: String
+    ) {
+        assessmentQueries.insertOrUpdateAssessmentProgress(
+            assessmentId = assessmentId,
+            studentId = studentId,
+            currentIndex = currentIndex.toLong(),
+            level = level
+        )
+    }
+
+    override fun getAssessmentProgress(
+        assessmentId: String,
+        studentId: String
+    ): Flow<AssessmentProgress?> {
+        return assessmentQueries.getAssessmentProgress(assessmentId = assessmentId, studentId = studentId)
+            .asFlow()
+            .mapToOneOrNull(Dispatchers.IO)
+            .map { entity ->
+                entity?.let {
+                    AssessmentProgress(
+                        index = entity.currentIndex.toInt(),
+                        assessmentLevel = entity.level,
+                        studentId = entity.studentId,
+                        assessmentId = entity.assessmentId
+                    )
+                }
+            }
+            .flowOn(Dispatchers.IO)
+    }
+
+    override suspend fun clearAssessmentProgress(
+        assessmentId: String,
+        studentId: String
+    ) {
+        assessmentQueries.clearAssessmentProgress(
+            assessmentId = assessmentId,
+            studentId = studentId
+        )
+    }
 }

@@ -1,5 +1,6 @@
 package com.nyansapoai.teaching.data.local
 
+import com.nyansapoai.teaching.domain.models.assessments.AssessmentProgress
 import com.nyansapoai.teaching.domain.models.school.LocalSchoolInfo
 import com.nyansapoai.teaching.domain.models.assessments.CompletedAssessment
 import com.nyansapoai.teaching.domain.models.assessments.literacy.PendingMultipleChoicesResult
@@ -82,4 +83,10 @@ interface LocalDataSource {
     fun getPendingHouseholdDataById(householdId: String): Flow<CreateHouseHoldInfo?>
     fun getChildrenInPendingHouseholds(): Flow<List<Child>>
     fun clearSubmittedHouseholdData(householdId: String)
+    suspend fun insertAssessmentProgress(assessmentId: String, studentId: String, currentIndex: Int, level: String)
+
+    fun getAssessmentProgress(assessmentId: String, studentId: String): Flow<AssessmentProgress?>
+
+    suspend fun clearAssessmentProgress(assessmentId: String, studentId: String)
+
 }
