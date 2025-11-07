@@ -35,7 +35,8 @@ fun SelectSchool(
     ) {
         if (schoolList.isEmpty()){
             Text(
-                text = stringResource(R.string.no_school_linked),
+//                text = stringResource(R.string.no_school_linked),
+                text = "You are not associated with any village in the project!",
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f),
                 style = MaterialTheme.typography.titleSmall,
@@ -56,7 +57,8 @@ fun SelectSchool(
             )
 
             Text(
-                text = stringResource(R.string.select_school),
+//                text = stringResource(R.string.select_school),
+                text = "Select the Village",
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onBackground

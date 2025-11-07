@@ -1,5 +1,6 @@
 package com.nyansapoai.teaching.data.firebase.user
 
+import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.toObject
@@ -30,6 +31,8 @@ class UserRepositoryFirebaseImp(
             .document(uid)
             .get()
             .await()
+
+        Log.d("user", documentSnapshot.toString())
 
         val userData = documentSnapshot.toObject<NyansapoUser>()
         emit(Results.success(data = userData))

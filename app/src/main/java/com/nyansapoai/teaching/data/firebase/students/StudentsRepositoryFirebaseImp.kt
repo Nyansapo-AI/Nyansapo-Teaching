@@ -33,6 +33,9 @@ class StudentsRepositoryFirebaseImp(
     ): Flow<Results<List<NyansapoStudent>>> = callbackFlow{
 
 
+
+
+
         val documentRef = studentClass?.let {
             firebaseDb.collection(ORGANIZATION_COLLECTION)
                 .document(organizationId)
@@ -63,10 +66,16 @@ class StudentsRepositoryFirebaseImp(
                 if (snapshot != null){
                     val data = snapshot.documents.mapNotNull { documentSnapshot ->
 
+                        val gradeValue = when (val g = documentSnapshot.get("grade")) {
+                            is Number -> g.toInt()
+                            is String -> g.toIntOrNull()
+                            else -> null
+                        }
+
                         NyansapoStudent(
                             id = documentSnapshot.id,
                             baseline = documentSnapshot.getString("baseline") ?: "",
-                            grade = documentSnapshot.getLong("grade")?.toInt(),
+                            grade = gradeValue,
                             group = documentSnapshot.getString("group") ?: "",
                             name = documentSnapshot.getString("name") ?: "",
                             first_name = documentSnapshot.getString("first_name") ?: "",
