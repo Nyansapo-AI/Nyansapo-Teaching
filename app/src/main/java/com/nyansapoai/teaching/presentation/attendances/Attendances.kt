@@ -41,6 +41,7 @@ import com.nyansapoai.teaching.R
 import com.nyansapoai.teaching.navController
 import com.nyansapoai.teaching.navigation.CollectAttendancePage
 import com.nyansapoai.teaching.presentation.attendances.composables.AttendanceRecordSummary
+import com.nyansapoai.teaching.presentation.attendances.composables.DateAttendanceRecord
 import com.nyansapoai.teaching.presentation.common.components.AppButton
 import com.nyansapoai.teaching.presentation.common.components.AppTextField
 import com.nyansapoai.teaching.utils.Utils
@@ -118,10 +119,29 @@ fun AttendancesScreen(
                when(isToday){
                    true -> {
                        state.attendanceRecord?.let {
+                           /*
                            AttendanceRecordSummary(
                                attendanceRecord = it,
                                modifier = Modifier
                                    .fillMaxSize()
+                           )*/
+
+                           DateAttendanceRecord(
+                               attendanceRecord = it,
+                               modifier = Modifier
+                                   .fillMaxSize()
+                                   .clickable(
+                                       onClick = {
+                                           navController.navigate(
+                                               CollectAttendancePage(
+                                                   date = state.currentWeekDay ?: "",
+                                                   schoolId = state.localSchoolInfo?.schoolUId ?: "",
+                                                   organizationId = state.localSchoolInfo?.organizationUid ?: "",
+                                                   projectId = state.localSchoolInfo?.projectUId ?: ""
+                                               )
+                                           )
+                                       }
+                                   )
                            )
                        } ?:
                        Box(

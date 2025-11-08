@@ -71,7 +71,11 @@ private fun StudentAttendanceRowReadOnly(
             .padding(vertical = 8.dp, horizontal = 4.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Column(modifier = Modifier.weight(1f)) {
+        Column(
+            modifier = Modifier
+                .weight(1f)
+
+        ) {
             Text(text = student.name, style = MaterialTheme.typography.bodyLarge)
             student.grade?.let {
                 Text(text = "Grade: $it", style = MaterialTheme.typography.bodySmall)
@@ -106,7 +110,8 @@ fun AttendanceRecordSummary(
         .joinToString(", ") { it.name }
 
     Card(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth(),
         shape = RoundedCornerShape(8.dp)
     ) {
         Column(

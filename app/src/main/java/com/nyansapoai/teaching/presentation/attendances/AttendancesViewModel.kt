@@ -6,11 +6,11 @@ import androidx.lifecycle.viewModelScope
 import com.nyansapoai.teaching.data.local.LocalDataSource
 import com.nyansapoai.teaching.data.remote.attendance.AttendanceRepository
 import com.nyansapoai.teaching.domain.models.school.LocalSchoolInfo
-import com.nyansapoai.teaching.presentation.students.StudentsState
 import com.nyansapoai.teaching.utils.ResultStatus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
@@ -68,35 +68,42 @@ class AttendancesViewModel(
     }
 
     private fun getAttendance(date: String, localSchoolInfo: LocalSchoolInfo?){
-        viewModelScope.launch(Dispatchers.IO) {
-            val response = attendancesRepository.getAttendanceData(
-                date = date,
-                organizationId = localSchoolInfo?.organizationUid ?: "",
-                schoolId = localSchoolInfo?.schoolUId ?: "",
-                projectId = localSchoolInfo?.schoolUId ?: "",
-            )
-
-            Log.d("ATTENDANCE", "getAttendance: $response")
-
-            when(response.status) {
-                ResultStatus.INITIAL ,
-                ResultStatus.LOADING -> {
-                    _state.update { it.copy(isLoading = true) }
-                }
-                ResultStatus.SUCCESS -> {
-                    _state.update {
-                        it.copy(attendanceRecord = response.data)
-                    }
-                }
-                ResultStatus.ERROR -> {
-                    _state.update {
-                        it.copy(
-                            errorMessage = response.message,
-                            isLoading = false
-                        )
-                    }
-                }
+        if (localSchoolInfo == null) {
+            _state.update {
+                it.copy(
+                    errorMessage = "Local school info is missing",
+                    isLoading = false
+                )
             }
+            Log.e("AttendancesViewModel", "getAttendance: Local school info is missing")
+            return
+        }
+
+
+        viewModelScope.launch(Dispatchers.IO) {
+            attendancesRepository.getAttendanceDataByDate(
+                date = date,
+                organizationId = localSchoolInfo.organizationUid,
+                schoolId = localSchoolInfo.schoolUId,
+                projectId = localSchoolInfo.projectUId,
+            )
+                .onStart {_state.update { it.copy(isLoading = true) }}
+                .catch { error ->  _state.update { it.copy(errorMessage = error.message, isLoading = false) } }
+                .collect { response ->
+                    when(response.status){
+                        ResultStatus.INITIAL ,
+                        ResultStatus.LOADING -> {
+                            _state.update { it.copy(isLoading = true) }
+                        }
+                        ResultStatus.SUCCESS -> {
+                            _state.update { it.copy(isLoading = false, attendanceRecord = response.data) }
+                        }
+                        ResultStatus.ERROR -> {
+                            _state.update { it.copy(errorMessage = response.message, isLoading = false) }
+                        }
+                    }
+
+                }
 
 
         }
