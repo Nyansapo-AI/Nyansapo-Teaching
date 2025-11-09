@@ -11,6 +11,8 @@ fun AssignedStudentDto.toNyansapoStudent(): NyansapoStudent {
         group = group,
         name = name,
         sex = sex,
+        has_done = has_done,
+        isLinked = isLinked,
         first_name = first_name,
         last_name = last_name
     )

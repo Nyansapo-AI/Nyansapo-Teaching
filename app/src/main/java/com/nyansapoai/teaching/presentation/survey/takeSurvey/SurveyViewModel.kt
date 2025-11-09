@@ -39,8 +39,8 @@ class SurveyViewModel(
             initialValue = false
         )
 
-//    private val _state = MutableStateFlow(SurveyState())
-    private val _state = MutableStateFlow(SurveyState.demoSurveyState)
+    private val _state = MutableStateFlow(SurveyState())
+//    private val _state = MutableStateFlow(SurveyState.demoSurveyState)
     val state = combine(
         _state,
         localDataSource.getSavedCurrentSchoolInfo(),

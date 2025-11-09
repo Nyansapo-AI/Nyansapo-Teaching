@@ -44,21 +44,26 @@ class IndividualAssessmentViewModel(
         localDataSource.getAssignedStudents()
     ){ state, assessment, assignedStudents ->
 
-        val filteredStudents = assessment.data?.assigned_students
-            ?.filter { remoteStudent ->
+        val filteredStudents = run {
+            val all = assessment.data?.assigned_students ?: emptyList()
+
+            val linkedOrLocal = all.filter { remoteStudent ->
                 remoteStudent.isLinked || assignedStudents.any { localStudent ->
                     localStudent.linkedLearnerId == remoteStudent.id
                 }
             }
-            ?.let { students ->
-                when {
-                    state.selectedGrade != null ->
-                        students.filter { it.grade == state.selectedGrade }
-                    else -> students
-                }
-            }
-            ?.map { it.toNyansapoStudent() }
-            ?: emptyList()
+
+            val byGrade = state.selectedGrade?.let { grade ->
+                linkedOrLocal.filter { it.grade == grade }
+            } ?: linkedOrLocal
+
+            // include done students regardless of link/local status
+            val withDone = all.filter { it.has_done }
+
+            val combined = (byGrade + withDone).distinctBy { it.id }
+
+            combined.map { it.toNyansapoStudent() }
+        }
 
         state.copy(
             assessmentState = assessment,
@@ -81,9 +86,18 @@ class IndividualAssessmentViewModel(
 
             is IndividualAssessmentAction.OnSetGrade -> {
                 _state.update { currentState ->
+                    val studentsList = run {
+                        val all = currentState.assessmentState.data?.assigned_students ?: emptyList()
+                        val byGrade = action.grade?.let { grade -> all.filter { it.grade == grade } } ?: all
+                        val withDone = all.filter { it.has_done }
+                        val combined = (byGrade + withDone).distinctBy { it.id }
+                        combined.map { it.toNyansapoStudent() }
+                    }
+
+
                     currentState.copy(
                         selectedGrade = action.grade,
-                        studentsList = action.grade?.let { currentState.assessmentState.data?.assigned_students?.filter { it.grade == action.grade }?.map { it.toNyansapoStudent() } }  ?: currentState.assessmentState.data?.assigned_students?.map { it.toNyansapoStudent() } ?: emptyList()
+                        studentsList = studentsList
                     )
                 }
             }
