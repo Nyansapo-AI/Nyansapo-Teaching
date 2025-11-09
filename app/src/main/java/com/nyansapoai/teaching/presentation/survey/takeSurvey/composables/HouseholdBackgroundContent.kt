@@ -8,7 +8,6 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
-import com.nyansapoai.teaching.presentation.common.components.AppCheckBox
 import com.nyansapoai.teaching.presentation.common.components.AppDropDownItem
 import com.nyansapoai.teaching.presentation.common.components.AppDropDownMenu
 import com.nyansapoai.teaching.presentation.common.components.AppTextField
@@ -49,7 +48,11 @@ fun HouseholdBackgroundContent(
     showAssetsDropdown: Boolean,
     onShowAssetsDropdownChanged: (Boolean) -> Unit,
     hasElectricity: Boolean?,
-    onHasElectricityChanged: (Boolean) -> Unit
+    onHasElectricityChanged: (Boolean) -> Unit,
+    maritalStatus: String,
+    onMaritalStatusChanged: (String) -> Unit,
+    showMaritalStatusDropdown: Boolean,
+    onShowMaritalStatusDropdownChanged: (Boolean) -> Unit,
 ) {
 
     val householdIncomeSources = remember {
@@ -94,6 +97,17 @@ fun HouseholdBackgroundContent(
         )
     }
 
+    val maritalStatusList = remember {
+        listOf(
+            "Widowed",
+            "Divorced",
+            "Separated",
+            "Single",
+            "Never married",
+            "Living together"
+        )
+    }
+
 
     Column(
         modifier = modifier
@@ -108,7 +122,7 @@ fun HouseholdBackgroundContent(
 
         AppTextField(
             required = true,
-            label = "Respondent Name",
+            label = "Name of the respondent",
             value = respondentName,
             error = respondentNameError,
             onValueChanged = onRespondentNameChanged,
@@ -167,7 +181,7 @@ fun HouseholdBackgroundContent(
 
         AppTextField(
             required = true,
-            label = "Household Head Mobile Number",
+            label = "Telephone/Mobile Number of the Household Head",
             value = householdHeadMobileNumber,
             onValueChanged = {onHouseholdHeadMobileNumberChanged(it)},
             keyboardType = KeyboardType.Phone,
@@ -200,7 +214,7 @@ fun HouseholdBackgroundContent(
 
         AppTextField(
             required = true,
-            label = "Total Household Members",
+            label = "Number of members regularly living in the household including yourself",
             value = householdMembersTotalNumber,
             onValueChanged = {onHouseholdMembersNumberChanged(it)},
             keyboardType = KeyboardType.Number,
@@ -222,6 +236,23 @@ fun HouseholdBackgroundContent(
                     item = source,
                     isSelected = houseHoldIncomeSource == source,
                     onClick = {onHouseHoldIncomeSourceChanged(source)}
+                )
+            }
+        }
+
+        AppDropDownMenu(
+            required = true,
+            expanded = showMaritalStatusDropdown,
+            label = "Household Head Marital status",
+            placeholder = "What is the marital status of the household head?",
+            onClick = { onShowMaritalStatusDropdownChanged(!showMaritalStatusDropdown)},
+            value = maritalStatus,
+        ) {
+            maritalStatusList.forEach { status ->
+                AppDropDownItem(
+                    item = status,
+                    isSelected = status == maritalStatus,
+                    onClick = { onMaritalStatusChanged(status) }
                 )
             }
         }

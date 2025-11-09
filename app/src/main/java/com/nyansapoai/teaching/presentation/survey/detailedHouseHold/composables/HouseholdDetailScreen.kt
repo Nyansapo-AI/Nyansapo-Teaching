@@ -184,14 +184,6 @@ fun HouseholdDetailScreen(
                                 "Has books/materials",
                                 learningEnvironment.hasBooksOrMaterials.toString()
                             )
-                            KeyValueRow(
-                                "Missed school last month",
-                                learningEnvironment.missedSchoolLastMonth.toString()
-                            )
-                            KeyValueRow(
-                                "Reason missed",
-                                learningEnvironment.reasonForMissingSchool ?: "N/A"
-                            )
                         }
                     }
                     Spacer(Modifier.height(12.dp))

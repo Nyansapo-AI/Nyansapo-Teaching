@@ -38,11 +38,11 @@ fun ParentalEngagementContent(
         modifier = modifier
             .imePadding()
     ) {
+
         YesNoOption(
             text = "Is there any school-age child (6–17 years) in this household?",
             isYes = isSchoolAgePresent,
             onChange = {onSchoolAgeChanged(it)}
-
         )
 
         // If No -> skip rest (AnimatedVisibility hides them)

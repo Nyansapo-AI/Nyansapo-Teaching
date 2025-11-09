@@ -25,6 +25,8 @@ sealed interface SurveyAction {
     data class SetShowMainLanguageDropdown(val show: Boolean) : SurveyAction
     data class SetTotalHouseholdMembers(val total: String) : SurveyAction
     data class SetHouseholdIncomeSource(val source: String) : SurveyAction
+    data class SetHeadMaritalStatus(val status: String) : SurveyAction
+    data class SetShowMaritalStatusDropdown(val show: Boolean) : SurveyAction
     data class SetShowIncomeSourceDropdown(val show: Boolean) : SurveyAction
     data class SetHouseholdAssets(val assets: List<String>) : SurveyAction
     data class SetHouseholdAssetsAddRemove(val asset: String) : SurveyAction

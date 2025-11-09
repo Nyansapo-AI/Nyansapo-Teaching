@@ -185,6 +185,14 @@ class SurveyViewModel(
                 }
             }
 
+            is SurveyAction.SetHeadMaritalStatus -> {
+                _state.update { it.copy(maritalStatus = action.status) }
+            }
+
+            is SurveyAction.SetShowMaritalStatusDropdown -> {
+                _state.update { it.copy(showMaritalStatusDropdown = action.show) }
+            }
+
             is SurveyAction.SetShowIncomeSourceDropdown -> {
                 _state.update { it.copy(showIncomeSourceDropdown = action.show) }
             }
@@ -404,6 +412,8 @@ class SurveyViewModel(
                         showParentOrGuardianSheet = false,
                         parentName = "",
                         parentAge = "",
+                        parentGender = "",
+                        type = "",
                         hasAttendedSchool = false,
                         highestEducationLevel = "",
                         familyMemberError = validateChildrenHaveParents(children = currentState.children, parents = currentState.parents)
@@ -540,6 +550,7 @@ class SurveyViewModel(
                     schoolId = action.localSchoolInfo.schoolUId,
                 )
             }
+
 
         }
 

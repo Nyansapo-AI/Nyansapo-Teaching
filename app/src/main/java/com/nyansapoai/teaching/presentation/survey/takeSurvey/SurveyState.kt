@@ -44,6 +44,9 @@ data class SurveyState(
     val householdAssets: MutableList<String> = mutableListOf(),
     val showAssetsDropdown: Boolean = false,
     val hasElectricity: Boolean? = null,
+    val showMaritalStatusDropdown: Boolean = false,
+    val maritalStatus: String = "",
+
 
     val isSchoolAgeChildrenPresent: Boolean? = null,
     val showWhoHelpsDropdown: Boolean = false,
@@ -114,9 +117,6 @@ data class SurveyState(
         when(currentStep){
             HouseSurveyStep.CONSENT -> {
                 return consentGiven == true &&
-//                        county.isNotBlank() &&
-//                        subCounty.isNotBlank() &&
-//                        ward.isNotBlank() &&
                         interviewerName.isNotBlank() &&
                         interviewNameError == null
             }
@@ -129,7 +129,8 @@ data class SurveyState(
                             mobileNumberError == null &&
                             mainLanguageSpokenAtHome.isNotBlank() &&
                             totalHouseholdMembers.isNotBlank() &&
-                            houseHoldIncomeSource.isNotBlank()
+                            houseHoldIncomeSource.isNotBlank() &&
+                            maritalStatus.isNotBlank()
                 } else {
                     respondentName.isNotBlank() &&
                             isRespondentHeadOfHousehold != null &&
@@ -144,10 +145,9 @@ data class SurveyState(
                             totalHouseholdMembers.isNotBlank() &&
                             houseHoldIncomeSource.isNotBlank()
                 }
-
             }
             HouseSurveyStep.FAMILY_MEMBERS -> {
-                return  children.isNotEmpty() && familyMemberError != null
+                return  children.isNotEmpty() && (parents.isNotEmpty() || familyMemberError != null)
             }
             HouseSurveyStep.PARENTAL_ENGAGEMENT -> {
                 return if (isSchoolAgeChildrenPresent == true) {
@@ -158,7 +158,7 @@ data class SurveyState(
             }
 
             HouseSurveyStep.CHILD_LEARNING_ENVIRONMENT -> {
-                return isQuietPlaceAvailable != null && hasLearningMaterials != null && hasMissedSchool != null
+                return isQuietPlaceAvailable != null && hasLearningMaterials != null
             }
         }
     }
@@ -168,9 +168,6 @@ data class SurveyState(
             return CreateHouseHoldInfo(
                 interviewerName = interviewerName,
                 villageId = localSchoolInfo?.schoolUId,
-//                village = "testVillage",
-//                county = county,
-//                subCounty = subCounty,
                 ward = ward,
                 consentGiven = consentGiven ?: false,
                 respondentName = respondentName,
@@ -180,6 +177,7 @@ data class SurveyState(
                 householdHeadPhone = householdHeadMobileNumber,
                 respondentAge = respondentAge.toIntOrNull(),
                 mainLanguage = mainLanguageSpokenAtHome,
+                maritalStatus = maritalStatus,
                 children = children.toList(),
                 parents = parents.toList(),
                 householdMembersCount = totalHouseholdMembers.toIntOrNull(),
@@ -197,9 +195,7 @@ data class SurveyState(
                 } else null,
                 childLearningEnvironment = ChildLearningEnvironment(
                     hasQuietPlaceToStudy = isQuietPlaceAvailable ?: false,
-                    hasBooksOrMaterials = hasLearningMaterials ?: false,
-                    missedSchoolLastMonth = hasMissedSchool ?: false,
-                    reasonForMissingSchool = if (missedReason == "Other") otherMissedReason else missedReason
+                    hasBooksOrMaterials = hasLearningMaterials ?: false
                 )
             )
         }
@@ -253,7 +249,7 @@ data class SurveyState(
 
             isQuietPlaceAvailable = true,
             hasLearningMaterials = true,
-            currentStep = HouseSurveyStep.HOUSEHOLD_BACKGROUND
+            currentStep = HouseSurveyStep.CONSENT
         )
     }
 }

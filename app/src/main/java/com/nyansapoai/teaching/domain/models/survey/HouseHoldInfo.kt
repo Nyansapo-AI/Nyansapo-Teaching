@@ -73,8 +73,6 @@ data class ParentalEngagement(
 data class ChildLearningEnvironment(
     val hasQuietPlaceToStudy: Boolean = false,
     val hasBooksOrMaterials: Boolean = false,
-    val missedSchoolLastMonth: Boolean = false,
-    val reasonForMissingSchool: String? = null,
 )
 
 data class Parent(

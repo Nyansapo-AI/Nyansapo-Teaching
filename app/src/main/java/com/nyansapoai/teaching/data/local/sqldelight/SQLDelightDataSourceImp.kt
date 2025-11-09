@@ -468,8 +468,8 @@ class SQLDelightDataSourceImp(
                     createHouseHoldData.id,
                     if (learningEnvironment.hasQuietPlaceToStudy) 1L else 0L,
                     if (learningEnvironment.hasBooksOrMaterials) 1L else 0L,
-                    if (learningEnvironment.missedSchoolLastMonth) 1L else 0L,
-                    learningEnvironment.reasonForMissingSchool
+                    0L,
+                    ""
                 )
             }
         }
@@ -549,12 +549,7 @@ class SQLDelightDataSourceImp(
                     ) {
                         null
                     } else {
-                        ChildLearningEnvironment(
-                            hasQuietPlaceToStudy = (householdRow.childLearningEnvironmentHasQuietPlaceToStudy == 1L),
-                            hasBooksOrMaterials = (householdRow.childLearningEnvironmentHasBooksOrMaterials == 1L),
-                            missedSchoolLastMonth = (householdRow.childLearningEnvironmentMissedSchoolLastMonth == 1L),
-                            reasonForMissingSchool = householdRow.childLearningEnvironmentReasonForMissingSchool
-                        )
+                        ChildLearningEnvironment()
                     }
 
                     CreateHouseHoldInfo(
@@ -656,12 +651,7 @@ class SQLDelightDataSourceImp(
                 ) {
                     null
                 } else {
-                    ChildLearningEnvironment(
-                        hasQuietPlaceToStudy = (fullRow.childLearningEnvironmentHasQuietPlaceToStudy == 1L),
-                        hasBooksOrMaterials = (fullRow.childLearningEnvironmentHasBooksOrMaterials == 1L),
-                        missedSchoolLastMonth = (fullRow.childLearningEnvironmentMissedSchoolLastMonth == 1L),
-                        reasonForMissingSchool = fullRow.childLearningEnvironmentReasonForMissingSchool
-                    )
+                    ChildLearningEnvironment()
                 }
 
                 CreateHouseHoldInfo(

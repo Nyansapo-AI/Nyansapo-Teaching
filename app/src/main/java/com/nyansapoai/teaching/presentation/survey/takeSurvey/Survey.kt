@@ -36,7 +36,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nyansapoai.teaching.R
 import com.nyansapoai.teaching.navController
-import com.nyansapoai.teaching.presentation.assessments.literacy.LiteracyAction
 import com.nyansapoai.teaching.presentation.common.components.AppAlertDialog
 import com.nyansapoai.teaching.presentation.common.components.AppButton
 import com.nyansapoai.teaching.presentation.common.components.StepContent
@@ -177,6 +176,10 @@ fun SurveyScreen(
                             )
                         )
                     },
+                    maritalStatus = state.maritalStatus,
+                    showMaritalStatusDropdown = state.showMaritalStatusDropdown,
+                    onMaritalStatusChanged = { onAction(SurveyAction.SetHeadMaritalStatus(it)) },
+                    onShowMaritalStatusDropdownChanged = {onAction(SurveyAction.SetShowMaritalStatusDropdown(it))},
                     mainLanguageSpokenAtHome = state.mainLanguageSpokenAtHome,
                     onMainLanguageSpokenAtHomeChanged = {
                         onAction(
@@ -429,38 +432,6 @@ fun SurveyScreen(
                     onHasLearningMaterialsChanged = {
                         onAction(
                             SurveyAction.SetHasLearningMaterials(
-                                it
-                            )
-                        )
-                    },
-                    hasMissedSchool = state.hasMissedSchool,
-                    onHasMissedSchoolChanged = {
-                        onAction(
-                            SurveyAction.SetHasMissedSchool(
-                                it
-                            )
-                        )
-                    },
-                    missedReason = state.missedReason,
-                    onMissedReasonChanged = {
-                        onAction(
-                            SurveyAction.SetMissedReason(
-                                it
-                            )
-                        )
-                    },
-                    showMissedReasonDropdown = state.showMissedReasonDropdown,
-                    onShowMissedReasonDropdownChanged = {
-                        onAction(
-                            SurveyAction.SetShowMissedReasonDropdown(
-                                it
-                            )
-                        )
-                    },
-                    otherMissedReason = state.otherMissedReason,
-                    onOtherMissedReasonChanged = {
-                        onAction(
-                            SurveyAction.SetOtherMissedReason(
                                 it
                             )
                         )

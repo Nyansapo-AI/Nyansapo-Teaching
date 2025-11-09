@@ -108,7 +108,7 @@ fun IdentificationAndContentContent(
         */
 
         YesNoOption(
-            text = "I consent to participate in this survey",
+            text = " Has the respondent given consent to participate?",
             isYes = consentGiven,
             onChange = onConsentChanged
         )
