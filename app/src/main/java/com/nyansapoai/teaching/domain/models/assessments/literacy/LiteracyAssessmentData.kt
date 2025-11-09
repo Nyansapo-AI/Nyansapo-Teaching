@@ -530,7 +530,7 @@ val literacyAssessmentContent = listOf(
             "can", "book", "tree", "chair", "market", // L3 words
 //            "hen", "jug", "bird", "window", "train", "cupboard" // L4 words
         ),
-        paragraphs = emptyList(), // none listed separately
+        paragraphs = listOf("A girl and a boy were playing with their balloons. The girl had a red balloon and the boy had a green balloon. The boy's balloon burst and he started crying. The girl ran to her mother and asked for money."), // none listed separately
         storys = listOf(
             // --- STORY 1 ---
             StoryData(

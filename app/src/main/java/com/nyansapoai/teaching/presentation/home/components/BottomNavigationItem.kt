@@ -16,17 +16,19 @@ data class BottomNavigationItem(
 ) {
     companion object {
         val appBottomNavItems = listOf(
+
             BottomNavigationItem(
                 title = "Home",
                 icon = R.drawable.home,
                 screen = { CampRoot() },
             ),
 
+            /*
             BottomNavigationItem(
                 title = "Students",
                 icon = R.drawable.students,
                 screen = { StudentsRoot() },
-            ),
+            ),*/
 
             BottomNavigationItem(
                 title = "Survey",

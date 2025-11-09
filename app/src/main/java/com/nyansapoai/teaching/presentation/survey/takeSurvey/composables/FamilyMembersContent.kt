@@ -103,10 +103,37 @@ fun FamilyMembersContent(
     error: String?
 
     ) {
-    val types = remember { listOf("Father", "Mother", "Guardian") }
+//    val types = remember { listOf("Father", "Mother", "Guardian") }
+    val types = remember(children, parents) {
+        val needed = mutableSetOf<String>()
+
+        children.forEach { child ->
+            when (child.livesWith) {
+                "Mother" -> needed.add("Mother")
+                "Father" -> needed.add("Father")
+                "Guardian" -> needed.add("Guardian")
+                "Both Mother and Father" -> {
+                    needed.add("Mother")
+                    needed.add("Father")
+                }
+            }
+        }
+
+        // If no child has a specific livesWith yet, allow adding any missing parent types
+        if (needed.isEmpty()) {
+            needed.addAll(listOf("Father", "Mother", "Guardian"))
+        }
+
+        // Remove types that already exist as parents
+        needed.removeAll { type -> parents.any { parent -> parent.type == type } }
+
+        needed.toList()
+    }
+
 
     val genderOptions = remember { listOf("Female","Intersex", "Male") }
     val livesWithOptions = remember { listOf("Mother", "Father", "Both Mother and Father", "Guardian") }
+
 
     val educationOptions = remember {
         listOf(
@@ -138,7 +165,8 @@ fun FamilyMembersContent(
                 .fillMaxSize()
                 .imePadding()
 
-        ){
+        )
+        {
             LazyColumn (
                 modifier = Modifier
                     .imePadding()
@@ -284,7 +312,8 @@ fun FamilyMembersContent(
                 .fillMaxSize()
                 .imePadding()
 
-        ){
+        )
+        {
             LazyColumn (
                 modifier = Modifier
                     .imePadding()
@@ -444,76 +473,6 @@ fun FamilyMembersContent(
         modifier = modifier
             .imePadding()
     ) {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        )
-        {
-            Text(
-                text = "Parent/Guardian",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold
-            )
-
-            Text(
-                text = "Please provide information about your parent or guardian.",
-                style = MaterialTheme.typography.bodyMedium,
-            )
-
-
-            FlowRow(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            )
-            {
-                TextButton(
-                    colors = ButtonDefaults.textButtonColors(
-                        contentColor = MaterialTheme.colorScheme.onBackground,
-                        containerColor = lightPrimary
-                    ) ,
-                    onClick = {onShowParentOrGuardianSheetChange(true)}
-                ) {
-                    Text(
-                        text = "Add Parent/Guardian",
-                        style = MaterialTheme.typography.bodyMedium.copy(
-                        )
-                    )
-                }
-
-                parents.forEach {
-                    OptionsItemContent(
-                        isSelected = true,
-                        onClick = {
-                            onRemoveParent(it)
-                        }
-                    ){
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(4.dp)
-                        ) {
-                            Text(
-                                text = "${it.type}: ${it.name}",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onPrimary,
-                                fontWeight = FontWeight.SemiBold
-                            )
-
-                            Icon(
-                                painter = painterResource(R.drawable.close),
-                                contentDescription = "remove parent",
-                                modifier = Modifier
-                                    .clickable(
-                                        onClick = {
-                                            onRemoveParent(it)
-                                        }
-                                    )
-                            )
-                        }
-                    }
-                }
-            }
-
-
-        }
 
         Column(
             verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -581,6 +540,81 @@ fun FamilyMembersContent(
             }
 
 
+        }
+
+        AnimatedVisibility(
+            visible = !children.isEmpty()
+        ) {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            )
+            {
+                Text(
+                    text = "Parent/Guardian",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold
+                )
+
+                Text(
+                    text = "Please provide information about your parent or guardian.",
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+
+
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                )
+                {
+                    TextButton(
+                        colors = ButtonDefaults.textButtonColors(
+                            contentColor = MaterialTheme.colorScheme.onBackground,
+                            containerColor = lightPrimary
+                        ) ,
+                        onClick = {onShowParentOrGuardianSheetChange(true)}
+                    ) {
+                        Text(
+                            text = "Add Parent/Guardian",
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                            )
+                        )
+                    }
+
+                    parents.forEach {
+                        OptionsItemContent(
+                            isSelected = true,
+                            onClick = {
+                                onRemoveParent(it)
+                            }
+                        ){
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                            ) {
+                                Text(
+                                    text = "${it.type}: ${it.name}",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onPrimary,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+
+                                Icon(
+                                    painter = painterResource(R.drawable.close),
+                                    contentDescription = "remove parent",
+                                    modifier = Modifier
+                                        .clickable(
+                                            onClick = {
+                                                onRemoveParent(it)
+                                            }
+                                        )
+                                )
+                            }
+                        }
+                    }
+                }
+
+
+            }
         }
 
         AnimatedVisibility(

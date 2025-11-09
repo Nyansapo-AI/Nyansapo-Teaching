@@ -189,14 +189,14 @@ fun AssessmentResultTopBarTitle(
                 modifier = Modifier
             )
 
-            /*
+
             Text(
                 text = level,
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Medium,
                 color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.7f),
                 modifier = Modifier
-            )*/
+            )
 
 
 
