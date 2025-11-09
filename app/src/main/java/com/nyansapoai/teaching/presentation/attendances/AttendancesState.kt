@@ -8,8 +8,8 @@ data class AttendancesState(
     val currentLocalDate: LocalDate? = LocalDate.now(),
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
-    val currentWeekDay: String? = null,
+    val currentWeekDay: String? = LocalDate.now().toString(),
     val attendanceRecord: AttendanceRecord? = null,
-    val paramTwo: List<String> = emptyList(),
     val localSchoolInfo: LocalSchoolInfo? = null,
+    val showDetailedAttendance: Boolean = false,
 )

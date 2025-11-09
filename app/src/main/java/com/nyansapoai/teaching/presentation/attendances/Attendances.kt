@@ -1,37 +1,39 @@
 package com.nyansapoai.teaching.presentation.attendances
 
-import android.os.Build
 import android.util.Log
-import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ScaleFactor
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.kizitonwose.calendar.compose.WeekCalendar
 import com.kizitonwose.calendar.compose.weekcalendar.rememberWeekCalendarState
 import com.kizitonwose.calendar.core.WeekDay
@@ -43,7 +45,6 @@ import com.nyansapoai.teaching.navigation.CollectAttendancePage
 import com.nyansapoai.teaching.presentation.attendances.composables.AttendanceRecordSummary
 import com.nyansapoai.teaching.presentation.attendances.composables.DateAttendanceRecord
 import com.nyansapoai.teaching.presentation.common.components.AppButton
-import com.nyansapoai.teaching.presentation.common.components.AppTextField
 import com.nyansapoai.teaching.utils.Utils
 import org.koin.androidx.compose.koinViewModel
 import java.time.LocalDate
@@ -59,8 +60,10 @@ fun AttendancesRoot() {
         state = state,
         onAction = viewModel::onAction
     )
+
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AttendancesScreen(
     state: AttendancesState,
@@ -79,6 +82,11 @@ fun AttendancesScreen(
         }
     }
 
+
+    LaunchedEffect(state) {
+        Log.d("AttendancesScreen", "state: $state")
+    }
+
     Scaffold(
         topBar = {
             Text(
@@ -92,6 +100,30 @@ fun AttendancesScreen(
             )
         }
     ) { innerPadding ->
+
+        AnimatedVisibility(
+            visible = state.showDetailedAttendance
+        ) {
+            ModalBottomSheet(
+                onDismissRequest = {
+                    onAction(AttendancesAction.SetShowDetailedAttendance(showDetailAttendance = false))
+                },
+                sheetState = rememberModalBottomSheetState(
+                    skipPartiallyExpanded = true
+                ),
+            ) {
+                state.attendanceRecord?.let { attendanceRecord ->
+                    DateAttendanceRecord(
+                        attendanceRecord = attendanceRecord,
+                        modifier = Modifier
+                            .fillMaxSize()
+                    )
+                }
+            }
+
+        }
+
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -103,15 +135,12 @@ fun AttendancesScreen(
                     onAction.invoke(
                         AttendancesAction.SetWeekDay(it)
                     )
-                }
+                },
+                selectedWeekDay = state.currentWeekDay
             )
 
-            /*
-            Text(
-                text = state.currentWeekDay ?: "No selected date"
-            )
 
-             */
+            Spacer(modifier = Modifier.height(24.dp))
 
             AnimatedContent(
                 targetState = isToday
@@ -119,30 +148,17 @@ fun AttendancesScreen(
                when(isToday){
                    true -> {
                        state.attendanceRecord?.let {
-                           /*
+
                            AttendanceRecordSummary(
                                attendanceRecord = it,
                                modifier = Modifier
-                                   .fillMaxSize()
-                           )*/
-
-                           DateAttendanceRecord(
-                               attendanceRecord = it,
-                               modifier = Modifier
-                                   .fillMaxSize()
                                    .clickable(
                                        onClick = {
-                                           navController.navigate(
-                                               CollectAttendancePage(
-                                                   date = state.currentWeekDay ?: "",
-                                                   schoolId = state.localSchoolInfo?.schoolUId ?: "",
-                                                   organizationId = state.localSchoolInfo?.organizationUid ?: "",
-                                                   projectId = state.localSchoolInfo?.projectUId ?: ""
-                                               )
-                                           )
+                                           onAction(AttendancesAction.SetShowDetailedAttendance(showDetailAttendance = true))
                                        }
                                    )
                            )
+
                        } ?:
                        Box(
                            modifier = Modifier
@@ -181,13 +197,30 @@ fun AttendancesScreen(
                            AttendanceRecordSummary(
                                attendanceRecord = it,
                                modifier = Modifier
-                                   .fillMaxSize()
+                                   .clickable(
+                                       onClick = {
+                                           onAction(AttendancesAction.SetShowDetailedAttendance(showDetailAttendance = true))
+                                       }
+                                   )
                            )
-                       } ?: Text(
-                           text = "No attendance record found",
-                           style = MaterialTheme.typography.titleLarge,
-                           fontWeight = FontWeight.Bold,
-                       )
+                       } ?: Column {
+                           Text(
+                               text = state.currentWeekDay ?: "No selected date",
+                               style = MaterialTheme.typography.titleMedium,
+                               fontWeight = FontWeight.SemiBold,
+                           )
+
+
+                           Text(
+                               text = "No attendance record found",
+                               style = MaterialTheme.typography.titleMedium,
+                               textAlign = TextAlign.Center,
+                               fontWeight = FontWeight.Normal,
+                               modifier = Modifier
+                                   .padding(12.dp)
+                                   .fillMaxWidth()
+                           )
+                       }
                    }
                }
             }
@@ -204,12 +237,13 @@ fun AttendancesScreen(
 fun WeekContent(
     modifier: Modifier = Modifier,
     onSelectedWeekDay: (WeekDay) -> Unit = {},
+    selectedWeekDay: String?
 ){
     val currentDate = remember { LocalDate.now() }
     val currentMonth = remember { YearMonth.now() }
-    val startDate = remember { currentMonth.minusMonths(1).atStartOfMonth() } // Adjust as needed
-    val endDate = remember { currentDate.plusDays(3) } // Adjust as needed
-    val firstDayOfWeek = remember { firstDayOfWeekFromLocale() } // Available from the library
+    val startDate = remember { currentMonth.minusMonths(0).atStartOfMonth() }
+    val endDate = remember { currentDate.plusDays(0) }
+    val firstDayOfWeek = remember { firstDayOfWeekFromLocale() }
 
     val state = rememberWeekCalendarState(
         startDate = startDate,
@@ -223,7 +257,7 @@ fun WeekContent(
         weekHeader = { week ->
             Text(
                 text = Utils.formatMonthYear(week.days.first().date),
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.W700,
                 modifier = Modifier
                     .padding(vertical = 8.dp)
@@ -232,7 +266,8 @@ fun WeekContent(
         dayContent = { weekDay ->
             WeekDayItem(
                 weekday = weekDay,
-                isSelected = weekDay.date == currentDate,
+                isToday = weekDay.date == currentDate,
+                isSelected = selectedWeekDay == weekDay.date.toString() ,
                 onClick = {
                     onSelectedWeekDay(it)
                 }
@@ -247,11 +282,11 @@ fun WeekContent(
 fun WeekDayItem(
     modifier: Modifier = Modifier,
     weekday: WeekDay,
-    isSelected: Boolean ,
+    isToday: Boolean,
+    isSelected: Boolean,
     onClick: (WeekDay) -> Unit = {}
 )
 {
-
     Box(
         contentAlignment = Alignment.TopCenter,
         modifier = modifier
@@ -262,14 +297,17 @@ fun WeekDayItem(
             .clickable(
                 onClick = { onClick(weekday) }
             )
-            .background(if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.background)
+            .background(if (isToday) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.background)
+            .then(if (isSelected) Modifier.background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.2f)) else Modifier)
 
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(4.dp),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 2.dp)
+
         ) {
             Text(
                 text = weekday.date.dayOfWeek.name.take(3).lowercase().replaceFirstChar { it.uppercase() },

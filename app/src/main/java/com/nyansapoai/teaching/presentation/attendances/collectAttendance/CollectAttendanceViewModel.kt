@@ -187,7 +187,6 @@ class CollectAttendanceViewModel(
                             error = null
                         )
                     }
-
                     onSuccess.invoke()
                 }
                 ResultStatus.ERROR -> {

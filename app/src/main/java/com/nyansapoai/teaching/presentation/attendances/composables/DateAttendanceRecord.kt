@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -23,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.nyansapoai.teaching.domain.models.attendance.AttendanceRecord
 import com.nyansapoai.teaching.domain.models.attendance.StudentAttendance
+import com.nyansapoai.teaching.ui.theme.lightPrimary
 
 @Composable
 fun DateAttendanceRecord(
@@ -110,6 +112,10 @@ fun AttendanceRecordSummary(
         .joinToString(", ") { it.name }
 
     Card(
+        colors = CardDefaults.cardColors(
+            containerColor = lightPrimary,
+            contentColor = MaterialTheme.colorScheme.onPrimary
+        ),
         modifier = modifier
             .fillMaxWidth(),
         shape = RoundedCornerShape(8.dp)
@@ -151,6 +157,8 @@ fun AttendanceRecordSummary(
                 Surface(
                     tonalElevation = 2.dp,
                     shape = RoundedCornerShape(6.dp),
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
+                    color = MaterialTheme.colorScheme.primary,
                 ) {
                     Column(modifier = Modifier
                         .fillMaxWidth()

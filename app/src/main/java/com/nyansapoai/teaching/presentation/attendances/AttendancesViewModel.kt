@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -25,6 +26,8 @@ class AttendancesViewModel(
 
     private val _state = MutableStateFlow(AttendancesState())
 
+    private var lastRequestedKey: Pair<String, String>? = null
+
     val state = combine(
         _state,
         localDataSource.getSavedCurrentSchoolInfo()
@@ -32,15 +35,28 @@ class AttendancesViewModel(
         currentState.copy(
             localSchoolInfo = localSchoolInfo,
         )
-        /*
-        currentState.currentWeekDay?.let {
-            getAttendance(
-                date = it,
-                localSchoolInfo = localSchoolInfo
-            )
-        }*/
     }.onStart {
+
     }
+        .onEach { combineState ->
+            val date = combineState.currentWeekDay ?: return@onEach
+
+            val localInfo = combineState.localSchoolInfo ?: return@onEach
+
+            val key = date to localInfo.schoolUId
+            if (key == lastRequestedKey) {
+                // already requested for this date + school
+                return@onEach
+            }
+            lastRequestedKey = key
+
+            getAttendance(
+                date = date,
+                localSchoolInfo = localInfo
+            )
+
+
+        }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000L),
@@ -54,15 +70,14 @@ class AttendancesViewModel(
                     currentWeekDay = action.weekDay.date.toString()
                 )
 
-                _state.value.currentWeekDay?.let { date ->
-                    val localInfo = state.value.localSchoolInfo
-                    getAttendance(
-                        date = date,
-                        localSchoolInfo = localInfo
+            }
+
+            is AttendancesAction.SetShowDetailedAttendance -> {
+                _state.update {
+                    it.copy(
+                        showDetailedAttendance = action.showDetailAttendance
                     )
-
                 }
-
             }
         }
     }

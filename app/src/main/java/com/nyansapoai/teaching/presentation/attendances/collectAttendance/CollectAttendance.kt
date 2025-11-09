@@ -12,32 +12,33 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
+import com.nyansapoai.teaching.R
 import com.nyansapoai.teaching.domain.models.attendance.StudentAttendance
-import com.nyansapoai.teaching.domain.models.students.NyansapoStudent
 import com.nyansapoai.teaching.navController
 import com.nyansapoai.teaching.presentation.common.components.AppButton
-import com.nyansapoai.teaching.presentation.common.components.AppComingSoon
-import com.nyansapoai.teaching.presentation.common.components.AppDropDownItem
-import com.nyansapoai.teaching.presentation.onboarding.components.OptionsItemUI
-import com.nyansapoai.teaching.presentation.students.components.StudentSelectionListUI
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -58,6 +59,7 @@ fun CollectAttendanceRoot(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CollectAttendanceScreen(
     state: CollectAttendanceState,
@@ -66,11 +68,34 @@ fun CollectAttendanceScreen(
 ) {
     Scaffold(
         topBar = {
-            Text(
-                text = date,
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold,
+            TopAppBar(
+                navigationIcon = {
+                    IconButton(
+                        onClick = { navController.popBackStack() },
+                        colors = IconButtonDefaults.iconButtonColors(
+                            contentColor = MaterialTheme.colorScheme.onPrimary
+                        )
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.arrow_back),
+                            contentDescription = "Back",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                },
+                title = {
+                    Text(
+                        text = date,
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold,
+                    )
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background,
+                    titleContentColor = MaterialTheme.colorScheme.onBackground
+                )
             )
+
         },
         modifier = Modifier
             .padding(horizontal = 12.dp)
@@ -125,7 +150,7 @@ fun CollectAttendanceContent(
         {
 
             Text(
-                text = "Student Attendance",
+                text = "Take Attendance",
                 fontWeight = FontWeight.Bold,
                 style = MaterialTheme.typography.titleLarge,
             )
@@ -133,14 +158,8 @@ fun CollectAttendanceContent(
             StudentAttendanceList(
                 studentList = studentList,
                 onOptionSelected = onOptionSelected,
-                selectedGrade = selectedGrade ,
-                studentItemContent = { student ->
-                    StudentAttendanceItem(
-                        student = student,
-                        isSelected = student.attendance,
-                        onClick = { onClickStudent(student) },
-                    )
-                }
+                selectedGrade = selectedGrade,
+                onSelectStudent = onClickStudent
             )
 
             Spacer(modifier = Modifier.height(70.dp))
@@ -165,6 +184,7 @@ fun CollectAttendanceContent(
 @Composable
 fun StudentAttendanceItem(
     modifier: Modifier = Modifier,
+    number: Int = 0,
     student: StudentAttendance,
     isSelected: Boolean,
     onClick: (StudentAttendance) -> Unit = { },
@@ -179,13 +199,27 @@ fun StudentAttendanceItem(
             )
             .padding(vertical = 8.dp)
     ) {
-        Text(
-            text = student.name,
-            maxLines = 1,
-            overflow = TextOverflow.MiddleEllipsis,
-            style = MaterialTheme.typography.bodyLarge,
-            fontWeight = FontWeight.Medium,
-        )
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            Text(
+                text = "${number}.",
+                maxLines = 1,
+                overflow = TextOverflow.MiddleEllipsis,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+            )
+            Text(
+                text = student.name,
+                maxLines = 1,
+                overflow = TextOverflow.MiddleEllipsis,
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Medium,
+            )
+
+        }
 
         RadioButton(
             selected = isSelected,
@@ -203,51 +237,18 @@ fun StudentAttendanceItem(
 @Composable
 fun StudentAttendanceList(
     modifier: Modifier = Modifier,
-    optionsList: List<Int?> = listOf(null, 1, 2, 3, 4, 5, 6, 7, 8, 9,),
     studentList: List<StudentAttendance> = emptyList(),
     onSelectStudent: (StudentAttendance) -> Unit = {  },
-    studentItemContent: @Composable (StudentAttendance) -> Unit = { student ->
-        StudentAttendanceItem(
-            student = student,
-            isSelected = student.attendance,
-            onClick = {
-                onSelectStudent(student)
-            },
-            modifier = Modifier
-                .padding(horizontal = 16.dp, )
-        )
-    },
     selectedGrade: Int? = null,
     onOptionSelected: (Int?) -> Unit = {  },
 ) {
     LazyColumn(
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
         modifier = modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
 
     ) {
-        /*
-        stickyHeader {
-            LazyRow(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier
-                    .background(MaterialTheme.colorScheme.background)
-            ) {
-                items(optionsList) { item ->
-                    OptionsItemUI(
-                        text = item?.let { "Grade $item" } ?: "All",
-                        isSelected = item == selectedGrade,
-                        onClick = { onOptionSelected(item) },
-                        modifier = Modifier
-                            .then(if (item == optionsList.last()) Modifier.padding(end = 16.dp) else Modifier)
-                            .then(if(item == optionsList.first()) Modifier.padding(start = 16.dp) else Modifier)
-                    )
-                }
-            }
-        }
-
-         */
 
         if (studentList.isEmpty()){
             item {
@@ -264,8 +265,17 @@ fun StudentAttendanceList(
             return@LazyColumn
         }
 
-        items(items= studentList){ student ->
-            studentItemContent(student)
+        itemsIndexed(items= studentList){ index, student ->
+            StudentAttendanceItem(
+                number = index + 1,
+                student = student,
+                isSelected = student.attendance,
+                onClick = {
+                    onSelectStudent(student)
+                },
+                modifier = Modifier
+            )
+
         }
 
     }
