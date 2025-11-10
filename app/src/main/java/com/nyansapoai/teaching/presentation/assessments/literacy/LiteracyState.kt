@@ -34,7 +34,7 @@ data class LiteracyState(
 //        LiteracyAssessmentLevel.LISTENING_COMPREHENSION,
         LiteracyAssessmentLevel.LETTER_RECOGNITION,
         LiteracyAssessmentLevel.WORD,
-//        LiteracyAssessmentLevel.PARAGRAPH,
+        LiteracyAssessmentLevel.PARAGRAPH,
         LiteracyAssessmentLevel.STORY,
         LiteracyAssessmentLevel.MULTIPLE_CHOICE,
         LiteracyAssessmentLevel.COMPLETED

@@ -421,7 +421,7 @@ class LiteracyViewModel(
     fun onSubmitStoryAssessment() {
 
         val contentList = when(_state.value.currentAssessmentLevel){
-            LiteracyAssessmentLevel.MULTIPLE_CHOICE -> _state.value.assessmentContent?.storys[1]?.questionsData ?: emptyList()
+            LiteracyAssessmentLevel.MULTIPLE_CHOICE -> _state.value.assessmentContent?.storys[0]?.questionsData ?: emptyList()
             LiteracyAssessmentLevel.LISTENING_COMPREHENSION -> state.value.assessmentContent?.storys[0]?.questionsData ?: emptyList()
             else -> emptyList()
         }

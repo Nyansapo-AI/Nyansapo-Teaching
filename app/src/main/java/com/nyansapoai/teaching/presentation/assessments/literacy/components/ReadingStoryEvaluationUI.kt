@@ -68,7 +68,7 @@ fun ReadingStoryEvaluationUI(
     title: String = "Reading Story",
     storyTitle: String? = "The Hyena",
     showInstructions: Boolean = true,
-    instructionAudio: Int = R.raw.read_letter,
+    instructionAudio: Int = R.raw.reading_story_instruction,
     isLoading: Boolean = false,
     onShowInstructionsChange: (Boolean) -> Unit = {},
     audioFilePath: String? = null,
@@ -367,7 +367,7 @@ fun ReadingStoryEvaluationUI(
                         showInstructions = showInstructions,
                         instructionsTitle = "Reading Story",
                         instructionsDescription = "Tap the microphone. Read the story out loud. Tap the microphone again when you finish.",
-                        instructionAudio = R.raw.reading_story_instruction,
+                        instructionAudio = instructionAudio,
                         onChangeShow = {show -> onShowInstructionsChange(show)},
                         hasCompletedPlaying = { hasCompleted -> onShowInstructionsChange(!hasCompleted) }
                     ) {

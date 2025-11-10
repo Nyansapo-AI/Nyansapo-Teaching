@@ -310,7 +310,7 @@ fun LiteracyScreen(
                             title = "Read the Paragraph",
                             storyTitle = null,
                             showInstructions = state.showInstructions,
-                            instructionAudio = R.raw.read_sentence,
+                            instructionAudio = R.raw.reading_paragraph_instruction,
                             isLoading = state.isLoading,
                             audioFilePath = state.audioFilePath,
                             onShowInstructionsChange = { show -> onAction(SetShowInstructions(show)) },
@@ -349,15 +349,15 @@ fun LiteracyScreen(
                                     )
                                 )
                             },
-                            storySentencesList = listOf(state.assessmentContent?.storys[1]?.story ?: "")
+                            storySentencesList = listOf(state.assessmentContent?.storys[0]?.story ?: "")
                         )
                     }
 
                     LiteracyAssessmentLevel.MULTIPLE_CHOICE -> {
                         MultichoiceQuestionsUI(
                             currentIndex = state.currentIndex,
-                            story = state.assessmentContent?.storys[1]?.story  ?: "",
-                            questionsList = state.assessmentContent?.storys[1]?.questionsData ?: emptyList(),
+                            story = state.assessmentContent?.storys[0]?.story  ?: "",
+                            questionsList = state.assessmentContent?.storys[0]?.questionsData ?: emptyList(),
                             selectedChoice = state.selectedChoice,
                             onSelectedChoiceChange = {
                                 onAction(SetSelectedChoice(it))

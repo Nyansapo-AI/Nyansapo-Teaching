@@ -532,7 +532,7 @@ val literacyAssessmentContent = listOf(
         ),
         paragraphs = listOf("A girl and a boy were playing with their balloons. The girl had a red balloon and the boy had a green balloon. The boy's balloon burst and he started crying. The girl ran to her mother and asked for money."), // none listed separately
         storys = listOf(
-            // --- STORY 1 ---
+            /*
             StoryData(
                 title = "Two Friends and a Bird",
                 story = """
@@ -580,6 +580,9 @@ val literacyAssessmentContent = listOf(
                 )
             ),
 
+             */
+
+            /*
             // --- STORY 2 ---
             StoryData(
                 title = "A Girl and a Boy with Balloons",
@@ -626,7 +629,7 @@ val literacyAssessmentContent = listOf(
                         )
                     )
                 )
-            ),
+            ),*/
 
             // --- STORY 3 ---
             StoryData(
@@ -641,6 +644,7 @@ val literacyAssessmentContent = listOf(
                 questionsData = listOf(
                     QuestionData(
                         question = "Which animal do people in Kome keep?",
+                        audio = R.raw.which_animal_do_people_in_kome_keep,
                         multipleChoices = MultipleChoices(
                             correctChoices = listOf("Cows."),
                             wrongChoices = listOf("Goats.", "Sheep.", "Chickens.")
@@ -648,6 +652,7 @@ val literacyAssessmentContent = listOf(
                     ),
                     QuestionData(
                         question = "What did the bad guys attempt to do with the cows?",
+                        audio = R.raw.what_did_the_bad_guys_attempt_to_do_with_the_cows,
                         multipleChoices = MultipleChoices(
                             correctChoices = listOf("Steal them."),
                             wrongChoices = listOf("Feed them.", "Sell them.", "Wash them.")
@@ -655,6 +660,7 @@ val literacyAssessmentContent = listOf(
                     ),
                     QuestionData(
                         question = "What caused the villagers to awaken?",
+                        audio = R.raw.what_caused_the_villagers_to_awaken,
                         multipleChoices = MultipleChoices(
                             correctChoices = listOf("The loud noise when Kisa kicked the bad guy."),
                             wrongChoices = listOf("The sound of rain.", "The rooster crowing.", "The barking dogs.")
@@ -662,6 +668,7 @@ val literacyAssessmentContent = listOf(
                     ),
                     QuestionData(
                         question = "Who assisted in capturing the bad guys?",
+                        audio = R.raw.who_assisted_in_capturing_the_bad_guys,
                         multipleChoices = MultipleChoices(
                             correctChoices = listOf("The villagers."),
                             wrongChoices = listOf("Only Kisa.", "The police.", "The farmer’s children.")
@@ -669,6 +676,7 @@ val literacyAssessmentContent = listOf(
                     ),
                     QuestionData(
                         question = "How did Kisa help the villagers?",
+                        audio = R.raw.how_did_kisa_help_the_villagers,
                         multipleChoices = MultipleChoices(
                             correctChoices = listOf("By kicking one of the bad guys."),
                             wrongChoices = listOf("By waking up the farmer.", "By running away.", "By hiding the cows.")
