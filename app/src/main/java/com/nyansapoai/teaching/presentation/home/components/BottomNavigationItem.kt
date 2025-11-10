@@ -23,12 +23,12 @@ data class BottomNavigationItem(
                 screen = { CampRoot() },
             ),
 
-            /*
+
             BottomNavigationItem(
                 title = "Students",
                 icon = R.drawable.students,
                 screen = { StudentsRoot() },
-            ),*/
+            ),
 
             BottomNavigationItem(
                 title = "Survey",

@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nyansapoai.teaching.data.local.LocalDataSource
+import com.nyansapoai.teaching.data.remote.assessment.AssessmentRepository
 import com.nyansapoai.teaching.data.remote.students.StudentsRepository
 import com.nyansapoai.teaching.data.remote.user.UserRepository
 import com.nyansapoai.teaching.utils.ResultStatus
@@ -18,6 +19,7 @@ import kotlinx.coroutines.launch
 
 class StudentsViewModel(
     private val studentsRepository: StudentsRepository,
+    private val assessmentRepository: AssessmentRepository,
     private val localDataSource: LocalDataSource,
     private val userRepository: UserRepository
 ) : ViewModel() {
@@ -109,4 +111,16 @@ class StudentsViewModel(
     }
 
 
+    fun fetchStudentByAssessmentId(organizationId: String, projectId: String, schoolId: String,) {
+        if (organizationId.isEmpty() || projectId.isEmpty() || schoolId.isEmpty()) {
+            Log.w(TAG, "Invalid IDs: org=$organizationId, project=$projectId, school=$schoolId")
+            _state.update { it.copy(error = "Invalid school identifiers", isLoading = false) }
+            return
+        }
+
+        viewModelScope.launch {
+            _state.update { it.copy(isLoading = true) }
+
+        }
+    }
 }
