@@ -9,4 +9,5 @@ sealed interface StudentsAction {
     ) : StudentsAction
 
     data class OnSelectGrade(val grade: Int?) : StudentsAction
+    data class OnSelectLevel(val level: String?) : StudentsAction
 }

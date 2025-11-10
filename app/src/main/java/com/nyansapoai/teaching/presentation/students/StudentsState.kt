@@ -8,6 +8,7 @@ data class StudentsState(
     val isManager: Boolean = false,
     val studentList: List<NyansapoStudent> = emptyList(),
     val selectedGrade: Int? = null,
+    val selectedLevel: String? = null,
     val localSchoolInfo: LocalSchoolInfo? = null,
     val error: String? = null,
 
