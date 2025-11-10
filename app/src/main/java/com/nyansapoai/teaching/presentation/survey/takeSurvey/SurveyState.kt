@@ -150,11 +150,7 @@ data class SurveyState(
                 return  children.isNotEmpty() && (parents.isNotEmpty() || familyMemberError != null)
             }
             HouseSurveyStep.PARENTAL_ENGAGEMENT -> {
-                return if (isSchoolAgeChildrenPresent == true) {
-                    whoHelps.isNotBlank() && discussFrequency.isNotBlank()
-                } else {
-                    isSchoolAgeChildrenPresent != null
-                }
+                return true
             }
 
             HouseSurveyStep.CHILD_LEARNING_ENVIRONMENT -> {

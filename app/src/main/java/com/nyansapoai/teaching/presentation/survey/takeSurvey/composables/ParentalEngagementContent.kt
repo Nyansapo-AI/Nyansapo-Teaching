@@ -37,14 +37,16 @@ fun ParentalEngagementContent(
     Column(
         modifier = modifier
             .imePadding()
-    ) {
+    )
+    {
 
-        YesNoOption(
-            text = "Is there any school-age child (6–17 years) in this household?",
-            isYes = isSchoolAgePresent,
-            onChange = {onSchoolAgeChanged(it)}
-        )
+//        YesNoOption(
+//            text = "Is there any school-age child (6–17 years) in this household?",
+//            isYes = isSchoolAgePresent,
+//            onChange = {onSchoolAgeChanged(it)}
+//        )
 
+        /*
         // If No -> skip rest (AnimatedVisibility hides them)
         AnimatedVisibility(isSchoolAgePresent == true) {
             Column {
@@ -105,6 +107,65 @@ fun ParentalEngagementContent(
                     onChange = onMonitorAttendanceChanged
                 )
             }
+        }*/
+
+        Column {
+            // D02
+            AppDropDownMenu(
+                expanded = showWhoHelpsDropdown,
+                label = "Who helps the child with homework?",
+                placeholder = "Select who helps",
+                onClick = { onShowWhoHelpsDropdownChanged(!showWhoHelpsDropdown) },
+                value = whoHelps
+            ) {
+                whoHelpsOptions.forEach { option ->
+                    AppDropDownItem(
+                        item = option,
+                        isSelected = whoHelps == option,
+                        onClick = { onWhoHelpsChanged(option) }
+                    )
+                }
+            }
+
+            AnimatedVisibility(visible = whoHelps == "Other") {
+                AppTextField(
+                    label = "Specify Other",
+                    value = otherWhoHelps,
+                    onValueChanged = onOtherWhoHelpsChanged,
+                    placeholder = "Specify who helps",
+                )
+            }
+
+            // D03
+            AppDropDownMenu(
+                expanded = showDiscussDropdown,
+                label = "How often do you discuss your child’s learning with teachers?",
+                placeholder = "Select frequency",
+                onClick = { onShowDiscussDropdownChanged(!showDiscussDropdown) },
+                value = discussFrequency
+            ) {
+                discussOptions.forEach { option ->
+                    AppDropDownItem(
+                        item = option,
+                        isSelected = discussFrequency == option,
+                        onClick = { onDiscussFrequencyChanged(option) }
+                    )
+                }
+            }
+
+            // D04
+            YesNoOption (
+                text = "Do you attend school meetings or parent–teacher forums?",
+                isYes = attendMeetings,
+                onChange = onAttendMeetingsChanged
+            )
+
+            // D05
+            YesNoOption(
+                text = "Do you monitor your child’s school attendance?",
+                isYes = monitorAttendance,
+                onChange = onMonitorAttendanceChanged
+            )
         }
     }
 }
