@@ -244,7 +244,7 @@ fun LiteracyReadingAssessmentUI(
 
             }
         }else if (audioFile != null){
-            delay(100)
+//            delay(50)
             appAudioRecorder.stop()
             audioFile?.let {
                 when {
