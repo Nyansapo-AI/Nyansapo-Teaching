@@ -235,7 +235,8 @@ fun LiteracyScreen(
             AppSimulateNavigation(
                 modifier = Modifier,
                 targetState = state.currentAssessmentLevel
-            ) {
+            )
+            {
                 when (state.currentAssessmentLevel) {
                     LiteracyAssessmentLevel.LETTER_RECOGNITION -> {
                         LiteracyReadingAssessmentUI(
