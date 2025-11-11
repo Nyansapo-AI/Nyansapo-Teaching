@@ -337,7 +337,7 @@ fun SchoolScreen(
                     )
                 )
             }
-        }
+        }*/
 
          */
 

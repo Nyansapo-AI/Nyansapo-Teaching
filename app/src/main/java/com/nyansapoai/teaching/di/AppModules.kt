@@ -99,7 +99,8 @@ val appModules = module {
 
     single<AuthenticationRepository> {
         AuthenticationRepositoryImp(
-            auth = get()
+            auth = get(),
+            firebaseDb = get()
         )
     }
 

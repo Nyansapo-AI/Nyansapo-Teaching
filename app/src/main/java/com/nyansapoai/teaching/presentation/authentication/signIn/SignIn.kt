@@ -1,5 +1,8 @@
 package com.nyansapoai.teaching.presentation.authentication.signIn
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,21 +14,26 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import com.nyansapoai.teaching.R
 import com.nyansapoai.teaching.navController
 import com.nyansapoai.teaching.presentation.common.components.AppButton
@@ -41,10 +49,12 @@ fun SignInRoot() {
     val name by viewModel.name.collectAsState()
     val phoneNumber by viewModel.phoneNumber.collectAsState()
     val canSubmit by viewModel.canSubmit.collectAsState()
+    val error by viewModel.errorMessage.collectAsState()
 
     SignInScreen(
         phoneNumber = phoneNumber,
         canSubmit = canSubmit,
+        error = error,
         onAction = viewModel::onAction
     )
 }
@@ -53,17 +63,49 @@ fun SignInRoot() {
 fun SignInScreen(
     phoneNumber: String,
     canSubmit: Boolean,
+    error: String? = null,
     onAction: (SignInAction) -> Unit,
 ) {
+
+
+
     Scaffold(
         modifier = Modifier
     ) { innerPadding ->
+
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-        ){
+        )
+        {
+            AnimatedVisibility(
+                visible = error != null,
+                modifier = Modifier
+                    .zIndex(1f)
+                    .align(Alignment.BottomCenter)
+                    .padding(12.dp)
+                    .clip(RoundedCornerShape(10))
+                    .background(MaterialTheme.colorScheme.tertiary)
+                    .border(
+                        width = 2.dp,
+                        color = MaterialTheme.colorScheme.error,
+                        shape = RoundedCornerShape(10)
+                    )
+            ) {
+                Text(
+                    text = error ?: "An error occurred. Please try again.",
+                    color = MaterialTheme.colorScheme.error,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth(0.7f)
+                        .padding(12.dp),
+                )
+            }
+
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
@@ -145,7 +187,7 @@ fun SignInScreen(
                         value = phoneNumber,
                         placeholder = "eg. +254712345607",
                         imeAction = ImeAction.Done,
-                        keyboardType = KeyboardType.Text,
+                        keyboardType = KeyboardType.Phone,
                         onValueChanged = { string ->
                             onAction.invoke(SignInAction.OnPhoneNumberChange(phoneNumber = string))
                         }
@@ -154,8 +196,16 @@ fun SignInScreen(
                     AppButton(
                         enabled = canSubmit,
                         onClick = {
-                            navController.navigate(OTPPage(phoneNumber = phoneNumber))
-
+                            onAction.invoke(
+                                SignInAction.OnSubmit(
+                                    onSuccess = {
+                                        navController.navigate(OTPPage(phoneNumber = phoneNumber))
+                                    },
+                                    onFailure = {
+//                                        navController.popBackStack()
+                                    }
+                                )
+                            )
                         },
                         modifier = Modifier
                             .fillMaxWidth(),
