@@ -7,5 +7,5 @@ sealed interface SignInAction {
 
     data class OnPhoneNumberChange(val phoneNumber: String): SignInAction
 
-    data class OnSubmit(val onSuccess: @Composable () -> Unit = {}): SignInAction
+    data class OnSubmit(val onSuccess: () -> Unit = {}, val onFailure: () -> Unit = {}): SignInAction
 }

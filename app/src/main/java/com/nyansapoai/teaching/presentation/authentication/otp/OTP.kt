@@ -39,6 +39,7 @@ import com.nyansapoai.teaching.presentation.authentication.otp.components.OTPImp
 import com.nyansapoai.teaching.presentation.common.components.CodeTextField
 import com.nyansapoai.teaching.navigation.OnboardingPage
 import com.nyansapoai.teaching.presentation.common.components.AppButton
+import com.nyansapoai.teaching.presentation.common.components.AppErrorToastContent
 import com.nyansapoai.teaching.utils.Utils
 import org.koin.androidx.compose.koinViewModel
 
@@ -79,6 +80,9 @@ fun OTPScreen(
 ) {
 
     var isLoading by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
+    var resendCode by remember { mutableStateOf(true) }
+
 
     Scaffold(
         modifier = Modifier
@@ -86,7 +90,7 @@ fun OTPScreen(
 
 
         AnimatedVisibility(
-            visible = true
+            visible = resendCode,
         ) {
             OTPImplementation(
                 phoneNumber = phoneNumber,
@@ -95,17 +99,13 @@ fun OTPScreen(
                 onVerificationCompleted = {
                     navController.navigate(OnboardingPage)
                 },
-                onVerificationFailed = {
-
+                onVerificationFailed = { error ->
+                    errorMessage = error
+                    resendCode = false
+                    isLoading = false
                 }
             )
 
-            /*
-            phoneAuth.StartPhoneNumberVerification(
-                phoneNumber = phoneNumber,
-                code = "343433",
-                canVerify = canSubmit,
-            )*/
         }
 
         Box(
@@ -114,6 +114,13 @@ fun OTPScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
         ){
+
+            AppErrorToastContent(
+                error = errorMessage,
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+            )
+
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(40.dp),
@@ -175,18 +182,18 @@ fun OTPScreen(
                         enabled = canResendOTPRequest,
                         colors = ButtonDefaults.buttonColors(
                             disabledContainerColor = Color.Transparent,
-                            disabledContentColor = MaterialTheme.colorScheme.onBackground.copy(
-                                alpha = 0.3f
-                            )
+                            disabledContentColor = MaterialTheme.colorScheme.onBackground.copy( alpha = 0.3f ),
+                            contentColor = MaterialTheme.colorScheme.secondary
                         ),
-                        onClick = {}
+                        onClick = {
+                            resendCode = true
+                        }
                     ) {
                         Text(
                             text = stringResource(R.string.resend_otp),
                             textAlign = TextAlign.Center,
                             style = MaterialTheme.typography.bodyMedium.copy(
                                 fontWeight = FontWeight.Normal,
-                                color = MaterialTheme.colorScheme.secondary
                             ),
                             modifier = Modifier
                         )
@@ -218,30 +225,6 @@ fun OTPScreen(
 
                     }
 
-                    /*
-                    Button(
-                        enabled = isOTPComplete,
-                        shape = RoundedCornerShape(5.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.secondary,
-                            contentColor = MaterialTheme.colorScheme.background
-                        ),
-                        onClick = {
-                            onAction.invoke(OTPAction.OnCanSubmitChange(true))
-
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(54.dp)
-                    ) {
-                        Text(
-                            text = stringResource(R.string.continue_text),
-                            style = MaterialTheme.typography.titleMedium.copy(
-                                fontWeight = FontWeight.Bold
-                            )
-                        )
-                    }*/
-
                     OutlinedButton(
                         shape = RoundedCornerShape(5.dp),
                         colors = ButtonDefaults.buttonColors(
@@ -251,7 +234,9 @@ fun OTPScreen(
                             1.dp,
                             color = MaterialTheme.colorScheme.secondary,
                         ),
-                        onClick = {},
+                        onClick = {
+                            navController.popBackStack()
+                        },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(54.dp)
