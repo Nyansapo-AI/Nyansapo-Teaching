@@ -130,6 +130,7 @@ class AssessmentRepositoryFirebaseImp(
                 }
 
                 if (snapshot != null && !snapshot.isEmpty) {
+                    Log.d("getAssessments", "Current data: ${snapshot.documents}")
                     val assessments = snapshot.documents.mapNotNull { it.toObject<Assessment>() }
                     trySend(assessments)
                 } else {

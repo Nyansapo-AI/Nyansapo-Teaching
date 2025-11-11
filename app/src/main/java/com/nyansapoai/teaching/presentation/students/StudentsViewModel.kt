@@ -138,13 +138,15 @@ class StudentsViewModel(
             assessmentRepository.getAssessments(schoolId = schoolId)
                 .collect { assessments ->
                     val students = assessments
-                        .flatMap { assessment -> assessment.assigned_students }
+                        .flatMap { assessment -> assessment.assigned_students ?: emptyList() }
                         .filter { assignedStudentDto -> assignedStudentDto.isLinked || assignedStudentDto.has_done }
                         .distinctBy { it.id }
+                        .map { student -> student.toNyansapoStudent() }
 
                     _state.update { state ->
                         state.copy(
-                            studentList = students.map { student -> student.toNyansapoStudent() },
+                            totalStudents = students,
+                            studentList = students,
                             isLoading = false,
                             error = null
                         )
@@ -156,10 +158,10 @@ class StudentsViewModel(
     private fun filterStudentsByLevel(level: String?){
         _state.update { state ->
             val filteredStudents = when(level){
-                "Beginner" -> state.studentList.filter { it.baseline == "beginner"  || it.baseline == "letter"}
-                "Word" -> state.studentList.filter { it.baseline == "word" }
-                "Paragraph" -> state.studentList.filter { it.baseline == "paragraph" }
-                else -> state.studentList
+                "Beginner" -> state.totalStudents.filter { it.baseline == "beginner"  || it.baseline == "letter"}
+                "Word" -> state.totalStudents.filter { it.baseline == "word" }
+                "Paragraph" -> state.totalStudents.filter { it.baseline == "paragraph" }
+                else -> state.totalStudents
             }
 
             state.copy(studentList = filteredStudents)
