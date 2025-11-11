@@ -75,7 +75,7 @@ fun HouseholdDetailScreen(
         ) {
             item {
                 InfoCard {
-                    KeyValueRow("Interviewer", household.interviewerName)
+                    KeyValueRow("Interviewee", household.interviewerName)
                     KeyValueRow("Interview Date", household.interviewDate)
 //                    KeyValueRow("County", household.county)
 //                    KeyValueRow("Sub-county", household.subCounty)
@@ -140,10 +140,11 @@ fun HouseholdDetailScreen(
                             modifier = Modifier.padding(bottom = 6.dp)
                         )
                         InfoCard {
+                            /*
                             KeyValueRow(
                                 "Has school age child",
                                 parentalEngagement.hasSchoolAgeChild.toString()
-                            )
+                            )*/
                             KeyValueRow(
                                 "Homework helper",
                                 parentalEngagement.homeworkHelper ?: "N/A"

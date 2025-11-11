@@ -532,7 +532,7 @@ class SurveyViewModel(
                 }
             }
 
-            SurveyAction.SubmitSurvey -> {
+            is SurveyAction.SubmitSurvey -> {
                 submitSurvey()
             }
 
@@ -568,7 +568,7 @@ class SurveyViewModel(
     }
 
 
-    private fun submitSurvey() {
+    private fun submitSurvey(onSuccess: () -> Unit = {}) {
         Log.d("SurveyViewModel", "Survey submitted with state: ${_state.value}")
 
         viewModelScope.launch {
@@ -602,6 +602,8 @@ class SurveyViewModel(
             )
 
             resetState()
+            onSuccess.invoke()
+
         }
     }
 
@@ -634,7 +636,7 @@ class SurveyViewModel(
                                 ?.filter { student ->
                                     student.id !in _state.value.isLinkedIdList
                                 }
-                                ?.take(10)
+//                                ?.take(10)
                                 ?: emptyList(),
                             isLoading = false,
                             error = null

@@ -171,9 +171,11 @@ fun IndividualAssessmentScreen(
                                         .padding(horizontal = 12.dp)
                                 )
                             }
+
                             item {
                                 val grades = listOf<Int?>(null, 1, 2, 3, 4, 5,6,7,8,9)
 
+                                /*
                                 LazyRow(
                                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                                 ) {
@@ -192,7 +194,7 @@ fun IndividualAssessmentScreen(
                                         )
                                     }
 
-                                }
+                                }*/
                             }
 
 

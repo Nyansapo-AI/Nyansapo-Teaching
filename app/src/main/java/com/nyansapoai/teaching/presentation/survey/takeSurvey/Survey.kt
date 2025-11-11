@@ -549,10 +549,15 @@ fun SurveyScreen(
                     isLoading = state.isLoading,
                     onClick = {
                         if (state.currentStepIndex < surveySteps.size -1){
-
                             onAction(SurveyAction.OnUpdateCurrentIndex(state.currentStepIndex +1))
                         } else {
-                            onAction(SurveyAction.SubmitSurvey)
+                            onAction(
+                                SurveyAction.SubmitSurvey(
+                                    onSuccess = {
+                                        navController.popBackStack()
+                                    }
+                                )
+                            )
                         }
                     }
                 ) {

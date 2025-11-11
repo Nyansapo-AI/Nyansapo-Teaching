@@ -182,6 +182,7 @@ fun AssessmentResultTopBarTitle(
             }
 
 
+            /*
             Text(
                 text = "Grade : $grade",
                 style = MaterialTheme.typography.titleMedium,
@@ -189,6 +190,8 @@ fun AssessmentResultTopBarTitle(
                 color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.7f),
                 modifier = Modifier
             )
+
+             */
 
 
             Text(

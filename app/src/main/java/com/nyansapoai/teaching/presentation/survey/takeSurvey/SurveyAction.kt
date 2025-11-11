@@ -77,6 +77,6 @@ sealed interface SurveyAction {
 
     data object OnChangeCurrentStep : SurveyAction
     data class OnUpdateCurrentIndex(val index: Int) : SurveyAction
-    data object SubmitSurvey: SurveyAction
+    data class SubmitSurvey(val onSuccess: () -> Unit): SurveyAction
 
 }

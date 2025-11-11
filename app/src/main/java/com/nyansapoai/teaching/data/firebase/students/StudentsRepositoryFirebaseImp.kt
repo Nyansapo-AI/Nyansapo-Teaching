@@ -32,7 +32,7 @@ class StudentsRepositoryFirebaseImp(
         studentClass: Int?
     ): Flow<Results<List<NyansapoStudent>>> = callbackFlow{
 
-
+        Log.d("SchoolRepository", "getSchoolStudents: org $organizationId project $projectId school $schoolId class $studentClass")
 
 
 
@@ -57,6 +57,9 @@ class StudentsRepositoryFirebaseImp(
 
         val snapshotListener = documentRef
             .addSnapshotListener { snapshot, error ->
+
+                Log.d("SchoolRepository", "getSchoolStudents: snapshot ${snapshot?.documents} error $error")
+
                 if (error != null){
                     trySend(Results.error(msg = error.message ?: "Something went wrong. Please try again"))
                     close(error)
@@ -85,8 +88,10 @@ class StudentsRepositoryFirebaseImp(
                         )
                     }
 
+                    Log.d("SchoolRepository", "getSchoolStudents: data $data")
                     trySend(Results.success(data = data))
                 }else{
+                    Log.d("SchoolRepository", "getSchoolStudents: snapshot is null")
                     trySend(Results.error(msg = "Unknown Students identification"))
                 }
             }

@@ -78,14 +78,18 @@ private fun StudentAttendanceRowReadOnly(
                 .weight(1f)
 
         ) {
-            Text(text = student.name, style = MaterialTheme.typography.bodyLarge)
+            Text(
+                text = student.name,
+                style = MaterialTheme.typography.bodyLarge
+            )
+            /*
             student.grade?.let {
                 Text(text = "Grade: $it", style = MaterialTheme.typography.bodySmall)
-            }
+            }*/
         }
 
         val statusText = if (student.attendance) "Present" else "Absent"
-        val statusColor = if (student.attendance) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
+        val statusColor = if (student.attendance) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.error
 
         Text(
             text = statusText,
