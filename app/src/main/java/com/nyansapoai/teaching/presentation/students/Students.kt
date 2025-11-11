@@ -1,6 +1,7 @@
 package com.nyansapoai.teaching.presentation.students
 
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -8,11 +9,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.nyansapoai.teaching.presentation.students.components.StudentSelectionListUI
 import com.nyansapoai.teaching.presentation.students.components.StudentsHeaderUI
+import com.nyansapoai.teaching.presentation.students.components.StudentsListUI
 import org.koin.androidx.compose.koinViewModel
-import java.nio.file.WatchEvent
 
 @Composable
 fun StudentsRoot() {
@@ -54,17 +53,19 @@ fun StudentsScreen(
 
 
         item {
-            StudentSelectionListUI(
+            StudentsListUI(
                 studentList = state.studentList,
                 onSelectStudent = { student ->
 //                    onAction(StudentsAction.OnSelectStudent(student))
                 },
                 selectedGrade = state.selectedGrade,
-                onOptionSelected = { grade ->
-                    onAction(StudentsAction.OnSelectGrade(grade))
+                selectedLevel = state.selectedLevel,
+                onLevelSelected = { level ->
+                    onAction(StudentsAction.OnSelectLevel(level))
                 },
                 modifier = Modifier
                     .height(600.dp)
+                    .padding(horizontal = 12.dp)
             )
         }
     }

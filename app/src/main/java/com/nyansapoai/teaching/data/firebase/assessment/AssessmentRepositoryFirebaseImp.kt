@@ -96,6 +96,7 @@ class AssessmentRepositoryFirebaseImp(
                         "student_last_name" to student.last_name,
                         "student_grade" to student.grade,
                     ))
+
                 }
 
                 // Execute batch write for all student documents
@@ -129,6 +130,7 @@ class AssessmentRepositoryFirebaseImp(
                 }
 
                 if (snapshot != null && !snapshot.isEmpty) {
+                    Log.d("getAssessments", "Current data: ${snapshot.documents}")
                     val assessments = snapshot.documents.mapNotNull { it.toObject<Assessment>() }
                     trySend(assessments)
                 } else {

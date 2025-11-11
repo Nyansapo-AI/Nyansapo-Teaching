@@ -138,13 +138,14 @@ fun AssessmentResultTopBarTitle(
                 modifier = Modifier
             )
 
+            /*
             Text(
                 text = "Grade : $grade",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Medium,
                 color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.7f),
                 modifier = Modifier
-            )
+            )*/
 
         }
     }else {
