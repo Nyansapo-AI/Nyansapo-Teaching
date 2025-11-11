@@ -66,35 +66,49 @@ class OnboardingViewModel(
     }
 
 
-    private fun fetchUserData(){
+    private fun fetchUserData() {
         viewModelScope.launch(Dispatchers.IO) {
-
             val userData = userRepository.getUserDetails().first()
 
-            when(userData.status){
-                ResultStatus.INITIAL,
-                ResultStatus.LOADING -> {
+            when (userData.status) {
+                ResultStatus.INITIAL, ResultStatus.LOADING -> {
                     _state.update { it.copy(isLoading = true) }
-
                 }
+
                 ResultStatus.SUCCESS -> {
+                    val data = userData.data
+                    if (data == null) {
+                        _state.update { it.copy(isLoading = false, error = "No user data available") }
+                        return@launch
+                    }
+
+                    val org = data.organizations.firstOrNull()
+                    val project = org?.projects?.firstOrNull()
+
+                    if (org == null || project == null) {
+                        _state.update {
+                            it.copy(isLoading = false, error = "No organizations or projects available")
+                        }
+                        return@launch
+                    }
+
                     _state.update {
                         it.copy(
-                            userData = userData.data,
-                            selectedOrganization = userData.data?.organizations[0],
-                            selectedProject = userData.data?.organizations[0]?.projects[0],
+                            userData = data,
+                            selectedOrganization = org,
+                            selectedProject = project,
+                            isLoading = false,
+                            error = null
                         )
                     }
                 }
+
                 ResultStatus.ERROR -> {
-                    _state.update {
-                        it.copy(error = userData.message)
-                    }
+                    _state.update { it.copy(error = userData.message, isLoading = false) }
                 }
             }
         }
     }
-
     private fun saveInfo(onSuccess: () -> Unit){
         if (_state.value.selectedOrganization == null || _state.value.selectedProject == null || _state.value.selectedSchool == null){
             _state.update {
