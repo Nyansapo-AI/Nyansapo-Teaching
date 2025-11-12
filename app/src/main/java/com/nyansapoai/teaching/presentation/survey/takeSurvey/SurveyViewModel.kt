@@ -444,7 +444,9 @@ class SurveyViewModel(
                         grade = currentState.childGrade.trim(),
                         age = currentState.childAge.trim(),
                         livesWith = currentState.livesWith.trim(),
-                        linkedLearnerId = currentState.linkedLearnerId.trim()
+                        wasAssessedIn2024 = currentState.wasChildAssessedIn2024 ?: false,
+                        wasAboveStoryLevelIn2024 = currentState.childWasLevelAboveStory,
+                        linkedLearnerId = currentState.linkedLearnerId.trim(),
                     )
 
                     val updatedChildren = currentState.children.toMutableList().apply { add(newChild) }

@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -65,19 +66,25 @@ fun SelectSchool(
             )
         }
 
-        FlowRow(
-            verticalArrangement = Arrangement.spacedBy(4.dp),
-            horizontalArrangement = Arrangement.spacedBy(4.dp)
+        LazyColumn(
+            verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            schoolList.forEach { school ->
+            item {
+                FlowRow(
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    schoolList.forEach { school ->
 
-                OptionsItemUI(
-                    text = school.name,
-                    isSelected = selectedSchool == school,
-                    onClick = {
-                        onSelectSchool.invoke(school)
+                        OptionsItemUI(
+                            text = school.name,
+                            isSelected = selectedSchool == school,
+                            onClick = {
+                                onSelectSchool.invoke(school)
+                            }
+                        )
                     }
-                )
+                }
             }
         }
 
