@@ -1,0 +1,15 @@
+DROP TABLE IF EXISTS children;
+
+CREATE TABLE children (
+    household_id TEXT NOT NULL,
+    first_name TEXT,
+    last_name TEXT,
+    gender TEXT,
+    age TEXT,
+    lives_with TEXT,
+    linked_learner_id TEXT,
+    grade TEXT,
+    wasAssessedIn2024 INTEGER NOT NULL ,            -- 0/1
+    wasAboveStoryLevelIn2024 INTEGER NOT NULL ,
+    FOREIGN KEY (household_id) REFERENCES households(id) ON DELETE CASCADE
+);

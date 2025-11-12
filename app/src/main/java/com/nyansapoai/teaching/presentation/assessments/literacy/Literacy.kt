@@ -82,7 +82,8 @@ fun LiteracyRoot(
         assessmentId = assessmentId,
         studentId = studentId,
         studentName = studentName,
-        onAction = viewModel::onAction
+        onAction = viewModel::onAction,
+        modifier = modifier
     )
 }
 
