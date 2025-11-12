@@ -147,12 +147,11 @@ data class SurveyState(
                 }
             }
             HouseSurveyStep.FAMILY_MEMBERS -> {
-                return  children.isNotEmpty() && (parents.isNotEmpty() || familyMemberError != null)
+                return  children.isNotEmpty() && parents.isNotEmpty() && familyMemberError == null
             }
             HouseSurveyStep.PARENTAL_ENGAGEMENT -> {
                 return true
             }
-
             HouseSurveyStep.CHILD_LEARNING_ENVIRONMENT -> {
                 return isQuietPlaceAvailable != null && hasLearningMaterials != null
             }

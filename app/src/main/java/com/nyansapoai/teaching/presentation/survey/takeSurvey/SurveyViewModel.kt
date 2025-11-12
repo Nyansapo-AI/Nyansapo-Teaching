@@ -11,11 +11,13 @@ import com.nyansapoai.teaching.domain.models.school.LocalSchoolInfo
 import com.nyansapoai.teaching.domain.models.survey.Child
 import com.nyansapoai.teaching.domain.models.survey.CreateHouseHoldInfo
 import com.nyansapoai.teaching.domain.models.survey.Parent
+import com.nyansapoai.teaching.navController
 import com.nyansapoai.teaching.presentation.common.connectivity.NetworkConnectivityObserver
 import com.nyansapoai.teaching.presentation.survey.takeSurvey.SurveyState.Companion.toCreateHouseHoldInfo
 import com.nyansapoai.teaching.presentation.survey.workers.SubmitHouseholdSurveyWorker
 import com.nyansapoai.teaching.utils.ResultStatus
 import com.nyansapoai.teaching.utils.Utils
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -24,6 +26,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class SurveyViewModel(
     private val localDataSource: LocalDataSource,
@@ -39,8 +42,8 @@ class SurveyViewModel(
             initialValue = false
         )
 
-    private val _state = MutableStateFlow(SurveyState())
-//    private val _state = MutableStateFlow(SurveyState.demoSurveyState)
+//    private val _state = MutableStateFlow(SurveyState())
+    private val _state = MutableStateFlow(SurveyState.demoSurveyState)
     val state = combine(
         _state,
         localDataSource.getSavedCurrentSchoolInfo(),
@@ -533,7 +536,7 @@ class SurveyViewModel(
             }
 
             is SurveyAction.SubmitSurvey -> {
-                submitSurvey()
+                submitSurvey(onSuccess = action.onSuccess)
             }
 
             is SurveyAction.SetLinkedLearnerId -> {
@@ -570,6 +573,8 @@ class SurveyViewModel(
 
     private fun submitSurvey(onSuccess: () -> Unit = {}) {
         Log.d("SurveyViewModel", "Survey submitted with state: ${_state.value}")
+        _state.update { it.copy(isLoading = true) }
+
 
         viewModelScope.launch {
             val localSchoolInfo = _state.value.localSchoolInfo
@@ -581,6 +586,7 @@ class SurveyViewModel(
                     _state.update {
                         it.copy(
                             localSchoolInfo = schoolInfo,
+                            isLoading = false,
                             errorMessage = "Please try submitting the survey again."
                         )
                     }
@@ -602,7 +608,10 @@ class SurveyViewModel(
             )
 
             resetState()
-            onSuccess.invoke()
+//            onSuccess.invoke()
+            withContext(Dispatchers.Main){
+                navController.popBackStack()
+            }
 
         }
     }
@@ -636,7 +645,6 @@ class SurveyViewModel(
                                 ?.filter { student ->
                                     student.id !in _state.value.isLinkedIdList
                                 }
-//                                ?.take(10)
                                 ?: emptyList(),
                             isLoading = false,
                             error = null
@@ -691,6 +699,7 @@ class SurveyViewModel(
             it.copy(
                 isSubmitting = false,
                 errorMessage = null,
+                isLoading = false,
                 currentStep = HouseSurveyStep.CONSENT,
                 currentStepIndex = 0,
                 consentGiven = false,

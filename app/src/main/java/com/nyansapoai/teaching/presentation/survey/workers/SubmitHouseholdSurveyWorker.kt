@@ -207,12 +207,10 @@ class SubmitHouseholdSurveyWorker(
                 SURVEY_ID to surveyId
             )
 
-            val constraints = Constraints.Builder()
-                .build()
+
 
             return OneTimeWorkRequestBuilder<SubmitHouseholdSurveyWorker>()
                 .setInputData(inputData)
-                .setConstraints(constraints)
                 .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 30, TimeUnit.SECONDS)
                 .build()
         }
