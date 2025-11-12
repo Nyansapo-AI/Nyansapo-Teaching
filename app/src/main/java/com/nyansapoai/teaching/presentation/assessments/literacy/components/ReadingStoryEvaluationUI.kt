@@ -475,10 +475,10 @@ fun ReadingStoryEvaluationUI(
                                     },
                                     modifier = Modifier
                                         .align(Alignment.Center)
+                                        .padding(bottom = 60.dp)
                                 )
                             }
                         }
-
                     },
                     modifier = Modifier
                         .fillMaxSize()

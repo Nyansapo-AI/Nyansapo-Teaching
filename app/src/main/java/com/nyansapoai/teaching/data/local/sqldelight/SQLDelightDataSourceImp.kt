@@ -426,7 +426,10 @@ class SQLDelightDataSourceImp(
                     child.gender,
                     child.age,
                     child.livesWith,
-                    child.linkedLearnerId
+                    child.linkedLearnerId,
+                    child.grade,
+                    if (child.wasAssessedIn2024) 1L else 0L,
+                    if (child.wasAboveStoryLevelIn2024) 1L else 0L
                 )
             }
 
@@ -491,7 +494,8 @@ class SQLDelightDataSourceImp(
                             row.childGender == null &&
                             row.childAge == null &&
                             row.childLivesWith == null &&
-                            row.childLinkedLearnerId == null
+                            row.childLinkedLearnerId == null &&
+                            row.childGrade == null
                         ) null
                         else Child(
                             firstName = row.childFirstName ?: "",
@@ -499,7 +503,10 @@ class SQLDelightDataSourceImp(
                             gender = row.childGender ?: "",
                             age = row.childAge ?: "",
                             livesWith = row.childLivesWith ?: "",
-                            linkedLearnerId = row.childLinkedLearnerId ?: ""
+                            linkedLearnerId = row.childLinkedLearnerId ?: "",
+                            grade = row.childGrade ?: "",
+                            wasAssessedIn2024 = (row.childWasAssessedIn2024 == 1L),
+                            wasAboveStoryLevelIn2024 = (row.childWasAboveStoryLevelIn2024 == 1L)
                         )
                     }.distinctBy { listOf(it.firstName, it.lastName, it.age, it.linkedLearnerId) }
 
@@ -601,7 +608,10 @@ class SQLDelightDataSourceImp(
                             gender = row.gender ?: "",
                             age = row.age ?: "",
                             livesWith = row.lives_with ?: "",
-                            linkedLearnerId = row.linked_learner_id ?: ""
+                            linkedLearnerId = row.linked_learner_id ?: "",
+                            grade = row.grade ?: "",
+                            wasAssessedIn2024 = (row.wasAssessedIn2024 == 1L),
+                            wasAboveStoryLevelIn2024 = (row.wasAboveStoryLevelIn2024 == 1L)
                         )
                     }
 
@@ -696,7 +706,10 @@ class SQLDelightDataSourceImp(
                         gender = entry.gender ?: "",
                         age = entry.age ?: "",
                         livesWith = entry.lives_with ?: "",
-                        linkedLearnerId = entry.linked_learner_id ?: ""
+                        linkedLearnerId = entry.linked_learner_id ?: "",
+                        grade = entry.grade ?: "",
+                        wasAboveStoryLevelIn2024 = (entry.wasAboveStoryLevelIn2024 == 1L),
+                        wasAssessedIn2024 = (entry.wasAssessedIn2024 == 1L)
                     )
                 }
             }
