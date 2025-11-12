@@ -90,5 +90,7 @@ data class Child(
     val grade: String = "",
     val age: String = "",
     val livesWith: String = "",
-    val linkedLearnerId: String = ""
+    val linkedLearnerId: String = "",
+    val wasAssessedIn2024: Boolean = false,
+    val wasAboveStoryLevelIn2024: Boolean = false
 )

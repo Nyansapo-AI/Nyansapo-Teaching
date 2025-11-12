@@ -33,7 +33,6 @@ import com.nyansapoai.teaching.domain.models.students.NyansapoStudent
 import com.nyansapoai.teaching.domain.models.survey.Child
 import com.nyansapoai.teaching.domain.models.survey.Parent
 import com.nyansapoai.teaching.presentation.common.components.AppButton
-import com.nyansapoai.teaching.presentation.common.components.AppCheckBox
 import com.nyansapoai.teaching.presentation.common.components.AppDropDownItem
 import com.nyansapoai.teaching.presentation.common.components.AppDropDownMenu
 import com.nyansapoai.teaching.presentation.common.components.AppTextField
@@ -84,6 +83,10 @@ fun FamilyMembersContent(
     onShowChildGenderDropdownChanged: (Boolean) -> Unit = {},
     livesWith: String = "",
     linkedLearnerId: String,
+    childWasAssessedIn2024: Boolean?,
+    onChildWasAssessedIn2024Changed: (Boolean) -> Unit,
+    childWasLevelAboveStory: Boolean,
+    onChildWasLevelAboveStoryChanged: (Boolean) -> Unit,
     childGrade: String,
     childGradeError: String?,
     showChildGradeDropdown: Boolean = false,
@@ -129,6 +132,9 @@ fun FamilyMembersContent(
 
         needed.toList()
     }
+
+    val isLinkRequired = (!childWasLevelAboveStory || childWasAssessedIn2024 == false)
+    val linkCondition = if (isLinkRequired) linkedLearnerId.isNotBlank() else true
 
 
     val genderOptions = remember { listOf("Female","Intersex", "Male") }
@@ -422,36 +428,72 @@ fun FamilyMembersContent(
 
 
                 item {
-                    AppDropDownMenu(
-                        required = true,
-                        expanded = showAvailableLearnersDropdown,
-                        label = "Link the child to",
-                        placeholder = "Select one ",
-                        onClick = { onShowAvailableLearnersDropdownChanged(!showAvailableLearnersDropdown) },
-                        value = if (linkedLearnerId.isNotBlank()) "Linked" else "Not Linked"
-                    ) {
-                        if (availableLearners.isEmpty()){
-                            Text(
-                                text = "No available learners",
-                                style = MaterialTheme.typography.bodyMedium,
-                            )
-                            return@AppDropDownMenu
-                        }
+                    YesNoOption(
+                        text = "Was the child assessed in the 2024 holiday camps?",
+                        isYes = childWasAssessedIn2024,
+                        onChange = {onChildWasAssessedIn2024Changed(it)}
+                    )
+                }
 
-                        availableLearners.forEach { learner ->
-                            AppDropDownItem(
-                                item = learner.name.ifEmpty { learner.first_name + " " + learner.last_name },
-                                isSelected = linkedLearnerId == learner.id,
-                                onClick = { onLinkedLearnerIdChange(learner.id) }
-                            )
-                        }
+                item {
+                    AnimatedVisibility(
+                        visible = childWasAssessedIn2024 == true
+                    ) {
+                        YesNoOption(
+                            text = "Did the child reach the story level in the 2024 holiday camps?",
+                            isYes = childWasLevelAboveStory,
+                            onChange = { onChildWasLevelAboveStoryChanged(it) }
+                        )
                     }
                 }
 
 
                 item {
+                    AnimatedVisibility(
+                        visible = !childWasLevelAboveStory || childWasAssessedIn2024 == false
+                    ) {
+                        AppDropDownMenu(
+                            required = true,
+                            expanded = showAvailableLearnersDropdown,
+                            label = "Link the child to",
+                            placeholder = "Select one ",
+                            onClick = { onShowAvailableLearnersDropdownChanged(!showAvailableLearnersDropdown) },
+                            value = if (linkedLearnerId.isNotBlank()) "Linked" else "Not Linked"
+                        )
+                        {
+                            if (availableLearners.isEmpty()){
+                                Text(
+                                    text = "No available learners",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                )
+                                return@AppDropDownMenu
+                            }
+
+                            availableLearners.forEach { learner ->
+                                AppDropDownItem(
+                                    item = learner.name.ifEmpty { learner.first_name + " " + learner.last_name },
+                                    isSelected = linkedLearnerId == learner.id,
+                                    onClick = { onLinkedLearnerIdChange(learner.id) }
+                                )
+                            }
+                        }
+                    }
+
+                }
+
+
+                item {
                     AppButton(
-                        enabled =childLastName.isNotBlank() && childFirstName.isNotBlank() && childGender.isNotBlank() && livesWith.isNotBlank() && childAge.isNotBlank() && linkedLearnerId.isNotBlank() && childAgeError == null && childGradeError == null && childGrade.isNotBlank(),
+                        enabled = childLastName.isNotBlank() &&
+                                childFirstName.isNotBlank() &&
+                                childGender.isNotBlank() &&
+                                livesWith.isNotBlank() &&
+                                childAge.isNotBlank() &&
+                                childAgeError == null &&
+                                childGradeError == null &&
+                                childWasAssessedIn2024 != null &&
+                                childGrade.isNotBlank() &&
+                                linkCondition,
                         onClick = {
                             onAddChild.invoke()
                         }
@@ -613,8 +655,6 @@ fun FamilyMembersContent(
                         }
                     }
                 }
-
-
             }
         }
 

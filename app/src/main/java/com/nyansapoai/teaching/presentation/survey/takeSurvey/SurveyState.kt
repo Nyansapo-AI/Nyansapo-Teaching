@@ -90,6 +90,8 @@ data class SurveyState(
     val childGradeError: String? = null,
     val showChildGenderDropdown: Boolean = false,
     val showChildGradeDropdown: Boolean = false,
+    val wasChildAssessedIn2024: Boolean? = null,
+    val childWasLevelAboveStory: Boolean = false,
     val livesWith: String = "",
     val linkedLearnerId: String = "",
     val showAvailableLearnersDropdown: Boolean = false,

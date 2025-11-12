@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -42,8 +43,8 @@ class SurveyViewModel(
             initialValue = false
         )
 
-//    private val _state = MutableStateFlow(SurveyState())
-    private val _state = MutableStateFlow(SurveyState.demoSurveyState)
+    private val _state = MutableStateFlow(SurveyState())
+//    private val _state = MutableStateFlow(SurveyState.demoSurveyState)
     val state = combine(
         _state,
         localDataSource.getSavedCurrentSchoolInfo(),
@@ -462,6 +463,8 @@ class SurveyViewModel(
                         livesWith = "",
                         childGrade = "",
                         linkedLearnerId = "",
+                        wasChildAssessedIn2024 = null,
+                        childWasLevelAboveStory = false,
                         familyMemberError = validateChildrenHaveParents(children = updatedChildren, parents = currentState.parents)
                     )
                 }
@@ -554,7 +557,17 @@ class SurveyViewModel(
                 )
             }
 
-
+            is SurveyAction.SetChildWasAssessedIn2024 -> {
+                _state.update { it.copy(wasChildAssessedIn2024 = action.assessed) }
+            }
+            is SurveyAction.SetChildWasLevelAboveStoryIn2024 -> {
+                _state.update {
+                    it.copy(
+                        childWasLevelAboveStory = action.level,
+                        linkedLearnerId = if (action.level) "" else it.linkedLearnerId
+                    )
+                }
+            }
         }
 
     }
@@ -571,48 +584,68 @@ class SurveyViewModel(
     }
 
 
+    // kotlin
     private fun submitSurvey(onSuccess: () -> Unit = {}) {
         Log.d("SurveyViewModel", "Survey submitted with state: ${_state.value}")
-        _state.update { it.copy(isLoading = true) }
-
+        _state.update { it.copy(isLoading = true, errorMessage = null) }
 
         viewModelScope.launch {
-            val localSchoolInfo = _state.value.localSchoolInfo
-            if (localSchoolInfo == null) {
-                Log.e("SurveyViewModel", "Cannot submit survey - school info not loaded")
-
-                localDataSource.getSavedCurrentSchoolInfo().collect { schoolInfo ->
-                    Log.d("SurveyViewModel", "Fetched school info from local data source")
+            try {
+                // get a single snapshot of school info (avoid indefinite collect)
+                val localSchoolInfo = _state.value.localSchoolInfo ?: localDataSource.getSavedCurrentSchoolInfo().firstOrNull()
+                if (localSchoolInfo == null) {
+                    Log.e("SurveyViewModel", "Cannot submit survey - school info not loaded")
                     _state.update {
                         it.copy(
-                            localSchoolInfo = schoolInfo,
                             isLoading = false,
-                            errorMessage = "Please try submitting the survey again."
+                            errorMessage = "School info not available. Please try again."
                         )
                     }
+                    return@launch
                 }
-                return@launch
+
+                val survey = withContext(Dispatchers.IO) {
+                    // insert linked learners synchronously
+                    _state.value.children.forEach { child ->
+                        if (child.linkedLearnerId.isNotEmpty()) {
+                            localDataSource.insertAssignedStudent(
+                                studentId = child.linkedLearnerId,
+                                firstName = child.firstName,
+                                lastName = child.lastName,
+                                isLinked = true
+                            )
+                        }
+                    }
+
+                    // build the survey DTO and persist pending survey
+                    val created = _state.value.toCreateHouseHoldInfo()
+                    localDataSource.insertHouseholdData(createHouseHoldData = created)
+                    created
+                }
+
+                // enqueue work (no heavy blocking here)
+                enqueueUploadHouseholdsWork(
+                    localSchoolInfo = localSchoolInfo,
+                    surveyId = survey.id
+                )
+
+                // success: clear UI state and navigate
+                _state.update { it.copy(isLoading = false) }
+                resetState()
+
+                withContext(Dispatchers.Main) {
+//                    onSuccess()
+                    navController.popBackStack()
+                }
+            } catch (t: Throwable) {
+                Log.e("SurveyViewModel", "Failed to submit survey", t)
+                _state.update {
+                    it.copy(
+                        isLoading = false,
+                        errorMessage = t.message ?: "Failed to submit survey"
+                    )
+                }
             }
-
-            _state.value.children.forEach { child ->
-                insertLinkedLearner(child = child)
-            }
-
-            val survey = _state.value.toCreateHouseHoldInfo()
-
-            insertPendingSurvey(householdData = survey)
-
-            enqueueUploadHouseholdsWork(
-                localSchoolInfo = localSchoolInfo,
-                surveyId = survey.id
-            )
-
-            resetState()
-//            onSuccess.invoke()
-            withContext(Dispatchers.Main){
-                navController.popBackStack()
-            }
-
         }
     }
 

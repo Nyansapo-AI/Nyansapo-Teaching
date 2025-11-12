@@ -64,17 +64,17 @@ sealed interface SurveyAction {
     data class SetChildLastName(val name: String) : SurveyAction
     data class SetChildGender(val gender: String) : SurveyAction
     data class SetChildAge(val age: String) : SurveyAction
+    data class SetChildWasAssessedIn2024(val assessed: Boolean) : SurveyAction
+    data class SetChildWasLevelAboveStoryIn2024(val level: Boolean) : SurveyAction
     data class SetShowChildGenderDropdown(val show: Boolean) : SurveyAction
     data class SetLivesWith(val livesWith: String) : SurveyAction
     data class SetShowChildGradeDropdown(val show: Boolean) : SurveyAction
-
     data class SetChildGrade(val grade: String): SurveyAction
     data class SetShowLivesWithDropdown(val show: Boolean) : SurveyAction
     data class SetShowAvailableLearnerDropdown(val show: Boolean) : SurveyAction
     data class SetLinkedLearnerId(val learnerId: String) : SurveyAction
     data object OnAddChild : SurveyAction
     data class OnRemoveChild(val child: Child) : SurveyAction
-
     data object OnChangeCurrentStep : SurveyAction
     data class OnUpdateCurrentIndex(val index: Int) : SurveyAction
     data class SubmitSurvey(val onSuccess: () -> Unit): SurveyAction

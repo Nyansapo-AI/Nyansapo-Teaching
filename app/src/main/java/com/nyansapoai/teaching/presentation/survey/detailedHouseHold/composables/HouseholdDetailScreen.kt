@@ -237,6 +237,10 @@ private fun ChildItem(child: Child) {
         KeyValueRow("Age", child.age)
         KeyValueRow("Grade", child.grade)
         KeyValueRow("Lives with", child.livesWith)
+        KeyValueRow("Was assessed in 2024", child.wasAssessedIn2024.toString())
+        if (child.wasAssessedIn2024){
+            KeyValueRow("Reached Story Level in 2024", child.wasAboveStoryLevelIn2024.toString())
+        }
     }
 }
 

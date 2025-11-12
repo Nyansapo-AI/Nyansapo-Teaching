@@ -107,20 +107,9 @@ fun SurveyScreen(
                 IdentificationAndContentContent(
                     name = state.interviewerName,
                     nameError = state.interviewNameError,
-                    county = state.county,
-                    subCounty = state.subCounty,
-                    ward = state.ward,
                     consentGiven = state.consentGiven,
                     onNameChanged = { onAction(SurveyAction.SetInterviewerName(it)) },
-                    onCountyChanged = { onAction(SurveyAction.SetCounty(it)) },
-                    onSubCountyChanged = { onAction(SurveyAction.SetSubCounty(it)) },
-                    onWardChanged = { onAction(SurveyAction.SetWard(it)) },
-                    onConsentChanged = { onAction(SurveyAction.SetConsentGiven(it)) },
-                    countyList = state.countyList,
-                    showCountyDropdown = state.showCountyDropdown,
-                    onShowCountyDropdownChanged = {onAction(SurveyAction.SetShowCountyDropdown(it))},
-                    showSubCountyDropdown = state.showSubCountyDropdown,
-                    onShowSubCountyDropdownChanged = {onAction(SurveyAction.SetShowSubCountyDropdown(it))}
+                    onConsentChanged = { onAction(SurveyAction.SetConsentGiven(it)) }
                 )
             },
             onSubmit = {
@@ -295,6 +284,10 @@ fun SurveyScreen(
                     onChildLastNameChanged = { onAction(SurveyAction.SetChildLastName(it)) },
                     childGender = state.childGender,
                     onChildGenderChanged = { onAction(SurveyAction.SetChildGender(it)) },
+                    childWasAssessedIn2024 = state.wasChildAssessedIn2024,
+                    onChildWasAssessedIn2024Changed = {onAction(SurveyAction.SetChildWasAssessedIn2024(it) )},
+                    childWasLevelAboveStory = state.childWasLevelAboveStory,
+                    onChildWasLevelAboveStoryChanged = {onAction(SurveyAction.SetChildWasLevelAboveStoryIn2024(it) )},
                     showChildGenderDropdown = state.showChildGenderDropdown,
                     onShowChildGenderDropdownChanged = {
                         onAction(
