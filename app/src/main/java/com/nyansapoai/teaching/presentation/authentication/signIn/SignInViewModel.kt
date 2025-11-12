@@ -96,7 +96,7 @@ class SignInViewModel(
             when(isRegister){
                 true -> {onSuccess()}
                 false -> {
-                    _errorMessage.value = "User is not Registered!"
+                    _errorMessage.value = "This Phone Number is not Registered!"
                     delay(2000)
                     onFailure()
                 }
