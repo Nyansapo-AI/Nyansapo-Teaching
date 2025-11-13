@@ -8,27 +8,44 @@ import com.nyansapoai.teaching.presentation.common.components.AppTextField
 @Composable
 fun IdentificationAndContentContent(
     modifier: Modifier = Modifier,
-    name: String,
+    interviewee: String,
+    interviewer: String,
+    interviewerError: String?,
     nameError: String?,
     consentGiven: Boolean?,
-    onNameChanged: (String) -> Unit,
+    onInterviewerChanged: (String) -> Unit,
+    onIntervieweeChanged: (String) -> Unit,
     onConsentChanged: (Boolean) -> Unit
 )
 {
     Column(
         modifier = modifier
-    ) {
+    )
+    {
+
         AppTextField(
             required = true,
+            showError = interviewerError != null || interviewer.isEmpty(),
+            label = "Interviewer(Volunteer)",
+            value = interviewer,
+            error = interviewerError,
+            onValueChanged = onInterviewerChanged,
+            placeholder = "Enter your full name",
+        )
+
+        AppTextField(
+            required = true,
+            showError = nameError != null || interviewee.isEmpty(),
             label = "Interviewee",
-            value = name,
+            value = interviewee,
             error = nameError,
-            onValueChanged = onNameChanged,
+            onValueChanged = onIntervieweeChanged,
             placeholder = "Enter your full name",
         )
 
         YesNoOption(
             text = " Has the respondent given consent to participate?",
+            showError = consentGiven == null,
             isYes = consentGiven,
             onChange = onConsentChanged
         )

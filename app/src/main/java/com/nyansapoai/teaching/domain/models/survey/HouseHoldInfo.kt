@@ -9,6 +9,7 @@ import kotlin.uuid.Uuid
 data class HouseHoldInfo(
     val id: String = "",
     val interviewerName: String = "",
+    val intervieweeName: String = "",
     val interviewDate: String = "",
     val villageId: String? = null,
     val village: String = "testVillage",
@@ -36,6 +37,7 @@ data class HouseHoldInfo(
 
 data class CreateHouseHoldInfo @OptIn(ExperimentalUuidApi::class) constructor(
     val id: String = Uuid.random().toString(),
+    val intervieweeName: String = "",
     val interviewerName: String = "",
     val interviewDate: String = Clock.System.now().toString(),
     val villageId: String? = null,

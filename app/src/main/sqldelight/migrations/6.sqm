@@ -1,0 +1,24 @@
+DROP TABLE IF EXISTS households;
+
+CREATE TABLE households (
+    id TEXT PRIMARY KEY,
+    volunteer_name TEXT NOT NULL,
+    interviewer_name TEXT NOT NULL,
+    interview_date TEXT NOT NULL,
+    village TEXT NOT NULL,
+    county TEXT,
+    sub_county TEXT,
+    ward TEXT,
+    consent_given INTEGER NOT NULL,        -- 0/1 for Boolean
+    respondent_name TEXT,
+    is_household_head INTEGER NOT NULL,    -- 0/1
+    household_head_name TEXT,
+    relationship_to_head TEXT,
+    household_head_phone TEXT,
+    respondent_age INTEGER,
+    main_language TEXT,
+    marital_status TEXT,
+    household_members_count INTEGER,
+    income_source TEXT,
+    has_electricity INTEGER                  -- nullable boolean mapped to INTEGER
+);

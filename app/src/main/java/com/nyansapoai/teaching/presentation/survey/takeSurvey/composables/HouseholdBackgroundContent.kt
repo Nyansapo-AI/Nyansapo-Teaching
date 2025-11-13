@@ -115,12 +115,14 @@ fun HouseholdBackgroundContent(
     ) {
 
         YesNoOption(
+            showError = isRespondentHead == null,
             text = "Is the respondent the household head?",
             isYes = isRespondentHead,
             onChange = onRespondentHeadChanged
         )
 
         AppTextField(
+            showError = respondentNameError != null || respondentName.isEmpty(),
             required = true,
             label = "Name of the respondent",
             value = respondentName,
@@ -130,6 +132,7 @@ fun HouseholdBackgroundContent(
         )
 
         AppTextField(
+            showError = respondentAgeError != null || respondentAge.isEmpty(),
             required = true,
             label = "Respondent Age",
             error = respondentAgeError,
@@ -142,10 +145,12 @@ fun HouseholdBackgroundContent(
 
         AnimatedVisibility(
             visible = isRespondentHead == false
-        ) {
+        )
+        {
 
             Column {
                 AppTextField(
+                    showError = isRespondentHead == false && (householdHeadNameError != null || householdHeadName.isEmpty()),
                     required = true,
                     label = "Household Head Name",
                     value = householdHeadName,
@@ -154,6 +159,7 @@ fun HouseholdBackgroundContent(
                     placeholder = "Enter the household head name",
                 )
                 AppDropDownMenu(
+                    showError = relationship.isEmpty() || relationship.isBlank(),
                     required = true,
                     expanded = showRelationshipDropdown,
                     label = "Select Relationship to Household Head",
@@ -180,6 +186,7 @@ fun HouseholdBackgroundContent(
 
 
         AppTextField(
+            showError = mobileNumberError != null || householdHeadMobileNumber.isEmpty(),
             required = true,
             label = "Telephone/Mobile Number of the Household Head",
             value = householdHeadMobileNumber,
@@ -190,6 +197,7 @@ fun HouseholdBackgroundContent(
         )
 
         AppDropDownMenu(
+            showError = mainLanguageSpokenAtHome.isEmpty() || mainLanguageSpokenAtHome.isBlank(),
             required = true,
             expanded = showMainLanguageDropdown,
             label = "Main Language Spoken at Home",
@@ -213,6 +221,7 @@ fun HouseholdBackgroundContent(
 
 
         AppTextField(
+            showError = householdMembersTotalNumber.isEmpty() || householdMembersTotalNumber.isBlank(),
             required = true,
             label = "Number of members regularly living in the household including yourself",
             value = householdMembersTotalNumber,
@@ -223,6 +232,7 @@ fun HouseholdBackgroundContent(
         )
 
         AppDropDownMenu(
+            showError = houseHoldIncomeSource.isEmpty() || houseHoldIncomeSource.isBlank(),
             required = true,
             expanded = showIncomeSourceDropdown,
             label = "Main Source of Income",
@@ -241,6 +251,7 @@ fun HouseholdBackgroundContent(
         }
 
         AppDropDownMenu(
+            showError = maritalStatus.isEmpty() || maritalStatus.isBlank(),
             required = true,
             expanded = showMaritalStatusDropdown,
             label = "Household Head Marital status",
@@ -258,6 +269,7 @@ fun HouseholdBackgroundContent(
         }
 
         YesNoOption(
+            showError = hasElectricity == null,
             text = "Does the household have electricity?",
             isYes = hasElectricity,
             onChange = {onHasElectricityChanged(it)}

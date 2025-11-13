@@ -105,10 +105,13 @@ fun SurveyScreen(
         StepContent(
             screen = {
                 IdentificationAndContentContent(
-                    name = state.interviewerName,
-                    nameError = state.interviewNameError,
+                    interviewer = state.interviewerName,
+                    interviewee = state.intervieweeName,
+                    interviewerError = state.interviewerNameError,
+                    nameError = state.intervieweeNameError,
                     consentGiven = state.consentGiven,
-                    onNameChanged = { onAction(SurveyAction.SetInterviewerName(it)) },
+                    onIntervieweeChanged = { onAction(SurveyAction.SetIntervieweeName(it)) },
+                    onInterviewerChanged = {onAction(SurveyAction.SetInterviewerName(it))},
                     onConsentChanged = { onAction(SurveyAction.SetConsentGiven(it)) }
                 )
             },
