@@ -75,8 +75,8 @@ fun HouseholdDetailScreen(
         ) {
             item {
                 InfoCard {
-                    if (household.intervieweeName.isNotBlank()){
-                        KeyValueRow("Interviewer", household.intervieweeName)
+                    if (household.interviewerName.isNotBlank()){
+                        KeyValueRow("Interviewer", household.interviewerName)
                     }
                     KeyValueRow("Interview Date", household.interviewDate)
                     KeyValueRow("Interviewee", household.intervieweeName)
