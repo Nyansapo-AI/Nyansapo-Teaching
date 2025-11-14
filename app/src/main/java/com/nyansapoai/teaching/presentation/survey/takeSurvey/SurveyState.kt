@@ -121,7 +121,7 @@ data class SurveyState(
             HouseSurveyStep.CONSENT -> {
                 return consentGiven == true &&
                         interviewerName.isNotBlank() &&
-                        interviewerName.isNotBlank() &&
+                        interviewerNameError == null &&
                         intervieweeName.isNotBlank() &&
                         intervieweeNameError == null
             }
