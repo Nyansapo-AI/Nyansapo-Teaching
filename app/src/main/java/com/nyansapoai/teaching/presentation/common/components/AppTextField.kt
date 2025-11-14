@@ -117,7 +117,7 @@ fun AppTextField(
                         Modifier.border(
                             2.dp,
                             MaterialTheme.colorScheme.error,
-                            RoundedCornerShape(5.dp) ) else textFieldModifier )
+                            RoundedCornerShape(5.dp) ) else Modifier )
                 .testTag(label.lowercase())
         )
         if (error != null) {
