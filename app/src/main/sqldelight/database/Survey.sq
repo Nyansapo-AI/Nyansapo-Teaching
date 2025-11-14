@@ -78,7 +78,7 @@ INSERT INTO households (
   relationship_to_head, household_head_phone, respondent_age, main_language,
   marital_status, household_members_count, income_source, has_electricity
 ) VALUES (
-  :id, :interviewer_name, :volunteer_name,:interview_date, :village, :county, :sub_county, :ward,
+  :id, :interviewer_name, :volunteer_name, :interview_date, :village, :county, :sub_county, :ward,
   :consent_given, :respondent_name, :is_household_head, :household_head_name,
   :relationship_to_head, :household_head_phone, :respondent_age, :main_language,
   :marital_status, :household_members_count, :income_source, :has_electricity
