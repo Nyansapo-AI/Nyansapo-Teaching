@@ -668,6 +668,7 @@ class SQLDelightDataSourceImp(
 
                 CreateHouseHoldInfo(
                     id = householdRow.id,
+                    interviewerName = householdRow.volunteer_name,
                     intervieweeName = householdRow.interviewer_name,
                     interviewDate = householdRow.interview_date,
                     village = householdRow.village,
