@@ -14,9 +14,10 @@ data class SurveyState(
     val error: String? = null,
     val prematureExitDialog: Boolean = false,
 
-
     val interviewerName: String = "",
-    val interviewNameError: String? = null,
+    val interviewerNameError: String? = null,
+    val intervieweeName: String = "",
+    val intervieweeNameError: String? = null,
     val countyList: List<County> = County.entries,
     val showCountyDropdown: Boolean = false,
     val showSubCountyDropdown: Boolean = false,
@@ -25,7 +26,7 @@ data class SurveyState(
     val ward: String = "",
     val consentGiven: Boolean? = null,
 
-    val respondentName: String = interviewerName,
+    val respondentName: String = intervieweeName,
     val respondentNameError: String? = null,
     val isRespondentHeadOfHousehold: Boolean? = null,
     val respondentAge: String = "",
@@ -120,7 +121,9 @@ data class SurveyState(
             HouseSurveyStep.CONSENT -> {
                 return consentGiven == true &&
                         interviewerName.isNotBlank() &&
-                        interviewNameError == null
+                        interviewerNameError == null &&
+                        intervieweeName.isNotBlank() &&
+                        intervieweeNameError == null
             }
             HouseSurveyStep.HOUSEHOLD_BACKGROUND -> {
                 return if (isRespondentHeadOfHousehold == true){
@@ -164,6 +167,7 @@ data class SurveyState(
         fun SurveyState.toCreateHouseHoldInfo(): CreateHouseHoldInfo{
             return CreateHouseHoldInfo(
                 interviewerName = interviewerName,
+                intervieweeName = intervieweeName,
                 villageId = localSchoolInfo?.schoolUId,
                 ward = ward,
                 consentGiven = consentGiven ?: false,
@@ -199,7 +203,7 @@ data class SurveyState(
 
 
         val demoSurveyState = SurveyState(
-            interviewerName = "John Doe",
+            intervieweeName = "John Doe",
             county = County.KAKAMEGA.title,
             subCounty = "Lurambi",
             ward = "Central Ward",

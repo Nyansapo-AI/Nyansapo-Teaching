@@ -192,6 +192,7 @@ fun FamilyMembersContent(
 
                 item {
                     AppTextField(
+                        showError = parentName.isEmpty(),
                         required = true,
                         label = "Name",
                         value = parentName,
@@ -204,6 +205,7 @@ fun FamilyMembersContent(
 
                 item {
                     AppTextField(
+                        showError = parentAge.isEmpty(),
                         required = true,
                         label = "Age",
                         value = parentAge,
@@ -217,6 +219,7 @@ fun FamilyMembersContent(
 
                 item {
                     AppDropDownMenu(
+                        showError = parentGender.isEmpty(),
                         required = true,
                         expanded = showGuardianGenderDropdown,
                         label = "What is the gender?",
@@ -237,6 +240,7 @@ fun FamilyMembersContent(
 
                 item {
                     AppDropDownMenu(
+                        showError = type.isEmpty(),
                         required = true,
                         expanded = showTypeDropdown,
                         label = "Type",
@@ -257,6 +261,7 @@ fun FamilyMembersContent(
 
                 item {
                     YesNoOption(
+                        showError = hasAttendedSchool == null,
                         text = "Has ever attended school?",
                         isYes = hasAttendedSchool ,
                         onChange = {onHasAttendedSchoolChanged(it)}
@@ -339,6 +344,7 @@ fun FamilyMembersContent(
 
                 item{
                     AppTextField(
+                        showError = childFirstName.isEmpty(),
                         required = true,
                         label = "First Name of the child",
                         value = childFirstName,
@@ -348,6 +354,7 @@ fun FamilyMembersContent(
                 }
                 item{
                     AppTextField(
+                        showError = childLastName.isEmpty(),
                         required = true,
                         label = "Last Name of the child",
                         value = childLastName,
@@ -358,6 +365,7 @@ fun FamilyMembersContent(
 
                 item {
                     AppDropDownMenu(
+                        showError = childGender.isEmpty(),
                         required = true,
                         expanded = showChildGenderDropdown,
                         label = "Gender of the child",
@@ -377,6 +385,7 @@ fun FamilyMembersContent(
 
                 item {
                     AppTextField(
+                        showError = childAge.isEmpty() || childAgeError != null,
                         required = true,
                         label = "Age of the child",
                         value = childAge,
@@ -388,6 +397,7 @@ fun FamilyMembersContent(
                 }
                 item {
                     AppDropDownMenu(
+                        showError = childGrade.isEmpty() || childGradeError != null,
                         required = true,
                         expanded = showChildGradeDropdown,
                         label = "Grade of the child",
@@ -409,6 +419,7 @@ fun FamilyMembersContent(
 
                 item {
                     AppDropDownMenu(
+                        showError = livesWith.isEmpty(),
                         required = true,
                         expanded = showLivesWithDropdown,
                         label = "The child lives with",
@@ -429,6 +440,7 @@ fun FamilyMembersContent(
 
                 item {
                     YesNoOption(
+                        showError = childWasAssessedIn2024 == null,
                         text = "Was the child assessed in the 2024 holiday camps?",
                         isYes = childWasAssessedIn2024,
                         onChange = {onChildWasAssessedIn2024Changed(it)}
@@ -453,6 +465,7 @@ fun FamilyMembersContent(
                         visible = !childWasLevelAboveStory || childWasAssessedIn2024 == false
                     ) {
                         AppDropDownMenu(
+                            showError = (!childWasLevelAboveStory || childWasAssessedIn2024 == false) && linkedLearnerId.isBlank() ,
                             required = true,
                             expanded = showAvailableLearnersDropdown,
                             label = "Link the child to",

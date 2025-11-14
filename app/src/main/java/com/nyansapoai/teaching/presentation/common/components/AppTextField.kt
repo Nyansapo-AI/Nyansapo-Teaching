@@ -1,5 +1,6 @@
 package com.nyansapoai.teaching.presentation.common.components
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -56,6 +57,7 @@ fun AppTextField(
     maxLines: Int = 1,
     trailingIcon: @Composable () -> Unit = {},
     leadingIcon: @Composable() (() -> Unit)? = null,
+    showError: Boolean = false,
     textFieldModifier: Modifier = Modifier
 ) {
     Column(
@@ -105,9 +107,18 @@ fun AppTextField(
             onValueChange = onValueChanged,
             shape = RoundedCornerShape(5.dp),
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-            modifier = textFieldModifier.fillMaxWidth().padding(vertical = 8.dp).testTag(label.lowercase()),
             trailingIcon = trailingIcon,
-            textStyle = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onBackground)
+            textStyle = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onBackground),
+            modifier = textFieldModifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp)
+                .then(
+                    if (showError)
+                        Modifier.border(
+                            2.dp,
+                            MaterialTheme.colorScheme.error,
+                            RoundedCornerShape(5.dp) ) else Modifier )
+                .testTag(label.lowercase())
         )
         if (error != null) {
             Text(
@@ -126,6 +137,8 @@ fun AppTextField(
 @Composable
 private fun AppTextFieldPreview(){
     AppTextField(
+        required = true,
+        showError = true,
         value = "",
         placeholder = "Name",
         error = null,

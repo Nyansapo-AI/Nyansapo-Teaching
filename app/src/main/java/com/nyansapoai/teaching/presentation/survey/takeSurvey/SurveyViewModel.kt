@@ -83,11 +83,11 @@ class SurveyViewModel(
                 }
             }
 
-            is SurveyAction.SetInterviewerName -> {
+            is SurveyAction.SetIntervieweeName -> {
                 _state.update {
                     it.copy(
-                        interviewerName = action.name,
-                        interviewNameError = if(Utils.hasTwoOrMoreNames(action.name) ) null else "Please enter full name"
+                        intervieweeName = action.name,
+                        intervieweeNameError = if(Utils.hasTwoOrMoreNames(action.name) ) null else "Please enter full name"
                     )
                 }
             }
@@ -570,6 +570,14 @@ class SurveyViewModel(
                     )
                 }
             }
+            is SurveyAction.SetInterviewerName -> {
+                _state.update {
+                    it.copy(
+                        interviewerName = action.name,
+                        interviewerNameError = if(Utils.hasTwoOrMoreNames(action.name) ) null else "Please enter full name"
+                    )
+                }
+            }
         }
 
     }
@@ -741,7 +749,7 @@ class SurveyViewModel(
                 county = "",
                 subCounty = "",
                 ward = "",
-                interviewerName = "",
+                intervieweeName = "",
                 respondentName = "",
                 respondentAge = "",
                 isRespondentHeadOfHousehold = false,

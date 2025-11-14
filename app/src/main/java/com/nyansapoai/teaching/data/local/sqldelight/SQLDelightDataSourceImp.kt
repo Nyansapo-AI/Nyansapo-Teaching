@@ -397,7 +397,8 @@ class SQLDelightDataSourceImp(
             // insert household (positional args to match .sq file parameter order)
             surveyQueries.insertHousehold(
                 createHouseHoldData.id,
-                createHouseHoldData.interviewerName,
+                createHouseHoldData.interviewerName, // volunteer_name (the volunteer)
+                createHouseHoldData.intervieweeName, // interviewer_name (the respondent)
                 createHouseHoldData.interviewDate,
                 createHouseHoldData.village,
                 createHouseHoldData.county,
@@ -561,7 +562,8 @@ class SQLDelightDataSourceImp(
 
                     CreateHouseHoldInfo(
                         id = householdRow.id,
-                        interviewerName = householdRow.interviewerName,
+                        interviewerName = householdRow.volunteerName,
+                        intervieweeName = householdRow.interviewerName,
                         interviewDate = householdRow.interviewDate,
                         village = householdRow.village,
                         county = householdRow.county ?: "",
@@ -666,7 +668,8 @@ class SQLDelightDataSourceImp(
 
                 CreateHouseHoldInfo(
                     id = householdRow.id,
-                    interviewerName = householdRow.interviewer_name,
+                    interviewerName = householdRow.volunteer_name,
+                    intervieweeName = householdRow.interviewer_name,
                     interviewDate = householdRow.interview_date,
                     village = householdRow.village,
                     county = householdRow.county ?: "",

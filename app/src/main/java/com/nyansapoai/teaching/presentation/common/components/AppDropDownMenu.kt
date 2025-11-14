@@ -34,6 +34,7 @@ fun AppDropDownMenu(
     onClick: () -> Unit,
     error: String? = null,
     required: Boolean = false,
+    showError: Boolean = false,
     content: @Composable () -> Unit
 ){
     Column(
@@ -50,6 +51,7 @@ fun AppDropDownMenu(
             keyboardType = KeyboardType.Text,
             error = error,
             maxLines = 2,
+            showError = showError,
             trailingIcon = {
                 IconButton(
                     onClick = onClick,

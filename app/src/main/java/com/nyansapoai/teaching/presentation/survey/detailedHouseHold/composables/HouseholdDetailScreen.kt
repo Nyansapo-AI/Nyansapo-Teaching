@@ -75,8 +75,11 @@ fun HouseholdDetailScreen(
         ) {
             item {
                 InfoCard {
-                    KeyValueRow("Interviewee", household.interviewerName)
+                    if (household.interviewerName.isNotBlank()){
+                        KeyValueRow("Interviewer", household.interviewerName)
+                    }
                     KeyValueRow("Interview Date", household.interviewDate)
+                    KeyValueRow("Interviewee", household.intervieweeName)
 //                    KeyValueRow("County", household.county)
 //                    KeyValueRow("Sub-county", household.subCounty)
 //                    KeyValueRow("Ward", household.ward)
