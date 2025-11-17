@@ -20,7 +20,7 @@ import kotlinx.coroutines.launch
 
 class AttendancesViewModel(
     private val localDataSource: LocalDataSource,
-    private val attendancesRepository: AttendanceRepository,
+    private val attendancesRepository: AttendanceRepository
 ) : ViewModel() {
 
 
