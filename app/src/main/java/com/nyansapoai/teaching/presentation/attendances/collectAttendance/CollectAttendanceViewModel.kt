@@ -9,8 +9,10 @@ import com.nyansapoai.teaching.data.remote.attendance.AttendanceRepository
 import com.nyansapoai.teaching.data.remote.students.StudentsRepository
 import com.nyansapoai.teaching.domain.models.attendance.AttendanceRecord
 import com.nyansapoai.teaching.domain.models.attendance.StudentAttendance
+import com.nyansapoai.teaching.navController
 import com.nyansapoai.teaching.navigation.CollectAttendancePage
 import com.nyansapoai.teaching.utils.ResultStatus
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.first
@@ -18,6 +20,7 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class CollectAttendanceViewModel(
     savedStateHandle: SavedStateHandle,
@@ -187,7 +190,6 @@ class CollectAttendanceViewModel(
                             error = null
                         )
                     }
-                    onSuccess.invoke()
                 }
                 ResultStatus.ERROR -> {
                     Log.w("Collect Attendance", "Error submitting attendance: ${response.message}")
@@ -198,6 +200,10 @@ class CollectAttendanceViewModel(
                         )
                     }
                 }
+            }
+
+            withContext(Dispatchers.Main) {
+                navController.popBackStack()
             }
         }
     }

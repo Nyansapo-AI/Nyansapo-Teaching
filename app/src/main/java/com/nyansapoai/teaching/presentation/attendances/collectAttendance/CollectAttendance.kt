@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,6 +14,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -22,12 +25,14 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -100,16 +105,8 @@ fun CollectAttendanceScreen(
         modifier = Modifier
             .padding(horizontal = 12.dp)
     ) { innerPadding ->
-        /*
-        AppComingSoon(
-            modifier = Modifier
-                .padding(innerPadding)
-        )
-
-         */
-
-
         CollectAttendanceContent(
+            isLoading = state.isLoading,
             studentList = state.studentAttendanceList,
             selectedGrade = state.selectedGrade,
             onOptionSelected = { onAction(CollectAttendanceAction.OnSelectedGrade(it)) },
@@ -137,6 +134,7 @@ fun CollectAttendanceContent(
     onClickStudent: (StudentAttendance) -> Unit = {  },
     onOptionSelected: (Int?) -> Unit = {  },
     selectedGrade: Int? = null,
+    isLoading: Boolean = false,
     onSubmitAttendance: () -> Unit = {  },
 )
 {
@@ -167,6 +165,7 @@ fun CollectAttendanceContent(
 
 
         AppButton(
+            isLoading = isLoading,
             onClick = onSubmitAttendance,
             modifier = Modifier
                 .align(Alignment.BottomCenter)
@@ -215,21 +214,56 @@ fun StudentAttendanceItem(
                 text = student.name,
                 maxLines = 1,
                 overflow = TextOverflow.MiddleEllipsis,
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.Medium,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
             )
-
         }
 
-        RadioButton(
-            selected = isSelected,
-            onClick = { onClick(student) },
-            colors = RadioButtonDefaults.colors(
-                selectedColor = MaterialTheme.colorScheme.secondary,
-                unselectedColor = MaterialTheme.colorScheme.onSurfaceVariant
-            ),
-            modifier = Modifier
+
+
+
+        FlowRow(
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
         )
+        {
+            TextButton(
+                colors = ButtonDefaults.textButtonColors(
+                    contentColor = if (student.attendance == true) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.onSurfaceVariant,
+                    containerColor = if (student.attendance == true) MaterialTheme.colorScheme.secondary.copy(alpha = 0.2f) else Color.Transparent
+                ),
+                shape = RoundedCornerShape(8.dp),
+                onClick = {
+                    onClick(student)
+                }
+            ) {
+
+                Text(
+                    text = "Present",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                )
+
+            }
+            TextButton(
+                colors = ButtonDefaults.textButtonColors(
+                    contentColor = if (student.attendance == false) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
+                    containerColor = if (student.attendance == false) MaterialTheme.colorScheme.errorContainer else Color.Transparent
+                ),
+                shape = RoundedCornerShape(8.dp),
+                onClick = {
+                    onClick(student)
+                }
+            ) {
+
+                Text(
+                    text = "Absent",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                )
+
+            }
+        }
     }
 }
 
@@ -276,6 +310,10 @@ fun StudentAttendanceList(
                 modifier = Modifier
             )
 
+        }
+
+        item {
+            Spacer(Modifier.height(120.dp))
         }
 
     }
