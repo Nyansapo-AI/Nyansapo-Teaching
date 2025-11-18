@@ -23,7 +23,7 @@ class OTPViewModel : ViewModel() {
     private val _otpCode = MutableStateFlow("")
     val otpCode = _otpCode.asStateFlow()
 
-    private val _timer = MutableStateFlow(30)
+    private val _timer = MutableStateFlow(60)
     val timer = _timer.asStateFlow()
 
     private val _message = MutableStateFlow("")
