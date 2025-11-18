@@ -16,13 +16,14 @@ import androidx.compose.ui.unit.sp
 import com.canopas.lib.showcase.IntroShowcase
 import com.canopas.lib.showcase.component.ShowcaseStyle
 import com.nyansapoai.teaching.R
-import com.nyansapoai.teaching.presentation.common.audio.AppAudio
+import com.nyansapoai.teaching.presentation.common.audio.AppLocalAudioPlayer
 
 @Composable
 fun AppShowInstructions(
     modifier: Modifier = Modifier,
     showInstructions: Boolean = true,
     onChangeShow: (Boolean) -> Unit = {  },
+    hasCompletedPlaying: (Boolean) -> Unit = {  },
     index: Int = 0,
     instructionAudio: Int = R.raw.reading_assessment_default_instructions,
     size: Dp = Dp.Unspecified,
@@ -35,14 +36,15 @@ fun AppShowInstructions(
     AnimatedVisibility(
         visible = showInstructions
     ) {
-        AppAudio(
-            audio = instructionAudio
+        AppLocalAudioPlayer(
+            audio = instructionAudio,
+            hasFinishedPlaying = { hasCompleted -> hasCompletedPlaying(hasCompleted) }
         )
     }
 
     IntroShowcase(
         showIntroShowCase = showInstructions,
-        dismissOnClickOutside = false,
+        dismissOnClickOutside = true,
         onShowCaseCompleted = {
             onChangeShow(false)
         },

@@ -1,5 +1,6 @@
 package com.nyansapoai.teaching.presentation.assessments.literacy
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -10,31 +11,54 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.nyansapoai.teaching.R
+import com.nyansapoai.teaching.navController
 import com.nyansapoai.teaching.presentation.assessments.components.HasCompletedAssessment
-import com.nyansapoai.teaching.presentation.assessments.literacy.LiteracyAction.*
+import com.nyansapoai.teaching.presentation.assessments.literacy.LiteracyAction.OnCompletePreTest
+import com.nyansapoai.teaching.presentation.assessments.literacy.LiteracyAction.OnSubmitLiteracyResults
+import com.nyansapoai.teaching.presentation.assessments.literacy.LiteracyAction.OnSubmitMultipleChoiceResponse
+import com.nyansapoai.teaching.presentation.assessments.literacy.LiteracyAction.OnSubmitResponse
+import com.nyansapoai.teaching.presentation.assessments.literacy.LiteracyAction.SetAudioFilePath
+import com.nyansapoai.teaching.presentation.assessments.literacy.LiteracyAction.SetMultipleQuestionOptions
+import com.nyansapoai.teaching.presentation.assessments.literacy.LiteracyAction.SetSelectedChoice
+import com.nyansapoai.teaching.presentation.assessments.literacy.LiteracyAction.SetShowContent
+import com.nyansapoai.teaching.presentation.assessments.literacy.LiteracyAction.SetShowInstructions
+import com.nyansapoai.teaching.presentation.assessments.literacy.components.ListeningQuestionUI
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.LiteracyAssessmentLevel
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.LiteracyReadingAssessmentUI
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.MultichoiceQuestionsUI
+import com.nyansapoai.teaching.presentation.assessments.literacy.components.PreTestReadingAssessmentUI
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.ReadingStoryEvaluationUI
+import com.nyansapoai.teaching.presentation.common.components.AppAlertDialog
 import com.nyansapoai.teaching.presentation.common.components.AppSimulateNavigation
+import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -42,7 +66,8 @@ fun LiteracyRoot(
     modifier: Modifier = Modifier,
     assessmentId: String,
     studentId: String,
-    assessmentNo: Int
+    assessmentNo: Int,
+    studentName: String
 ) {
 
     val viewModel = koinViewModel<LiteracyViewModel>()
@@ -56,6 +81,7 @@ fun LiteracyRoot(
         state = state,
         assessmentId = assessmentId,
         studentId = studentId,
+        studentName = studentName,
         onAction = viewModel::onAction
     )
 }
@@ -63,9 +89,11 @@ fun LiteracyRoot(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LiteracyScreen(
+    modifier: Modifier = Modifier,
     state: LiteracyState,
     assessmentId: String,
     studentId: String,
+    studentName: String,
     onAction: (LiteracyAction) -> Unit = {},
 ) {
 
@@ -73,13 +101,129 @@ fun LiteracyScreen(
         onAction(LiteracyAction.SetIds(assessmentId = assessmentId, studentId = studentId))
     }
 
-    LaunchedEffect(state.currentAssessmentLevel == LiteracyAssessmentLevel.COMPLETED) {
-        onAction.invoke(LiteracyAction.OnSubmitLiteracyResults(assessmentId = assessmentId, studentId = studentId))
+    LaunchedEffect(state.currentAssessmentLevel) {
+        if (state.currentAssessmentLevel == LiteracyAssessmentLevel.COMPLETED) {
+            onAction.invoke(OnSubmitLiteracyResults(assessmentId = assessmentId, studentId = studentId))
+            delay(3000)
+            navController.popBackStack()
+        }
     }
 
+    BackHandler(enabled = true) {
+
+        if (state.currentAssessmentLevel == LiteracyAssessmentLevel.PRE_TEST || state.currentAssessmentLevel == LiteracyAssessmentLevel.COMPLETED) {
+            navController.popBackStack()
+            return@BackHandler
+        }
+
+        onAction.invoke(LiteracyAction.OnShowPrematureEndAssessmentDialogChange(true))
+
+    }
+
+
     Scaffold(
-        
+        topBar = {
+            TopAppBar(
+                navigationIcon = {
+                    IconButton(
+                        onClick = {
+                            if(state.currentAssessmentLevel == LiteracyAssessmentLevel.PRE_TEST || state.currentAssessmentLevel == LiteracyAssessmentLevel.COMPLETED) {
+                                navController.popBackStack()
+                                return@IconButton
+                            }
+
+                            onAction.invoke(LiteracyAction.OnShowPrematureEndAssessmentDialogChange(true))
+                        }
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.arrow_back),
+                            tint = MaterialTheme.colorScheme.onPrimary,
+                            contentDescription = "Back",
+                        )
+                    }
+                },
+                title = {
+                    Text(
+                        text = studentName,
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.secondary,
+                        modifier = Modifier
+                    )
+                },
+                actions = {
+                    AnimatedVisibility(
+                        visible = !state.hasCompletedAssessment && state.currentAssessmentLevel != LiteracyAssessmentLevel.PRE_TEST,
+                        enter = fadeIn(),
+                        exit = fadeOut()
+                    ) {
+                        TextButton(
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.error,
+                                contentColor = MaterialTheme.colorScheme.onError
+                            ),
+                            onClick = {
+                                onAction.invoke(LiteracyAction.OnShowEndAssessmentDialogChange(true))
+                            },
+                            modifier = Modifier
+                                .padding(horizontal = 12.dp)
+                        ) {
+                            Text(
+                                text = "End",
+                                style = MaterialTheme.typography.bodyLarge,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier
+                                    .padding(horizontal = 12.dp, vertical = 6.dp),
+                            )
+                        }
+
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                )
+            )
+        },
+        modifier = modifier
+            .fillMaxSize()
+            .statusBarsPadding()
+            .navigationBarsPadding()
+
+
     ) { innerPadding ->
+
+        AnimatedVisibility(
+            visible = state.showPrematureEndAssessmentDialog,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            AppAlertDialog(
+                onDismissRequest = { onAction.invoke(LiteracyAction.OnShowPrematureEndAssessmentDialogChange(false)) },
+                dialogText = "You are about to end assessment, and you have to restart the assessment. Click confirm to continue.",
+                dialogTitle = "End Assessment",
+                onConfirmation = {
+                    onAction.invoke(LiteracyAction.OnShowPrematureEndAssessmentDialogChange(false))
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        AnimatedVisibility(
+            visible = state.showEndAssessmentDialog,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            AppAlertDialog(
+                onDismissRequest = { onAction.invoke(LiteracyAction.OnShowEndAssessmentDialogChange(false)) },
+                dialogText = "You are about to end assessment. Click confirm to continue.",
+                dialogTitle = "End Assessment",
+                onConfirmation = {
+                    onAction.invoke(LiteracyAction.OnShowEndAssessmentDialogChange(false))
+                    onAction.invoke(LiteracyAction.OnEndAssessment)
+                },
+            )
+        }
+
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
@@ -87,41 +231,35 @@ fun LiteracyScreen(
                 .padding(innerPadding)
         ) {
 
-            /*
-            LazyColumn {
-                item {
-                }
-            }*/
 
             AppSimulateNavigation(
                 modifier = Modifier,
                 targetState = state.currentAssessmentLevel
-            ) {
+            )
+            {
                 when (state.currentAssessmentLevel) {
                     LiteracyAssessmentLevel.LETTER_RECOGNITION -> {
                         LiteracyReadingAssessmentUI(
                             modifier = Modifier,
-                            readingList = state.assessmentContent?.letters ?: emptyList(),
+                            readingList = state.assessmentContent?.letters?.take(5) ?: emptyList(),
                             currentIndex = state.currentIndex,
                             showInstructions = state.showInstructions,
+                            showQuestionNumber = false,
                             onShowInstructionsChange = {
                                 onAction(SetShowInstructions(it))
                             },
-                            title = "Letter",
+                            title = "Letter Recognition",
                             fontSize = 120.sp,
                             showContent = state.showContent,
+                            instructionAudio = R.raw.read_letter,
                             onShowContentChange = {
                                 onAction(SetShowContent(it))
                             },
-                            audioByteArray = state.audioByteArray,
-                            onAudioByteArrayChange = {
-                                onAction(SetAudioByteArray(it))
-                            },
-                            response = state.response,
                             isLoading = state.isLoading,
                             onAudioPathChange = {
                                 onAction(SetAudioFilePath(audioFilePath = it))
                             },
+                            audioFilePath = state.audioFilePath,
                             onSubmit = {
                                 onAction(
                                     OnSubmitResponse(
@@ -137,7 +275,7 @@ fun LiteracyScreen(
                     LiteracyAssessmentLevel.WORD -> {
                         LiteracyReadingAssessmentUI(
                             modifier = Modifier,
-                            readingList = state.assessmentContent?.words ?: emptyList(),
+                            readingList = state.assessmentContent?.words?.take(5) ?: emptyList(),
                             currentIndex = state.currentIndex,
                             showInstructions = state.showInstructions,
                             onShowInstructionsChange = {
@@ -147,18 +285,15 @@ fun LiteracyScreen(
                             instructionTitle = "Read the word",
                             fontSize = 80.sp,
                             showContent = state.showContent,
+                            instructionAudio = R.raw.read_word,
                             onShowContentChange = {
                                 onAction(SetShowContent(it))
                             },
-                            audioByteArray = state.audioByteArray,
-                            onAudioByteArrayChange = {
-                                onAction(SetAudioByteArray(it))
-                            },
-                            response = state.response,
                             isLoading = state.isLoading,
                             onAudioPathChange = {
                                 onAction(SetAudioFilePath(audioFilePath = it))
                             },
+                            audioFilePath = state.audioFilePath,
                             onSubmit = {
                                 onAction(
                                     OnSubmitResponse(
@@ -168,90 +303,62 @@ fun LiteracyScreen(
                                 )
                             }
                         )
-
                     }
 
                     LiteracyAssessmentLevel.PARAGRAPH -> {
-                        LiteracyReadingAssessmentUI(
-                            modifier = Modifier,
-                            readingList = state.assessmentContent?.paragraphs ?: emptyList(),
+                        ReadingStoryEvaluationUI(
                             currentIndex = state.currentIndex,
+                            title = "Read the Paragraph",
+                            storyTitle = null,
                             showInstructions = state.showInstructions,
-                            onShowInstructionsChange = {
-                                onAction(SetShowInstructions(it))
-                            },
-                            title = "Paragraphs",
-                            instructionTitle = "Read the paragraph",
-                            fontSize = 40.sp,
-                            showContent = state.showContent,
-                            onShowContentChange = {
-                                onAction(SetShowContent(it))
-                            },
-                            audioByteArray = state.audioByteArray,
-                            onAudioByteArrayChange = {
-                                onAction(SetAudioByteArray(it))
-                            },
-                            response = state.response,
+                            instructionAudio = R.raw.read_sentence,
                             isLoading = state.isLoading,
-                            onAudioPathChange = {
-                                onAction(SetAudioFilePath(audioFilePath = it))
-                            },
+                            audioFilePath = state.audioFilePath,
+                            onShowInstructionsChange = { show -> onAction(SetShowInstructions(show)) },
+                            onAudioPathChange = { path -> onAction(SetAudioFilePath(audioFilePath = path)) },
                             onSubmit = {
-                                onAction(
+                                onAction.invoke(
                                     OnSubmitResponse(
                                         assessmentId = assessmentId,
                                         studentId = studentId
                                     )
                                 )
-                            }
+                            },
+//                            storySentencesList = state.assessmentContent?.paragraphs[0]?.split(".")?: emptyList()
+                            storySentencesList = listOf(state.assessmentContent?.paragraphs[0] ?: "")
                         )
+
 
                     }
 
                     LiteracyAssessmentLevel.STORY -> {
-
-                        LiteracyReadingAssessmentUI(
-                            modifier = Modifier,
-                            readingList = state.assessmentContent?.storys[0]?.split(".") ?: emptyList(),
+                        ReadingStoryEvaluationUI(
                             currentIndex = state.currentIndex,
-                            showInstructions = state.showInstructions,
-                            onShowInstructionsChange = {
-                                onAction(SetShowInstructions(it))
-                            },
                             title = "Reading Story",
-                            instructionTitle = "Read the sentence",
-                            fontSize = 40.sp,
-                            showQuestionNumber = true,
-                            showContent = state.showContent,
-                            onShowContentChange = {
-                                onAction(SetShowContent(it))
-                            },
-                            audioByteArray = state.audioByteArray,
-                            onAudioByteArrayChange = {
-                                onAction(SetAudioByteArray(it))
-                            },
-                            response = state.response,
+                            storyTitle = state.assessmentContent?.storys[0]?.title,
+                            showInstructions = state.showInstructions,
+                            instructionAudio = R.raw.read_sentence,
                             isLoading = state.isLoading,
-                            onAudioPathChange = {
-                                onAction(SetAudioFilePath(audioFilePath = it))
-                            },
+                            audioFilePath = state.audioFilePath,
+                            onShowInstructionsChange = { show -> onAction(SetShowInstructions(show)) },
+                            onAudioPathChange = { path -> onAction(SetAudioFilePath(audioFilePath = path)) },
                             onSubmit = {
-                                onAction(
+                                onAction.invoke(
                                     OnSubmitResponse(
                                         assessmentId = assessmentId,
                                         studentId = studentId
                                     )
                                 )
-                            }
+                            },
+                            storySentencesList = listOf(state.assessmentContent?.storys[0]?.story ?: "")
                         )
-
                     }
 
                     LiteracyAssessmentLevel.MULTIPLE_CHOICE -> {
                         MultichoiceQuestionsUI(
                             currentIndex = state.currentIndex,
-                            story = state.assessmentContent?.storys[0] ?: "",
-                            questionsList = state.assessmentContent?.questionsData ?: emptyList(),
+                            story = state.assessmentContent?.storys[0]?.story  ?: "",
+                            questionsList = state.assessmentContent?.storys[0]?.questionsData ?: emptyList(),
                             selectedChoice = state.selectedChoice,
                             onSelectedChoiceChange = {
                                 onAction(SetSelectedChoice(it))
@@ -272,6 +379,37 @@ fun LiteracyScreen(
 
                     LiteracyAssessmentLevel.COMPLETED -> {
                         HasCompletedAssessment()
+                    }
+
+                    LiteracyAssessmentLevel.PRE_TEST -> {
+                        PreTestReadingAssessmentUI(
+                            onStart = {
+                                onAction(OnCompletePreTest)
+                            }
+                        )
+                    }
+
+                    LiteracyAssessmentLevel.LISTENING_COMPREHENSION -> {
+                        ListeningQuestionUI(
+                            story = state.assessmentContent?.storys[0]?.story  ?: "",
+                            questionsList = state.assessmentContent?.storys[0]?.questionsData ?: emptyList(),
+                            selectedChoice = state.selectedChoice,
+                            onSelectedChoiceChange = {
+                                onAction(SetSelectedChoice(it))
+                            },
+                            onSubmitMultipleChoices = {
+                                onAction(
+                                    OnSubmitMultipleChoiceResponse(
+                                        assessmentId = assessmentId,
+                                        studentId = studentId
+                                    )
+                                )
+                            },
+                            onSetOptionsList = { options ->
+                                onAction(SetMultipleQuestionOptions(options))
+                            },
+                            storyAudio = R.raw.two_friends_and_bird,
+                        )
                     }
                 }
             }
@@ -301,8 +439,6 @@ fun LiteracyScreen(
                     )
 
                 }
-
-
             }
 
             AnimatedVisibility(

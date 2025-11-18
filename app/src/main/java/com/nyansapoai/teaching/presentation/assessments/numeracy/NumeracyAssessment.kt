@@ -1,25 +1,63 @@
 package com.nyansapoai.teaching.presentation.assessments.numeracy
 
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.foundation.layout.Column
+import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyOperations
-import com.nyansapoai.teaching.domain.models.assessments.numeracy.numeracyAssessmentData
+import com.nyansapoai.teaching.R
+import com.nyansapoai.teaching.navController
+import com.nyansapoai.teaching.presentation.assessments.components.HasCompletedAssessment
+import com.nyansapoai.teaching.presentation.assessments.literacy.components.LiteracyReadingAssessmentUI
+import com.nyansapoai.teaching.presentation.assessments.numeracy.NumeracyAssessmentAction.OnAnswerImageFilePathChange
+import com.nyansapoai.teaching.presentation.assessments.numeracy.NumeracyAssessmentAction.OnAudioFilePathChange
+import com.nyansapoai.teaching.presentation.assessments.numeracy.NumeracyAssessmentAction.OnCountMatchAnswerChange
+import com.nyansapoai.teaching.presentation.assessments.numeracy.NumeracyAssessmentAction.OnIsSubmittingChange
+import com.nyansapoai.teaching.presentation.assessments.numeracy.NumeracyAssessmentAction.OnShowContentChange
+import com.nyansapoai.teaching.presentation.assessments.numeracy.NumeracyAssessmentAction.OnShowInstructionChange
+import com.nyansapoai.teaching.presentation.assessments.numeracy.NumeracyAssessmentAction.OnSubmitCountMatch
+import com.nyansapoai.teaching.presentation.assessments.numeracy.NumeracyAssessmentAction.OnSubmitNumberRecognition
+import com.nyansapoai.teaching.presentation.assessments.numeracy.NumeracyAssessmentAction.OnSubmitNumeracyOperations
+import com.nyansapoai.teaching.presentation.assessments.numeracy.NumeracyAssessmentAction.OnSubmitWordProblem
+import com.nyansapoai.teaching.presentation.assessments.numeracy.NumeracyAssessmentAction.OnWorkAreaImageFilePathChange
+import com.nyansapoai.teaching.presentation.assessments.numeracy.NumeracyAssessmentAction.SubmitNumeracyAssessmentResults
+import com.nyansapoai.teaching.presentation.assessments.numeracy.components.NumeracyArithmeticOperationsContainerUI
 import com.nyansapoai.teaching.presentation.assessments.numeracy.components.NumeracyAssessmentLevel
-import com.nyansapoai.teaching.presentation.assessments.numeracy.components.NumeracyContent
-import com.nyansapoai.teaching.presentation.common.animations.AppLottieAnimations
+import com.nyansapoai.teaching.presentation.assessments.numeracy.components.NumeracyCountAndMatch
+import com.nyansapoai.teaching.presentation.assessments.numeracy.components.NumeracyWordProblemContainer
+import com.nyansapoai.teaching.presentation.common.components.AppAlertDialog
+import com.nyansapoai.teaching.presentation.common.components.AppSimulateNavigation
 import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
 
@@ -28,6 +66,7 @@ fun NumeracyAssessmentRoot(
     modifier: Modifier = Modifier,
     assessmentId: String,
     studentId: String,
+    studentName: String,
     assessmentNo: Int
 ) {
 
@@ -39,280 +78,362 @@ fun NumeracyAssessmentRoot(
         onAction = viewModel::onAction,
         studentId = studentId,
         assessmentId = assessmentId,
+        studentName = studentName,
         modifier = modifier
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NumeracyAssessmentScreen(
     modifier: Modifier = Modifier,
     state: NumeracyAssessmentState,
     onAction: (NumeracyAssessmentAction) -> Unit,
     studentId: String,
-    assessmentId: String
+    assessmentId: String,
+    studentName: String
 ) {
 
+    LaunchedEffect(state.hasCompletedAssessment) {
+        if (state.hasCompletedAssessment) {
+            onAction(
+                SubmitNumeracyAssessmentResults(
+                    assessmentId = assessmentId,
+                    studentId = studentId
+                )
+            )
 
-    var isLoading by remember { mutableStateOf(true) }
+            delay(4000)
+            navController.popBackStack()
 
-    LaunchedEffect(true) {
-        delay(3000)
-        isLoading = false
+        }
     }
 
+    BackHandler(enabled = true) {
+        if (state.hasCompletedAssessment){
+            navController.popBackStack()
+            return@BackHandler
+        }
+
+        onAction.invoke(NumeracyAssessmentAction.OnShowPreMatureAssessmentEndDialogChange(true))
+    }
+
+
     Scaffold(
-        modifier = modifier
-            .fillMaxSize()
-    ) { innerPadding  ->
+        topBar = {
+            TopAppBar(
+                navigationIcon = {
+                    IconButton(
+                        onClick = {
+                            if (state.hasCompletedAssessment) {
+                                navController.popBackStack()
+                                return@IconButton
+                            }
 
-        AnimatedContent(
-            targetState = isLoading,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-
-        ) { loading ->
-            when(loading) {
-                true -> {
-                    AppLottieAnimations(
-                        modifier = Modifier
-                            .fillMaxSize()
-                    )
-                }
-                false -> {
-
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = modifier
-                            .fillMaxSize()
+                            onAction.invoke(NumeracyAssessmentAction.OnShowPreMatureAssessmentEndDialogChange(true))
+                        }
                     ) {
-
-                        state.numeracyAssessmentContent.data?.let {
-                            NumeracyContent(
+                        Icon(
+                            painter = painterResource(R.drawable.arrow_back),
+                            tint = MaterialTheme.colorScheme.onPrimary,
+                            contentDescription = "Back",
+                        )
+                    }
+                },
+                title = {
+                    Text(
+                        text = studentName,
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.secondary,
+                        modifier = Modifier
+                    )
+                },
+                actions = {
+                    AnimatedVisibility(
+                        visible = !state.hasCompletedAssessment,
+                        enter = fadeIn(),
+                        exit = fadeOut()
+                    ) {
+                        TextButton(
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.error,
+                                contentColor = MaterialTheme.colorScheme.onError
+                            ),
+                            onClick = {
+                                onAction.invoke(NumeracyAssessmentAction.OnShowEndAssessmentDialogChange(true))
+                            },
+                            modifier = Modifier
+                                .padding(horizontal = 12.dp)
+                        ) {
+                            Text(
+                                text = "End",
+                                style = MaterialTheme.typography.bodyLarge,
+                                fontWeight = FontWeight.Bold,
                                 modifier = Modifier
-                                    .fillMaxSize(),
-                                isLoading = state.isLoading,
-                                assessmentContent = numeracyAssessmentData.numeracyAssessmentContentList[0],
-                                countMatchIndex = state.countMatchIndex,
-                                subtractionIndex = state.subtractionIndex,
-                                multiplicationIndex = state.multiplicationIndex,
-                                divisionIndex = state.divisionIndex,
-                                numberRecognitionIndex = state.numberRecognitionIndex,
-                                assessmentLevel = state.numeracyLevel,
-                                onReadAnswerImage = {
-                                    onAction(
-                                        NumeracyAssessmentAction.OnReadAnswerImage(imageByteArray = state.answerImageByteArray)
-                                    )
-                                },
-                                onSelectCountMatch = { answer ->
-                                    onAction(
-                                        NumeracyAssessmentAction.OnCountMatchAnswerChange(countMatchAnswer = answer )
-                                    )
-                                },
-                                selectedCount = state.countMatchAnswer,
-                                onSubmitAddition = {
-
-                                    onAction(
-                                        NumeracyAssessmentAction.OnAddArithmeticOperation(
-                                            numeracyOperations = NumeracyOperations(
-                                                firstNumber = state.numeracyAssessmentContent.data.additions[state.additionIndex].firstNumber,
-                                                secondNumber = state.numeracyAssessmentContent.data.additions[state.additionIndex].secondNumber,
-                                                answer = state.numeracyAssessmentContent.data.additions[state.additionIndex].answer,
-                                                operationType = state.numeracyAssessmentContent.data.additions[state.additionIndex].operationType
-                                            ),
-                                            onSuccess = {
-                                                when {
-                                                    state.additionIndex + 1 >= state.numeracyAssessmentContent.data.additions.size -> {
-                                                        onAction(NumeracyAssessmentAction.OnSubmitNumeracyOperations(
-                                                            operationList = state.arithmeticOperationResults,
-                                                            assessmentId = assessmentId,
-                                                            studentId = studentId,
-                                                            onSuccess = {
-                                                                onAction(NumeracyAssessmentAction.OnNumeracyLevelChange(NumeracyAssessmentLevel.SUBTRACTION))
-                                                            }
-                                                        ))
-                                                    }
-                                                    else -> {
-                                                        onAction(NumeracyAssessmentAction.OnAdditionIndexChange(index = state.additionIndex + 1))
-                                                    }
-                                                }
-                                            }
-                                        )
-                                    )
-                                },
-                                additionIndex = state.additionIndex,
-                                onSubmitCountMatch = {
-                                    onAction(
-                                        NumeracyAssessmentAction.OnAddCountMatch(
-                                            countMatch = state.numeracyAssessmentContent.data.countAndMatchNumbersList[state.countMatchIndex],
-                                            onSuccess = {
-                                                onAction(
-                                                    NumeracyAssessmentAction.OnSubmitCountMatch(
-                                                        countMatch = state.countAndMatchResults,
-                                                        assessmentId = assessmentId,
-                                                        studentId = studentId,
-                                                        onSuccess = {
-                                                            when {
-                                                                state.countMatchIndex + 1 >= state.numeracyAssessmentContent.data.countAndMatchNumbersList.size -> {
-                                                                    onAction(NumeracyAssessmentAction.OnNumeracyLevelChange(NumeracyAssessmentLevel.ADDITION))
-                                                                }
-                                                                else -> {
-                                                                    onAction(NumeracyAssessmentAction.OnCountMachIndexChange(index = state.countMatchIndex + 1))
-                                                                }
-                                                            }
-                                                        }
-                                                    )
-                                                )
-                                            }
-                                        )
-                                    )
-                                },
-                                onSubmitSubtraction = {
-                                    onAction(
-                                        NumeracyAssessmentAction.OnAddArithmeticOperation(
-                                            numeracyOperations = NumeracyOperations(
-                                                firstNumber = state.numeracyAssessmentContent.data.subtractions[state.subtractionIndex].firstNumber,
-                                                secondNumber = state.numeracyAssessmentContent.data.subtractions[state.subtractionIndex].secondNumber,
-                                                answer = state.numeracyAssessmentContent.data.subtractions[state.subtractionIndex].answer,
-                                                operationType = state.numeracyAssessmentContent.data.subtractions[state.subtractionIndex].operationType
-                                            ),
-                                            onSuccess = {
-                                                when {
-                                                    state.subtractionIndex + 1 >= state.numeracyAssessmentContent.data.subtractions.size -> {
-                                                        onAction(NumeracyAssessmentAction.OnSubmitNumeracyOperations(
-                                                            operationList = state.arithmeticOperationResults,
-                                                            assessmentId = assessmentId,
-                                                            studentId = studentId,
-                                                            onSuccess = {
-                                                                onAction(NumeracyAssessmentAction.OnNumeracyLevelChange(NumeracyAssessmentLevel.MULTIPLICATION))
-                                                            }
-                                                        ))
-                                                    }
-                                                    else -> {
-                                                        onAction(NumeracyAssessmentAction.OnSubtractionIndexChange(index = state.subtractionIndex + 1))
-                                                    }
-                                                }
-                                            }
-                                        )
-                                    )
-
-                                },
-                                onSubmitMultiplication = {
-                                    onAction(
-                                        NumeracyAssessmentAction.OnAddArithmeticOperation(
-                                            numeracyOperations = NumeracyOperations(
-                                                firstNumber = state.numeracyAssessmentContent.data.multiplications[state.multiplicationIndex].firstNumber,
-                                                secondNumber = state.numeracyAssessmentContent.data.multiplications[state.multiplicationIndex].secondNumber,
-                                                answer = state.numeracyAssessmentContent.data.multiplications[state.multiplicationIndex].answer,
-                                                operationType = state.numeracyAssessmentContent.data.multiplications[state.multiplicationIndex].operationType
-                                            ),
-                                            onSuccess = {
-                                                when {
-                                                    state.multiplicationIndex + 1 >= state.numeracyAssessmentContent.data.multiplications.size -> {
-                                                        onAction(NumeracyAssessmentAction.OnSubmitNumeracyOperations(
-                                                            operationList = state.arithmeticOperationResults,
-                                                            assessmentId = assessmentId,
-                                                            studentId = studentId,
-                                                            onSuccess = {
-                                                                onAction(NumeracyAssessmentAction.OnNumeracyLevelChange(NumeracyAssessmentLevel.DIVISION))
-                                                            }
-                                                        ))
-                                                    }
-                                                    else -> {
-                                                        onAction(NumeracyAssessmentAction.OnMultiplicationIndexChange(index = state.multiplicationIndex + 1))
-                                                    }
-                                                }
-                                            }
-                                        )
-                                    )
-
-                                },
-                                onSubmitWordProblem = {
-                                    /*
-                                    onAction(
-                                        NumeracyAssessmentAction.OnSubmitWordProblem(
-                                            wordProblem = NumeracyWordProblem(
-
-                                            ),
-                                            assessmentId = assessmentId,
-                                            studentId = studentId,
-                                            onSuccess = {
-                                                onAction(NumeracyAssessmentAction.OnNumeracyLevelChange(NumeracyAssessmentLevel.NUMBER_RECOGNITION))
-                                            }
-                                        )
-                                    )*/
-                                },
-                                onSubmitDivision = {
-                                    onAction(
-                                        NumeracyAssessmentAction.OnAddArithmeticOperation(
-                                            numeracyOperations = NumeracyOperations(
-                                                firstNumber = state.numeracyAssessmentContent.data.divisions[state.divisionIndex].firstNumber,
-                                                secondNumber = state.numeracyAssessmentContent.data.divisions[state.divisionIndex].secondNumber,
-                                                answer = state.numeracyAssessmentContent.data.divisions[state.divisionIndex].answer,
-                                                operationType = state.numeracyAssessmentContent.data.divisions[state.divisionIndex].operationType
-                                            ),
-                                            onSuccess = {
-                                                when {
-                                                    state.divisionIndex + 1 >= state.numeracyAssessmentContent.data.divisions.size -> {
-                                                        onAction(NumeracyAssessmentAction.OnSubmitNumeracyOperations(
-                                                            operationList = state.arithmeticOperationResults,
-                                                            assessmentId = assessmentId,
-                                                            studentId = studentId,
-                                                            onSuccess = {
-                                                                onAction(NumeracyAssessmentAction.OnNumeracyLevelChange(NumeracyAssessmentLevel.WORD_PROBLEM))
-                                                            }
-                                                        ))
-                                                    }
-                                                    else -> {
-                                                        onAction(NumeracyAssessmentAction.OnDivisionIndexChange(index = state.divisionIndex + 1))
-                                                    }
-                                                }
-                                            }
-                                        )
-                                    )
-                                },
-                                onSubmitNumberRecognition = {},
-                                responseError = state.responseError,
-                                answerResponse = state.response,
-                                onCaptureAnswerContent = {image ->
-                                    onAction(NumeracyAssessmentAction.OnCaptureAnswer(image))
-
-                                },
-                                shouldCaptureAnswer = state.shouldCaptureAnswer,
-                                onCaptureWorkAreaContent = { image ->
-                                    onAction(NumeracyAssessmentAction.OnCaptureWorkArea(image))
-                                },
-                                showResponseAlert = state.showResponseAlert,
-                                onDismissResponseAlert = {
-                                    onAction(NumeracyAssessmentAction.OnShowResponseAlertChange(false))
-                                }
+                                    .padding(horizontal = 12.dp, vertical = 6.dp),
                             )
-
                         }
 
-                        /*
-                        item {
-                            NumeracyOperation(
-                                firstNumber = 34,
-                                secondNumber = 20,
-                                shouldCaptureAnswer = state.shouldCaptureAnswer,
-                                shouldCaptureWorkArea = state.shouldCaptureWorkArea,
-                                onCaptureAnswerContent = { imageByteArray ->
-                                    onAction(NumeracyAssessmentAction.OnCaptureAnswer(imageByteArray))
-                                },
-                                onCaptureWorkAreaContent = { imageByteArray ->
-                                    onAction(NumeracyAssessmentAction.OnCaptureWorkArea(imageByteArray))
-                                },
-                                onSubmit = {
-                                    onAction(NumeracyAssessmentAction.OnSubmitAnswer)
-                                },
-                                modifier = modifier
-                            )
-                        }*/
                     }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                )
+            )
+        },
+        modifier = modifier
+            .fillMaxSize()
+            .statusBarsPadding()
+            .navigationBarsPadding()
+    ) { innerPadding  ->
+
+        if (state.numeracyAssessmentContent == null) {
+            Text(
+                text = "No Questions available",
+                style = MaterialTheme.typography.titleMedium,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(12.dp),
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.error
+            )
+            return@Scaffold
+        }
+
+
+        if (state.hasCompletedAssessment){
+            HasCompletedAssessment(
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .fillMaxSize()
+            )
+
+            return@Scaffold
+        }
+
+        AnimatedVisibility(
+            visible = state.showPreMatureAssessmentEndDialog,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            AppAlertDialog(
+                onDismissRequest = { onAction.invoke(NumeracyAssessmentAction.OnShowPreMatureAssessmentEndDialogChange(false)) },
+                dialogText = "You are about to end assessment, and you have to restart the assessment. Click confirm to continue.",
+                dialogTitle = "End Assessment",
+                onConfirmation = {
+                    onAction.invoke(
+                        NumeracyAssessmentAction.OnShowPreMatureAssessmentEndDialogChange(
+                            false
+                        )
+                    )
+                    navController.popBackStack()
+
+                }
+
+            )
+        }
+
+
+        AnimatedVisibility(
+            visible = state.showEndAssessmentDialog,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            AppAlertDialog(
+                onDismissRequest = { onAction.invoke(NumeracyAssessmentAction.OnShowEndAssessmentDialogChange(false)) },
+                dialogText = "You are about to end assessment. Click confirm to continue.",
+                dialogTitle = "End Assessment",
+                onConfirmation = {
+                    onAction.invoke(NumeracyAssessmentAction.OnShowEndAssessmentDialogChange(false))
+                    onAction.invoke(NumeracyAssessmentAction.EndAssessment)
+                },
+            )
+        }
+
+
+        if (state.isLoading) {
+            AnimatedVisibility(
+                visible = state.isLoading,
+                enter = scaleIn() + fadeIn(),
+                exit = scaleOut() + fadeOut(),
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(MaterialTheme.colorScheme.background.copy(alpha = 0.8f))
+                ) {
+                    LinearProgressIndicator(
+                        color = MaterialTheme.colorScheme.secondary,
+                        trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                        modifier = Modifier
+                            .height(8.dp)
+                            .width(200.dp),
+                    )
 
                 }
             }
+            return@Scaffold
+        }
+
+        AppSimulateNavigation(
+            targetState = state.numeracyLevel,
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize()
+        ){
+            when(state.numeracyLevel) {
+                NumeracyAssessmentLevel.COUNT_MATCH -> {
+                    NumeracyCountAndMatch(
+                        countList = state.numeracyAssessmentContent.countAndMatchNumbersList,
+                        currentIndex = state.currentIndex,
+                        onSelectCount = { count ->
+                            onAction(
+                                OnCountMatchAnswerChange(countMatchAnswer = count)
+                            )
+                        },
+                        selectedCount = state.countMatchAnswer,
+                        onSubmit = {
+                            onAction.invoke(
+                                OnSubmitCountMatch(
+                                    countMatch = emptyList(),
+                                    assessmentId = assessmentId,
+                                    studentId = studentId,
+                                    onSuccess = {}
+                                )
+                            )
+                        }
+                    )
+                }
+
+                NumeracyAssessmentLevel.ADDITION ,
+                NumeracyAssessmentLevel.SUBTRACTION ,
+                NumeracyAssessmentLevel.MULTIPLICATION,
+                NumeracyAssessmentLevel.DIVISION -> {
+
+                    val operationList = when(state.numeracyLevel) {
+                        NumeracyAssessmentLevel.ADDITION -> state.numeracyAssessmentContent.additions
+                        NumeracyAssessmentLevel.SUBTRACTION -> state.numeracyAssessmentContent.subtractions
+                        NumeracyAssessmentLevel.MULTIPLICATION -> state.numeracyAssessmentContent.multiplications
+                        NumeracyAssessmentLevel.DIVISION -> state.numeracyAssessmentContent.divisions
+                        else -> emptyList()
+                    }
+
+                    val title = when(state.numeracyLevel) {
+                        NumeracyAssessmentLevel.ADDITION -> "Addition"
+                        NumeracyAssessmentLevel.SUBTRACTION -> "Subtraction"
+                        NumeracyAssessmentLevel.MULTIPLICATION -> "Multiplication"
+                        NumeracyAssessmentLevel.DIVISION -> "Division"
+                        else -> ""
+                    }
+
+                    NumeracyArithmeticOperationsContainerUI(
+                        numeracyOperationList = operationList,
+                        currentIndex = state.currentIndex,
+                        title = title,
+                        onAnswerFilePathChange = {path ->
+                            onAction.invoke(
+                                OnAnswerImageFilePathChange(path = path)
+                            )
+                        },
+                        onWorkOutFilePathChange = { path ->
+                            onAction.invoke(
+                                OnWorkAreaImageFilePathChange(path = path)
+                            )
+                        },
+                        isLoading = state.isLoading,
+                        shouldCapture = state.shouldCaptureAnswer,
+                        onIsSubmittingChange = {
+                            onAction.invoke(
+                                OnIsSubmittingChange(isSubmitting = it)
+                            )
+                        },
+                        onSubmit = {
+                            onAction.invoke(
+                                OnSubmitNumeracyOperations(
+                                    operationList = emptyList(),
+                                    assessmentId = assessmentId,
+                                    studentId = studentId,
+                                    onSuccess = {}
+                                )
+                            )
+                        }
+                    )
+                }
+                NumeracyAssessmentLevel.NUMBER_RECOGNITION -> {
+                    LiteracyReadingAssessmentUI(
+                        readingList = state.numeracyAssessmentContent.numberRecognitionList.map { it.toString() },
+                        currentIndex = state.currentIndex,
+                        showInstructions = state.showInstruction,
+                        onShowInstructionsChange = { instructionsVisible ->
+                            onAction.invoke(OnShowInstructionChange(instructionsVisible))
+                        },
+                        title = "Read Numbers",
+                        showContent = state.showContent,
+                        onShowContentChange = { contentVisible ->
+                            onAction.invoke(OnShowContentChange(contentVisible))
+                        },
+                        isLoading = state.isLoading,
+                        fontSize = 96.sp,
+                        instructionAudio = R.raw.read_number,
+                        instructionTitle = "Read the number",
+                        instructionDescription = "Read the number shown in the screen",
+                        showQuestionNumber = true,
+                        onAudioPathChange = { filePath ->
+                            onAction.invoke(OnAudioFilePathChange(filePath))
+                        },
+                        audioFilePath = state.audioFilePath,
+                        onSubmit = {
+                            onAction.invoke(
+                                OnSubmitNumberRecognition(
+                                    assessmentId = assessmentId,
+                                    studentId = studentId,
+                                )
+                            )
+                        }
+                    )
+                }
+                NumeracyAssessmentLevel.WORD_PROBLEM -> {
+                    val wordProblemList = state.numeracyAssessmentContent.wordProblems.map { it.problem }
+
+                    NumeracyWordProblemContainer(
+                        wordProblemList = wordProblemList,
+                        currentIndex = state.currentIndex,
+                        onAnswerFilePathChange = { path ->
+                            onAction.invoke(
+                                OnAnswerImageFilePathChange(path = path)
+                            )
+                        },
+                        onWorkOutFilePathChange = { path ->
+                            onAction.invoke(
+                                OnWorkAreaImageFilePathChange(path = path)
+                            )
+                        },
+                        shouldCapture = state.shouldCaptureAnswer,
+                        onIsSubmittingChange = {
+                            onAction.invoke(
+                                OnIsSubmittingChange(isSubmitting = it)
+                            )
+                        },
+                        onSubmit = {
+                            onAction.invoke(
+                                OnSubmitWordProblem(
+                                    assessmentId = assessmentId,
+                                    studentId = studentId,
+                                    onSuccess = {}
+                                )
+                            )
+                        }
+                    )
+                }
+
+
+            }
+
         }
 
     }

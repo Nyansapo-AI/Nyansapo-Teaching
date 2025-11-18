@@ -2,6 +2,9 @@ package com.nyansapoai.teaching.utils
 
 import android.content.Context
 import android.graphics.Bitmap
+import androidx.compose.animation.core.animateIntAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
 import kotlinx.datetime.toLocalDateTime
@@ -9,6 +12,7 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
+import java.time.LocalDate
 import java.util.Date
 import java.util.Locale
 
@@ -103,7 +107,7 @@ object Utils {
         context: Context,
         filename: String? = null,
         format: Bitmap.CompressFormat = Bitmap.CompressFormat.PNG,
-        quality: Int = 90
+        quality: Int = 100
     ): File? {
         // Convert ImageBitmap to ByteArray
         val byteArray = this.toByteArray(format, quality)
@@ -116,7 +120,7 @@ object Utils {
             Bitmap.CompressFormat.WEBP -> ".webp"
             else -> ".png"
         }
-        val actualFilename = filename ?: "IMG_$timeStamp$extension"
+        val actualFilename = filename.let { "IMG_$filename$timeStamp$extension"  } ?: "IMG_$timeStamp$extension"
 
         // Get the directory for the app's private pictures directory
         val storageDir = context.getExternalFilesDir(null) ?: context.filesDir
@@ -165,7 +169,25 @@ object Utils {
     }
 
 
+    @Composable
+    fun animatedNumberString(number: String, animatedPlayed: Boolean): String {
+        val numberInt = number.toIntOrNull()
 
+        return numberInt?.let {
+            animateIntAsState(
+                targetValue = if (animatedPlayed) numberInt else 0,
+                animationSpec = tween(
+                    durationMillis = if (numberInt > 20) 3000  else 1000,
+                    delayMillis = 100
+                ),
+                label = "animated int string",
+            ).value.toString()
+        } ?: number
+    }
 
-
+    fun formatMonthYear(date: LocalDate): String {
+        val month = date.month.name.lowercase().replaceFirstChar { it.uppercase() }
+        val year = date.year
+        return "$month, $year"
+    }
 }

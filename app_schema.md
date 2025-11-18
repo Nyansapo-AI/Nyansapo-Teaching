@@ -35,7 +35,7 @@
           "distribution" : [
             {
               "learning_level": "string",
-              "value" : "float"
+              "value" : "float",
             }
           ]
         }
@@ -112,17 +112,14 @@
           "date": "string",                              
         
           "students": [ 
-        
                 { 
             
                     "id": "string", 
-            
                     "name": "string", 
-            
+                    "grade": "number",
                     "attendance": "boolean"
             
                 } 
-        
           ]
         } 
 
@@ -139,11 +136,15 @@
 
   "created_at": "timestamp",           
   
-  "assessmentNumber": "number",
+  "assessmentDate": "Timestamp",
 
   "type": "string", 
 
-  "start_level": ["string"], 
+  "start_level": ["string"],
+ "school_id": "string";
+ "project_id": "string";
+ "organization_id":"string"
+
 
   "alert": { 
     "day_before_assessment": "number", 
@@ -172,11 +173,7 @@
           "competence": "number?" 
     
         } 
-    
   ]
-
- 
-
 } 
 ```
 
@@ -240,7 +237,7 @@
     
     ], 
 
-    "number_recognition" : [ 
+    "number_recognition" : [
     
         {
             "type": "string", //number_recognition 
@@ -256,7 +253,7 @@
                 "transcript": "number"
             }
         }
-    
+  
     ], 
 
  
@@ -275,7 +272,7 @@
             
             "operations_number2" : "number", 
             
-            "metadata" : { 
+            "metadata" : {  
             
                 "screenshot_url": "string", 
                 
@@ -287,7 +284,7 @@
         } 
     ], 
 
-    "word_problem" : { 
+    "word_problem" : [ { 
     
         "question" : "string", 
         
@@ -302,7 +299,8 @@
             "transcript": "number"
         
         } 
-    
+    }
+    ]   
     } 
 
 }

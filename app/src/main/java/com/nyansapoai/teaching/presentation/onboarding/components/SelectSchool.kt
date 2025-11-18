@@ -14,17 +14,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.nyansapoai.teaching.R
+import com.nyansapoai.teaching.domain.models.school.NyansapoSchool
 import com.nyansapoai.teaching.presentation.onboarding.OnboardingSchoolState
 
 @Composable
 fun SelectSchool(
     modifier: Modifier = Modifier,
-    schoolList: List<OnboardingSchoolState> = emptyList(),
-    selectedSchool: OnboardingSchoolState? = null,
-    onSelectSchool: (OnboardingSchoolState) -> Unit = {}
+    schoolList: List<NyansapoSchool> = emptyList(),
+    selectedSchool: NyansapoSchool? = null,
+    onSelectSchool: (NyansapoSchool) -> Unit = {}
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(24.dp),
@@ -44,7 +46,7 @@ fun SelectSchool(
         }
 
         Row(
-            verticalAlignment = Alignment.Top,
+            verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Icon(
@@ -55,7 +57,8 @@ fun SelectSchool(
 
             Text(
                 text = stringResource(R.string.select_school),
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onBackground
             )
         }

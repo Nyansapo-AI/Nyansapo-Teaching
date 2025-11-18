@@ -1,0 +1,15 @@
+package com.nyansapoai.teaching.domain.mapper.assessment
+
+import com.nyansapoai.teaching.domain.models.assessments.literacy.ReadingAssessmentMetadata
+import com.nyansapoai.teaching.domain.models.assessments.literacy.ReadingAssessmentResult
+import database.PendingReadingResult
+
+fun PendingReadingResult.toReadingAssessmentResult() : ReadingAssessmentResult {
+    return ReadingAssessmentResult(
+        type = type,
+        content = content,
+        metadata = ReadingAssessmentMetadata(
+            audio_url = audioUrl,
+        )
+    )
+}

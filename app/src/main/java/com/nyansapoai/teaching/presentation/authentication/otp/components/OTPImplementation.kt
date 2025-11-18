@@ -23,6 +23,7 @@ fun OTPImplementation(
     onVerificationFailed: (String) -> Unit = {},
     onCodeSent: (String) -> Unit = {}
 ) {
+
     val context = LocalContext.current
     val activity = context as? Activity ?: return
     val auth = FirebaseAuth.getInstance()

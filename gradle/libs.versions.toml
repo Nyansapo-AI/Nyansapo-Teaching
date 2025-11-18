@@ -3,6 +3,9 @@ agp = "8.9.3"
 androidDriver = "2.1.0"
 clientSdk = "1.34.0"
 coilCompose = "3.2.0"
+coilComposeVersion = "3.3.0"
+coilNetworkOkhttp = "3.3.0"
+coreSplashscreen = "1.0.1"
 firebaseBom = "33.15.0"
 introshowcaseview = "2.0.1"
 kotlin = "2.1.21"
@@ -27,29 +30,38 @@ navigationCompose = "2.9.0"
     googleGmsGoogleServices = "4.4.2"
     firebaseAnalytics = "22.4.0"
 navigationTesting = "2.9.0"
+riveAndroid = "5.0.1"
 roomRuntime = "2.7.2"
+startupRuntime = "1.2.0"
 workRuntimeKtx = "2.10.2"
     sqlDelight = "2.1.0"
     googleFirebaseAppdistribution = "5.1.1"
+    kizitonwose-calendar = "2.9.0"
 
 
 
     [libraries]
 android-driver = { module = "app.cash.sqldelight:android-driver", version.ref = "androidDriver" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreen" }
 androidx-media3-exoplayer = { module = "androidx.media3:media3-exoplayer", version.ref = "media3Exoplayer" }
 androidx-media3-exoplayer-dash = { module = "androidx.media3:media3-exoplayer-dash", version.ref = "media3Exoplayer" }
 androidx-media3-ui = { module = "androidx.media3:media3-ui", version.ref = "media3Exoplayer" }
 androidx-media3-ui-compose = { module = "androidx.media3:media3-ui-compose", version.ref = "media3Exoplayer" }
 androidx-navigation-testing = { module = "androidx.navigation:navigation-testing", version.ref = "navigationTesting" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomRuntime" }
+androidx-startup-runtime = { module = "androidx.startup:startup-runtime", version.ref = "startupRuntime" }
 androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntimeKtx" }
 client-sdk = { module = "com.microsoft.cognitiveservices.speech:client-sdk", version.ref = "clientSdk" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coilCompose" }
+coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coilNetworkOkhttp" }
+coil-compose-v330 = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coilComposeVersion" }
 firebase-auth = { module = "com.google.firebase:firebase-auth" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
+firebase-crashlytics-ndk = { module = "com.google.firebase:firebase-crashlytics-ndk" }
 firebase-firestore = { module = "com.google.firebase:firebase-firestore" }
 firebase-storage = { module = "com.google.firebase:firebase-storage" }
+google-firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
 introshowcaseview = { module = "com.canopas.intro-showcase-view:introshowcaseview", version.ref = "introshowcaseview" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
@@ -74,6 +86,7 @@ kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
     firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics", version.ref = "firebaseAnalytics" }
 ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktor" }
+    kizitonwose-calendar = { module = "com.kizitonwose.calendar:compose", version.ref = "kizitonwose-calendar" }
 
     ktor-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
     ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
@@ -88,6 +101,8 @@ ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "k
 lottie-compose = { module = "com.airbnb.android:lottie-compose", version.ref = "lottieCompose" }
 material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
 
+
+rive-android = { module = "app.rive:rive-android", version.ref = "riveAndroid" }
     sqlDelight-coroutine = { module = "app.cash.sqldelight:coroutines-extensions", version.ref = "sqlDelight" }
 
     [plugins]

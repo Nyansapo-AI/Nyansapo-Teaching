@@ -29,13 +29,13 @@ fun AppLottieAnimations(
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
-            .fillMaxSize()
+            .size(size)
     ){
         LottieAnimation(
             composition = composition,
 //        progress = { progress },
             iterations = LottieConstants.IterateForever,
-            modifier = Modifier.size(size)
+            modifier = Modifier.fillMaxSize()
         )
 
     }

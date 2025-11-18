@@ -11,6 +11,7 @@ plugins {
 
     id("app.cash.sqldelight") version "2.1.0"
     alias(libs.plugins.google.firebase.appdistribution)
+    id("com.google.firebase.crashlytics")
 }
 
 
@@ -29,10 +30,10 @@ android {
 
     defaultConfig {
         applicationId = "com.nyansapoai.teaching"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 35
         versionCode = 1
-        versionName = "1.0"
+        versionName = "1.9.4"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -45,8 +46,6 @@ android {
                 "proguard-rules.pro"
             )
         }
-
-
         getByName("debug") {
             buildConfigField(
                 "String",
@@ -69,8 +68,6 @@ android {
                 "AZURE_SPEECH_SUBSCRIPTION_KEY",
                 localProperties.getProperty("AZURE_SPEECH_SUBSCRIPTION_KEY")
             )
-
-
         }
     }
     compileOptions {
@@ -116,6 +113,8 @@ dependencies {
 
     implementation (libs.material3)
 
+    //splash screen
+    implementation(libs.androidx.core.splashscreen)
 
     // Koin for Android
     implementation(libs.koin.android)
@@ -133,6 +132,8 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.storage)
+    implementation(libs.google.firebase.analytics)
+    implementation(libs.firebase.crashlytics.ndk)
 
     //datetime
     implementation (libs.kotlinx.datetime)
@@ -153,9 +154,6 @@ dependencies {
 
     //lottie
     implementation (libs.lottie.compose)
-    
-    //microsoft cognitive services speech
-    implementation(libs.client.sdk)
 
     // media 3
     implementation(libs.androidx.media3.exoplayer)
@@ -176,5 +174,14 @@ dependencies {
     implementation(libs.android.driver)
     implementation(libs.sqlDelight.coroutine)
 
+    //rive
+    implementation(libs.rive.android)
+    implementation(libs.androidx.startup.runtime)
 
+    //calendar
+    implementation(libs.kizitonwose.calendar)
+
+    //coil
+    implementation(libs.coil.compose.v330)
+    implementation(libs.coil.network.okhttp)
 }

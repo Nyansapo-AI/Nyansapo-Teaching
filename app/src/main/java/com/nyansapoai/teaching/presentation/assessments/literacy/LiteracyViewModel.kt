@@ -1,6 +1,6 @@
 package com.nyansapoai.teaching.presentation.assessments.literacy
 
-import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.Constraints
@@ -9,17 +9,15 @@ import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.workDataOf
-import com.nyansapoai.teaching.data.remote.ai.ArtificialIntelligenceRepository
-import com.nyansapoai.teaching.data.remote.assessment.AssessmentRepository
-import com.nyansapoai.teaching.data.remote.media.MediaRepository
+import com.nyansapoai.teaching.data.local.LocalDataSource
 import com.nyansapoai.teaching.domain.models.assessments.literacy.literacyAssessmentContent
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.LiteracyAssessmentLevel
 import com.nyansapoai.teaching.presentation.assessments.literacy.workers.EvaluateMultipleChoiceQuestionWorker
 import com.nyansapoai.teaching.presentation.assessments.literacy.workers.EvaluateReadingAssessmentWorker
-import com.nyansapoai.teaching.presentation.assessments.literacy.workers.MarkLiteracyAssessmentWorker
+import com.nyansapoai.teaching.presentation.assessments.literacy.workers.MarkAssessmentDoneWorker
 import com.nyansapoai.teaching.presentation.assessments.literacy.workers.SubmitMultipleChoiceResultsWorker
-import com.nyansapoai.teaching.presentation.assessments.literacy.workers.SubmitReadingAssessmentWorker
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.onStart
@@ -28,10 +26,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class LiteracyViewModel(
-    private val assessmentRepository: AssessmentRepository,
-    private val artificialIntelligenceRepository: ArtificialIntelligenceRepository,
-    private val mediaRepository: MediaRepository,
-    private val appContext: Context
+    private val localDataSource: LocalDataSource,
+    private val workManager: WorkManager
 ) : ViewModel() {
 
     private var hasLoadedInitialData = false
@@ -113,8 +109,7 @@ class LiteracyViewModel(
             }
 
             is LiteracyAction.OnSubmitMultipleChoiceResponse -> {
-                onSubmitStoryAssessment(
-                )
+                onSubmitStoryAssessment()
             }
             is LiteracyAction.SetSelectedChoice -> {
                 _state.update {
@@ -146,27 +141,55 @@ class LiteracyViewModel(
                     studentId = action.studentId
                 )
             }
+
+            LiteracyAction.OnCompletePreTest -> {
+                _state.update { it.copy(currentAssessmentLevel = LiteracyAssessmentLevel.LETTER_RECOGNITION) }
+            }
+
+            is LiteracyAction.OnShowEndAssessmentDialogChange -> {
+                _state.update {
+                    it.copy(
+                        showEndAssessmentDialog = action.show
+                    )
+                }
+            }
+
+            is LiteracyAction.OnShowPrematureEndAssessmentDialogChange -> {
+                _state.update {
+                    it.copy(
+                        showPrematureEndAssessmentDialog = action.show
+                    )
+                }
+            }
+
+            LiteracyAction.OnEndAssessment -> {
+                endAssessment()
+            }
+
+
         }
     }
 
     private fun evaluateReadingAssessmentWithWorkManager(
         assessmentId: String?,
         studentId: String?,
-        audioByteArray: ByteArray?,
         audioFilePath: String?,
         content: String,
         type: String,
+        round: Int,
         onSuccess: () -> Unit
     ){
 
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
 
-            if (assessmentId.isNullOrEmpty() || studentId.isNullOrEmpty() || audioFilePath.isNullOrEmpty() || audioByteArray == null) {
+            if (assessmentId.isNullOrEmpty() || studentId.isNullOrEmpty() || audioFilePath.isNullOrEmpty()) {
                 _state.update {
                     it.copy(
                         error = "Assessment can not be evaluated"
                     )
                 }
+                Log.d("LiteracyViewModel", "AssessmentId or StudentId or AudioFilePath is null or empty")
+                Log.d("LiteracyViewModel", "assessmentId: $assessmentId, studentId: $studentId, audioFilePath: $audioFilePath")
                 return@launch
             }
 
@@ -179,11 +202,13 @@ class LiteracyViewModel(
                 "content" to content,
                 "type" to type,
                 "assessment_id" to assessmentId,
-                "student_id" to studentId
+                "student_id" to studentId,
+                "round" to round
             )
 
             val constraints = Constraints.Builder()
                 .setRequiredNetworkType(NetworkType.CONNECTED)
+                .setRequiresStorageNotLow(true)
                 .build()
 
             val tag = "assessment_${assessmentId}_${studentId}"
@@ -196,17 +221,25 @@ class LiteracyViewModel(
 
             val uniqueWorkName = "reading_assessment_${assessmentId}_${studentId}_${contentHash}_${System.currentTimeMillis()}"
 
-            WorkManager.getInstance(appContext)
+            workManager
                 .enqueueUniqueWork(
                     uniqueWorkName = uniqueWorkName,
                     ExistingWorkPolicy.REPLACE,
                     request = request
                 )
 
+            localDataSource.insertLiteracyAssessmentWorkerRequest(
+                assessmentId = assessmentId,
+                studentId = studentId,
+                requestId = request.id.toString(),
+                type = "reading_assessment"
+            )
+
+            delay(1000)
+
             _state.update {
                 it.copy(
                     isLoading = false,
-                    message = "Assessment content submitted for evaluation"
                 )
             }
 
@@ -230,25 +263,25 @@ class LiteracyViewModel(
     }
 
     fun onSubmitReadingAssessment(){
-
         val currentAssessmentContentList =when(_state.value.currentAssessmentLevel){
-            LiteracyAssessmentLevel.LETTER_RECOGNITION -> _state.value.assessmentContent?.letters ?: emptyList()
-            LiteracyAssessmentLevel.WORD -> _state.value.assessmentContent?.words ?: emptyList()
-            LiteracyAssessmentLevel.PARAGRAPH -> _state.value.assessmentContent?.paragraphs
-            LiteracyAssessmentLevel.STORY -> _state.value.assessmentContent?.storys[0]?.split(".") ?: emptyList()
+            LiteracyAssessmentLevel.LETTER_RECOGNITION -> _state.value.assessmentContent?.letters?.take(5) ?: emptyList()
+            LiteracyAssessmentLevel.WORD -> _state.value.assessmentContent?.words?.take(5) ?: emptyList()
+            LiteracyAssessmentLevel.PARAGRAPH -> listOf(_state.value.assessmentContent?.paragraphs?.get(0) ?: "")
+            LiteracyAssessmentLevel.STORY -> listOf(_state.value.assessmentContent?.storys?.get(0)?.story ?: "")
             LiteracyAssessmentLevel.MULTIPLE_CHOICE -> emptyList()
             LiteracyAssessmentLevel.COMPLETED -> emptyList()
+            LiteracyAssessmentLevel.PRE_TEST -> emptyList()
+            LiteracyAssessmentLevel.LISTENING_COMPREHENSION -> emptyList()
         }
 
         currentAssessmentContentList?.let {
-
             evaluateReadingAssessmentWithWorkManager(
                 assessmentId = _state.value.assessmentId ?: return@let,
                 studentId = _state.value.studentId ?: return@let,
-                audioByteArray = _state.value.audioByteArray,
                 content = currentAssessmentContentList[_state.value.currentIndex],
                 type = _state.value.currentAssessmentLevel.label,
                 audioFilePath = _state.value.audioFilePath,
+                round = _state.value.round,
                 onSuccess = {
                     when{
                         _state.value.currentIndex == currentAssessmentContentList.size - 1 -> {
@@ -266,16 +299,21 @@ class LiteracyViewModel(
                                 it.copy(
                                     currentAssessmentLevelIndex = nextIndex,
                                     currentAssessmentLevel = nextLevel,
+                                    showInstructions = true,
                                     currentIndex = 0,
-                                    message = null
+                                    round = it.round +1,
+                                    message = null,
+                                    audioByteArray = null,
+                                    audioFilePath = null,
                                 )
                             }
                         }
+
                         else -> {
                             _state.update {
                                 it.copy(
                                     currentIndex = it.currentIndex + 1,
-                                    showInstructions = true,
+                                    round = it.round +1,
                                     showContent = false,
                                     audioByteArray = null,
                                     audioFilePath = null,
@@ -295,7 +333,6 @@ class LiteracyViewModel(
                     error = "No assessment content available."
                 )
             }
-
         }
     }
 
@@ -306,6 +343,18 @@ class LiteracyViewModel(
         correctOptions: List<String>,
         onSuccess: () -> Unit
     ){
+
+        if (assessmentId.isNullOrEmpty() || studentId.isNullOrEmpty()) {
+            _state.update {
+                it.copy(
+                    error = "Assessment can not be evaluated"
+                )
+            }
+            return
+        }
+
+
+
         viewModelScope.launch {
             if (_state.value.selectedChoice == null){
                 _state.update {
@@ -346,17 +395,25 @@ class LiteracyViewModel(
 
             val uniqueWorkName = "multiple_choices_${assessmentId}_${studentId}_${questionHash}_${System.currentTimeMillis()}"
 
-            WorkManager.getInstance(appContext)
+            workManager
                 .enqueueUniqueWork(
                     uniqueWorkName = uniqueWorkName,
                     ExistingWorkPolicy.REPLACE,
                     request = request
                 )
 
+
+            localDataSource.insertLiteracyAssessmentWorkerRequest(
+                assessmentId = assessmentId,
+                studentId = studentId,
+                requestId = request.id.toString(),
+                type = "multiple_choices"
+            )
+
             _state.update {
                 it.copy(
                     isLoading = false,
-                    message = "Assessment content submitted for evaluation"
+
                 )
             }
 
@@ -369,7 +426,7 @@ class LiteracyViewModel(
     fun onSubmitStoryAssessment() {
 
         val contentList = when(_state.value.currentAssessmentLevel){
-            LiteracyAssessmentLevel.MULTIPLE_CHOICE -> _state.value.assessmentContent?.questionsData ?: emptyList()
+            LiteracyAssessmentLevel.MULTIPLE_CHOICE -> _state.value.assessmentContent?.storys[0]?.questionsData ?: emptyList()
             else -> emptyList()
         }
 
@@ -398,6 +455,8 @@ class LiteracyViewModel(
                             else
                                 _state.value.assessmentFlow[0]
 
+
+
                             it.copy(
                                 currentAssessmentLevelIndex = nextIndex,
                                 currentAssessmentLevel = nextLevel,
@@ -405,6 +464,9 @@ class LiteracyViewModel(
                                 multipleChoiceQuestionsResult = mutableListOf()
                             )
                         }
+
+                        addCompleteAssessment()
+
                     }
 
 
@@ -423,6 +485,21 @@ class LiteracyViewModel(
     }
 
 
+    private fun addCompleteAssessment(){
+        if (_state.value.studentId.isNullOrBlank() ||_state.value.assessmentId.isNullOrBlank()){
+            return
+        }
+
+        viewModelScope.launch {
+            localDataSource.insertCompletedAssessment(
+                studentId = _state.value.studentId ?: "",
+                assessmentId = _state.value.assessmentId ?: ""
+            )
+
+        }
+    }
+
+
     private fun submitLiteracyAssessment(
         assessmentId: String,
         studentId: String,
@@ -437,30 +514,32 @@ class LiteracyViewModel(
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
 
-        val submitReadingResultsRequest = OneTimeWorkRequestBuilder<SubmitReadingAssessmentWorker>()
-            .setInputData(workData)
-            .setConstraints(constraints = constraints)
-            .build()
-
         val submitMultipleChoicesResultsRequest = OneTimeWorkRequestBuilder<SubmitMultipleChoiceResultsWorker>()
             .setInputData(workData)
             .setConstraints(constraints = constraints)
             .build()
 
-        val markLiteracyAssessmentRequest = OneTimeWorkRequestBuilder<MarkLiteracyAssessmentWorker>()
+        val markAssessmentDoneRequest = OneTimeWorkRequestBuilder<MarkAssessmentDoneWorker>()
             .setInputData(workData)
-            .setConstraints(constraints = constraints)
             .build()
 
-        WorkManager.getInstance(appContext)
+        workManager
             .beginUniqueWork(
                 uniqueWorkName ="complete_assessment_${assessmentId}_${studentId}",
                  existingWorkPolicy =  ExistingWorkPolicy.REPLACE,
-                request = submitReadingResultsRequest
+                request = markAssessmentDoneRequest
             )
             .then(submitMultipleChoicesResultsRequest)
-            .then(markLiteracyAssessmentRequest)
             .enqueue()
+    }
+
+
+    private fun endAssessment(){
+        _state.update {
+            it.copy(
+                currentAssessmentLevel = LiteracyAssessmentLevel.COMPLETED
+            )
+        }
     }
 
 }

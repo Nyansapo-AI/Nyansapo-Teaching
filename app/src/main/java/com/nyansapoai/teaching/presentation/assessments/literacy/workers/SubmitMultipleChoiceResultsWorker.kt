@@ -24,7 +24,7 @@ class SubmitMultipleChoiceResultsWorker(
         val studentId = inputData.getString("student_id")
 
         if (assessmentId.isNullOrEmpty() || studentId.isNullOrEmpty()) {
-            Log.e("SubmitMCResultsWorker", "Missing assessmentId or studentId")
+            Log.e(WORK_NAME, "Missing assessmentId or studentId")
             return Result.failure()
         }
 
@@ -35,7 +35,7 @@ class SubmitMultipleChoiceResultsWorker(
             ).first()
 
             if (pending.isEmpty()) {
-                Log.i("SubmitMCResultsWorker", "No pending results to submit")
+                Log.i(WORK_NAME, "No pending results to submit")
                 return Result.success()
             }
 
@@ -61,24 +61,29 @@ class SubmitMultipleChoiceResultsWorker(
                                 assessmentId = groupAssessmentId,
                                 studentId = groupStudentId
                             )
+
                             true
                         }
                         ResultStatus.ERROR -> {
-                            Log.e("SubmitMCResultsWorker", "Submission failed for $groupAssessmentId/$groupStudentId: ${response.message}")
+                            Log.e(WORK_NAME, "Submission failed for $groupAssessmentId/$groupStudentId: ${response.message}")
                             false
                         }
                         else -> true
                     }
                 } catch (e: Exception) {
-                    Log.e("SubmitMCResultsWorker", "Exception for $groupAssessmentId/$groupStudentId", e)
+                    Log.e(WORK_NAME, "Exception for $groupAssessmentId/$groupStudentId", e)
                     false
                 }
             }
 
-            if (allSucceeded) Result.success() else Result.retry()
+            if (allSucceeded) Result.success() else Result.failure()
         } catch (e: Exception) {
-            Log.e("SubmitMCResultsWorker", "Exception in doWork", e)
+            Log.e(WORK_NAME, "Exception in doWork", e)
             Result.failure()
         }
+    }
+    companion object {
+        const val WORK_NAME = "SubmitMultipleChoiceResultsWorker"
+        const val MAX_RETRIES = 4
     }
 }

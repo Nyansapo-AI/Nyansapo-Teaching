@@ -1,5 +1,6 @@
 package com.nyansapoai.teaching.presentation.assessments.literacy.components
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -25,9 +26,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.nyansapoai.teaching.R
 import com.nyansapoai.teaching.domain.models.assessments.literacy.MultipleChoices
 import com.nyansapoai.teaching.domain.models.assessments.literacy.QuestionData
+import com.nyansapoai.teaching.presentation.common.audio.AppLocalAudioPlayer
 import com.nyansapoai.teaching.presentation.common.components.AppLinearProgressIndicator
+import com.nyansapoai.teaching.presentation.common.components.AppShowInstructions
 
 @Composable
 fun MultichoiceQuestionsUI(
@@ -38,7 +42,8 @@ fun MultichoiceQuestionsUI(
     selectedChoice: String?,
     onSelectedChoiceChange: (String) -> Unit,
     onSetOptionsList: (List<String>) -> Unit,
-    onSubmitMultipleChoices: () -> Unit
+    onSubmitMultipleChoices: () -> Unit,
+    audioInstruction: Int = R.raw.answer_the_following_questions,
 ) {
 
 
@@ -46,11 +51,25 @@ fun MultichoiceQuestionsUI(
         Text(
             text = "Questions are not available.",
             style = MaterialTheme.typography.titleMedium,
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .fillMaxSize()
         )
-
         return
     }
+
+    if (currentIndex >= questionsList.size){
+        Text(
+            text = "No more questions available.",
+            style = MaterialTheme.typography.titleMedium,
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .fillMaxSize()
+        )
+        return
+    }
+
+
 
     var progress by remember {
         mutableFloatStateOf(0f)
@@ -59,6 +78,10 @@ fun MultichoiceQuestionsUI(
     var showStory by remember { mutableStateOf(false) }
 
     val choiceList = remember(currentIndex) {
+        if (currentIndex >= questionsList.size) {
+            return@remember emptyList<String>()
+        }
+
         (listOf(questionsList[currentIndex].multipleChoices.correctChoices.random()) +
                 questionsList[currentIndex].multipleChoices.wrongChoices.shuffled().take(2)).shuffled()
     }
@@ -75,6 +98,25 @@ fun MultichoiceQuestionsUI(
         onSetOptionsList(choiceList)
     }
 
+    var playQuestionAudio by remember(currentIndex) {
+        mutableStateOf(true)
+    }
+
+    var playInstructions by remember {
+        mutableStateOf(true)
+    }
+
+    AnimatedVisibility(
+        visible = playQuestionAudio && !playInstructions,
+    ) {
+        AppLocalAudioPlayer(
+            audio = questionsList[currentIndex].audio,
+            hasFinishedPlaying = { hasCompleted ->
+                playQuestionAudio = !hasCompleted
+            }
+        )
+    }
+
 
     when(showStory){
         true -> {
@@ -88,7 +130,6 @@ fun MultichoiceQuestionsUI(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(60.dp),
                 modifier = modifier
-//                    .fillMaxSize()
                     .widthIn(max = 600.dp)
                     .padding(16.dp),
             ) {
@@ -96,7 +137,8 @@ fun MultichoiceQuestionsUI(
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                     modifier = Modifier
                         .fillMaxWidth()
-                ) {
+                )
+                {
 
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
@@ -116,7 +158,6 @@ fun MultichoiceQuestionsUI(
                                 containerColor = MaterialTheme.colorScheme.tertiary,
                                 contentColor = MaterialTheme.colorScheme.onBackground
                             ),
-//                            shape = RoundedCornerShape(10),
                             onClick = {
                                 showStory = !showStory
                             }
@@ -145,18 +186,29 @@ fun MultichoiceQuestionsUI(
 
                 }
 
-                MultichoiceQuestionItemUI(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .align(Alignment.CenterHorizontally),
-                    question = questionsList[currentIndex].question,
-                    choices = choiceList,
-                    selectedChoice = selectedChoice,
-                    canSubmit = selectedChoice != null,
-                    onChoiceSelected = { choice -> onSelectedChoiceChange(choice) },
-                    onSubmit = onSubmitMultipleChoices
+                AppShowInstructions(
+                    showInstructions = playInstructions,
+                    instructionsTitle = "Answer Questions",
+                    instructionsDescription = "Answer the following questions based on the story",
+                    instructionAudio = audioInstruction,
+                    onChangeShow = { },
+                    hasCompletedPlaying = { hasCompleted ->
+                        playInstructions = !hasCompleted
+                    },
+                    content = {
+                        MultichoiceQuestionItemUI(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .align(Alignment.CenterHorizontally),
+                            question = questionsList[currentIndex].question,
+                            choices = choiceList,
+                            selectedChoice = selectedChoice,
+                            canSubmit = selectedChoice != null,
+                            onChoiceSelected = { choice -> onSelectedChoiceChange(choice) },
+                            onSubmit = onSubmitMultipleChoices
+                        )
+                    }
                 )
-
             }
 
         }

@@ -24,13 +24,14 @@ fun HasCompletedAssessment(modifier: Modifier = Modifier) {
 
 
     Box(
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
+        modifier = modifier
     ) {
 
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(12.dp),
-            modifier = modifier
+            modifier = Modifier
                 .widthIn(max = 600.dp)
         ) {
             Text(
@@ -39,7 +40,7 @@ fun HasCompletedAssessment(modifier: Modifier = Modifier) {
                 fontWeight = FontWeight.ExtraBold,
                 color = MaterialTheme.colorScheme.secondary,
                 textAlign = TextAlign.Center,
-                modifier = modifier,
+                modifier = Modifier,
             )
 
             Text(
@@ -47,7 +48,7 @@ fun HasCompletedAssessment(modifier: Modifier = Modifier) {
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Medium,
                 textAlign = TextAlign.Center,
-                modifier = modifier,
+                modifier = Modifier,
             )
         }
 

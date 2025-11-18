@@ -1,27 +1,33 @@
 package com.nyansapoai.teaching.data.remote.assessment
 
 import com.nyansapoai.teaching.domain.models.assessments.Assessment
-import com.nyansapoai.teaching.domain.models.assessments.AssignedStudent
+import com.nyansapoai.teaching.domain.models.assessments.CompletedAssessment
+import com.nyansapoai.teaching.domain.models.assessments.literacy.LiteracyAssessmentResults
 import com.nyansapoai.teaching.domain.models.assessments.literacy.MultipleChoicesResult
 import com.nyansapoai.teaching.domain.models.assessments.literacy.ReadingAssessmentResult
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.CountMatch
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyArithmeticOperation
+import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyAssessmentResults
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyWordProblem
+import com.nyansapoai.teaching.domain.models.students.NyansapoStudent
 import com.nyansapoai.teaching.utils.Results
 import kotlinx.coroutines.flow.Flow
 
-interface AssessmentRepository {
+interface  AssessmentRepository {
     suspend fun createAssessment(
         name: String,
         type: String,
         startLevel: String,
         assessmentNumber: Int,
-        assignedStudents: List<AssignedStudent>
+        assignedStudents: List<NyansapoStudent>,
+        schoolId: String = "",
+        organizationId: String = "",
+        projectId: String = ""
     ): Results<Unit>
 
-    suspend fun getAssessments(): Flow<List<Assessment>>
+    suspend fun getAssessments(schoolId: String = ""): Flow<List<Assessment>>
 
-    suspend fun getAssessmentById(assessmentId: String): Flow<Results<Assessment>>
+    fun getAssessmentById(assessmentId: String): Flow<Results<Assessment>>
 
     suspend fun assessNumeracyCountAndMatch(
         assessmentId: String,
@@ -46,7 +52,7 @@ interface AssessmentRepository {
     suspend fun assessNumeracyWordProblem(
         assessmentId: String,
         studentID: String,
-        wordProblem: NumeracyWordProblem
+        wordProblemList: List<NumeracyWordProblem>
     ): Results<String>
 
 
@@ -56,6 +62,12 @@ interface AssessmentRepository {
         readingAssessmentResults: List<ReadingAssessmentResult>
     ): Results<String>
 
+    suspend fun addReadingAssessmentResult(
+        assessmentId: String,
+        studentID: String,
+        readingAssessment: ReadingAssessmentResult
+    ): Results<String>
+
     suspend fun assessMultipleChoiceQuestions(
         assessmentId: String,
         studentID: String,
@@ -63,4 +75,12 @@ interface AssessmentRepository {
     ): Results<String>
 
     suspend fun markLiteracyAssessmentAsComplete(assessmentId: String, studentId: String): Results<String>
+
+    fun getCompletedAssessments(assessmentId: String): Flow<Results<List<CompletedAssessment>>>
+
+    fun fetchLiteracyAssessmentResults(assessmentId: String, studentId: String): Flow<Results<LiteracyAssessmentResults>>
+
+    suspend fun markAssessmentDone(assessmentId: String, studentId: String): Results<String>
+
+    fun fetchNumeracyAssessmentResults(assessmentId: String, studentId: String): Flow<Results<NumeracyAssessmentResults>>
 }

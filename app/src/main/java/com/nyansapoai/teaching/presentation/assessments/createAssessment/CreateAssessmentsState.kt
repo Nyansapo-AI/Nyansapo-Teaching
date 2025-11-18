@@ -1,44 +1,25 @@
 package com.nyansapoai.teaching.presentation.assessments.createAssessment
 
-import com.nyansapoai.teaching.domain.models.assessments.AssignedStudent
+import com.nyansapoai.teaching.domain.models.assessments.numeracy.numeracyAssessmentData
+import com.nyansapoai.teaching.domain.models.assessments.literacy.literacyAssessmentContent
+import com.nyansapoai.teaching.domain.models.school.LocalSchoolInfo
+import com.nyansapoai.teaching.domain.models.students.NyansapoStudent
 
 data class CreateAssessmentsState(
     val name: String = "",
     val type: String = "",
     val startLevel: String = "",
-    val assessmentNumber: Int = 1,
-    val assignedStudents: List<AssignedStudent> = emptyList(),
+    val isManager: Boolean = false,
+    val assessmentNumber: Int = 8,
+    val error: String? = null,
+    val localSchoolInfo: LocalSchoolInfo? = null,
+    val assignedStudents: List<NyansapoStudent> = emptyList(),
+    val selectedGrade: Int? = null,
     val isTypeDropDownExpanded: Boolean = false,
     val isStartLevelDropDownExpanded: Boolean = false,
     val isAssessmentNumberDropDownExpanded: Boolean = false,
     val isStudentListDropDownExpanded: Boolean = false,
-    val studentList: List<AssignedStudent> = listOf(
-        AssignedStudent(
-            student_id = "student_1",
-            student_name = "John Doe",
-            competence = null
-        ),
-        AssignedStudent(
-            student_id = "student_2",
-            student_name = "Jane Smith",
-            competence = null
-        ),
-        AssignedStudent(
-            student_id = "student_3",
-            student_name = "Alice Johnson",
-            competence = null
-        ),
-        AssignedStudent(
-            student_id = "student_4",
-            student_name = "Bob Brown",
-            competence = null
-        ),
-        AssignedStudent(
-            student_id = "student_5",
-            student_name = "Charlie Davis",
-            competence = null
-        )
-    ),
+    val studentList: List<NyansapoStudent> = emptyList(),
     val assessmentTypeList: List<String> = listOf(
         "Numeracy",
         "Literacy",
@@ -62,7 +43,8 @@ data class CreateAssessmentsState(
     ),
 
     val selectedStartingLevel : List<String> = emptyList(),
-    val assessmentNumberList: List<Int> = listOf(1, 2, 3, 4, 5),
+//    val assessmentNumberList: List<Int> = if (type == "Numeracy") listOf(numeracyAssessmentData.numeracyAssessmentContentList.size) else listOf(literacyAssessmentContent.size),
+    val assessmentNumberList: List<Int> = if (type == "Numeracy") listOf(8) else listOf(8),
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
     val successMessage: String? = null

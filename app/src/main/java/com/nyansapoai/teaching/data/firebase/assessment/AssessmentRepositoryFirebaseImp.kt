@@ -1,19 +1,21 @@
 package com.nyansapoai.teaching.data.firebase.assessment
 
 import android.util.Log
-import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.toObject
 import com.nyansapoai.teaching.data.remote.assessment.AssessmentRepository
 import com.nyansapoai.teaching.domain.models.assessments.Assessment
-import com.nyansapoai.teaching.domain.models.assessments.AssignedStudent
+import com.nyansapoai.teaching.domain.models.assessments.CompletedAssessment
+import com.nyansapoai.teaching.domain.models.assessments.literacy.LiteracyAssessmentResults
 import com.nyansapoai.teaching.domain.models.assessments.literacy.MultipleChoicesResult
 import com.nyansapoai.teaching.domain.models.assessments.literacy.ReadingAssessmentMetadata
 import com.nyansapoai.teaching.domain.models.assessments.literacy.ReadingAssessmentResult
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.CountMatch
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyArithmeticOperation
+import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyAssessmentResults
 import com.nyansapoai.teaching.domain.models.assessments.numeracy.NumeracyWordProblem
+import com.nyansapoai.teaching.domain.models.students.NyansapoStudent
 import com.nyansapoai.teaching.utils.Results
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
@@ -23,16 +25,16 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
-import kotlin.text.set
-import kotlin.toString
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
 class AssessmentRepositoryFirebaseImp(
-    private val firebaseDb: FirebaseFirestore
+    private val firebaseDb: FirebaseFirestore,
+//    private val assessmentDocumentReference: DocumentReference
 ): AssessmentRepository {
 
     private val assessmentCollection = "assessments"
+    private val assessmentResultsCollection = "assessments-results"
 
     @OptIn(ExperimentalUuidApi::class)
     override suspend fun createAssessment(
@@ -40,9 +42,19 @@ class AssessmentRepositoryFirebaseImp(
         type: String,
         startLevel: String,
         assessmentNumber: Int,
-        assignedStudents: List<AssignedStudent>
+        assignedStudents: List<NyansapoStudent>,
+        schoolId: String,
+        organizationId: String,
+        projectId: String
     ): Results<Unit> {
         val deferred = CompletableDeferred<Results<Unit>>()
+
+
+        if (schoolId.isEmpty()){
+            deferred.complete(Results.error(msg = "School ID cannot be null or empty"))
+        }
+
+
 
         val newAssessment = Assessment(
             id = Uuid.random().toString(),
@@ -51,7 +63,10 @@ class AssessmentRepositoryFirebaseImp(
             type = type,
             start_level = startLevel,
             assessmentNumber = assessmentNumber,
-            assigned_students = assignedStudents
+            assigned_students = assignedStudents,
+            school_id = schoolId,
+            organization_id = organizationId,
+            project_id = projectId
         )
 
 
@@ -68,12 +83,16 @@ class AssessmentRepositoryFirebaseImp(
                     val resultDocRef = firebaseDb.collection(assessmentCollection)
                         .document(newAssessment.id)
                         .collection("assessments-results")
-                        .document("${newAssessment.id}_${student.student_id}")
+                        .document("${newAssessment.id}_${student.id}")
 
                     batch.set(resultDocRef, mapOf(
                         "assessmentId" to newAssessment.id,
-                        "student_id" to student.student_id,
-                        type to null
+                        "school_id" to schoolId,
+                        "student_id" to student.id,
+                        "student_name" to student.name,
+                        "student_first_name" to student.first_name,
+                        "student_last_name" to student.last_name,
+                        "student_grade" to student.grade,
                     ))
                 }
 
@@ -97,8 +116,9 @@ class AssessmentRepositoryFirebaseImp(
         }
     }
 
-    override suspend fun getAssessments(): Flow<List<Assessment>> = callbackFlow {
+    override suspend fun getAssessments(schoolId: String): Flow<List<Assessment>> = callbackFlow {
         val snapshotListener = firebaseDb.collection(assessmentCollection)
+            .whereEqualTo("school_id", schoolId)
             .addSnapshotListener { snapshot, e ->
                 if (e != null) {
                     Log.w("getAssessments", "Listen failed.", e)
@@ -119,7 +139,7 @@ class AssessmentRepositoryFirebaseImp(
         }
     }
 
-    override suspend fun getAssessmentById(assessmentId: String): Flow<Results<Assessment>> = callbackFlow {
+    override fun getAssessmentById(assessmentId: String): Flow<Results<Assessment>> = callbackFlow {
 
         val snapshotListener = firebaseDb.collection(assessmentCollection)
             .document(assessmentId)
@@ -152,22 +172,23 @@ class AssessmentRepositoryFirebaseImp(
         assessmentId: String,
         studentID: String,
         countAndMatchList: List<CountMatch>
-    ): Results<String> {
+    ): Results<String> = withContext(Dispatchers.IO) {
         val deferred = CompletableDeferred<Results<String>>()
-
-        firebaseDb.collection(assessmentCollection)
+        val docRef = firebaseDb.collection(assessmentCollection)
             .document(assessmentId)
             .collection("assessments-results")
-            .document(assessmentId+"_$studentID")
-            .set(
-                mapOf(
-                    "assessmentId" to assessmentId,
-                    "student_id" to studentID,
-                    "numeracy_results" to mapOf(
-                        "count_and_match" to countAndMatchList
-                    )
+            .document("${assessmentId}_$studentID")
+
+        docRef.set(
+            mapOf(
+                "assessmentId" to assessmentId,
+                "student_id" to studentID,
+                "numeracy_results" to mapOf(
+                    "count_and_match" to countAndMatchList
                 )
-            )
+            ),
+            SetOptions.merge()
+        )
             .addOnSuccessListener {
                 Log.d("AssessmentRepositoryFirebaseImp", "Assessment submitted count and match successfully")
                 deferred.complete(Results.success(data = "Assessment submitted successfully"))
@@ -177,11 +198,9 @@ class AssessmentRepositoryFirebaseImp(
                 deferred.complete(Results.error(msg = "Failed to submit assessment: ${it.message}"))
             }
 
-
-        return withContext(Dispatchers.IO) {
-            deferred.await()
-        }
+        deferred.await()
     }
+
 
     override suspend fun assessNumeracyNumberRecognition(
         assessmentId: String,
@@ -252,7 +271,7 @@ class AssessmentRepositoryFirebaseImp(
     override suspend fun assessNumeracyWordProblem(
         assessmentId: String,
         studentID: String,
-        wordProblem: NumeracyWordProblem
+        wordProblemList: List<NumeracyWordProblem>
     ): Results<String> {
 
         val deferred = CompletableDeferred<Results<String>>()
@@ -261,12 +280,12 @@ class AssessmentRepositoryFirebaseImp(
             .document(assessmentId)
             .collection("assessments-results")
             .document(assessmentId+"_$studentID")
-            .set(
+            .update(
                 mapOf(
                     "assessmentId" to assessmentId,
                     "student_id" to studentID,
                     "numeracy_results" to mapOf(
-                        "word_problem" to wordProblem
+                        "word_problems" to wordProblemList
                     )
                 )
             )
@@ -354,6 +373,227 @@ class AssessmentRepositoryFirebaseImp(
         }
     }
 
+    override fun getCompletedAssessments(assessmentId: String): Flow<Results<List<CompletedAssessment>>> = callbackFlow {
+        // Validate assessmentId first to prevent malformed paths
+        if (assessmentId.isBlank()) {
+            trySend(Results.error(msg = "Invalid assessment ID provided"))
+            close()
+            return@callbackFlow
+        }
+
+        try {
+            // Log the path for debugging
+            val path = "$assessmentCollection/$assessmentId/$assessmentResultsCollection"
+            Log.d("AssessmentRepo", "Fetching completed assessments from: $path")
+
+            val snapshotListener = firebaseDb.collection(assessmentCollection)
+                .document(assessmentId)
+                .collection(assessmentResultsCollection)
+                .whereEqualTo("completed_assessment", true)
+                .addSnapshotListener { snapshot, error ->
+                    if (error != null) {
+                        Log.e("AssessmentRepo", "Error fetching completed assessments: ${error.message}", error)
+                        trySend(Results.error(msg = error.message ?: "Something went wrong"))
+                        close(error)
+                        return@addSnapshotListener
+                    }
+
+                    if (snapshot != null) {
+                        val completedAssessments = snapshot.documents.mapNotNull { documentSnapshot ->
+                            try {
+                                documentSnapshot.toObject<CompletedAssessment>()
+                            } catch (e: Exception) {
+                                Log.e("AssessmentRepo", "Error parsing assessment: ${e.message}")
+                                null
+                            }
+                        }
+                        trySend(Results.success(data = completedAssessments))
+                    } else {
+                        trySend(Results.error(msg = "No assessment data found"))
+                    }
+                }
+
+            awaitClose {
+                snapshotListener.remove()
+            }
+        } catch (e: Exception) {
+            Log.e("AssessmentRepo", "Exception in getCompletedAssessments: ${e.message}", e)
+            trySend(Results.error(msg = "Error accessing assessments: ${e.message}"))
+            close(e)
+        }
+    }
+
+    override fun fetchLiteracyAssessmentResults(
+        assessmentId: String,
+        studentId: String
+    ): Flow<Results<LiteracyAssessmentResults>> {
+        return callbackFlow {
+            if (assessmentId.isBlank() || studentId.isBlank()) {
+                Log.w("AssessmentRepo", "Invalid assessment ID or student ID provided")
+                trySend(Results.error(msg = "Invalid assessment ID or student ID provided"))
+                close()
+                return@callbackFlow
+            }
+
+            try {
+                val documentId = "${assessmentId}_$studentId"
+                val path = "$assessmentCollection/$assessmentId/$assessmentResultsCollection/$documentId"
+                Log.d("AssessmentRepo", "Fetching literacy results from: $path")
+
+                val snapshotListener = firebaseDb.collection(assessmentCollection)
+                    .document(assessmentId)
+                    .collection(assessmentResultsCollection)
+                    .document(documentId)
+                    .addSnapshotListener { snapshot, error ->
+                        if (error != null) {
+                            Log.e("AssessmentRepo", "Error fetching literacy results: ${error.message}", error)
+                            trySend(Results.error(msg = error.message ?: "Something went wrong"))
+                            close(error)
+                            return@addSnapshotListener
+                        }
+
+                        if (snapshot != null && snapshot.exists()) {
+                            try {
+                                val results = snapshot.toObject<LiteracyAssessmentResults>()
+                                if (results != null) {
+                                    Log.d("AssessmentRepo", "Literacy results fetched successfully, size of reading results: ${snapshot.data}")
+                                    Log.d("AssessmentRepo", "Literacy results fetched successfully, size of multiple choice questions: ${results}")
+
+                                    trySend(Results.success(data = results))
+                                } else {
+                                    Log.w("AssessmentRepo", "No literacy assessment data found")
+
+                                    trySend(Results.error(msg = "No literacy assessment data found"))
+                                }
+                            } catch (e: Exception) {
+                                Log.e("AssessmentRepo", "Error parsing literacy results: ${e.message}", e)
+                                trySend(Results.error(msg = "Error parsing data: ${e.message}"))
+                            }
+                        } else {
+                            Log.w("AssessmentRepo", "Literacy assessment not found for ID: $documentId")
+                            trySend(Results.error(msg = "Literacy assessment not found"))
+                        }
+                    }
+
+                awaitClose {
+                    snapshotListener.remove()
+                }
+            } catch (e: Exception) {
+                Log.e("AssessmentRepo", "Exception in fetchLiteracyAssessmentResults: ${e.message}", e)
+                trySend(Results.error(msg = "Error accessing literacy results: ${e.message}"))
+                close(e)
+            }
+        }
+    }
+
+    override suspend fun markAssessmentDone(
+        assessmentId: String,
+        studentId: String
+    ): Results<String> {
+        val deferred = CompletableDeferred<Results<String>>()
+
+        firebaseDb.collection(assessmentCollection)
+            .document(assessmentId)
+            .get()
+            .addOnSuccessListener { documentSnapshot ->
+                if (documentSnapshot.exists()) {
+                    val assessment = documentSnapshot.toObject<Assessment>()
+                    assessment?.let {
+                        // Update assigned_students list with has_done=true for the specific student
+                        val updatedStudents = it.assigned_students.map { student ->
+                            if (student.id == studentId) {
+                                // Create updated student with has_done=true
+                                student.copy(has_done = true)
+                            } else {
+                                student
+                            }
+                        }
+
+                        // Update the document with the modified student list
+                        firebaseDb.collection(assessmentCollection)
+                            .document(assessmentId)
+                            .update("assigned_students", updatedStudents)
+                            .addOnSuccessListener {
+                                deferred.complete(Results.success(data = "Assessment marked as done"))
+                            }
+                            .addOnFailureListener { e ->
+                                deferred.complete(Results.error(msg = "Failed to mark assessment as done: ${e.message}"))
+                            }
+                    } ?: deferred.complete(Results.error(msg = "Assessment not found"))
+                } else {
+                    deferred.complete(Results.error(msg = "Assessment not found"))
+                }
+            }
+            .addOnFailureListener { e ->
+                deferred.complete(Results.error(msg = "Failed to retrieve assessment: ${e.message}"))
+            }
+
+        return withContext(Dispatchers.IO) {
+            deferred.await()
+        }
+    }
+
+    override fun fetchNumeracyAssessmentResults(
+        assessmentId: String,
+        studentId: String
+    ): Flow<Results<NumeracyAssessmentResults>> {
+        return callbackFlow {
+            if (assessmentId.isBlank() || studentId.isBlank()) {
+                Log.w("AssessmentRepo", "Invalid assessment ID or student ID provided")
+                trySend(Results.error(msg = "Invalid assessment ID or student ID provided"))
+                close()
+                return@callbackFlow
+            }
+
+            try {
+                val documentId = "${assessmentId}_$studentId"
+
+                val snapshotListener = firebaseDb.collection(assessmentCollection)
+                    .document(assessmentId)
+                    .collection(assessmentResultsCollection)
+                    .document(documentId)
+                    .addSnapshotListener { snapshot, error ->
+                        if (error != null) {
+                            Log.e("AssessmentRepo", "Error fetching numeracy results: ${error.message}", error)
+                            trySend(Results.error(msg = error.message ?: "Something went wrong"))
+                            close(error)
+                            return@addSnapshotListener
+                        }
+
+                        if (snapshot != null && snapshot.exists()) {
+                            try {
+                                val results = snapshot.toObject<NumeracyAssessmentResults>()
+                                if (results != null) {
+                                    Log.d("AssessmentRepo", "numeracy results fetched successfully, numeracy result: ${results}")
+
+                                    trySend(Results.success(data = results))
+
+                                } else {
+                                    Log.w("AssessmentRepo", "No numeracy assessment data found")
+
+                                    trySend(Results.error(msg = "No numeracy assessment data found"))
+                                }
+                            } catch (e: Exception) {
+                                Log.e("AssessmentRepo", "Error parsing numeracy results: ${e.message}", e)
+                                trySend(Results.error(msg = "Error parsing data: ${e.message}"))
+                            }
+                        } else {
+                            Log.w("AssessmentRepo", "numeracy assessment not found for ID: $documentId")
+                            trySend(Results.error(msg = "numeracy assessment not found"))
+                        }
+                    }
+
+                awaitClose {
+                    snapshotListener.remove()
+                }
+
+            }catch (e: Exception){
+                trySend(Results.error(msg = "Error accessing literacy results: ${e.message}"))
+                close(e)
+            }
+        }
+    }
+
     override suspend fun assessReadingAssessment(
         assessmentId: String,
         studentID: String,
@@ -408,6 +648,14 @@ class AssessmentRepositoryFirebaseImp(
         return withContext(Dispatchers.IO) {
             deferred.await()
         }
+    }
+
+    override suspend fun addReadingAssessmentResult(
+        assessmentId: String,
+        studentID: String,
+        readingAssessment: ReadingAssessmentResult
+    ): Results<String> {
+        TODO("Not yet implemented")
     }
 
     override suspend fun assessMultipleChoiceQuestions(
@@ -524,8 +772,8 @@ class AssessmentRepositoryFirebaseImp(
         val metadata = (map["metadata"] as? Map<String, Any>)?.let { metadataMap ->
             ReadingAssessmentMetadata(
                 audio_url = metadataMap["audio_url"] as? String ?: "",
-                passed = metadataMap["passed"] as? Boolean ?: false,
-                transcript = metadataMap["transcript"] as? String ?: ""
+//                passed = metadataMap["passed"] as? Boolean ?: false,
+//                transcript = metadataMap["transcript"] as? String ?: ""
             )
         }
 
@@ -535,25 +783,5 @@ class AssessmentRepositoryFirebaseImp(
             metadata = metadata
         )
     }
-
-    private fun convertReadingAssessmentResultToMap(result: ReadingAssessmentResult): Map<String, Any> {
-        val map = mutableMapOf<String, Any>(
-            "type" to result.type,
-            "content" to result.content
-        )
-
-        result.metadata?.let { metadata ->
-            map["metadata"] = mapOf(
-                "audio_url" to metadata.audio_url,
-                "passed" to metadata.passed,
-                "transcript" to metadata.transcript
-            )
-        }
-
-        return map
-    }
-
-
-
 
 }

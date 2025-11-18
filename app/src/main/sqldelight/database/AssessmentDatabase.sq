@@ -66,3 +66,144 @@ WHERE assessmentId = ? AND studentId = ?;
 clearSubmittedMultipleChoicesResults:
 DELETE FROM PendingMultipleChoicesResultEntity
 WHERE isPending = 0 AND assessmentId = ? AND studentId = ?;
+
+
+CREATE TABLE CompleteAssessmentEntity(
+    assessmentId TEXT NOT NULL,
+    studentId TEXT NOT NULL,
+    isCompleted INTEGER NOT NULL,
+    PRIMARY KEY (assessmentId, studentId)
+);
+
+insertCompleteAssessment:
+INSERT OR REPLACE INTO CompleteAssessmentEntity(assessmentId, studentId, isCompleted)
+VALUES (?, ?, ?);
+
+updateAssessmentCompletion:
+UPDATE CompleteAssessmentEntity
+SET isCompleted = ?
+WHERE assessmentId = ? AND studentId = ?;
+
+getCompletedAssessments:
+SELECT * FROM CompleteAssessmentEntity
+WHERE assessmentId = ?;
+
+getCompletedAssessmentsByAssessment:
+SELECT * FROM CompleteAssessmentEntity
+WHERE isCompleted = 1 AND assessmentId = ?;
+
+clearCompletedAssessments:
+DELETE FROM CompleteAssessmentEntity
+WHERE assessmentId = ? AND studentId = ? AND isCompleted = 1;
+
+CREATE TABLE LiteracyAssessmentWorkerRequestEntity(
+    requestId TEXT PRIMARY KEY,
+    assessmentId TEXT NOT NULL,
+    studentId TEXT NOT NULL,
+    assessmentType TEXT NOT NULL
+);
+
+insertLIteracyAssessmentWorkerRequest:
+INSERT OR REPLACE INTO LiteracyAssessmentWorkerRequestEntity(requestId, assessmentId, studentId, assessmentType)
+VALUES (?,?,?,?);
+
+getLIteracyAssessmentWorkerRequestByAssessmentIDandStudentIDandAssessmentType:
+SELECT * FROM LiteracyAssessmentWorkerRequestEntity
+WHERE assessmentId = ? AND studentId = ? AND assessmentType = ?;
+
+clearLIteracyAssessmentWorkerRequestByAssessmentIDandStudentIDandAssessmentType:
+DELETE FROM LiteracyAssessmentWorkerRequestEntity
+WHERE assessmentId = ? AND studentId = ? AND assessmentType = ?;
+
+CREATE TABLE PendingNumeracyArithmreticResultEntity(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    assessmentId TEXT NOT NULL,
+    studentId TEXT NOT NULL,
+    operationType TEXT NOT NULL,
+    operand1 INTEGER NOT NULL,
+    operand2 INTEGER NOT NULL,
+    expectedAnswer INTEGER NOT NULL,
+    answer INTEGER,
+    passed INTEGER NOT NULL,
+    workAreaImageUrl TEXT,
+    answerImageUrl TEXT,
+    isPending INTEGER NOT NULL DEFAULT 1
+
+);
+
+insertPendingNumeracyArithmeticResult:
+INSERT INTO PendingNumeracyArithmreticResultEntity(assessmentId, studentId, operationType, operand1, operand2, expectedAnswer, answer, passed, workAreaImageUrl, answerImageUrl)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+getPendingNumeracyArithmeticResults:
+SELECT * FROM PendingNumeracyArithmreticResultEntity WHERE assessmentId = ? AND studentId = ?;
+
+clearPendingNumeracyArithmeticResults:
+DELETE FROM PendingNumeracyArithmreticResultEntity
+WHERE assessmentId = ? AND studentId = ?;
+
+CREATE TABLE PendingNumeracyWordProblemResultEntity(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    assessmentId TEXT NOT NULL,
+    studentId TEXT NOT NULL,
+    question TEXT NOT NULL,
+    studentAnswer INTEGER ,
+    expectedAnswer INTEGER NOT NULL,
+    passed INTEGER NOT NULL,
+    workAreaImageUrl TEXT,
+    answerImageUrl TEXT,
+    isPending INTEGER NOT NULL DEFAULT 1
+);
+
+insertPendingNumeracyWordProblemResult:
+INSERT INTO PendingNumeracyWordProblemResultEntity(assessmentId, studentId, question, studentAnswer, expectedAnswer, passed, workAreaImageUrl, answerImageUrl)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+
+getPendingNumeracyWordProblemResults:
+SELECT * FROM PendingNumeracyWordProblemResultEntity WHERE assessmentId = ? AND studentId = ?;
+
+clearPendingNumeracyWordProblemResults:
+DELETE FROM PendingNumeracyWordProblemResultEntity
+WHERE assessmentId = ? AND studentId = ?;
+
+CREATE TABLE PendingCountAndMatchResultEntity(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    assessmentId TEXT NOT NULL,
+    studentId TEXT NOT NULL,
+    expectedNumber INTEGER NOT NULL,
+    studentAnswer INTEGER,
+    passed INTEGER NOT NULL,
+    isPending INTEGER NOT NULL DEFAULT 1
+);
+
+
+insertPendingCountAndMatchResult:
+INSERT INTO PendingCountAndMatchResultEntity(assessmentId, studentId, expectedNumber, studentAnswer, passed)
+VALUES (?, ?, ?, ?, ?);
+
+getPendingCountAndMatchResults:
+SELECT * FROM PendingCountAndMatchResultEntity WHERE assessmentId = ? AND studentId = ?;
+
+clearPendingCountAndMatchResults:
+DELETE FROM PendingCountAndMatchResultEntity
+WHERE assessmentId = ? AND studentId = ?;
+
+CREATE TABLE AssessmentProgressEntity(
+    assessmentId TEXT NOT NULL,
+    studentId TEXT NOT NULL,
+    currentIndex INTEGER NOT NULL,
+    level TEXT NOT NULL,
+    PRIMARY KEY (assessmentId, studentId)
+);
+
+insertOrUpdateAssessmentProgress:
+INSERT OR REPLACE INTO AssessmentProgressEntity(assessmentId, studentId, currentIndex, level)
+VALUES (?, ?, ?, ?);
+
+getAssessmentProgress:
+SELECT * FROM AssessmentProgressEntity
+WHERE assessmentId = ? AND studentId = ?;
+
+clearAssessmentProgress:
+DELETE FROM AssessmentProgressEntity
+WHERE assessmentId = ? AND studentId = ?;

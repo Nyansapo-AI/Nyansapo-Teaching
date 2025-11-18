@@ -3,11 +3,11 @@ package com.nyansapoai.teaching.presentation.assessments.literacy
 import com.nyansapoai.teaching.domain.models.assessments.literacy.LiteracyAssessmentData
 import com.nyansapoai.teaching.domain.models.assessments.literacy.MultipleChoicesResult
 import com.nyansapoai.teaching.domain.models.assessments.literacy.ReadingAssessmentResult
-import com.nyansapoai.teaching.domain.models.assessments.literacy.literacyAssessmentContent
 import com.nyansapoai.teaching.presentation.assessments.literacy.components.LiteracyAssessmentLevel
 
 data class LiteracyState(
     val currentIndex: Int = 0,
+    val showPrematureEndAssessmentDialog: Boolean = false,
     val showInstructions: Boolean = true,
     val title: String = "",
     val showContent: Boolean = false,
@@ -26,7 +26,7 @@ data class LiteracyState(
     val selectedChoice: String? = null,
     val options: List<String> = emptyList(),
 
-    val currentAssessmentLevel: LiteracyAssessmentLevel = LiteracyAssessmentLevel.LETTER_RECOGNITION,
+    val currentAssessmentLevel: LiteracyAssessmentLevel = LiteracyAssessmentLevel.PRE_TEST,
     val currentAssessmentLevelIndex: Int = 0,
     val assessmentContent: LiteracyAssessmentData? = null,
     val readingAssessmentResults: MutableList<ReadingAssessmentResult> = mutableListOf(),
@@ -38,8 +38,10 @@ data class LiteracyState(
         LiteracyAssessmentLevel.MULTIPLE_CHOICE,
         LiteracyAssessmentLevel.COMPLETED
     ),
+    val round: Int = 0,
 
     val multipleChoiceQuestionsResult: MutableList<MultipleChoicesResult> = mutableListOf(),
 
-    val hasCompletedAssessment: Boolean = false
+    val hasCompletedAssessment: Boolean = false,
+    val showEndAssessmentDialog: Boolean = false,
 )

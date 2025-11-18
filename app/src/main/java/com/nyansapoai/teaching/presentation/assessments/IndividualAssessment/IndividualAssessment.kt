@@ -1,23 +1,33 @@
 package com.nyansapoai.teaching.presentation.assessments.IndividualAssessment
 
+import android.widget.Toast
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -30,16 +40,26 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.nyansapoai.teaching.R
+import com.nyansapoai.teaching.domain.models.students.NyansapoStudent
 import com.nyansapoai.teaching.navController
-import com.nyansapoai.teaching.presentation.camps.LearningLevelDescription
-import com.nyansapoai.teaching.presentation.camps.components.LearningLevelItem
+import com.nyansapoai.teaching.navigation.AssessmentResultsPage
 import com.nyansapoai.teaching.presentation.common.components.AppCircularLoading
 import com.nyansapoai.teaching.navigation.ConductAssessmentPage
+import com.nyansapoai.teaching.navigation.LiteracyResultsPage
+import com.nyansapoai.teaching.presentation.assessments.IndividualAssessment.composables.AssessmentsStatUI
+import com.nyansapoai.teaching.presentation.onboarding.components.OptionsItemUI
 import com.nyansapoai.teaching.utils.ResultStatus
 import org.koin.androidx.compose.koinViewModel
+import kotlin.text.ifEmpty
 
 @Composable
 fun IndividualAssessmentRoot(
@@ -47,11 +67,6 @@ fun IndividualAssessmentRoot(
 ) {
 
     val viewModel = koinViewModel<IndividualAssessmentViewModel>()
-
-    LaunchedEffect(true) {
-        viewModel.getAssessmentById(assessmentId = assessmentId)
-    }
-
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     IndividualAssessmentScreen(
@@ -64,11 +79,33 @@ fun IndividualAssessmentRoot(
 @Composable
 fun IndividualAssessmentScreen(
     state: IndividualAssessmentState,
-    onAction: (IndividualAssessmentAction) -> Unit,
+    onAction: (IndividualAssessmentAction) -> Unit
 ) {
+
+    val context = LocalContext.current
+
+    LaunchedEffect(state.assessmentState) {
+        onAction.invoke(
+            IndividualAssessmentAction.OnGetCompletedAssessments(assessmentId = state.assessmentState.data?.id ?: "")
+        )
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
+                navigationIcon = {
+                    IconButton(
+                        onClick = {
+                            navController.popBackStack()
+                        }
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.arrow_back),
+                            tint = MaterialTheme.colorScheme.onPrimary,
+                            contentDescription = "Back",
+                        )
+                    }
+                },
                 title = {
                     Text(
                         text = state.assessmentState.data?.name ?: "Unknown Assessment",
@@ -81,8 +118,19 @@ fun IndividualAssessmentScreen(
                     titleContentColor = MaterialTheme.colorScheme.secondary
                 )
             )
-        }
+        },
+        modifier = Modifier
+            .fillMaxSize()
+            .statusBarsPadding()
+            .navigationBarsPadding()
     ) { innerPadding ->
+
+        AnimatedVisibility(
+            visible = state.isLoading
+        ) {
+            AppCircularLoading()
+        }
+
         AnimatedContent(
             targetState = state.assessmentState.status,
             transitionSpec = { fadeIn() togetherWith fadeOut() } ,
@@ -104,119 +152,96 @@ fun IndividualAssessmentScreen(
                                 .fillMaxSize()
                         ) {
                             item {
-                                state.assessmentState.data.level_distribution.let { assessmentLevelDistributions ->
-                                    if (assessmentLevelDistributions.isEmpty()){
-                                        ElevatedCard(
-                                            colors = CardDefaults.outlinedCardColors(
-                                                containerColor = MaterialTheme.colorScheme.tertiary
-                                            ),
-                                            elevation = CardDefaults.cardElevation(
-                                                defaultElevation = 12.dp
-                                            ),
-                                            modifier = Modifier
-                                                .heightIn(max = 200.dp)
-                                                .widthIn(max = 420.dp)
-                                                .padding(12.dp)
-                                        ) {
-                                            Text(
-                                                "no data available yet",
-                                                textAlign = TextAlign.Center,
-                                                style = MaterialTheme.typography.bodyMedium,
-                                                modifier = Modifier
-                                                    .fillMaxWidth()
-                                                    .padding(16.dp)
-                                            )
-                                        }
-                                        return@item
-                                    }
-
-                                    LearningLevelItem(
-                                        modifier = Modifier
-                                            .padding(12.dp)
-                                            .heightIn(min = 200.dp)
-                                            .widthIn(max = 420.dp),
-                                        levelDescription = LearningLevelDescription(state.assessmentState.data.type, totalStudents = state.assessmentState.data.assigned_students.size)
-                                    )
-
-
-                                }
-                            }
-
-                            stickyHeader {
-                                Text(
-                                    text = "Students",
-                                    style = MaterialTheme.typography.titleMedium,
+                                AssessmentsStatUI(
+                                    total = state.assessmentState.data.assigned_students.size,
+                                    completed = state.assessmentState.data.assigned_students.filter { it.has_done }.size,
                                     modifier = Modifier
-                                        .fillMaxWidth()
                                         .padding(16.dp)
                                 )
                             }
 
-                            items(items = assessment.assigned_students, key = { it.student_id }) { student ->
-                                ElevatedCard(
-                                    colors = CardDefaults.outlinedCardColors(
-                                        containerColor = MaterialTheme.colorScheme.tertiary
-                                    ),
-                                    elevation = CardDefaults.cardElevation(
-                                        defaultElevation = 12.dp
-                                    ),
+                            stickyHeader {
+                                Text(
+                                    text = "Learners",
+                                    style = MaterialTheme.typography.titleLarge,
+                                    fontWeight = FontWeight.ExtraBold,
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .widthIn(max = 420.dp)
+                                        .background(MaterialTheme.colorScheme.primary)
                                         .padding(horizontal = 12.dp)
-                                        .clickable(
-                                            onClick = {
-                                                navController.navigate(ConductAssessmentPage(
-                                                    assessmentId = assessment.id,
-                                                    studentId = student.student_id,
-                                                    assessmentType = assessment.type,
-                                                    assessmentNo = assessment.assessmentNumber
-                                                ))
+                                )
+                            }
+                            item {
+                                val grades = listOf<Int?>(null, 1, 2, 3, 4, 5,6,7,8,9)
 
-                                            }
-                                        )
+                                LazyRow(
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                                 ) {
-                                    Row(
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.SpaceBetween,
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(12.dp)
-
-                                    ) {
-                                        Text(
-                                            text = student.student_name,
-                                            style = MaterialTheme.typography.titleMedium,
-                                            modifier = Modifier
-                                        )
-
-                                        TextButton(
+                                    items(items = grades){ item ->
+                                        OptionsItemUI(
+                                            text = item?.let{"Grade $item"} ?: "All",
+                                            isSelected = item == state.selectedGrade,
                                             onClick = {
-
-                                                navController.navigate(ConductAssessmentPage(
-                                                    assessmentId = assessment.id,
-                                                    studentId = student.student_id,
-                                                    assessmentType = assessment.type,
-                                                    assessmentNo = assessment.assessmentNumber
-                                                ))
+                                                onAction.invoke(
+                                                    IndividualAssessmentAction.OnSetGrade(grade = item)
+                                                )
                                             },
-                                            colors = ButtonDefaults.textButtonColors(
-                                                contentColor = MaterialTheme.colorScheme.onBackground,
-                                            ),
-                                        ) {
-                                            Text(
-                                                text = student.competence?.let { "$it" } ?: "Assess",
-                                                style = MaterialTheme.typography.bodyMedium,
-                                                color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.7f),
-                                                modifier = Modifier
-//                                                .padding(16.dp)
-//                                                .weight(1f)
-                                            )
-
-                                        }
-
+                                            modifier = Modifier
+                                                .then(if(item == grades.first()) Modifier.padding(start = 16.dp) else Modifier)
+                                                .then(if(item == grades.last()) Modifier.padding(end = 16.dp) else Modifier)
+                                        )
                                     }
+
                                 }
+                            }
+
+
+                            item {
+                                if (state.studentsList.isEmpty()){
+                                    Text(
+                                        text = "No Student assigned",
+                                        style = MaterialTheme.typography.titleMedium,
+                                        color = MaterialTheme.colorScheme.tertiary,
+                                        fontWeight = FontWeight.Bold,
+                                        textAlign = TextAlign.Left
+                                    )
+                                }
+                                return@item
+                            }
+
+
+                            items(
+                                items = state.studentsList.sortedWith(compareBy { !it.has_done }).reversed(),
+                                key = { it.id }
+                            ) { student ->
+                                AssignedLearnersItem(
+                                    student = student,
+                                    hasDone = student.has_done || student.id in state.completedAssessments.map { it.student_id },
+                                    doneClick = {
+                                        Toast.makeText(context, "${student.first_name} ${student.last_name} has already done the assessment", Toast.LENGTH_SHORT).show()
+
+                                        navController.navigate(
+                                            AssessmentResultsPage(
+                                                assessmentId = assessment.id,
+                                                studentId = student.id,
+                                                studentName = student.first_name + " " + student.last_name,
+                                                level = student.baseline ?:"",
+                                                grade = student.grade ?: 0,
+                                                assessmentName = state.assessmentState.data.name,
+                                                assessmentType = state.assessmentState.data.type,
+                                            )
+                                        )
+                                    },
+                                    notDoneClick = {
+                                        navController.navigate(ConductAssessmentPage(
+                                            assessmentId = assessment.id,
+                                            studentId = student.id,
+                                            assessmentType = assessment.type,
+                                            assessmentNo = assessment.assessmentNumber,
+                                            studentName = student.first_name + " " + student.last_name
+                                        ))
+                                    }
+                                )
                             }
                         }
 
@@ -226,6 +251,109 @@ fun IndividualAssessmentScreen(
 
                 }
             }
+        }
+    }
+
+}
+
+
+@Composable
+fun AssignedLearnersItem(
+    modifier: Modifier = Modifier,
+    student: NyansapoStudent,
+    hasDone: Boolean,
+    doneClick: () -> Unit,
+    notDoneClick: () -> Unit,
+){
+    ElevatedCard(
+        colors = CardDefaults.outlinedCardColors(
+            containerColor = if (student.has_done) Color.Green.copy(alpha = 0.2f) else MaterialTheme.colorScheme.tertiary,
+        ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 12.dp
+        ),
+        modifier = modifier
+            .fillMaxWidth()
+            .widthIn(max = 420.dp)
+            .padding(horizontal = 12.dp)
+            .clickable(
+                onClick = {
+                    if (hasDone){
+                        doneClick()
+                        return@clickable
+                    }
+                    notDoneClick()
+                }
+            )
+            .border(
+                width = 2.dp,
+                color = if (hasDone)Color.Green else Color.Transparent,
+                shape = CardDefaults.elevatedShape
+            )
+
+    )
+    {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp)
+
+        ) {
+            Text(
+                text = student.name.ifEmpty { "${student.first_name} ${student.last_name}" },
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onBackground,
+                modifier = Modifier
+            )
+
+            TextButton(
+                onClick = {
+
+                    if (hasDone){
+                        doneClick()
+                        return@TextButton
+                    }
+                    notDoneClick()
+
+                    /*
+                    navController.navigate(
+                        LiteracyResultsPage(
+                            assessmentId = assessment.id,
+                            studentId = student.id
+                        )
+                    )*/
+
+
+                },
+                colors = ButtonDefaults.textButtonColors(
+                    contentColor = MaterialTheme.colorScheme.onBackground,
+                ),
+            ) {
+
+                if  (hasDone){
+                    Image(
+                        painter = painterResource(R.drawable.done_3_),
+                        contentDescription = "has completed the assessment",
+                        contentScale = ContentScale.Fit,
+                        modifier = Modifier
+                            .size(40.dp)
+                            .graphicsLayer(
+                                rotationZ = -0.2f
+                            )
+                    )
+                    return@TextButton
+                }
+                Text(
+                    text = "Start",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.7f),
+                    modifier = Modifier
+                )
+
+            }
+
         }
     }
 

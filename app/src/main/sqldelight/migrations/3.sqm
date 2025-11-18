@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS AssessmentProgressEntity(
+    assessmentId TEXT NOT NULL,
+    studentId TEXT NOT NULL,
+    currentIndex INTEGER NOT NULL,
+    level TEXT NOT NULL,
+    PRIMARY KEY (assessmentId, studentId)
+);
