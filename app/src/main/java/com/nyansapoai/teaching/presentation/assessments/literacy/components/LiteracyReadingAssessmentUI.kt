@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
@@ -23,12 +24,15 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.BasicAlertDialog
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -79,7 +83,9 @@ import kotlin.time.ExperimentalTime
 
 private var audioFile: File? = null
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalTime::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalTime::class,
+    ExperimentalMaterial3ExpressiveApi::class
+)
 @Composable
 fun LiteracyReadingAssessmentUI(
     modifier: Modifier = Modifier,
@@ -102,6 +108,7 @@ fun LiteracyReadingAssessmentUI(
 ) {
 
     var allPermissionsAllowed by remember { mutableStateOf(false) }
+    var listenBack by remember { mutableStateOf(false) }
 
 
     RequestAppPermissions(
@@ -259,6 +266,43 @@ fun LiteracyReadingAssessmentUI(
     }
 
 
+    /**
+     * Listen back to the audio file
+     *
+     */
+    LaunchedEffect(listenBack) {
+        when (listenBack) {
+            true -> {
+                if (!audioFilePath.isNullOrBlank()) {
+                    // If audioFilePath is an absolute path use it directly,
+                    // otherwise assume it's a filename inside context.filesDir
+                    val fileToPlay = if (File(audioFilePath).isAbsolute) {
+                        File(audioFilePath)
+                    } else {
+                        File(context.filesDir, audioFilePath)
+                    }
+
+                    if (fileToPlay.exists()) {
+                        audioPlayer.playFile(
+                           file =  fileToPlay,
+                            onCompletion = {
+                                listenBack = false
+                            }
+                        )
+                    } else {
+                        Log.w("Playback", "Audio file does not exist: ${fileToPlay.absolutePath}")
+                    }
+                } else {
+                    Log.w("Playback", "audioFilePath is null or blank, cannot play")
+                }
+            }
+            false -> {
+                audioPlayer.stop()
+            }
+        }
+    }
+
+
     DisposableEffect(Unit) {
         onDispose {
             appAudioRecorder.stop()
@@ -311,15 +355,6 @@ fun LiteracyReadingAssessmentUI(
 //                            tint = if (showInstructions) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
                         )
                     }
-                    /*
-                    Text(
-                        text = "Tap to hear instructions",
-                        style = MaterialTheme.typography.bodySmall,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier
-                    )
-
-                     */
                 }
             }
 
@@ -425,20 +460,64 @@ fun LiteracyReadingAssessmentUI(
             }
         }
 
-
-
-        AppButton(
-            enabled = audioFilePath != null,
-            onClick = onSubmit,
-            modifier = Modifier
-                .fillMaxWidth()
+        Column(
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = "Next",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
-            )
+
+            AnimatedVisibility(
+                visible = audioFilePath != null && !showContent,
+                enter = fadeIn(),
+                exit = fadeOut(
+                    animationSpec = tween(durationMillis = 250)
+                )
+            ) {
+                TextButton(
+                    enabled = audioFilePath != null && !showContent,
+                    onClick = {
+                        listenBack = !listenBack
+                    },
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = MaterialTheme.colorScheme.onPrimary,
+                        containerColor = lightPrimary
+                    )
+                )
+                {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier
+                            .padding( 8.dp)
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.volume),
+                            contentDescription = "Listen to your recording"
+                        )
+                        Text(
+                            text = "Listen",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+
+            }
+
+
+            AppButton(
+                enabled = audioFilePath != null,
+                onClick = onSubmit,
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                Text(
+                    text = "Next",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+            }
         }
+
     }
 
 }
@@ -448,7 +527,8 @@ fun LiteracyReadingAssessmentUI(
 fun PreTestReadingAssessmentUI(
     modifier: Modifier = Modifier,
     onStart: () -> Unit = { }
-) {
+)
+{
 
     val coroutineScope = rememberCoroutineScope()
 
@@ -461,7 +541,7 @@ fun PreTestReadingAssessmentUI(
 
 
 
-    val readingList  = listOf("A", "B", "Boy", "Cat")
+    val readingList  = listOf("a", "b", "boy", "cat")
 
     AnimatedContent(
         targetState = showAudioInstructions
@@ -472,7 +552,7 @@ fun PreTestReadingAssessmentUI(
                 Box(
                     modifier = modifier
                         .fillMaxSize()
-                        .widthIn(max= 420.dp)
+                        .widthIn(max = 420.dp)
                 ) {
                     AppLottieAnimations(
                         resId = R.raw.talking_boy,
@@ -488,7 +568,7 @@ fun PreTestReadingAssessmentUI(
                         fontWeight = FontWeight.SemiBold,
                         modifier = Modifier
                             .align(Alignment.CenterEnd)
-                            .padding( horizontal =16.dp)
+                            .padding(horizontal = 16.dp)
                             .widthIn(max = 180.dp)
                             .border(
                                 width = 2.dp,
