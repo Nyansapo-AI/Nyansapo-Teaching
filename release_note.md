@@ -1,3 +1,20 @@
+# Release Note: Version 1.9.5
+
+Release Date: November 19, 2025
+
+- **Enhanced audio player with pause/resume functionality and improved error handling.**
+  - Added pause and resume capabilities to the audio player, allowing users to control playback more effectively during assessments.
+  - Implemented robust null-safety checks for MediaPlayer creation to prevent crashes when audio files are invalid or missing.
+  - Added proper error handling with completion callbacks to track playback success or failure.
+  - Fixed file path resolution for audio playback to correctly handle both absolute paths and relative filenames.
+
+- **Fixed critical audio playback crash in literacy assessments.**
+  - Resolved NullPointerException in AndroidAudioPlayer when attempting to play audio files.
+  - Improved file existence validation before attempting playback.
+  - Added defensive programming practices with proper MediaPlayer lifecycle management.
+
+---
+
 # Release Note: Version 1.9.4
 
 Release Date: November 12, 2025
