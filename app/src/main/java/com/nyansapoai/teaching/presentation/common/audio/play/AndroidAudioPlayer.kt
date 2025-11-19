@@ -11,11 +11,26 @@ class AndroidAudioPlayer(
 
     private var player: MediaPlayer? = null
 
-    override fun playFile(file: File) {
-        MediaPlayer.create(context, file.toUri()).apply {
-            player = this
-            start()
+    override fun playFile(file: File, onCompletion: (Boolean) -> Unit) {
+        stop()
+
+        val media = MediaPlayer.create(context, file.toUri())
+
+        if (media == null){
+            onCompletion(true)
+            return
         }
+
+
+        player = media
+
+        media.setOnCompletionListener {
+            onCompletion(true)
+            stop()
+        }
+
+        media.start()
+
     }
 
     override fun stop() {

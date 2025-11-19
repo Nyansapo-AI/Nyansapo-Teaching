@@ -10,8 +10,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -89,37 +91,11 @@ fun ReadingStoryEvaluationUI(
 
     var audioFilePathList by remember { mutableStateOf<List<String>>(emptyList()) }
 
+    var listenBack by remember { mutableStateOf(false) }
+
 
     var isRecording by remember { mutableStateOf(false) }
 
-    /*
-    LaunchedEffect(currentIndex, showInstructions) {
-        if (!showInstructions && !isRecording) {
-            val file = File(
-                context.filesDir,
-                "audio_recording_${Clock.System.now().epochSeconds}.wav"
-            )
-            try {
-                appAudioRecorder.start(outputFile = file)
-                audioFile = file
-                isRecording = true
-            } catch (e: Exception) {
-                Log.e("AudioFile", "Failed to start recording: ${e.message}")
-            }
-        } else if (showInstructions && isRecording) {
-            try {
-                appAudioRecorder.stop()
-                isRecording = false
-                audioFile?.let {
-                    onAudioPathChange(it.absolutePath)
-                    audioFilePathList = audioFilePathList + it.absolutePath
-//                    audioFile = null
-                }
-            } catch (e: Exception) {
-                Log.e("AudioFile", "Failed to stop recording: ${e.message}")
-            }
-        }
-    }*/
 
     LaunchedEffect(isRecording) {
         if (!showInstructions && isRecording) {
@@ -158,6 +134,38 @@ fun ReadingStoryEvaluationUI(
             }
             audioFile = null
             isRecording = false
+        }
+    }
+
+    LaunchedEffect(listenBack) {
+        when(listenBack){
+            true -> {
+                if (!audioFilePath.isNullOrBlank()) {
+                    // If audioFilePath is an absolute path use it directly,
+                    // otherwise assume it's a filename inside context.filesDir
+                    val fileToPlay = if (File(audioFilePath).isAbsolute) {
+                        File(audioFilePath)
+                    } else {
+                        File(context.filesDir, audioFilePath)
+                    }
+
+                    if (fileToPlay.exists()) {
+                        audioPlayer.playFile(
+                            file = fileToPlay,
+                            onCompletion = {
+                                listenBack = false
+                            }
+                        )
+                    } else {
+                        Log.w("Playback", "Audio file does not exist: ${fileToPlay.absolutePath}")
+                    }
+                } else {
+                    Log.w("Playback", "audioFilePath is null or blank, cannot play")
+                }
+            }
+            false -> {
+                audioPlayer.stop()
+            }
         }
     }
 
@@ -261,10 +269,6 @@ fun ReadingStoryEvaluationUI(
 
     val listState = rememberLazyListState()
 
-    /*
-    LaunchedEffect(currentIndex) {
-        listState.animateScrollToItem(currentIndex)
-    } */
 
 
     Column(
@@ -302,37 +306,6 @@ fun ReadingStoryEvaluationUI(
         }
 
 
-
-
-        /*
-        TextButton(
-            colors = ButtonDefaults.textButtonColors(
-                containerColor = MaterialTheme.colorScheme.tertiary,
-                contentColor = MaterialTheme.colorScheme.onTertiary
-            ),
-            onClick = {
-                onShowInstructionsChange(!showInstructions)
-            }
-        )
-        {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                modifier = Modifier,
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.play),
-                    contentDescription = "click for instructions"
-                )
-
-                Text(
-                    text = "Instructions",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Medium
-                )
-            }
-        }*/
-
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(20.dp),
@@ -358,13 +331,48 @@ fun ReadingStoryEvaluationUI(
 
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
                         .zIndex(1f)
                         .background(androidx.compose.ui.graphics.Color.Transparent)
 
                 ) {
+
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        IconButton(
+                            enabled = audioFilePath != null && !isRecording,
+                            onClick = {
+                                listenBack = !listenBack
+                            },
+                            colors = IconButtonDefaults.iconButtonColors(
+                                contentColor = MaterialTheme.colorScheme.onPrimary,
+                                containerColor = lightPrimary
+                            ),
+                            modifier = Modifier
+                                .size(70.dp)
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.volume),
+                                contentDescription = "listen to your answer",
+                                modifier = Modifier
+                                    .size(35.dp)
+                            )
+                        }
+                        /*
+                        Text(
+                            text = "Listen",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Bold
+                        )
+
+                         */
+                    }
+
+
                     AppShowInstructions(
                         showInstructions = showInstructions,
                         instructionsTitle = instructionTitle,
@@ -396,45 +404,38 @@ fun ReadingStoryEvaluationUI(
                     }
 
 
-                    AnimatedVisibility(
-                        visible = !isRecording && audioFilePath != null,
-                        enter = slideInHorizontally(),
-                        exit = slideOutHorizontally()
-                    ) {
-                        AppShowInstructions(
-                            showInstructions = false,
-                            instructionsTitle = "Next Sentence",
-                            onChangeShow = { show -> onShowInstructionsChange(show) },
-                            index = 1,
-                            instructionAudio = R.raw.click_the_button_to_move_to_the_next_sentence,
-                            instructionsDescription = "click to move to the next sentence",
+                    AppShowInstructions(
+                        showInstructions = false,
+                        instructionsTitle = "Next Sentence",
+                        onChangeShow = { show -> onShowInstructionsChange(show) },
+                        index = 1,
+                        instructionAudio = R.raw.click_the_button_to_move_to_the_next_sentence,
+                        instructionsDescription = "click to move to the next sentence",
+                        modifier = Modifier
+                    )
+                    {
+
+                        AppButton(
+                            enabled = !isLoading && !showInstructions && !isRecording && audioFilePath != null ,
+                            onClick = {
+                                appAudioRecorder.stop()
+                                isRecording = false
+                                audioFile?.let {
+                                    onAudioPathChange(it.absolutePath)
+                                    audioFilePathList = audioFilePathList + it.absolutePath
+                                    audioFile = null
+                                    onSubmit.invoke()
+                                }
+                            },
                             modifier = Modifier
-                        )
-                        {
-
-                            AppButton(
-                                enabled = !isLoading && !showInstructions && !isRecording && audioFilePath != null ,
-                                onClick = {
-                                    appAudioRecorder.stop()
-                                    isRecording = false
-                                    audioFile?.let {
-                                        onAudioPathChange(it.absolutePath)
-                                        audioFilePathList = audioFilePathList + it.absolutePath
-                                        audioFile = null
-                                        onSubmit.invoke()
-                                    }
-                                },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                            ) {
-                                Text(
-                                    text = "Next",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.Bold
-                                )
-                            }
+                                .fillMaxWidth()
+                        ) {
+                            Text(
+                                text = "Next",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold
+                            )
                         }
-
                     }
                 }
 
@@ -478,6 +479,10 @@ fun ReadingStoryEvaluationUI(
                                     modifier = Modifier
                                         .align(Alignment.Center)
                                 )
+                            }
+
+                            item{
+                                Spacer(modifier = Modifier.height(150.dp))
                             }
                         }
 
