@@ -37,14 +37,10 @@ class MainActivity : ComponentActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-
-        // Clean up resources
-//        Utils.clearAppPrivatePicturesDir(context = this.applicationContext)
     }
 
     override fun onStop() {
         super.onStop()
-//        Utils.clearAppPrivatePicturesDir(context = this.applicationContext)
     }
 
 }
