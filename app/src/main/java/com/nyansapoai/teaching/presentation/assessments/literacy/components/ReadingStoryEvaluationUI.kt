@@ -54,6 +54,7 @@ import com.nyansapoai.teaching.presentation.common.audio.record.AppAudioRecorder
 import com.nyansapoai.teaching.presentation.common.components.AppButton
 import com.nyansapoai.teaching.presentation.common.components.AppShowInstructions
 import com.nyansapoai.teaching.presentation.common.permissions.RequestAppPermissions
+import com.nyansapoai.teaching.ui.theme.abeeZeeFont
 import com.nyansapoai.teaching.ui.theme.lightPrimary
 import org.koin.compose.koinInject
 import java.io.File
@@ -463,7 +464,7 @@ fun ReadingStoryEvaluationUI(
                             { index, it ->
                                 Text(
                                     text = it,
-                                    textAlign = TextAlign.Center,
+                                    textAlign = TextAlign.Left,
                                     style = if (index == currentIndex) {
                                         TextStyle(
                                             fontSize = 40.sp,
@@ -476,6 +477,7 @@ fun ReadingStoryEvaluationUI(
                                             color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f)
                                         )
                                     },
+                                    fontFamily = abeeZeeFont,
                                     modifier = Modifier
                                         .align(Alignment.Center)
                                 )
