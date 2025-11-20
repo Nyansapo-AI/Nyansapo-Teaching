@@ -24,9 +24,9 @@
               <option name="connection">
                 <ConnectionSetting>
                   <option name="appId" value="com.nyansapoai.teaching" />
-                  <option name="mobileSdkAppId" value="1:510141847161:android:2aa6f634dd960209c4e6a8" />
-                  <option name="projectId" value="nyansapo-ai-v2" />
-                  <option name="projectNumber" value="510141847161" />
+                  <option name="mobileSdkAppId" value="1:977929872610:android:0151277d0407a77ccf2abb" />
+                  <option name="projectId" value="nyansapoai-v2" />
+                  <option name="projectNumber" value="977929872610" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />
