@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -11,17 +12,20 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.nyansapoai.teaching.domain.models.students.NyansapoStudent
 import com.nyansapoai.teaching.presentation.common.components.AppDropDownItem
 import com.nyansapoai.teaching.presentation.onboarding.components.OptionsItemUI
+import com.nyansapoai.teaching.ui.theme.lightPrimary
 
 @Composable
 fun StudentSelectionListUI(
@@ -96,6 +100,7 @@ fun StudentSelectionListUI(
 @Composable
 fun StudentsListUI(
     modifier: Modifier = Modifier,
+    showOptions: Boolean = true,
     optionsList: List<Int?> = listOf(null, 1, 2, 3, 4, 5, 6, 7, 8, 9,) ,
     levelList: List<String?> = listOf(null,"Beginner", "Word", "Paragraph"),
     studentList: List<NyansapoStudent> = emptyList(),
@@ -113,22 +118,24 @@ fun StudentsListUI(
 
     ) {
 
-        stickyHeader{
-            LazyRow(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier
-                    .background(MaterialTheme.colorScheme.background)
+        if(showOptions){
+            stickyHeader{
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier
+                        .background(MaterialTheme.colorScheme.background)
 //                    .padding(horizontal = 12.dp)
-            ) {
-                items(levelList) { item ->
-                    OptionsItemUI(
-                        text = item ?: "All",
-                        isSelected = item == selectedLevel,
-                        onClick = { onLevelSelected(item) },
-                        modifier = Modifier
+                ) {
+                    items(levelList) { item ->
+                        OptionsItemUI(
+                            text = item ?: "All",
+                            isSelected = item == selectedLevel,
+                            onClick = { onLevelSelected(item) },
+                            modifier = Modifier
 //                            .then(if( item == levelList.last() )Modifier.padding(end = 16.dp) else Modifier)
 //                            .then(if( item == levelList.first() )Modifier.padding(end = 16.dp) else Modifier)
-                    )
+                        )
+                    }
                 }
             }
         }

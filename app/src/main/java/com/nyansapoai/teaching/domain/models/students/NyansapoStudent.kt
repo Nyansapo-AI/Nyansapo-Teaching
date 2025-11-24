@@ -1,10 +1,12 @@
 package com.nyansapoai.teaching.domain.models.students
 
+import androidx.compose.runtime.Immutable
 import com.google.firebase.firestore.IgnoreExtraProperties
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @IgnoreExtraProperties
+@Immutable
 data class NyansapoStudent(
     val id: String = "",
     val baseline: String? = null,

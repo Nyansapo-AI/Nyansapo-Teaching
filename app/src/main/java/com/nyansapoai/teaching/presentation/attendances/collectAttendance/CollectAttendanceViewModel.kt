@@ -222,52 +222,6 @@ class CollectAttendanceViewModel(
         }
     }
 
-
-    /*
-    private fun fetchStudentByAssessmentId(organizationId: String, projectId: String, schoolId: String){
-
-        if (organizationId.isEmpty() || projectId.isEmpty() || schoolId.isEmpty()) {
-            Log.w("Collect Attendance", "Invalid IDs: org=$organizationId, project=$projectId, school=$schoolId")
-            _state.update { it.copy(error = "Invalid school identifiers", isLoading = false) }
-            return
-        }
-        viewModelScope.launch(Dispatchers.IO) {
-            _state.update { it.copy(isLoading = true) }
-
-            assessmentRepository.getAssessments(schoolId = schoolId)
-                .collect {assessments ->
-                    val students = assessments
-                        .flatMap { assessment -> assessment.assigned_students }
-                        .filter { assignedStudentDto -> assignedStudentDto.isLinked || assignedStudentDto.has_done }
-                        .distinctBy { it.id }
-                        .map { studentDto -> studentDto.toNyansapoStudent() }
-
-                    if (students.isEmpty()) {
-                        Log.w("Collect Attendance", "No students found for school $schoolId")
-                        _state.update { it.copy(error = "No students found", isLoading = false) }
-                        return@collect
-                    }
-
-                    _state.update {
-                        it.copy(
-                            studentAttendanceList = students.map { student ->
-                                StudentAttendance(
-                                    id = student.id,
-                                    name = student.first_name + " " + student.last_name,
-                                    grade = student.grade,
-                                    attendance = false
-                                )
-                            }.toMutableList(),
-                            isLoading = false,
-                            error = null
-                        )
-                    }
-                }
-        }
-    }
-
-     */
-
     private fun fetchStudentByAssessmentId(organizationId: String, projectId: String, schoolId: String){
 
         if (organizationId.isEmpty() || projectId.isEmpty() || schoolId.isEmpty()) {
@@ -299,7 +253,7 @@ class CollectAttendanceViewModel(
                                 { it.id }
                             )
                         )
-                        .take(20)
+//                        .take(20)
 
                     if (students.isEmpty()) {
                         Log.w("Collect Attendance", "No students found for school $schoolId")
@@ -309,6 +263,7 @@ class CollectAttendanceViewModel(
 
                     _state.update {
                         it.copy(
+                            studentList = students,
                             studentAttendanceList = students.map { student ->
                                 StudentAttendance(
                                     id = student.id,
