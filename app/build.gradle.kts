@@ -110,7 +110,7 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-    implementation (libs.material3)
+    implementation(libs.material3)
 
     //splash screen
     implementation(libs.androidx.core.splashscreen)
@@ -135,9 +135,9 @@ dependencies {
     implementation(libs.firebase.crashlytics.ndk)
 
     //datetime
-    implementation (libs.kotlinx.datetime)
+    implementation(libs.kotlinx.datetime)
 
-    androidTestImplementation (libs.androidx.navigation.testing)
+    androidTestImplementation(libs.androidx.navigation.testing)
 
     //coil
     implementation(libs.coil.compose)
@@ -152,7 +152,7 @@ dependencies {
     implementation(libs.ktor.client.okhttp)
 
     //lottie
-    implementation (libs.lottie.compose)
+    implementation(libs.lottie.compose)
 
     // media 3
     implementation(libs.androidx.media3.exoplayer)
@@ -161,7 +161,7 @@ dependencies {
     implementation(libs.androidx.media3.ui.compose)
 
     //showcase
-    implementation (libs.introshowcaseview)
+    implementation(libs.introshowcaseview)
 
 
     //work manager

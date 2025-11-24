@@ -1,7 +1,6 @@
 package com.nyansapoai.teaching
 
 import android.app.Application
-import coil3.util.Logger
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
@@ -12,7 +11,7 @@ import org.koin.core.context.startKoin
 
 private lateinit var auth: FirebaseAuth
 
-class NyansapoTeaching: Application(){
+class NyansapoTeaching : Application() {
 
 
     override fun onCreate() {
